@@ -1,5 +1,5 @@
 <h1 align=center>LULC-GPU</h1>
 
-GPU Infrastructure for the LULC project
+<p align=center>GPU Infrastructure for the LULC project</p>
 
 ![Diagram](./docs/dia.jpeg)
