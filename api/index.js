@@ -130,8 +130,88 @@ async function server(argv, config, cb) {
         limit: '50mb'
     }));
 
-    router.post('/token', (req, res) => {
+    /**  
+     * @api {get} /api/login Session Info
+     * @apiVersion 1.0.0
+     * @apiName get
+     * @apiGroup Login
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return information about the currently logged in user
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "username": "example"
+     *       "email": "example@example.com",
+     *       "access": "admin",
+     *       "flags": {}
+     *   }
+     */
+    router.get('/login', async (req, res) => { 
+        if (req.session && req.session.auth && req.session.auth.username) {
+            return res.json({
+                username: req.session.auth.username,
+                email: req.session.auth.email,
+                access: req.session.auth.access,
+                flags: req.session.auth.flags
+            });
+        } else {
+            return res.status(401).json({
+                status: 401,
+                message: 'Invalid session'
+            });
+        }
+    });
 
+    /**
+     * @api {post} /api/login Create Session
+     * @apiVersion 1.0.0
+     * @apiName login
+     * @apiGroup Login
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Log a user into the service and create an authenticated cookie
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "username": "example"
+     *   }
+     */
+    router.post('/login', async (req, res) => {
+    });
+
+    /**  
+     * @api {get} /api/token List Tokens
+     * @apiVersion 1.0.0
+     * @apiName ListTokens
+     * @apiGroup Token
+     * @apiPermission user
+     */
+    router.get('/token', async (req, res) => { 
+    });
+
+    /**  
+     * @api {post} /api/token Create Token
+     * @apiVersion 1.0.0
+     * @apiName CreateToken
+     * @apiGroup Token
+     * @apiPermission user
+     */
+    router.post('/token', async (req, res) => {
+    });
+
+    /**
+     * @api {delete} /api/token/:id Delete Token
+     * @apiVersion 1.0.0
+     * @apiName DeleteToken
+     * @apiGroup Token
+     * @apiPermission user
+     */
+    router.delete('/token/:id', async (req, res) => {
     });
 
     /**

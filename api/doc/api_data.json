@@ -1,6 +1,56 @@
 [
   {
     "type": "get",
+    "url": "/api/login",
+    "title": "Session Info",
+    "version": "1.0.0",
+    "name": "get",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "user"
+      }
+    ],
+    "description": "<p>Return information about the currently logged in user</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "post",
+    "url": "/api/login",
+    "title": "Create Session",
+    "version": "1.0.0",
+    "name": "login",
+    "group": "Login",
+    "permission": [
+      {
+        "name": "user"
+      }
+    ],
+    "description": "<p>Log a user into the service and create an authenticated cookie</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Login"
+  },
+  {
+    "type": "get",
     "url": "/health",
     "title": "Server Healthcheck",
     "version": "1.0.0",
@@ -48,6 +98,51 @@
     },
     "filename": "./index.js",
     "groupTitle": "Server"
+  },
+  {
+    "type": "post",
+    "url": "/api/token",
+    "title": "Create Token",
+    "version": "1.0.0",
+    "name": "CreateToken",
+    "group": "Token",
+    "permission": [
+      {
+        "name": "user"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Token"
+  },
+  {
+    "type": "delete",
+    "url": "/api/token/:id",
+    "title": "Delete Token",
+    "version": "1.0.0",
+    "name": "DeleteToken",
+    "group": "Token",
+    "permission": [
+      {
+        "name": "user"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Token"
+  },
+  {
+    "type": "get",
+    "url": "/api/token",
+    "title": "List Tokens",
+    "version": "1.0.0",
+    "name": "ListTokens",
+    "group": "Token",
+    "permission": [
+      {
+        "name": "user"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Token"
   },
   {
     "type": "post",
