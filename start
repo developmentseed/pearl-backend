@@ -1,5 +1,15 @@
 #! /bin/bash
 
+set -euo pipefail
+
+if echo '\l' | psql -U postgres lulc; then
+    echo "ok - postgres lulc database exists"
+else
+    echo "
+        CREATE DATABASE lulc;
+    " | psql -U postgres
+fi
+
 # API Bootstrapping
 npm --prefix ./api/ install
 npm --prefix ./api/ run doc
