@@ -6,17 +6,24 @@
     "author": "ingalls <nick@ingalls.ca>",
     "license": "MIT",
     "scripts": {
+        "doc": "apidoc -i ./ -f index.js -e node_modules --private",
         "dev": "./index.js"
     },
     "dependencies": {
+        "apidoc": "^0.25.0",
         "body-parser": "^1.19.0",
         "connect-pg-simple": "^6.2.1",
         "express": "^4.17.1",
+        "express-jwt": "^6.0.0",
         "express-minify": "^1.0.0",
         "express-session": "^1.17.1",
         "express-validator": "^6.9.1",
         "minimist": "^1.2.5",
         "morgan": "^1.10.0",
         "pg": "^8.5.1"
-    }
+    },
+    "apidoc": {
+        "name": "OpenAddresses API",
+        "title": "OpenAddresses API"
+    }  
 }

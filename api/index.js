@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
+const jwt = require('express-jwt');
 const morgan = require('morgan');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
@@ -73,6 +74,8 @@ async function server(argv, config, cb) {
         secret: config.CookieSecret
     }));
 
+    app.use('/docs', express.static('./doc'));
+
     /**
      * @api {get} /api Get Metadata
      * @apiVersion 1.0.0
@@ -126,6 +129,71 @@ async function server(argv, config, cb) {
     router.use(bodyparser.json({
         limit: '50mb'
     }));
+
+    router.post('/token', (req, res) => {
+
+    });
+
+    /**
+     * @api {get} /api/user List Users
+     * @apiVersion 1.0.0
+     * @apiName list
+     * @apiGroup User
+     * @apiPermission admin
+     *
+     * @apiParam {Number} [limit=100] Limit number of returned runs
+     * @apiParamExample {String} ?limit
+     *     ?limit=12
+     *
+     * @apiParam {Number} [page=0] The offset based on limit to return
+     * @apiParamExample {String} ?page
+     *     ?page=0
+     *
+     * @apiParam {String} [filter=] Filter a complete or partial username/email
+     * @apiParamExample {String} ?filter
+     *     ?filter=person@example.com
+     *
+     * @apiDescription
+     *     Return a list of users that have registered with the service
+     */
+    router.get('/user', async (req, res) => {
+    });
+
+    /**
+     * @api {post} /api/user Create User
+     * @apiVersion 1.0.0
+     * @apiName Create
+     * @apiGroup User
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Create a new user
+     */
+    router.post('/user', async (req, res) => {
+    });
+
+    /**
+     * @api {get} /api/user/me Get User Session Metadata
+     * @apiVersion 1.0.0
+     * @apiName self
+     * @apiGroup User
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return basic user information about the currently authenticated user
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "username": "example"
+     *       "email": "example@example.com",
+     *       "access": "admin",
+     *       "flags": {}
+     *   }
+     */
+    router.get('/user/me', async (req, res) => {
+    });
+ 
 
     router.all('*', (req, res) => {
         return res.status(404).json({
