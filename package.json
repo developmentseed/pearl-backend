@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "test": "tape test/**.test.js"
+    },
+    "dependencies": {
+        "request": "^2.88.2",
+        "tape": "^5.1.0"
+    }
+}

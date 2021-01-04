@@ -30,7 +30,7 @@ if (require.main === module) {
     configure(argv);
 }
 
-function configure(argv, cb) {
+function configure(argv = {}, cb) {
     Config.env(argv).then((config) => {
         return server(argv, config, cb);
     }).catch((err) => {
@@ -290,4 +290,10 @@ async function server(argv, config, cb) {
         console.error(`ok - running http://localhost:${PORT}`);
     });
 
+}
+
+module.exports = {
+    server,
+    configure,
+    Config
 }
