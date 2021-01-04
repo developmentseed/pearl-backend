@@ -1,4 +1,9 @@
 {
+    "name": "lulc",
+    "version": "1.0.0",
+    "private": true,
+    "repository": "git@github.com:developmentseed/lulc-infra",
+    "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
         "test": "tape test/**.test.js"
     },

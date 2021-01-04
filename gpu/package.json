@@ -2,9 +2,9 @@
     "name": "lulc-gpu",
     "version": "1.0.0",
     "main": "index.js",
+    "private": true,
     "repository": "git@github.com:developmentseed/lulc-gpu",
     "author": "ingalls <nick@ingalls.ca>",
-    "license": "MIT",
     "scripts": {
         "dev": "./index.js"
     },
