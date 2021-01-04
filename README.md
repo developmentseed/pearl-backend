@@ -5,3 +5,9 @@
 ## Infrastructure
 
 ![Diagram](./docs/dia.jpeg)
+
+## Development
+
+```
+./start
+```
