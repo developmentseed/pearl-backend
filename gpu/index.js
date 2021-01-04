@@ -4,7 +4,7 @@ const argv = require('minimist')(process.argv, {
     boolean: ['dev']
 });
 
-const PORT = 2000;
+const PORT = 1999;
 
 if (require.main === module) {
     return server();

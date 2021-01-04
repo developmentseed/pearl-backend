@@ -1,0 +1,12 @@
+{
+    "name": "lulc-api",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "git@github.com:developmentseed/lulc-infra",
+    "author": "ingalls <nick@ingalls.ca>",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.17.1",
+        "minimist": "^1.2.5"
+    }
+}
