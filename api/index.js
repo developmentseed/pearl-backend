@@ -3,6 +3,7 @@
 'use strict';
 
 const fs = require('fs');
+const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
@@ -54,6 +55,9 @@ async function server(argv, config, cb) {
     } catch (err) {
         throw new Error(err);
     }
+
+    const auth = new (require('./lib/auth').Auth)(pool);
+    const authtoken = new (require('./lib/auth').AuthToken)(pool);
 
     app.disable('x-powered-by');
     app.use(minify());
@@ -130,7 +134,7 @@ async function server(argv, config, cb) {
         limit: '50mb'
     }));
 
-    /**  
+    /**
      * @api {get} /api/login Session Info
      * @apiVersion 1.0.0
      * @apiName get
@@ -149,7 +153,7 @@ async function server(argv, config, cb) {
      *       "flags": {}
      *   }
      */
-    router.get('/login', async (req, res) => { 
+    router.get('/login', async (req, res) => {
         if (req.session && req.session.auth && req.session.auth.username) {
             return res.json({
                 username: req.session.auth.username,
@@ -181,20 +185,41 @@ async function server(argv, config, cb) {
      *       "username": "example"
      *   }
      */
-    router.post('/login', async (req, res) => {
-    });
+    router.post(
+        '/login',
+        body('username').isEmail(),
+        body('password').isLength({ min: 7 }),
+        async (req, res) => {
+            Err.validate(req)
 
-    /**  
+            try {
+                const user = await auth.login({
+                    username: req.body.username,
+                    password: req.body.password
+                });
+
+                req.session.auth = user;
+
+                return res.json({
+                    username: user.username
+                });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {get} /api/token List Tokens
      * @apiVersion 1.0.0
      * @apiName ListTokens
      * @apiGroup Token
      * @apiPermission user
      */
-    router.get('/token', async (req, res) => { 
+    router.get('/token', async (req, res) => {
     });
 
-    /**  
+    /**
      * @api {post} /api/token Create Token
      * @apiVersion 1.0.0
      * @apiName CreateToken
@@ -273,7 +298,6 @@ async function server(argv, config, cb) {
      */
     router.get('/user/me', async (req, res) => {
     });
- 
 
     router.all('*', (req, res) => {
         return res.status(404).json({
