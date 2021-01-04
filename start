@@ -1,5 +1,7 @@
 #! /bin/bash
 
+npm --prefix ./api/ run doc
+
 npm --prefix ./api/ run dev &
 npm --prefix ./gpu/ run dev &
 

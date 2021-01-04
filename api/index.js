@@ -46,7 +46,7 @@ function configure(argv, cb) {
  */
 async function server(argv, config, cb) {
     const pool = new Pool({
-        connectionString: config.postgres
+        connectionString: config.Postgres
     });
 
     try {

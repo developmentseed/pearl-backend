@@ -23,7 +23,7 @@
         "pg": "^8.5.1"
     },
     "apidoc": {
-        "name": "OpenAddresses API",
-        "title": "OpenAddresses API"
+        "name": "Microsoft LULC API",
+        "title": "Microsoft LULC API"
     }  
 }
