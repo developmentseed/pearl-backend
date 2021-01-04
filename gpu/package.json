@@ -5,6 +5,9 @@
     "repository": "git@github.com:developmentseed/lulc-gpu",
     "author": "ingalls <nick@ingalls.ca>",
     "license": "MIT",
+    "scripts": {
+        "dev": "./index.js"
+    },
     "dependencies": {
         "express": "^4.17.1",
         "minimist": "^1.2.5",

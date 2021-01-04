@@ -1,7 +1,11 @@
+#! /usr/bin/env node
+
+'use strict';
+
 const WebSocket = require('ws');
 const express = require('express');
 const argv = require('minimist')(process.argv, {
-    boolean: ['dev']
+    boolean: ['prod']
 });
 
 const PORT = 1999;
