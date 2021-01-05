@@ -186,6 +186,8 @@ async function server(argv, config, cb) {
      * @apiDescription
      *     Log a user into the service and create an authenticated cookie
      *
+     * @apiSchema (Body) {jsonschema=./schema/login.json} apiParam
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
@@ -276,11 +278,17 @@ async function server(argv, config, cb) {
      * @apiGroup User
      * @apiPermission public
      *
+     * @apiSchema (Body) {jsonschema=./schema/user.json} apiParam
+     *
      * @apiDescription
      *     Create a new user
      */
-    router.post('/user', async (req, res) => {
-    });
+    router.post(
+        '/user',
+        validate({ body: require('./schema/user.json') }),
+        async (req, res) => {
+        }
+    );
 
     /**
      * @api {get} /api/user/me Get User Session Metadata

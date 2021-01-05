@@ -37,6 +37,26 @@ define({ "api": [
       }
     ],
     "description": "<p>Log a user into the service and create an authenticated cookie</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "examples": [
         {
@@ -156,6 +176,33 @@ define({ "api": [
         "name": "public"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "description": "<p>Create a new user</p>",
     "filename": "./index.js",
     "groupTitle": "User"

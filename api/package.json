@@ -26,5 +26,8 @@
     "apidoc": {
         "name": "Microsoft LULC API",
         "title": "Microsoft LULC API"
+    },
+    "devDependencies": {
+        "apidoc-plugin-schema": "^0.1.8"
     }
 }
