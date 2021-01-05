@@ -47,6 +47,19 @@ function configure(argv = {}, cb) {
 }
 
 /**
+ * @apiDefine admin Admin
+ *   The user must be an admin to use this endpoint
+ */
+/**
+ * @apiDefine user User
+ *   A user must be logged in to use this endpoint
+ */
+/**
+ * @apiDefine public Public
+ *   This API endpoint does not require authentication
+ */
+
+/**
  * @param {Object} argv
  * @param {Config} config
  * @param {function} cb
