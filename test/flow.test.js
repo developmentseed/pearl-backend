@@ -62,7 +62,31 @@ test('new user', (t) => {
 });
 
 test('new token', (t) => {
-    t.end();
+    request({
+        method: 'POST',
+        json: true,
+        url: 'http://localhost:2000/api/token',
+        auth: {
+            user: 'example',
+            password: 'password123'
+        },
+        body: {
+            username: 'example',
+            email: 'example@example.com',
+            password: 'password123'
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200);
+
+        t.deepEquals(body, {
+            status: 200,
+            message: 'User Created'
+        });
+
+        t.end();
+    });
 });
 
 flight.landing(test);
