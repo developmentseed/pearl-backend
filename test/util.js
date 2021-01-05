@@ -55,6 +55,8 @@ class Flight {
                 await client.query(`
                     CREATE DATABASE lulc;
                 `);
+
+                await client.end();
             } catch (err) {
                 t.error(err);
             }
@@ -67,12 +69,12 @@ class Flight {
      * @param {Tape} test tape instance to run landing action on
      */
     landing(test) {
-        test('test server landing', (t) => {
+        test('test server landing', async (t) => {
             t.ok(this.srv, 'server object returned');
             t.ok(this.pool, 'pool object returned');
 
-            this.pool.end();
-            this.srv.close();
+            await this.pool.end();
+            await this.srv.close();
 
             t.end();
         });

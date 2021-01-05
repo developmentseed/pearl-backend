@@ -67,4 +67,3 @@ test('new token', (t) => {
 
 flight.landing(test);
 
-
