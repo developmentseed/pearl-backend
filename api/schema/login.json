@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "required": [
+        "username",
+        "password"
+    ],
+    "properties": {
+        "username": {
+            "type": "number"
+        },
+        "password": {
+            "type": "string"
+        }
+    }
+}

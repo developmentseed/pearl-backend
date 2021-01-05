@@ -15,10 +15,10 @@
         "body-parser": "^1.19.0",
         "connect-pg-simple": "^6.2.1",
         "express": "^4.17.1",
+        "express-json-validator-middleware": "^2.1.1",
         "express-jwt": "^6.0.0",
         "express-minify": "^1.0.0",
         "express-session": "^1.17.1",
-        "express-validator": "^6.9.1",
         "minimist": "^1.2.5",
         "morgan": "^1.10.0",
         "pg": "^8.5.1"

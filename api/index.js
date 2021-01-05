@@ -11,7 +11,7 @@ const jwt = require('express-jwt');
 const morgan = require('morgan');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
-const { body } = require('express-validator');
+const { Validator, ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
@@ -24,6 +24,12 @@ const router = express.Router();
 const app = express();
 const { Pool } = require('pg');
 const Config = require('./lib/config');
+
+const validator = new Validator({
+    allErrors: true
+});
+
+const validate = validator.validate;
 
 const PORT = 2000;
 
@@ -188,11 +194,8 @@ async function server(argv, config, cb) {
      */
     router.post(
         '/login',
-        body('username').isEmail().normalizeEmail(),
-        body('password').isLength({ min: 7 }),
+        validate({ body: require('./schema/login.json') }),
         async (req, res) => {
-            if (Err.validate(req, res)) return;
-
             try {
                 const user = await auth.login({
                     username: req.body.username,
@@ -306,6 +309,26 @@ async function server(argv, config, cb) {
             status: 404,
             message: 'API endpoint does not exist!'
         });
+    });
+
+    router.use((err, req, res, next) => {
+        if (err instanceof ValidationError) {
+            console.error(err.validationErrors.body);
+
+            Err.respond(
+                new Err(400, null, 'validation error'),
+                res,
+                err.validationErrors.body.map((e) => {
+                    return {
+                        message: e.message
+                    };
+                })
+            );
+
+            next();
+        } else {
+            next(err);
+        }
     });
 
     const srv = app.listen(PORT, (err) => {
