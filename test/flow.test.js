@@ -61,18 +61,13 @@ test('new user', (t) => {
     });
 });
 
-test('new token', (t) => {
+test('new session', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/token',
-        auth: {
-            user: 'example',
-            password: 'password123'
-        },
+        url: 'http://localhost:2000/api/login',
         body: {
             username: 'example',
-            email: 'example@example.com',
             password: 'password123'
         }
     } , (err, res, body) => {
@@ -81,8 +76,7 @@ test('new token', (t) => {
         t.equals(res.statusCode, 200);
 
         t.deepEquals(body, {
-            status: 200,
-            message: 'User Created'
+            username: 'example'
         });
 
         t.end();
