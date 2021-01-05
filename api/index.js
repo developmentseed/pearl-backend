@@ -154,6 +154,32 @@ async function server(argv, config, cb) {
         limit: '50mb'
     }));
 
+    // Unified Auth
+    router.use(async (req, res, next) => {
+        if (req.session && req.session.auth && req.session.auth.username) {
+            req.auth = req.session.auth;
+            req.auth.type = 'session';
+        } else if (req.header('authorization')) {
+            const authorization = req.header('authorization').split(' ');
+            if (authorization[0].toLowerCase() !== 'bearer') {
+                return res.status(401).json({
+                    status: 401,
+                    message: 'Only "Bearer" authorization header is allowed'
+                });
+            }
+
+            try {
+                req.auth = await authtoken.validate(authorization[1]);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        } else {
+            req.auth = false;
+        }
+
+        return next();
+    });
+
     /**
      * @api {get} /api/login Session Info
      * @apiVersion 1.0.0
@@ -245,9 +271,33 @@ async function server(argv, config, cb) {
      * @apiName CreateToken
      * @apiGroup Token
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new API token to perform API requests with
+     *
+     * @apiSchema (Body) {jsonschema=./schema/login.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "username": "example"
+     *       "email": "example@example.com",
+     *       "access": "admin",
+     *       "flags": {}
+     *   }
      */
-    router.post('/token', async (req, res) => {
-    });
+    router.post('/token',
+        validate({ body: require('./schema/token.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_auth(req);
+
+                return res.json(await authtoken.generate(req.auth, req.body.name));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     /**
      * @api {delete} /api/token/:id Delete Token
@@ -282,6 +332,15 @@ async function server(argv, config, cb) {
      *     Return a list of users that have registered with the service
      */
     router.get('/user', async (req, res) => {
+        try {
+            await auth.is_admin(req);
+
+            const users = await auth.list(req.query);
+
+            return res.json(users);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -304,7 +363,7 @@ async function server(argv, config, cb) {
                 await auth.register(req.body);
 
                 return res.json({
-                    status: 200, 
+                    status: 200,
                     message: 'User Created'
                 });
             } catch (err) {
@@ -333,6 +392,14 @@ async function server(argv, config, cb) {
      *   }
      */
     router.get('/user/me', async (req, res) => {
+        if (req.session && req.session.auth && req.session.auth.uid) {
+            return res.json(await auth.user(req.session.auth.uid));
+        } else {
+            return res.status(401).json({
+                status: 401,
+                message: 'Invalid session'
+            });
+        }
     });
 
     router.all('*', (req, res) => {
