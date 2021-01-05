@@ -11,7 +11,7 @@ const jwt = require('express-jwt');
 const morgan = require('morgan');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
-const { body, validationResult } = require('express-validator');
+const { body } = require('express-validator');
 const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
@@ -128,8 +128,9 @@ async function server(argv, config, cb) {
 
     app.use('/api', router);
 
-    router.use(bodyparser.urlencoded({ extended: true }));
     router.use(morgan('combined'));
+    router.use(bodyparser.text());
+    router.use(bodyparser.urlencoded({ extended: true }));
     router.use(bodyparser.json({
         limit: '50mb'
     }));
@@ -187,7 +188,7 @@ async function server(argv, config, cb) {
      */
     router.post(
         '/login',
-        body('username').isEmail(),
+        body('username').isEmail().normalizeEmail(),
         body('password').isLength({ min: 7 }),
         async (req, res) => {
             Err.validate(req)
@@ -217,6 +218,7 @@ async function server(argv, config, cb) {
      * @apiPermission user
      */
     router.get('/token', async (req, res) => {
+        return res.send('HERE');
     });
 
     /**
