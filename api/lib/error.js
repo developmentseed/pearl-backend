@@ -9,13 +9,13 @@ class PublicError {
         this.safe = safe;
     }
 
-    static respond(err, res, locs = []) {
+    static respond(err, res, messages = []) {
         if (err instanceof PublicError) {
 
             res.status(err.status).json({
                 status: err.status,
                 message: err.safe,
-                locations: locs
+                messages: messages
             });
         } else {
             console.error(err);
@@ -23,7 +23,7 @@ class PublicError {
             res.status(500).json({
                 status: 500,
                 message: 'Internal Server Error',
-                locations: locs
+                messages: messages
             });
         }
     }

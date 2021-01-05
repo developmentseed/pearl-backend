@@ -40,14 +40,21 @@ test('api running', (t) => {
 test('new user', (t) => {
     request({
         method: 'POST',
-        url: 'http://localhost:2000/api/user'
+        json: true,
+        url: 'http://localhost:2000/api/user',
+        body: {
+            username: 'example',
+            email: 'example@example.com',
+            password: 'password123'
+        }
     } , (err, res, body) => {
         t.error(err, 'no error');
 
         t.equals(res.statusCode, 200);
 
         t.deepEquals(body, {
-
+            status: 200,
+            message: 'User Created'
         });
 
         t.end();

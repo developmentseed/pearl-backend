@@ -300,6 +300,16 @@ async function server(argv, config, cb) {
         '/user',
         validate({ body: require('./schema/user.json') }),
         async (req, res) => {
+            try {
+                await auth.register(req.body);
+
+                return res.json({
+                    status: 200, 
+                    message: 'User Created'
+                });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
     );
 

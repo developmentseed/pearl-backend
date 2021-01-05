@@ -5,9 +5,10 @@
         "password",
         "email"
     ],
+    "additionalProperties": false,
     "properties": {
         "username": {
-            "type": "number"
+            "type": "string"
         },
         "password": {
             "type": "string"

@@ -368,7 +368,11 @@ class Auth {
                     user.email,
                     hash
                 ], (err) => {
-                    if (err) return reject(new Err(500, err, 'Failed to create user'));
+                    if (err && err.code === '23505') {
+                        return reject(new Err(400, err, 'Cannot create duplicate user'));
+                    } else if (err) {
+                        return reject(new Err(500, err, 'Failed to create user'));
+                    }
 
                     return resolve({
                         status: 200,
