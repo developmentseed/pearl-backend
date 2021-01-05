@@ -7,7 +7,6 @@ const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
-const jwt = require('express-jwt');
 const morgan = require('morgan');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
@@ -74,7 +73,7 @@ async function server(argv, config, cb) {
     }
 
     const auth = new (require('./lib/auth').Auth)(pool);
-    const authtoken = new (require('./lib/auth').AuthToken)(pool);
+    const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
 
     app.disable('x-powered-by');
     app.use(minify());

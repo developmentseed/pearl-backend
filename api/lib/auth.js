@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
 const hash = promisify(bcrypt.hash);
+const jwt = require('jsonwebtoken');
 
 class Auth {
     constructor(pool) {
@@ -385,8 +386,9 @@ class Auth {
 }
 
 class AuthToken {
-    constructor(pool) {
+    constructor(pool, config) {
         this.pool = pool;
+        this.config = config;
     }
 
     async delete(auth, token_id) {
@@ -417,12 +419,10 @@ class AuthToken {
     }
 
     async validate(token) {
-        if (token.split('.').length !== 2 || token.split('.')[0] !== 'oa' || token.length !== 67) {
-            throw new Err(401, null, 'Invalid token');
-        }
-
         let pgres;
         try {
+            let decoded = jwt.verify(token, this.config.TokenSecret);
+
             pgres = await this.pool.query(`
                 SELECT
                     users.id AS uid,
@@ -446,6 +446,11 @@ class AuthToken {
             throw new Err(401, null, 'Invalid token');
         } else if (pgres.rows.length > 1) {
             throw new Err(401, null, 'Token collision');
+        }
+
+        // Token UID must equad DB UID
+        if (decoded.uid !== parseInt(pgres.rows[0].uid)) {
+            throw new Err(401, null, 'Invalid token');
         }
 
         return {
@@ -494,6 +499,10 @@ class AuthToken {
             throw new Err(400, null, 'Token name required');
         }
 
+        jwt.sign({
+            uid: auth.uid
+        }, this.config.TokenSecret);
+
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO users_tokens (
@@ -508,7 +517,7 @@ class AuthToken {
                     $3
                 ) RETURNING *
             `, [
-                'oa.' + (await randomBytes(32)).toString('hex'),
+                jwt,
                 auth.uid,
                 name
             ]);

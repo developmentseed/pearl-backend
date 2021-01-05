@@ -7,10 +7,15 @@ class Config {
         this.Postgres = process.env.Postgres || args.postgres || 'postgres://postgres@localhost:5432/lulc';
 
         if (args.prod && !process.env.CookieSecret) {
-            throw new Error('CookieSecret env var must be used in production environment');
+            throw new Error('CookieSecret env var must be set in production environment');
         }
 
-        this.CookieSecret = process.env.CookieSecret || 'dev-secret';
+        if (args.prod && !process.env.TokenSecret) {
+            throw new Error('TokenSecret env var must be set in production environment');
+        }
+
+        this.CookieSecret = process.env.CookieSecret || 'dev-cookie-secret';
+        this.TokenSecret = process.env.TokenSecret || 'dev-token-secret';
 
         this.Port = args.port || 2000;
 
