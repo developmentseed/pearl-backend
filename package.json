@@ -8,6 +8,7 @@
         "test": "tape test/**.test.js"
     },
     "dependencies": {
+        "pg": "^8.5.1",
         "request": "^2.88.2",
         "tape": "^5.1.0"
     }
