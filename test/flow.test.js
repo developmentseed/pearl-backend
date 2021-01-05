@@ -16,7 +16,7 @@ const flight = new Flight();
 
 flight.takeoff(test);
 
-let user;
+let session = request.jar();
 let token;
 
 test('api running', (t) => {
@@ -50,12 +50,12 @@ test('new user', (t) => {
     } , (err, res, body) => {
         t.error(err, 'no error');
 
-        t.equals(res.statusCode, 200);
+        t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(body, {
             status: 200,
             message: 'User Created'
-        });
+        }, 'expected body');
 
         t.end();
     });
@@ -66,6 +66,7 @@ test('new session', (t) => {
         method: 'POST',
         json: true,
         url: 'http://localhost:2000/api/login',
+        jar: session,
         body: {
             username: 'example',
             password: 'password123'
@@ -73,11 +74,47 @@ test('new session', (t) => {
     } , (err, res, body) => {
         t.error(err, 'no error');
 
-        t.equals(res.statusCode, 200);
+        t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(body, {
             username: 'example'
-        });
+        }, 'expected body');
+
+        t.equals(res.headers['set-cookie'].length, 1, '1 cookie is set');
+        t.equals(res.headers['set-cookie'][0].split('=')[0], 'session', 'session cookie is set');
+
+        t.end();
+    });
+});
+
+test('new token', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        jar: session,
+        url: 'http://localhost:2000/api/token',
+        body: {
+            name: 'Access Token'
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, '200 status code');
+
+        t.deepEquals(Object.keys(body), [
+            'id',
+            'name',
+            'token',
+            'created'
+        ], 'expected props');
+
+        delete body.created;
+        delete body.token;
+
+        t.deepEquals(body, {
+            id: 1,
+            name: 'Access Token'
+        }, 'expected body');
 
         t.end();
     });
