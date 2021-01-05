@@ -12,6 +12,8 @@ class Config {
 
         this.CookieSecret = process.env.CookieSecret || 'dev-secret';
 
+        this.Port = args.port || 2000;
+
         return this;
     }
 }

@@ -16,7 +16,7 @@ const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
     boolean: ['prod'],
-    string: ['postgres']
+    string: ['postgres', 'port']
 });
 
 const pgSession = require('connect-pg-simple')(session);
@@ -30,8 +30,6 @@ const validator = new Validator({
 });
 
 const validate = validator.validate;
-
-const PORT = 2000;
 
 if (require.main === module) {
     configure(argv);
@@ -429,12 +427,12 @@ async function server(argv, config, cb) {
         }
     });
 
-    const srv = app.listen(PORT, (err) => {
+    const srv = app.listen(config.Port, (err) => {
         if (err) return err;
 
         if (cb) return cb(srv, pool);
 
-        console.error(`ok - running http://localhost:${PORT}`);
+        console.error(`ok - running http://localhost:${config.Port}`);
     });
 
 }
