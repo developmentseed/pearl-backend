@@ -191,7 +191,7 @@ async function server(argv, config, cb) {
         body('username').isEmail().normalizeEmail(),
         body('password').isLength({ min: 7 }),
         async (req, res) => {
-            Err.validate(req)
+            if (Err.validate(req, res)) return;
 
             try {
                 const user = await auth.login({
