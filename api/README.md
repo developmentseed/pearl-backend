@@ -57,3 +57,7 @@ router.post(
     }
 );
 ```
+
+## Database
+
+![database diagram](./doc/db.png)
