@@ -6,6 +6,7 @@ const fs = require('fs');
 const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
+const { Param } = require('./lib/util');
 const session = require('express-session');
 const morgan = require('morgan');
 const minify = require('express-minify');
@@ -257,9 +258,23 @@ async function server(argv, config, cb) {
      * @apiName ListTokens
      * @apiGroup Token
      * @apiPermission user
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   [{
+     *       "id": 1,
+     *       "created": "<date>",
+     *       "name": "Token Name"
+     *   }]
      */
     router.get('/token', async (req, res) => {
-        return res.send('HERE');
+        try {
+            await auth.is_auth(req);
+
+            return res.json(await authtoken.list(req.auth));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -302,8 +317,24 @@ async function server(argv, config, cb) {
      * @apiName DeleteToken
      * @apiGroup Token
      * @apiPermission user
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "status": 200,
+     *       "message": "Token Deleted"
+     *   }
      */
     router.delete('/token/:id', async (req, res) => {
+        Param.int(req, res, 'id');
+
+        try {
+            await auth.is_auth(req);
+
+            return res.json(await authtoken.delete(req.auth, req.params.id));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -327,6 +358,19 @@ async function server(argv, config, cb) {
      *
      * @apiDescription
      *     Return a list of users that have registered with the service
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "users": [{
+     *           "id": 1,
+     *           "username": "example",
+     *           "email": "example@example.com",
+     *           "access": "user",
+     *           "flags": { "test_flag": true }
+     *       }]
+     *   }
      */
     router.get('/user', async (req, res) => {
         try {
@@ -351,6 +395,13 @@ async function server(argv, config, cb) {
      *
      * @apiDescription
      *     Create a new user
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "status": 200,
+     *       "message": "User Created"
+     *   }
      */
     router.post(
         '/user',
