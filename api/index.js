@@ -450,6 +450,31 @@ async function server(argv, config, cb) {
         }
     });
 
+    /**
+     * @api {get} /api/instance Create Instance
+     * @apiVersion 1.0.0
+     * @apiName self
+     * @apiGroup User
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Instruct the GPU pool to start a new model instance and return a time limited session
+     *     token for accessing the websockets GPU API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "url": "ws://<websocket-connection-url>",
+     *       "token": "websocket auth token"
+     *   }
+     */
+    router.post('/instance',
+        validate({ body: require('./schema/instance.json') }),
+        async (req, res) => {
+
+        }
+    );
+
     router.all('*', (req, res) => {
         return res.status(404).json({
             status: 404,

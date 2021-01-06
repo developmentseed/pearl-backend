@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "required": [
+        "model_id"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "model_id": {
+            "type": "integer",
+            "description": "The model id to start an instance with"
+        }
+    }
+}

@@ -120,5 +120,37 @@ test('new token', (t) => {
     });
 });
 
+test('new instance', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: 'http://localhost:2000/api/instance',
+        body: {
+            name: 'Access Token'
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, '200 status code');
+
+        t.deepEquals(Object.keys(body), [
+            'id',
+            'name',
+            'token',
+            'created'
+        ], 'expected props');
+
+        delete body.created;
+        delete body.token;
+
+        t.deepEquals(body, {
+            id: 1,
+            name: 'Access Token'
+        }, 'expected body');
+
+        t.end();
+    });
+});
+
 flight.landing(test);
 

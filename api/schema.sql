@@ -31,3 +31,14 @@ CREATE TABLE IF NOT EXISTS users_reset (
     token       TEXT
 );
 
+CREATE TABLE IF NOT EXISTS models (
+    id          BIGSERIAL PRIMARY KEY,
+    created     TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS instances (
+    id          BIGSERIAL PRIMARY KEY,
+    uid         BIGINT,
+    created     TIMESTAMP,
+    model_id    BIGINT
+);
