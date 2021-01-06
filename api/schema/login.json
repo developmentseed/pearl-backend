@@ -7,10 +7,12 @@
     "additionalProperties": false,
     "properties": {
         "username": {
-            "type": "string"
+            "type": "string",
+            "description": "username to authenticate with"
         },
         "password": {
-            "type": "string"
+            "type": "string",
+            "description": "password to authenticate with"
         }
     }
 }

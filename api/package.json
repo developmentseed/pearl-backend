@@ -25,7 +25,11 @@
     },
     "apidoc": {
         "name": "Microsoft LULC API",
-        "title": "Microsoft LULC API"
+        "title": "Microsoft LULC API",
+        "header": {
+            "title": "Authentication",
+            "filename": "API.md"
+        }
     },
     "devDependencies": {
         "apidoc-plugin-schema": "^0.1.8"

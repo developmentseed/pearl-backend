@@ -8,13 +8,16 @@
     "additionalProperties": false,
     "properties": {
         "username": {
-            "type": "string"
+            "type": "string",
+            "description": "username"
         },
         "password": {
-            "type": "string"
+            "type": "string",
+            "description": "password"
         },
         "email": {
-            "type": "string"
+            "type": "string",
+            "description": "email"
         }
     }
 }

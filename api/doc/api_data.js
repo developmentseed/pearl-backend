@@ -8,7 +8,9 @@ define({ "api": [
     "group": "Login",
     "permission": [
       {
-        "name": "user"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "description": "<p>Return information about the currently logged in user</p>",
@@ -33,7 +35,9 @@ define({ "api": [
     "group": "Login",
     "permission": [
       {
-        "name": "user"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "description": "<p>Log a user into the service and create an authenticated cookie</p>",
@@ -42,17 +46,17 @@ define({ "api": [
         "Body": [
           {
             "group": "Body",
-            "type": "Number",
+            "type": "String",
             "optional": false,
             "field": "username",
-            "description": "<p>undefined</p>"
+            "description": "<p>username to authenticate with</p>"
           },
           {
             "group": "Body",
             "type": "String",
             "optional": false,
             "field": "password",
-            "description": "<p>undefined</p>"
+            "description": "<p>password to authenticate with</p>"
           }
         ]
       }
@@ -78,7 +82,9 @@ define({ "api": [
     "group": "Server",
     "permission": [
       {
-        "name": "public"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>AWS ELB Healthcheck for the server</p>",
@@ -103,7 +109,9 @@ define({ "api": [
     "group": "Server",
     "permission": [
       {
-        "name": "public"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return basic metadata about server configuration</p>",
@@ -128,9 +136,41 @@ define({ "api": [
     "group": "Token",
     "permission": [
       {
-        "name": "user"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Create a new API token to perform API requests with</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>username to authenticate with</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>password to authenticate with</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Token"
   },
@@ -143,7 +183,9 @@ define({ "api": [
     "group": "Token",
     "permission": [
       {
-        "name": "user"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "filename": "./index.js",
@@ -158,7 +200,9 @@ define({ "api": [
     "group": "Token",
     "permission": [
       {
-        "name": "user"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "filename": "./index.js",
@@ -173,7 +217,9 @@ define({ "api": [
     "group": "User",
     "permission": [
       {
-        "name": "public"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "parameter": {
@@ -181,24 +227,24 @@ define({ "api": [
         "Body": [
           {
             "group": "Body",
-            "type": "Number",
+            "type": "String",
             "optional": false,
             "field": "username",
-            "description": "<p>undefined</p>"
+            "description": "<p>username</p>"
           },
           {
             "group": "Body",
             "type": "String",
             "optional": false,
             "field": "password",
-            "description": "<p>undefined</p>"
+            "description": "<p>password</p>"
           },
           {
             "group": "Body",
             "type": "String",
             "optional": false,
             "field": "email",
-            "description": "<p>undefined</p>"
+            "description": "<p>email</p>"
           }
         ]
       }
@@ -216,7 +262,9 @@ define({ "api": [
     "group": "User",
     "permission": [
       {
-        "name": "admin"
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
     "parameter": {
@@ -279,7 +327,9 @@ define({ "api": [
     "group": "User",
     "permission": [
       {
-        "name": "user"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "description": "<p>Return basic user information about the currently authenticated user</p>",
