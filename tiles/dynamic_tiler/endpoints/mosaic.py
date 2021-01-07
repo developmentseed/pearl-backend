@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Optional, Type
 from urllib.parse import urlencode
 
+from aiocache import cached
 from morecantile import TileMatrixSet
 from cogeo_mosaic.backends import BaseBackend, MosaicBackend
 from cogeo_mosaic.models import Info as mosaicInfo
@@ -55,7 +56,8 @@ class MosaicTilerFactory(BaseTilerFactory):
         @self.router.get(
             r"/{layer}/tiles/{z}/{x}/{y}@{scale}x.{format}", **img_endpoint_params
         )
-        def tile(
+        @cached()
+        async def tile(
             z: int = Path(..., ge=0, le=30, description="Mercator tiles's zoom level"),
             x: int = Path(..., description="Mercator tiles's column"),
             y: int = Path(..., description="Mercator tiles's row"),

@@ -2,7 +2,7 @@
 
 from setuptools import find_packages, setup
 
-inst_reqs = ["aiocache[memcached]", "titiler==0.1.0a14", "rasterio==1.2b1"]
+inst_reqs = ["aiocache[memcached]", "titiler==0.1.0a14", "rasterio==1.2b1", "ujson"]
 
 extra_reqs = {
     "test": ["pytest", "pytest-cov", "pytest-asyncio", "requests"],

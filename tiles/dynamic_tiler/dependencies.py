@@ -5,7 +5,10 @@ from dataclasses import dataclass
 
 from fastapi import HTTPException, Query
 
-from .settings import mosaic_config
+from .settings import mosaic_settings
+
+
+mosaic_config = mosaic_settings()
 
 
 @dataclass
