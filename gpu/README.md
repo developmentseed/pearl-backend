@@ -8,7 +8,7 @@
 
 ```json
 {
-    "action": "<category>:<action>"
+    "action": "<category>:<action>",
     "data": {}
 }
 ```
