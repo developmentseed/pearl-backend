@@ -1,5 +1,39 @@
 define({ "api": [
   {
+    "type": "delete",
+    "url": "/api/instance/:instance",
+    "title": "Delete Instance",
+    "version": "1.0.0",
+    "name": "CreateInstance",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "get",
+    "url": "/api/instance/:instance",
+    "title": "Get Instance",
+    "version": "1.0.0",
+    "name": "GetInstance",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
     "type": "get",
     "url": "/api/instance",
     "title": "Create Instance",
@@ -23,23 +57,6 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
-    "groupTitle": "Instance"
-  },
-  {
-    "type": "delete",
-    "url": "/api/instance/:instance",
-    "title": "Delete Instance",
-    "version": "1.0.0",
-    "name": "create",
-    "group": "Instance",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
     "filename": "./index.js",
     "groupTitle": "Instance"
   },
@@ -118,6 +135,57 @@ define({ "api": [
     "groupTitle": "Login"
   },
   {
+    "type": "post",
+    "url": "/api/model",
+    "title": "Create Model",
+    "version": "1.0.0",
+    "name": "CreateModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "delete",
+    "url": "/api/model/:modelid",
+    "title": "Delete Model",
+    "version": "1.0.0",
+    "name": "DeleteModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "get",
+    "url": "/api/model/:modelid",
+    "title": "Get Model",
+    "version": "1.0.0",
+    "name": "GetModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
     "type": "get",
     "url": "/health",
     "title": "Server Healthcheck",
@@ -170,6 +238,40 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "Server"
+  },
+  {
+    "type": "get",
+    "url": "/api/model/:modelid",
+    "title": "Get TileJson",
+    "version": "1.0.0",
+    "name": "GetJson",
+    "group": "Tile",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Tile"
+  },
+  {
+    "type": "get",
+    "url": "/api/model/:modelid",
+    "title": "Get Tile",
+    "version": "1.0.0",
+    "name": "GetTile",
+    "group": "Tile",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Tile"
   },
   {
     "type": "post",

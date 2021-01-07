@@ -475,22 +475,71 @@ async function server(argv, config, cb) {
     /**
      * @api {delete} /api/instance/:instance Delete Instance
      * @apiVersion 1.0.0
-     * @apiName create
+     * @apiName CreateInstance
      * @apiGroup Instance
      * @apiPermission user
      */
     router.delete('/instance/:instanceid', async (req, res) =>{
     });
+
+    /**
+     * @api {get} /api/instance/:instance Get Instance
+     * @apiVersion 1.0.0
+     * @apiName GetInstance
+     * @apiGroup Instance
+     * @apiPermission user
+     */
     router.get('/instance/:instanceid', async (req, res) =>{
     });
 
+    /**
+     * @api {post} /api/model Create Model
+     * @apiVersion 1.0.0
+     * @apiName CreateModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
     router.post('/model', async (req, res) = {
     });
+
+    /**
+     * @api {delete} /api/model/:modelid Delete Model
+     * @apiVersion 1.0.0
+     * @apiName DeleteModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
     router.delete('/model/:modelid', async (req, res) = {
     });
-    router.put('/model/:modelid', async (req, res) = {
-    });
+
+    /**
+     * @api {get} /api/model/:modelid Get Model
+     * @apiVersion 1.0.0
+     * @apiName GetModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
     router.get('/model/:modelid', async (req, res) = {
+    });
+
+    /**
+     * @api {get} /api/model/:modelid Get TileJson
+     * @apiVersion 1.0.0
+     * @apiName GetJson
+     * @apiGroup Tile
+     * @apiPermission user
+     */
+    router.get('/tile', async (req, res) => {
+    });
+
+    /**
+     * @api {get} /api/model/:modelid Get Tile
+     * @apiVersion 1.0.0
+     * @apiName GetTile
+     * @apiGroup Tile
+     * @apiPermission user
+     */
+    router.get('/tile/:z/:x/:y', async (req, res) => {
     });
 
     router.all('*', (req, res) => {
