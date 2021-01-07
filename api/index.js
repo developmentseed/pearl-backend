@@ -318,6 +318,9 @@ async function server(argv, config, cb) {
      * @apiGroup Token
      * @apiPermission user
      *
+     * @apiDescription
+     *     Delete an existing token
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
@@ -325,13 +328,13 @@ async function server(argv, config, cb) {
      *       "message": "Token Deleted"
      *   }
      */
-    router.delete('/token/:id', async (req, res) => {
-        Param.int(req, res, 'id');
+    router.delete('/token/:tokenid', async (req, res) => {
+        Param.int(req, res, 'tokenid');
 
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.delete(req.auth, req.params.id));
+            return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -344,17 +347,7 @@ async function server(argv, config, cb) {
      * @apiGroup User
      * @apiPermission admin
      *
-     * @apiParam {Number} [limit=100] Limit number of returned runs
-     * @apiParamExample {String} ?limit
-     *     ?limit=12
-     *
-     * @apiParam {Number} [page=0] The offset based on limit to return
-     * @apiParamExample {String} ?page
-     *     ?page=0
-     *
-     * @apiParam {String} [filter=] Filter a complete or partial username/email
-     * @apiParamExample {String} ?filter
-     *     ?filter=person@example.com
+     * @apiSchema (Query) {jsonschema=./schema/user-list.query.json} apiParam
      *
      * @apiDescription
      *     Return a list of users that have registered with the service
@@ -372,17 +365,21 @@ async function server(argv, config, cb) {
      *       }]
      *   }
      */
-    router.get('/user', async (req, res) => {
-        try {
-            await auth.is_admin(req);
+    router.get(
+        '/user',
+        validate({ query: require('./schema/user-list.query.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_admin(req);
 
-            const users = await auth.list(req.query);
+                const users = await auth.list(req.query);
 
-            return res.json(users);
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(users);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/user Create User
@@ -453,8 +450,8 @@ async function server(argv, config, cb) {
     /**
      * @api {get} /api/instance Create Instance
      * @apiVersion 1.0.0
-     * @apiName self
-     * @apiGroup User
+     * @apiName create
+     * @apiGroup Instance
      * @apiPermission user
      *
      * @apiDescription
@@ -474,6 +471,27 @@ async function server(argv, config, cb) {
 
         }
     );
+
+    /**
+     * @api {delete} /api/instance/:instance Delete Instance
+     * @apiVersion 1.0.0
+     * @apiName create
+     * @apiGroup Instance
+     * @apiPermission user
+     */
+    router.delete('/instance/:instanceid', async (req, res) =>{
+    });
+    router.get('/instance/:instanceid', async (req, res) =>{
+    });
+
+    router.post('/model', async (req, res) = {
+    });
+    router.delete('/model/:modelid', async (req, res) = {
+    });
+    router.put('/model/:modelid', async (req, res) = {
+    });
+    router.get('/model/:modelid', async (req, res) = {
+    });
 
     router.all('*', (req, res) => {
         return res.status(404).json({

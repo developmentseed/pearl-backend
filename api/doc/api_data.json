@@ -1,6 +1,50 @@
 [
   {
     "type": "get",
+    "url": "/api/instance",
+    "title": "Create Instance",
+    "version": "1.0.0",
+    "name": "create",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Instruct the GPU pool to start a new model instance and return a time limited session token for accessing the websockets GPU API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "delete",
+    "url": "/api/instance/:instance",
+    "title": "Delete Instance",
+    "version": "1.0.0",
+    "name": "create",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "get",
     "url": "/api/login",
     "title": "Session Info",
     "version": "1.0.0",
@@ -188,6 +232,7 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Delete an existing token</p>",
     "success": {
       "examples": [
         {
@@ -296,25 +341,25 @@
     ],
     "parameter": {
       "fields": {
-        "Parameter": [
+        "Query": [
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
             "description": "<p>Limit number of returned runs</p>"
           },
           {
-            "group": "Parameter",
-            "type": "Number",
+            "group": "Query",
+            "type": "Integer",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
             "description": "<p>The offset based on limit to return</p>"
           },
           {
-            "group": "Parameter",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "filter",
@@ -322,24 +367,7 @@
             "description": "<p>Filter a complete or partial username/email</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "?limit",
-          "content": "?limit=12",
-          "type": "String"
-        },
-        {
-          "title": "?page",
-          "content": "?page=0",
-          "type": "String"
-        },
-        {
-          "title": "?filter",
-          "content": "?filter=person@example.com",
-          "type": "String"
-        }
-      ]
+      }
     },
     "description": "<p>Return a list of users that have registered with the service</p>",
     "success": {
