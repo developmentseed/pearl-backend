@@ -3,25 +3,33 @@
 'use strict';
 
 const WebSocket = require('ws');
-const express = require('express');
 const argv = require('minimist')(process.argv, {
     boolean: ['prod']
 });
 
-const PORT = 1999;
+const Config = require('./lib/config');
 
 if (require.main === module) {
-    return server();
+    configure(argv);
+}
+
+function configure(argv = {}, cb) {
+    Config.env(argv).then((config) => {
+        return server(argv, config, cb);
+    }).catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
 }
 
 /**
- * @param {Object} args
+ * @param {Object} argv
  * @param {Config} config
  * @param {function} cb
  */
-async function server(args, config, cb) {
+async function server(argv, config, cb) {
     const wss = new WebSocket.Server({
-        port: PORT,
+        port: config.Port
     });
 
     wss.on('connection', (ws) => {
@@ -30,5 +38,5 @@ async function server(args, config, cb) {
         });
     });
 
-    console.error(`ok - running ws://localhost:${PORT}`);
+    console.error(`ok - running ws://localhost:${config.Port}`);
 }
