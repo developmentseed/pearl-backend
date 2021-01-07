@@ -75,6 +75,8 @@ async function server(argv, config, cb) {
 
     const auth = new (require('./lib/auth').Auth)(pool);
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
+    const model = new (require('./lib/model').Model)(pool);
+    const instance = new (require('./lib/instance').Instance)(pool, config);
 
     app.disable('x-powered-by');
     app.use(minify());
@@ -168,6 +170,7 @@ async function server(argv, config, cb) {
 
             try {
                 req.auth = await authtoken.validate(authorization[1]);
+                req.auth.type = 'token';
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -468,7 +471,13 @@ async function server(argv, config, cb) {
     router.post('/instance',
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
+            try {
+                await auth.is_auth(req);
 
+                res.json(await instance.create(req.auth, req.body.model_id));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
     );
 
@@ -489,7 +498,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission user
      */
-    router.get('/instance/:instanceid', async (req, res) =>{
+    router.get('/instance/:instanceid', async (req, res) => {
     });
 
     /**
@@ -499,7 +508,17 @@ async function server(argv, config, cb) {
      * @apiGroup Model
      * @apiPermission user
      */
-    router.post('/model', async (req, res) = {
+    router.post(
+        '/model',
+        validate({ body: require('./schema/model.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_auth(req);
+
+                res.json(await model.create(req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
     });
 
     /**
@@ -509,7 +528,9 @@ async function server(argv, config, cb) {
      * @apiGroup Model
      * @apiPermission user
      */
-    router.delete('/model/:modelid', async (req, res) = {
+    router.delete('/model/:modelid', async (req, res) => {
+        // Don't actually delete models as their may be dependant instances,
+        // but disallow new instance creation & hide from UI
     });
 
     /**
@@ -519,7 +540,14 @@ async function server(argv, config, cb) {
      * @apiGroup Model
      * @apiPermission user
      */
-    router.get('/model/:modelid', async (req, res) = {
+    router.get('/model/:modelid', async (req, res) => {
+        try {
+            await auth.is_auth(req);
+
+            res.json(await model.get(req.body));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**

@@ -26,7 +26,7 @@ class Model {
         }
 
         return {
-            id: pgres.rows[0].id,
+            id: parseInt(pgres.rows[0].id),
             created: pgres.rows[0].created
         };
     }
@@ -51,10 +51,10 @@ class Model {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        if (!pgres.rows.length) throw new Erro(404, null, 'No model found');
+        if (!pgres.rows.length) throw new Err(404, null, 'No model found');
 
         return {
-            id: pgres.rows[0].id,
+            id: parseInt(pgres.rows[0].id),
             created: pgres.rows[0].created
         };
     }

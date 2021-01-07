@@ -1,3 +1,5 @@
+'use strict';
+
 const api = require('../api/index');
 const { Client } = require('pg');
 
@@ -83,4 +85,4 @@ class Flight {
 
 module.exports = {
     Flight
-}
+};

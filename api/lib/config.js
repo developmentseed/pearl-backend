@@ -1,7 +1,5 @@
 'use strict';
 
-const pkg = require('../package.json');
-
 class Config {
     static async env(args) {
         if (args.prod && !process.env.CookieSecret) {

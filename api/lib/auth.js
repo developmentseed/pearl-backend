@@ -419,9 +419,9 @@ class AuthToken {
     }
 
     async validate(token) {
-        let pgres;
+        let pgres, decoded;
         try {
-            let decoded = jwt.verify(token, this.config.TokenSecret);
+            decoded = jwt.verify(token, this.config.TokenSecret);
 
             pgres = await this.pool.query(`
                 SELECT
