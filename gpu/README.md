@@ -2,3 +2,20 @@
 
 <p align=center>GPU Infrastructure for the LULC project</p>
 
+## API
+
+### Message Format
+
+```json
+{
+    "action": "<category>:<action>"
+    "data": {}
+}
+```
+
+### Supported Actions
+
+| Action | Notes |
+| ------ | ----- |
+| 'auth:initial' |       |
+| 'auth:extend'  |       |
