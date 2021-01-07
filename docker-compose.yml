@@ -5,8 +5,10 @@ services:
     build:
       context: ./tiles
       dockerfile: Dockerfile
+    depends_on:
+      - memcache
     ports:
-      - "8000:8000"
+    - "8000:8000"
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
@@ -23,13 +25,21 @@ services:
       - WORKERS_PER_CORE=1
       - MOSAIC_BACKEND=dynamodb://
       - MOSAIC_HOST=us-west-2/ds-mosaics-labs
+      - CACHE_ENDPOINT=memcached://host.docker.internal:11211
 
-  db:
-    image: postgis/postgis:12-3.0
-    container_name: postgres
+  memcache:
+    container_name: memcache
+    image: memcached:latest
     ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=username
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=postgis
+      - 11211:11211
+
+  # db:
+  #   image: postgis/postgis:12-3.0
+  #   container_name: postgres
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=username
+  #     - POSTGRES_PASSWORD=password
+  #     - POSTGRES_DB=postgis
+
