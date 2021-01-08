@@ -3,6 +3,7 @@
 'use strict';
 
 const WebSocket = require('ws');
+const jwt = require('jsonwebtoken');
 const argv = require('minimist')(process.argv, {
     boolean: ['prod']
 });
@@ -29,25 +30,40 @@ function configure(argv = {}, cb) {
  */
 function server(argv, config, cb) {
     const wss = new WebSocket.Server({
-        port: config.Port
+        port: config.Port,
+        verifyClient: (info, cb) => {
+            if (!info.req.headers.token) return cb(false, 401, 'Unauthorized');
+
+            jwt.verify(info.req.headers.token, config.InstanceSecret, (err, decoded) => {
+                if (err) return cb(false, 401, 'Unauthorized');
+
+                info.req.user = decoded;
+
+                return cb(true);
+            });
+        }
     });
 
     wss.on('connection', (ws) => {
-        ws.on('message', async (payload) => {
-            await router(payload);
+        ws.isAlive = true;
+
+        ws.on('pong', () => {
+            ws.isAlive = true;
         });
     });
 
+    const interval = setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (ws.isAlive === false) return ws.terminate();
+
+            ws.isAlive = false;
+            ws.ping(() => {});
+        });
+    }, 30000);
+
     console.error(`ok - running ws://localhost:${config.Port}`);
 
-    return cb(wss);
-}
-
-async function router(payload) {
-    const action = payload.action.split(':')[0];
-
-    if (action === 'auth') {
-    }
+    if (cb) return cb(wss);
 }
 
 module.exports = {
