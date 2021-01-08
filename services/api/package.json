@@ -7,6 +7,8 @@
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
         "doc": "apidoc -i ./ -f index.js -e node_modules --private",
+        "lint": "eslint index.js lib/**.js",
+        "prod": "./index.js --prod",
         "dev": "./index.js"
     },
     "dependencies": {
@@ -23,6 +25,9 @@
         "morgan": "^1.10.0",
         "pg": "^8.5.1"
     },
+    "devDependencies": {
+        "apidoc-plugin-schema": "^0.1.8"
+    },
     "apidoc": {
         "name": "Microsoft LULC API",
         "title": "Microsoft LULC API",
@@ -30,8 +35,5 @@
             "title": "Authentication",
             "filename": "API.md"
         }
-    },
-    "devDependencies": {
-        "apidoc-plugin-schema": "^0.1.8"
     }
 }

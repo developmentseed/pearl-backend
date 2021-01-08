@@ -75,6 +75,8 @@ async function server(argv, config, cb) {
 
     const auth = new (require('./lib/auth').Auth)(pool);
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
+    const model = new (require('./lib/model').Model)(pool);
+    const instance = new (require('./lib/instance').Instance)(pool, config);
 
     app.disable('x-powered-by');
     app.use(minify());
@@ -168,6 +170,7 @@ async function server(argv, config, cb) {
 
             try {
                 req.auth = await authtoken.validate(authorization[1]);
+                req.auth.type = 'token';
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -318,6 +321,9 @@ async function server(argv, config, cb) {
      * @apiGroup Token
      * @apiPermission user
      *
+     * @apiDescription
+     *     Delete an existing token
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
@@ -325,13 +331,13 @@ async function server(argv, config, cb) {
      *       "message": "Token Deleted"
      *   }
      */
-    router.delete('/token/:id', async (req, res) => {
-        Param.int(req, res, 'id');
+    router.delete('/token/:tokenid', async (req, res) => {
+        Param.int(req, res, 'tokenid');
 
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.delete(req.auth, req.params.id));
+            return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -344,17 +350,7 @@ async function server(argv, config, cb) {
      * @apiGroup User
      * @apiPermission admin
      *
-     * @apiParam {Number} [limit=100] Limit number of returned runs
-     * @apiParamExample {String} ?limit
-     *     ?limit=12
-     *
-     * @apiParam {Number} [page=0] The offset based on limit to return
-     * @apiParamExample {String} ?page
-     *     ?page=0
-     *
-     * @apiParam {String} [filter=] Filter a complete or partial username/email
-     * @apiParamExample {String} ?filter
-     *     ?filter=person@example.com
+     * @apiSchema (Query) {jsonschema=./schema/user-list.query.json} apiParam
      *
      * @apiDescription
      *     Return a list of users that have registered with the service
@@ -372,17 +368,21 @@ async function server(argv, config, cb) {
      *       }]
      *   }
      */
-    router.get('/user', async (req, res) => {
-        try {
-            await auth.is_admin(req);
+    router.get(
+        '/user',
+        validate({ query: require('./schema/user-list.query.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_admin(req);
 
-            const users = await auth.list(req.query);
+                const users = await auth.list(req.query);
 
-            return res.json(users);
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(users);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/user Create User
@@ -448,6 +448,126 @@ async function server(argv, config, cb) {
                 message: 'Invalid session'
             });
         }
+    });
+
+    /**
+     * @api {get} /api/instance Create Instance
+     * @apiVersion 1.0.0
+     * @apiName create
+     * @apiGroup Instance
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Instruct the GPU pool to start a new model instance and return a time limited session
+     *     token for accessing the websockets GPU API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "url": "ws://<websocket-connection-url>",
+     *       "token": "websocket auth token"
+     *   }
+     */
+    router.post('/instance',
+        validate({ body: require('./schema/instance.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_auth(req);
+
+                res.json(await instance.create(req.auth, req.body.model_id));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {delete} /api/instance/:instance Delete Instance
+     * @apiVersion 1.0.0
+     * @apiName CreateInstance
+     * @apiGroup Instance
+     * @apiPermission user
+     */
+    router.delete('/instance/:instanceid', async (req, res) =>{
+    });
+
+    /**
+     * @api {get} /api/instance/:instance Get Instance
+     * @apiVersion 1.0.0
+     * @apiName GetInstance
+     * @apiGroup Instance
+     * @apiPermission user
+     */
+    router.get('/instance/:instanceid', async (req, res) => {
+    });
+
+    /**
+     * @api {post} /api/model Create Model
+     * @apiVersion 1.0.0
+     * @apiName CreateModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
+    router.post(
+        '/model',
+        validate({ body: require('./schema/model.json') }),
+        async (req, res) => {
+            try {
+                await auth.is_auth(req);
+
+                res.json(await model.create(req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+    });
+
+    /**
+     * @api {delete} /api/model/:modelid Delete Model
+     * @apiVersion 1.0.0
+     * @apiName DeleteModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
+    router.delete('/model/:modelid', async (req, res) => {
+        // Don't actually delete models as their may be dependant instances,
+        // but disallow new instance creation & hide from UI
+    });
+
+    /**
+     * @api {get} /api/model/:modelid Get Model
+     * @apiVersion 1.0.0
+     * @apiName GetModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
+    router.get('/model/:modelid', async (req, res) => {
+        try {
+            await auth.is_auth(req);
+
+            res.json(await model.get(req.body));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/model/:modelid Get TileJson
+     * @apiVersion 1.0.0
+     * @apiName GetJson
+     * @apiGroup Tile
+     * @apiPermission user
+     */
+    router.get('/tile', async (req, res) => {
+    });
+
+    /**
+     * @api {get} /api/model/:modelid Get Tile
+     * @apiVersion 1.0.0
+     * @apiName GetTile
+     * @apiGroup Tile
+     * @apiPermission user
+     */
+    router.get('/tile/:z/:x/:y', async (req, res) => {
     });
 
     router.all('*', (req, res) => {

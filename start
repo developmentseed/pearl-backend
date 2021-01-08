@@ -11,13 +11,13 @@ else
 fi
 
 # API Bootstrapping
-npm --prefix ./api/ install
-npm --prefix ./api/ run doc
+npm --prefix ./services/api/ install
+npm --prefix ./services/api/ run doc
 
 # GPU Bootstrapping
-npm --prefix ./api/ install
+npm --prefix ./services/api/ install
 
-npm --prefix ./api/ run dev &
-npm --prefix ./gpu/ run dev &
+npm --prefix ./services/api/ run dev &
+npm --prefix ./services/gpu/ run dev &
 
 wait

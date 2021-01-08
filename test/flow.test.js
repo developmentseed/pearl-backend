@@ -16,7 +16,7 @@ const flight = new Flight();
 
 flight.takeoff(test);
 
-let session = request.jar();
+const session = request.jar();
 let token;
 
 test('api running', (t) => {
@@ -109,11 +109,77 @@ test('new token', (t) => {
         ], 'expected props');
 
         delete body.created;
+
+        token = body.token;
         delete body.token;
 
         t.deepEquals(body, {
             id: 1,
             name: 'Access Token'
+        }, 'expected body');
+
+        t.end();
+    });
+});
+
+test('new model', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: 'http://localhost:2000/api/model',
+        body: { },
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, '200 status code');
+
+        t.deepEquals(Object.keys(body), [
+            'id',
+            'created'
+        ], 'expected props');
+
+        delete body.created;
+
+        t.deepEquals(body, {
+            id: 1,
+        }, 'expected body');
+
+        t.end();
+    });
+});
+
+test('new instance', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: 'http://localhost:2000/api/instance',
+        body: {
+            model_id: 1
+        },
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, '200 status code');
+
+        t.deepEquals(Object.keys(body), [
+            'id',
+            'created',
+            'model_id',
+            'token'
+        ], 'expected props');
+        
+        delete body.created;
+        delete body.token;
+
+        t.deepEquals(body, {
+            id: 1,
+            model_id: 1,
         }, 'expected body');
 
         t.end();

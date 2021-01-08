@@ -419,9 +419,9 @@ class AuthToken {
     }
 
     async validate(token) {
-        let pgres;
+        let pgres, decoded;
         try {
-            let decoded = jwt.verify(token, this.config.TokenSecret);
+            decoded = jwt.verify(token, this.config.TokenSecret);
 
             pgres = await this.pool.query(`
                 SELECT
@@ -499,7 +499,7 @@ class AuthToken {
             throw new Err(400, null, 'Token name required');
         }
 
-        jwt.sign({
+        const token = jwt.sign({
             uid: auth.uid
         }, this.config.TokenSecret);
 
@@ -517,7 +517,7 @@ class AuthToken {
                     $3
                 ) RETURNING *
             `, [
-                jwt,
+                token,
                 auth.uid,
                 name
             ]);

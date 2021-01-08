@@ -5,9 +5,12 @@
     "repository": "git@github.com:developmentseed/lulc-infra",
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
-        "test": "tape test/**.test.js"
+        "test": "tape test/**.test.js",
+        "lint": "eslint test/**.js"
     },
     "devDependencies": {
+        "eslint": "^7.17.0",
+        "eslint-plugin-node": "^11.1.0",
         "pg": "^8.5.1",
         "request": "^2.88.2",
         "tape": "^5.1.0",
