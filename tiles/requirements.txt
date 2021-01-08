@@ -1,4 +1,4 @@
-aiocache[memcached]
+aiocache[redis]
 
 titiler==0.1.0a14
 

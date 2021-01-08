@@ -193,3 +193,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+tiles/data/*.gz
+tiles/data/*.geojson
+tiles/data/*.p

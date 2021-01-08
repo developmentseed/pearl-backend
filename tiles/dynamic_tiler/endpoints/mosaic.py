@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Optional, Type
 from urllib.parse import urlencode
 
-from aiocache import cached
 from morecantile import TileMatrixSet
 from cogeo_mosaic.backends import BaseBackend, MosaicBackend
 from cogeo_mosaic.models import Info as mosaicInfo
@@ -19,6 +18,7 @@ from titiler.ressources.enums import ImageType, PixelSelectionMethod
 from titiler.dependencies import WebMercatorTMSParams
 
 from ..dependencies import MosaicParams
+from ..cache import api_cache
 
 from fastapi import Depends, Path, Query
 
@@ -56,7 +56,7 @@ class MosaicTilerFactory(BaseTilerFactory):
         @self.router.get(
             r"/{layer}/tiles/{z}/{x}/{y}@{scale}x.{format}", **img_endpoint_params
         )
-        @cached()
+        @api_cache()
         async def tile(
             z: int = Path(..., ge=0, le=30, description="Mercator tiles's zoom level"),
             x: int = Path(..., description="Mercator tiles's column"),
