@@ -33,10 +33,17 @@ async function server(argv, config, cb) {
     });
 
     wss.on('connection', (ws) => {
-        ws.on('message', (data) => {
-            console.error(data);
+        ws.on('message', (payload) => {
+            await router(payload);
         });
     });
 
     console.error(`ok - running ws://localhost:${config.Port}`);
+}
+
+async function router(payload) {
+    const action = payload.action.split(':')[0];
+
+    if (action === 'auth') {
+    }
 }

@@ -17,5 +17,5 @@
 
 | Action | Notes |
 | ------ | ----- |
-| 'auth:initial' |       |
+| 'auth:init' |       |
 | 'auth:extend'  |       |
