@@ -39,6 +39,8 @@ function server(argv, config, cb) {
     });
 
     console.error(`ok - running ws://localhost:${config.Port}`);
+
+    return cb(wss);
 }
 
 async function router(payload) {
@@ -47,3 +49,9 @@ async function router(payload) {
     if (action === 'auth') {
     }
 }
+
+module.exports = {
+    Config,
+    configure,
+    server
+};

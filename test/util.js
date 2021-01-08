@@ -1,6 +1,7 @@
 'use strict';
 
-const api = require('../api/index');
+const api = require('../services/api/index');
+const gpu = require('../services/gpu/index');
 const { Client } = require('pg');
 
 class Flight {
@@ -8,6 +9,7 @@ class Flight {
     constructor() {
         this.srv = false;
         this.pool = false;
+        this.gpu = false;
     }
 
     /**
@@ -25,6 +27,16 @@ class Flight {
 
                 this.srv = srv;
                 this.pool = pool;
+
+                t.end();
+            });
+        });
+
+        test('test gpu takeoff', (t) => {
+            gpu.configure({}, (gpu) => {
+                t.ok(gpu, 'gpu object returned');
+
+                this.gpu = gpu;
 
                 t.end();
             });
@@ -73,10 +85,12 @@ class Flight {
     landing(test) {
         test('test server landing', async (t) => {
             t.ok(this.srv, 'server object returned');
+            t.ok(this.gpu, 'gpu object returned');
             t.ok(this.pool, 'pool object returned');
 
             await this.pool.end();
             await this.srv.close();
+            await this.gpu.close();
 
             t.end();
         });
