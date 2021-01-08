@@ -194,6 +194,6 @@ ENV/
 # mypy
 .mypy_cache/
 
-tiles/data/*.gz
-tiles/data/*.geojson
-tiles/data/*.p
+services/tiles/data/*.gz
+services/tiles/data/*.geojson
+services/tiles/data/*.p
