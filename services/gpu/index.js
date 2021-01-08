@@ -27,13 +27,13 @@ function configure(argv = {}, cb) {
  * @param {Config} config
  * @param {function} cb
  */
-async function server(argv, config, cb) {
+function server(argv, config, cb) {
     const wss = new WebSocket.Server({
         port: config.Port
     });
 
     wss.on('connection', (ws) => {
-        ws.on('message', (payload) => {
+        ws.on('message', async (payload) => {
             await router(payload);
         });
     });

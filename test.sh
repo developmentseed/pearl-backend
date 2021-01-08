@@ -11,5 +11,5 @@ test() {
 }
 
 test .
-test api/
-test gpu/
+test services/api/
+test services/gpu/
