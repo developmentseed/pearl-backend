@@ -8,6 +8,7 @@
     "scripts": {
         "doc": "apidoc -i ./ -f index.js -e node_modules --private",
         "lint": "eslint index.js lib/**.js",
+        "prod": "./index.js --prod",
         "dev": "./index.js"
     },
     "dependencies": {
