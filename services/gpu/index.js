@@ -50,6 +50,10 @@ function server(argv, config, cb) {
         ws.on('pong', () => {
             ws.isAlive = true;
         });
+
+        ws.on('message', (payload) => {
+            consoel.error(payload);
+        });
     });
 
     const interval = setInterval(() => {
