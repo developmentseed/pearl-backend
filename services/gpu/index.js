@@ -67,7 +67,13 @@ function server(argv, config, cb) {
 
     console.error(`ok - running ws://localhost:${config.Port}`);
 
-    if (cb) return cb(wss);
+    if (cb) return cb((cb) => {
+        clearInterval(interval);
+
+        wss.close(() => {
+            return cb();
+        });
+    });
 }
 
 module.exports = {

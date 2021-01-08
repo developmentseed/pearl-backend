@@ -83,16 +83,22 @@ class Flight {
      * @param {Tape} test tape instance to run landing action on
      */
     landing(test) {
-        test('test server landing', async (t) => {
+        test('test server landing - api', async (t) => {
             t.ok(this.srv, 'server object returned');
-            t.ok(this.gpu, 'gpu object returned');
             t.ok(this.pool, 'pool object returned');
 
             await this.pool.end();
             await this.srv.close();
-            await this.gpu.close();
 
             t.end();
+        });
+
+        test('test server landing - gpu', (t) => {
+            t.ok(this.gpu, 'gpu object returned');
+
+            this.gpu(() => {
+                t.end();
+            });
         });
     }
 }
