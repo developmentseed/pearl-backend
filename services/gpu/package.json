@@ -6,6 +6,7 @@
     "repository": "git@github.com:developmentseed/lulc-gpu",
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
+        "prod": "./index.js --prod",
         "dev": "./index.js",
         "lint": "eslint index.js lib/**.js"
     },

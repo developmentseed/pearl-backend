@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM alpine:3.12
 
 EXPOSE 1999
 
@@ -7,7 +7,7 @@ WORKDIR $HOME
 COPY ./ $HOME/gpu
 WORKDIR $HOME/gpu
 
-RUN apk add nodejs
+RUN apk add nodejs npm
 RUN npm install
 
 CMD npm run prod
