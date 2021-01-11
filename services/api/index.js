@@ -519,7 +519,8 @@ async function server(argv, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-    });
+        }
+    );
 
     /**
      * @api {delete} /api/model/:modelid Delete Model
@@ -527,10 +528,31 @@ async function server(argv, config, cb) {
      * @apiName DeleteModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Mark a model as inactive, and disallow subsequent instances of this model
+     *     Note: this will not affect currently running instances of the model
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "status": 200,
+     *       "message": "Model deleted"
+     *   }
      */
     router.delete('/model/:modelid', async (req, res) => {
-        // Don't actually delete models as their may be dependant instances,
-        // but disallow new instance creation & hide from UI
+        try {
+            await auth.is_auth(req);
+
+            await model.delete(req.params.modelid);
+
+            return res.status(200).json({
+                status: 200,
+                message: 'Model deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**

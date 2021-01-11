@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS users_reset (
 
 CREATE TABLE IF NOT EXISTS models (
     id          BIGSERIAL PRIMARY KEY,
-    created     TIMESTAMP
+    created     TIMESTAMP,
+    active      BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS instances (
