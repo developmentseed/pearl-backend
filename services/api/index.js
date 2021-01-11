@@ -523,6 +523,26 @@ async function server(argv, config, cb) {
     );
 
     /**
+     * @api {get} /api/model List Models
+     * @apiVersion 1.0.0
+     * @apiName ListModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
+    router.get(
+        '/model',
+        async (req, res) => {
+            try {
+                await auth.is_auth(req);
+
+                res.json(await model.list());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {delete} /api/model/:modelid Delete Model
      * @apiVersion 1.0.0
      * @apiName DeleteModel
@@ -573,7 +593,7 @@ async function server(argv, config, cb) {
     });
 
     /**
-     * @api {get} /api/model/:modelid Get TileJson
+     * @api {get} /api/tile Get TileJson
      * @apiVersion 1.0.0
      * @apiName GetJson
      * @apiGroup Tile
@@ -583,7 +603,7 @@ async function server(argv, config, cb) {
     });
 
     /**
-     * @api {get} /api/model/:modelid Get Tile
+     * @api {get} /api/tile/:z/:x/:y Get Tile
      * @apiVersion 1.0.0
      * @apiName GetTile
      * @apiGroup Tile

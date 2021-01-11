@@ -197,6 +197,23 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/model",
+    "title": "List Models",
+    "version": "1.0.0",
+    "name": "ListModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "get",
     "url": "/health",
     "title": "Server Healthcheck",
     "version": "1.0.0",
@@ -251,7 +268,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/model/:modelid",
+    "url": "/api/tile",
     "title": "Get TileJson",
     "version": "1.0.0",
     "name": "GetJson",
@@ -268,7 +285,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/model/:modelid",
+    "url": "/api/tile/:z/:x/:y",
     "title": "Get Tile",
     "version": "1.0.0",
     "name": "GetTile",
