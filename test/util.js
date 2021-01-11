@@ -1,7 +1,7 @@
 'use strict';
 
 const api = require('../services/api/index');
-const gpu = require('../services/gpu/index');
+const socket = require('../services/socket/index');
 const { Client } = require('pg');
 
 class Flight {
@@ -9,7 +9,7 @@ class Flight {
     constructor() {
         this.srv = false;
         this.pool = false;
-        this.gpu = false;
+        this.socket = false;
     }
 
     /**
@@ -32,11 +32,11 @@ class Flight {
             });
         });
 
-        test('test gpu takeoff', (t) => {
-            gpu.configure({}, (gpu) => {
-                t.ok(gpu, 'gpu object returned');
+        test('test socket takeoff', (t) => {
+            socket.configure({}, (socket) => {
+                t.ok(socket, 'socket object returned');
 
-                this.gpu = gpu;
+                this.socket = socket;
 
                 t.end();
             });
@@ -93,10 +93,10 @@ class Flight {
             t.end();
         });
 
-        test('test server landing - gpu', (t) => {
-            t.ok(this.gpu, 'gpu object returned');
+        test('test server landing - socket', (t) => {
+            t.ok(this.socket, 'socket object returned');
 
-            this.gpu(() => {
+            this.socket(() => {
                 t.end();
             });
         });
