@@ -1,0 +1,17 @@
+charts:
+  - name: lulc-helm
+    imagePrefix: developmentseed/lulc-
+    repo:
+       git: developmentseed/lulc-chart
+       published: https://devseed.com/lulc-chart
+
+    images:
+      api:
+        valuesPath: api.image
+        contextPath: services/api/
+        dockerfilePath: services/api/Dockerfile        
+      gpu:
+        valuesPath: gpu.image
+        contextPath: serivces/gpu/
+        dockerfilePath: services/gpu/Dockerfile
+      
