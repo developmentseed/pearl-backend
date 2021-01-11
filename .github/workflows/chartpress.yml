@@ -1,0 +1,26 @@
+name: Chartpress Publish
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: 'sajjadhelmacr.azurecr.io'
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    - name: Setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+    - name: Setup git
+      run: git config --global user.email "noreply@developmentseed.org" && git config --global user.name "Github Action"
+    - name: Install Chartpress
+      run: |
+        pip install -v chartpress
+    - name: Run Chartpress
+      run: chartpress --push # should eventually --publish-chart
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
