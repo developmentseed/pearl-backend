@@ -3,9 +3,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "lulc-helm.fullname" . }}-gpu
-  component: gpu-deployment
-  environment: {{ .Values.environment }}
-  release: {{ .Release.Name }}
+  labels:
+    component: gpu-deployment
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.gpu.replicaCount }}
   selector:

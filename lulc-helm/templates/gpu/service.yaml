@@ -9,7 +9,6 @@ metadata:
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
-  # In case cloudProvider=aws
   {{- if eq .Values.environment "dev" }}
   type: NodePort
   {{- else }}

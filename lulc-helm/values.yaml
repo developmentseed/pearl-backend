@@ -1,13 +1,14 @@
-environment: dev
+environment: staging
 api:
   enabled: true
   replicaCount: 1
   containerPort: 2000
   image:
-    name: 'developmentseed/lulc-api'
-    tag: '0.0.1-n060.h82d2bb3'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
 gpu:
   enabled: true
+  containerPort: 1999
   image:
-    name: 'developmentseed/lulc-gpu'
-    tag: '0.0.1-n060.h82d2bb3'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
