@@ -192,7 +192,9 @@ test('gpu connection', (t) => {
     const ws = new WebSocket(`http://localhost:1999?token=${instance}`);
 
     ws.on('open', () => {
-        ws.send
+        t.ok('connection opened');
+        ws.close();
+        t.end();
     });
 });
 
