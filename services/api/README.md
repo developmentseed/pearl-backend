@@ -53,14 +53,15 @@ Not required in a dev environment, an insecure default is provided.
 
 The postgres connection string required to connect to the lulc database, provided in the following format
 
+_Formatted Value:_
 ```
 postgres://<user>@<ip|host>:<port>/<db name>
 ```
 
+_Default Value:_
 ```
 postgres://postgres@localhost:5432/lulc
 ```
-_Default Value_
 
 #### `Port` [optional]
 
