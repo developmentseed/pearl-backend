@@ -31,14 +31,40 @@ See the main README for how to view API documentation once generated
 
 ### Environment Variables
 
-#### `CookieSecret`
+#### `CookieSecret` [required: prod]
 
-#### `TokenSecret`
+A string value that is used to securely sign session cookies.
 
-#### `InstanceSecret`
+Not required in a dev environment, an insecure default is provided.
 
-#### `Postgres`
+#### `TokenSecret` [required: prod]
 
+A string value that is used to securely sign JSON Web Tokens used as API Access Tokens
+
+Not required in a dev environment, an insecure default is provided.
+
+#### `InstanceSecret` [required: prod]
+
+A string value that is used to securely sign JSON Web Tokens used for GPU Instance Tokens
+
+Not required in a dev environment, an insecure default is provided.
+
+#### `Postgres` [optional]
+
+The postgres connection string required to connect to the lulc database, provided in the following format
+
+```
+postgres://<user>@<ip|host>:<port>/<db name>
+```
+
+```
+postgres://postgres@localhost:5432/lulc
+```
+__Default Value__
+
+#### `Port` [optional]
+
+Optionally sets a non-default port. All infrastructure is set to use the 2000 as the default port.
 
 ## API
 
