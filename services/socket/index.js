@@ -5,7 +5,7 @@
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const argv = require('minimist')(process.argv, {
-    boolean: ['prod']
+    boolean: ['prod', 'help']
 });
 
 const Timeout = require('./lib/timeout');
@@ -13,6 +13,8 @@ const Timeout = require('./lib/timeout');
 const Config = require('./lib/config');
 
 if (require.main === module) {
+    if (argv.help) return Config.help();
+
     configure(argv);
 }
 
