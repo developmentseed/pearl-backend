@@ -50,7 +50,8 @@ jobs:
     - uses: azure/k8s-bake@v1
       with:
         renderEngine: 'helm'
-        helmChart: './lulc-helm/'
+        helmChart: './lulc-helm/values.yaml'
+        overrideFiles: '.'
         releaseName: lulc-test
         helm-version: 'latest'
       id: bake
