@@ -60,7 +60,7 @@ postgres://<user>@<ip|host>:<port>/<db name>
 ```
 postgres://postgres@localhost:5432/lulc
 ```
-__Default Value__
+_Default Value_
 
 #### `Port` [optional]
 
