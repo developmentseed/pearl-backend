@@ -8,6 +8,8 @@
 
 #### `InstanceSecret`
 
+The `InstanceSecret` environment variable must be the same value as that of the api server.
+Documentation on this variable exists in the [API README](./services/api#instancesecret)
 
 
 ## API
