@@ -46,7 +46,7 @@ jobs:
     - name: Install helm dependencies
       run: cd lulc-helm && helm dep up
     - name: Helm deploy
-      run: helm upgrade lulc-test --wait lulc-helm
+      run: helm upgrade lulc-test --set imagePullSecrets=regcred --wait lulc-helm
     # - uses: azure/k8s-bake@v1
     #   with:
     #     renderEngine: 'helm'
