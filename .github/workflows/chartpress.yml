@@ -40,7 +40,7 @@ jobs:
         container-registry-url: ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io
         container-registry-username: ${{ secrets.STAGING_REGISTRY_USERNAME }}
         container-registry-password: ${{ secrets.STAGING_REGISTRY_PASSWORD }}
-        secret-name: ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
+        secret-name: ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io
         namespace: ${{ secrets.STAGING_NAMESPACE }}
     - name: Install helm dependencies
       run: cd lulc-helm && helm dep up
