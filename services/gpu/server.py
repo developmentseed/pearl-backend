@@ -39,45 +39,6 @@ import beaker.middleware
 
 SESSION_TIMEOUT_SECONDS = 900
 
-
-#---------------------------------------------------------------------------------------
-# before_request and after_request methods
-#---------------------------------------------------------------------------------------
-
-def manage_sessions():
-    '''This method is called before every request.
-    
-    Adds the beaker SessionMiddleware class on as request.session.
-
-    Checks to see if there a session assosciated with the current request.
-    If there is then update the last interaction time on that session.
-    '''
-    bottle.request.session = bottle.request.environ['beaker.session']
-    bottle.request.client_ip = bottle.request.environ.get('HTTP_X_FORWARDED_FOR') or bottle.request.environ.get('REMOTE_ADDR')
-
-    if SESSION_HANDLER.is_expired(bottle.request.session.id): # Someone is trying to use a session that we have deleted due to inactivity
-        SESSION_HANDLER.cleanup_expired_session(bottle.request.session.id)
-        bottle.request.session.delete() # This sets a Set-cookie header to expire the current bottle.request.session.id on the frontend
-        LOGGER.info("Cleaned up an out of date session")
-    elif not SESSION_HANDLER.is_active(bottle.request.session.id):
-        LOGGER.debug("We are getting a request that doesn't have an active session")
-    else:
-        if bottle.request.path == "/getSessionStatus":
-            pass # getting the session status should not trigger a touch_session
-        else:
-            SESSION_HANDLER.touch_session(bottle.request.session.id) # let the SESSION_HANDLER know that this session has activity
-
-
-def enable_cors():
-    '''From https://gist.github.com/richard-flosi/3789163
-
-    This globally enables Cross-Origin Resource Sharing (CORS) headers for every response from this server.
-    '''
-    bottle.response.headers['Access-Control-Allow-Origin'] = '*'
-    bottle.response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
-    bottle.response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
-
-
 #---------------------------------------------------------------------------------------
 # Session handling endpoints
 #---------------------------------------------------------------------------------------

@@ -8,11 +8,15 @@ const argv = require('minimist')(process.argv, {
     boolean: ['prod']
 });
 
+const Timeout = require('./lib/timeout');
+
 const Config = require('./lib/config');
 
 if (require.main === module) {
     configure(argv);
 }
+
+const pool = new Map();
 
 function configure(argv = {}, cb) {
     Config.env(argv).then((config) => {
@@ -46,31 +50,27 @@ function server(argv, config, cb) {
         }
     });
 
+    const timeout = new Timeout(config, wss);
+
+    /*
+     * ws.isAlive {boolean} Store whether the connection is still alive
+     * ws.activity {Date} Store the timestamp of th last user defined action
+     */
     wss.on('connection', (ws) => {
         ws.isAlive = true;
+        ws.activity = +new Date();
 
-        ws.on('pong', () => {
-            ws.isAlive = true;
-        });
+        Timeout.client(ws);
 
         ws.on('message', (payload) => {
             console.error(payload);
         });
     });
 
-    const interval = setInterval(() => {
-        wss.clients.forEach((ws) => {
-            if (ws.isAlive === false) return ws.terminate();
-
-            ws.isAlive = false;
-            ws.ping(() => {});
-        });
-    }, 30000);
-
     console.error(`ok - running ws://localhost:${config.Port}`);
 
     if (cb) return cb((cb) => {
-        clearInterval(interval);
+        timeout.close();
 
         wss.close(() => {
             return cb();
