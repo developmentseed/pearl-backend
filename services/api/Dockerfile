@@ -12,4 +12,3 @@ RUN npm install \
     && npm run doc
 
 CMD npm run prod
-

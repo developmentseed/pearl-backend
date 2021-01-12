@@ -2,6 +2,14 @@
 
 <p align=center>GPU Infrastructure for the LULC project</p>
 
+## Deployment
+
+### Environment Variables
+
+#### `InstanceSecret`
+
+
+
 ## API
 
 The connection URL is supplied to the user upon a successful response from the instance API.
@@ -35,7 +43,14 @@ The websocket will then validate the instance token and accept or deny the conne
 
 ### Supported Actions
 
-| Action | Notes |
-| ------ | ----- |
-| 'auth:init' |       |
-| 'auth:extend'  |       |
+| Action                | Notes |
+| --------------------- | ----- |
+| 'model:reset'         |       |
+| 'model:retrain'       |       |
+| 'pred:correct'        |       |
+| 'pred:patch'          |       |
+| 'pred:tile'           |       |
+| 'download:all'        |       |
+| 'session:kill'        |       |
+| 'checkpoint:create'   |       |
+| 'checkpoint:list'     |       |

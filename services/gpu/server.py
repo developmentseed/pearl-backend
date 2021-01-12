@@ -78,13 +78,6 @@ def enable_cors():
     bottle.response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
 
-def do_options():
-    '''This method is necessary for CORS to work (I think --Caleb)
-    '''
-    bottle.response.status = 204
-    return
-
-
 #---------------------------------------------------------------------------------------
 # Session handling endpoints
 #---------------------------------------------------------------------------------------
@@ -469,41 +462,19 @@ def main():
     app.add_hook("before_request", manage_sessions) # before every request we want to check to make sure there are no session issues
 
     # API paths
-    app.route("/predPatch", method="OPTIONS", callback=do_options) # TODO: all of our web requests from index.html fire an OPTIONS call because of https://stackoverflow.com/questions/1256593/why-am-i-getting-an-options-request-instead-of-a-get-request, we should fix this 
     app.route('/predPatch', method="POST", callback=pred_patch)
-
-    app.route("/predTile", method="OPTIONS", callback=do_options)
     app.route('/predTile', method="POST", callback=pred_tile)
-
-    app.route("/downloadAll", method="OPTIONS", callback=do_options)
     app.route('/downloadAll', method="POST", callback=download_all)
-    
-    app.route("/getInput", method="OPTIONS", callback=do_options)
     app.route('/getInput', method="POST", callback=get_input)
-
-    app.route("/recordCorrection", method="OPTIONS", callback=do_options)
     app.route('/recordCorrection', method="POST", callback=record_correction)
-
-    app.route("/retrainModel", method="OPTIONS", callback=do_options)
     app.route('/retrainModel', method="POST", callback=retrain_model)
-
-    app.route("/resetModel", method="OPTIONS", callback=do_options)
     app.route('/resetModel', method="POST", callback=reset_model)
-
-    app.route("/doUndo", method="OPTIONS", callback=do_options)
     app.route("/doUndo", method="POST", callback=do_undo)
-
-    app.route("/createSession", method="OPTIONS", callback=do_options)
     app.route("/createSession", method="POST", callback=create_session)
-
-    app.route("/killSession", method="OPTIONS", callback=do_options)
     app.route("/killSession", method="POST", callback=kill_session)
-
-    app.route("/getSessionStatus", method="OPTIONS", callback=do_options)
     app.route("/getSessionStatus", method="POST", callback=get_session_status)
 
     # Checkpoints
-    app.route("/createCheckpoint", method="OPTIONS", callback=do_options)
     app.route("/createCheckpoint", method="POST", callback=checkpoint_wrapper(args.disable_checkpoints))
     app.route("/getCheckpoints", method="GET", callback=get_checkpoints)
 

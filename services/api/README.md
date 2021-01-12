@@ -27,6 +27,19 @@ npm run doc
 
 See the main README for how to view API documentation once generated
 
+## Deployment
+
+### Environment Variables
+
+#### `CookieSecret`
+
+#### `TokenSecret`
+
+#### `InstanceSecret`
+
+#### `Postgres`
+
+
 ## API
 
 All JSON paths can be found in the `./index.js` file in this directory. Each
