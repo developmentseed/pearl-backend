@@ -43,8 +43,8 @@ jobs:
         secret-name: ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
         namespace: ${{ secrets.STAGING_NAMESPACE }}
     - uses: actions/checkout@v1
-    # - name: Install helm dependencies
-    #   run: cd lulc-helm && helm dep up
+    - name: Install helm dependencies
+      run: cd lulc-helm && helm dep up
     # - name: Helm deploy
     #   run: helm upgrade lulc-test --wait lulc-helm
     - uses: azure/k8s-bake@v1
