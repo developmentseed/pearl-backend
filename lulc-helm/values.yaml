@@ -1,4 +1,5 @@
 environment: staging
+imagePullSecrets: regcred
 api:
   enabled: true
   replicaCount: 1
