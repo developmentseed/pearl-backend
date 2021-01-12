@@ -32,8 +32,21 @@ CREATE TABLE IF NOT EXISTS users_reset (
 );
 
 CREATE TABLE IF NOT EXISTS models (
-    id          BIGSERIAL PRIMARY KEY,
-    created     TIMESTAMP
+    id                      BIGSERIAL PRIMARY KEY,
+    created                 TIMESTAMP,
+    active                  BOOLEAN,
+    uid                     BIGINT,
+
+    name                    TEXT,
+
+    model_type              TEXT,
+    model_finetunelayer     INT,
+    model_numparams         BIGINT,
+    model_inputshape        INT[],
+
+    storage                 TEXT,
+    classes                 JSONB,
+    meta                    JSONB
 );
 
 CREATE TABLE IF NOT EXISTS instances (

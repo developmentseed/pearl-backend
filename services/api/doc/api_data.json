@@ -165,6 +165,16 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Mark a model as inactive, and disallow subsequent instances of this model Note: this will not affect currently running instances of the model</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Model deleted\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Model"
   },
@@ -174,6 +184,23 @@
     "title": "Get Model",
     "version": "1.0.0",
     "name": "GetModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "get",
+    "url": "/api/model",
+    "title": "List Models",
+    "version": "1.0.0",
+    "name": "ListModel",
     "group": "Model",
     "permission": [
       {
@@ -241,7 +268,7 @@
   },
   {
     "type": "get",
-    "url": "/api/model/:modelid",
+    "url": "/api/tile",
     "title": "Get TileJson",
     "version": "1.0.0",
     "name": "GetJson",
@@ -258,7 +285,7 @@
   },
   {
     "type": "get",
-    "url": "/api/model/:modelid",
+    "url": "/api/tile/:z/:x/:y",
     "title": "Get Tile",
     "version": "1.0.0",
     "name": "GetTile",

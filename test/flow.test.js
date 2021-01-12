@@ -13,11 +13,12 @@ const request = require('request');
 const test = require('tape');
 
 const flight = new Flight();
+const WebSocket = require('ws');
 
 flight.takeoff(test);
 
 const session = request.jar();
-let token;
+let token, instance;
 
 test('api running', (t) => {
     request({
@@ -173,8 +174,9 @@ test('new instance', (t) => {
             'model_id',
             'token'
         ], 'expected props');
-        
+
         delete body.created;
+        instance = body.token;
         delete body.token;
 
         t.deepEquals(body, {
@@ -182,6 +184,16 @@ test('new instance', (t) => {
             model_id: 1,
         }, 'expected body');
 
+        t.end();
+    });
+});
+
+test('gpu connection', (t) => {
+    const ws = new WebSocket(`http://localhost:1999?token=${instance}`);
+
+    ws.on('open', () => {
+        t.ok('connection opened');
+        ws.close();
         t.end();
     });
 });

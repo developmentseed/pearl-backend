@@ -32,9 +32,11 @@ function server(argv, config, cb) {
     const wss = new WebSocket.Server({
         port: config.Port,
         verifyClient: (info, cb) => {
-            if (!info.req.headers.token) return cb(false, 401, 'Unauthorized');
+            const url = new URL(`http://localhost:${config.Port}` + info.req.url);
 
-            jwt.verify(info.req.headers.token, config.InstanceSecret, (err, decoded) => {
+            if (!url.searchParams.has('token')) return cb(false, 401, 'Unauthorized');
+
+            jwt.verify(url.searchParams.get('token'), config.InstanceSecret, (err, decoded) => {
                 if (err) return cb(false, 401, 'Unauthorized');
 
                 info.req.user = decoded;
@@ -52,7 +54,7 @@ function server(argv, config, cb) {
         });
 
         ws.on('message', (payload) => {
-            consoel.error(payload);
+            console.error(payload);
         });
     });
 

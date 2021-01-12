@@ -519,7 +519,28 @@ async function server(argv, config, cb) {
             } catch (err) {
                 return Err.respond(err, res);
             }
-    });
+        }
+    );
+
+    /**
+     * @api {get} /api/model List Models
+     * @apiVersion 1.0.0
+     * @apiName ListModel
+     * @apiGroup Model
+     * @apiPermission user
+     */
+    router.get(
+        '/model',
+        async (req, res) => {
+            try {
+                await auth.is_auth(req);
+
+                res.json(await model.list());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     /**
      * @api {delete} /api/model/:modelid Delete Model
@@ -527,10 +548,31 @@ async function server(argv, config, cb) {
      * @apiName DeleteModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Mark a model as inactive, and disallow subsequent instances of this model
+     *     Note: this will not affect currently running instances of the model
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "status": 200,
+     *       "message": "Model deleted"
+     *   }
      */
     router.delete('/model/:modelid', async (req, res) => {
-        // Don't actually delete models as their may be dependant instances,
-        // but disallow new instance creation & hide from UI
+        try {
+            await auth.is_auth(req);
+
+            await model.delete(req.params.modelid);
+
+            return res.status(200).json({
+                status: 200,
+                message: 'Model deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -551,7 +593,7 @@ async function server(argv, config, cb) {
     });
 
     /**
-     * @api {get} /api/model/:modelid Get TileJson
+     * @api {get} /api/tile Get TileJson
      * @apiVersion 1.0.0
      * @apiName GetJson
      * @apiGroup Tile
@@ -561,7 +603,7 @@ async function server(argv, config, cb) {
     });
 
     /**
-     * @api {get} /api/model/:modelid Get Tile
+     * @api {get} /api/tile/:z/:x/:y Get Tile
      * @apiVersion 1.0.0
      * @apiName GetTile
      * @apiGroup Tile
