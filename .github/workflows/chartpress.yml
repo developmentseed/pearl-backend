@@ -43,15 +43,13 @@ jobs:
         secret-name: ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
         namespace: ${{ secrets.STAGING_NAMESPACE }}
     - uses: actions/checkout@v1
-    - name: Install helm dependencies
-      run: cd lulc-helm && helm dep up
     # - name: Helm deploy
     #   run: helm upgrade lulc-test --wait lulc-helm
     - uses: azure/k8s-bake@v1
       with:
         renderEngine: 'helm'
-        helmChart: './lulc-helm/values.yaml'
-        overrideFiles: '.'
+        helmChart: './lulc-helm/'
+        overrideFiles: './lulc-helm/values.yaml'
         releaseName: lulc-test
         helm-version: 'latest'
       id: bake
