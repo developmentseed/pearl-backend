@@ -18,7 +18,7 @@ from titiler.ressources.enums import ImageType, PixelSelectionMethod
 from titiler.dependencies import WebMercatorTMSParams
 
 from ..dependencies import MosaicParams
-from ..cache import api_cache
+from ..cache import cached
 
 from fastapi import Depends, Path, Query
 
@@ -56,8 +56,8 @@ class MosaicTilerFactory(BaseTilerFactory):
         @self.router.get(
             r"/{layer}/tiles/{z}/{x}/{y}@{scale}x.{format}", **img_endpoint_params
         )
-        @api_cache()
-        async def tile(
+        @cached()
+        def tile(
             z: int = Path(..., ge=0, le=30, description="Mercator tiles's zoom level"),
             x: int = Path(..., description="Mercator tiles's column"),
             y: int = Path(..., description="Mercator tiles's row"),

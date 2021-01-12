@@ -3,7 +3,7 @@ version: '3'
 services:
   tiler:
     build:
-      context: ./tiles
+      context: .
       dockerfile: Dockerfile
     depends_on:
       - cache

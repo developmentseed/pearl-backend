@@ -1,10 +1,20 @@
 """Cache Plugin."""
 
-from aiocache import cached, logger
+import asyncio
+import urllib
+from typing import Any, Dict, Optional
+
+import aiocache
 from starlette.responses import Response
 
+from fastapi.dependencies.utils import is_coroutine_callable
 
-class api_cache(cached):
+from .settings import cache_settings
+
+CacheSettings = cache_settings()
+
+
+class cached(aiocache.cached):
     """Custom Cached Decorator."""
 
     async def get_from_cache(self, key):
@@ -14,4 +24,67 @@ class api_cache(cached):
                 value.headers["X-Cache"] = "HIT"
             return value
         except Exception:
-            logger.exception("Couldn't retrieve %s, unexpected error", key)
+            aiocache.logger.exception(
+                "Couldn't retrieve %s, unexpected error", key
+            )
+
+    async def decorator(
+        self,
+        f,
+        *args,
+        cache_read=True,
+        cache_write=True,
+        aiocache_wait_for_write=True,
+        **kwargs,
+    ):
+        key = self.get_cache_key(f, args, kwargs)
+
+        if cache_read:
+            value = await self.get_from_cache(key)
+            if value is not None:
+                return value
+
+        if is_coroutine_callable(f):
+            result = await f(*args, **kwargs)
+        else:
+            result = f(*args, **kwargs)
+
+        if cache_write:
+            if aiocache_wait_for_write:
+                await self.set_in_cache(key, result)
+            else:
+                asyncio.ensure_future(self.set_in_cache(key, result))
+
+        return result
+
+
+def setup_cache():
+    """Setup aiocache."""
+    config: Dict[str, Any] = {
+        'cache': "aiocache.SimpleMemoryCache",
+        'serializer': {
+            'class': "aiocache.serializers.PickleSerializer"
+        }
+    }
+    if CacheSettings.ttl is not None:
+        config["ttl"] = CacheSettings.ttl
+
+    if CacheSettings.endpoint:
+        url = urllib.parse.urlparse(CacheSettings.endpoint)
+        ulr_config = dict(urllib.parse.parse_qsl(url.query))
+        config.update(ulr_config)
+
+        cache_class = aiocache.Cache.get_scheme_class(url.scheme)
+        config.update(cache_class.parse_uri_path(url.path))
+        config["endpoint"] = url.hostname
+        config["port"] = str(url.port)
+
+        if url.password:
+            config["password"] = url.password
+
+        if cache_class == aiocache.Cache.REDIS:
+            config["cache"] = "aiocache.RedisCache"
+        elif cache_class == aiocache.Cache.MEMCACHED:
+            config["cache"] = "aiocache.MemcachedCache"
+
+    aiocache.caches.set_config({"default": config})
