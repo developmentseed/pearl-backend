@@ -24,3 +24,27 @@ jobs:
       run: chartpress --push # should eventually --publish-chart
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+  deploy:
+    needs: build
+    steps:
+      - name: Set AKS context
+      - uses: azure/aks-set-context@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          cluster-name: ${{ secrets.STAGING_CLUSTER_NAME }}
+          resource-group: ${{ secrets.CLUSTER_RESOURCE_GROUP }}
+
+      - name: Create image pull secret for ACR
+      - uses: azure/k8s-create-secret@v1
+        with:
+          container-registry-url: ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io
+          container-registry-username: ${{ secrets.STAGING_REGISTRY_USERNAME }}
+          container-registry-password: ${{ secrets.STAGING_REGISTRY_PASSWORD }}
+          secret-name: ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
+          namespace: ${{ secrets.STAGING_NAMESPACE }}
+
+      - name: Install helm dependencies
+        run: cd lulc-helm && helm dep up
+
+      - name: Helm deploy
+        run: helm upgrade lulc-test --wait lulc-helm
