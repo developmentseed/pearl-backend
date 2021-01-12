@@ -40,27 +40,28 @@ jobs:
         container-registry-url: ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io
         container-registry-username: ${{ secrets.STAGING_REGISTRY_USERNAME }}
         container-registry-password: ${{ secrets.STAGING_REGISTRY_PASSWORD }}
-        secret-name: regcred
+        secret-name: ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
         namespace: ${{ secrets.STAGING_NAMESPACE }}
     - uses: actions/checkout@v1
-    - name: Install helm dependencies
-      run: cd lulc-helm && helm dep up
-    - name: Helm deploy
-      run: helm upgrade lulc-test --set imagePullSecrets=regcred --wait lulc-helm
-    # - uses: azure/k8s-bake@v1
-    #   with:
-    #     renderEngine: 'helm'
-    #     helmChart: './lulc-helm/'
-    #     helm-version: 'latest'
-    #   id: bake
+    # - name: Install helm dependencies
+    #   run: cd lulc-helm && helm dep up
+    # - name: Helm deploy
+    #   run: helm upgrade lulc-test --wait lulc-helm
+    - uses: azure/k8s-bake@v1
+      with:
+        renderEngine: 'helm'
+        helmChart: './lulc-helm/'
+        releaseName: lulc-test
+        helm-version: 'latest'
+      id: bake
 
-    # # Deploy app to AKS
-    # - uses: azure/k8s-deploy@v1
-    #   with:
-    #     manifests: ${{ steps.bake.outputs.manifestsBundle }}
-    #     images: |
-    #       ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-api:${{ github.sha }}
-    #       ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-gpu:${{ github.sha }}
-    #     imagepullsecrets: |
-    #       ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
-    #     namespace: ${{ secrets.STAGING_NAMESPACE }}
+    # Deploy app to AKS
+    - uses: azure/k8s-deploy@v1
+      with:
+        manifests: ${{ steps.bake.outputs.manifestsBundle }}
+        images: |
+          ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-api:${{ github.sha }}
+          ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-gpu:${{ github.sha }}
+        imagepullsecrets: |
+          ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
+        namespace: ${{ secrets.STAGING_NAMESPACE }}
