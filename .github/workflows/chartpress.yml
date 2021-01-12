@@ -49,7 +49,7 @@ jobs:
     #   run: helm upgrade lulc-test --wait lulc-helm
     - uses: azure/k8s-bake@v1
       with:
-        renderEngine: 'helm3'
+        renderEngine: 'helm'
         helmChart: './lulc-helm/'
         helm-version: 'latest'
       id: bake
