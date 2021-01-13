@@ -60,9 +60,6 @@ jobs:
     - uses: azure/k8s-deploy@v1
       with:
         manifests: ${{ steps.bake.outputs.manifestsBundle }}
-        images: |
-          ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-api:${{ github.sha }}
-          ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-gpu:${{ github.sha }}
         imagepullsecrets: |
           ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
         namespace: ${{ env.NAMESPACE }}
