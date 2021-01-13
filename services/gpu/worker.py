@@ -29,7 +29,7 @@ class MyService(rpyc.Service):
 
     def __init__(self, model):
         self.model = model
-        
+
     def on_connect(self, conn):
         pass
 
@@ -68,7 +68,6 @@ def main():
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose debugging", default=False)
     parser.add_argument("--port", action="store", type=int, help="Port we are listenning on", default=0)
     parser.add_argument("--gpu_id", action="store", dest="gpu_id", type=int, help="GPU to use", required=False)
-    parser.add_argument("--model_key", action="store", dest="model_key", type=str, help="Model key from models.json to use")
     args = parser.parse_args(sys.argv[1:])
 
     # Setup logging
@@ -77,14 +76,10 @@ def main():
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = "" if args.gpu_id is None else str(args.gpu_id)
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-    model_configs = load_models()
-    if not args.model_key in model_configs:
-        LOGGER.error("'%s' is not recognized as a valid model, exiting..." % (args.model_key))
-        return
+def load(model_type):
     model_type = model_configs[args.model_key]["type"]
-
     if model_type == "keras_example":
         model = KerasDenseFineTune(args.gpu_id, **model_configs[args.model_key])
     elif model_type == "pytorch_example":
@@ -98,6 +93,6 @@ def main():
 
     t = OneShotServer(MyService(model), port=args.port)
     t.start()
-   
+
 if __name__ == "__main__":
     main()
