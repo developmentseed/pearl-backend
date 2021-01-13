@@ -1,4 +1,5 @@
 environment: staging
+imagePullSecrets: ''
 api:
   enabled: true
   replicaCount: 1

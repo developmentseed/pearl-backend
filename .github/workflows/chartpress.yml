@@ -50,7 +50,8 @@ jobs:
       with:
         renderEngine: 'helm'
         helmChart: './lulc-helm/'
-        overrideFiles: './lulc-helm/values.yaml'
+        overrides: |
+          imagePullSecrets: ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
         releaseName: lulc-test
         helm-version: 'latest'
       id: bake
