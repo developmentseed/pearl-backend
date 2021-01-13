@@ -12,6 +12,5 @@ charts:
         dockerfilePath: services/api/Dockerfile        
       gpu:
         valuesPath: gpu.image
-        contextPath: services/gpu/
-        dockerfilePath: services/gpu/Dockerfile
-      
+        contextPath: services/socket/
+        dockerfilePath: services/socket/Dockerfile

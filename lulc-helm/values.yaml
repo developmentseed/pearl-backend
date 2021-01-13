@@ -6,7 +6,7 @@ api:
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
-gpu:
+socket:
   enabled: true
   containerPort: 1999
   image:

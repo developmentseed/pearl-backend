@@ -1,37 +1,37 @@
-{{- if .Values.gpu.enabled }}
+{{- if .Values.socket.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "lulc-helm.fullname" . }}-gpu
+  name: {{ template "lulc-helm.fullname" . }}-socket
   labels:
-    component: gpu-deployment
+    component: socket-deployment
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
-  replicas: {{ .Values.gpu.replicaCount }}
+  replicas: {{ .Values.socket.replicaCount }}
   selector:
     matchLabels:
       app: {{ template "lulc-helm.name" . }}
       release: {{ .Release.Name }}
-      run: {{ .Release.Name }}-gpu
+      run: {{ .Release.Name }}-socket
   template:
     metadata:
       labels:
         app: {{ template "lulc-helm.name" . }}
         release: {{ .Release.Name }}
-        run: {{ .Release.Name }}-gpu
+        run: {{ .Release.Name }}-socket
     spec:
       containers:
-        - name: {{ .Chart.Name }}-gpu
-          image: "{{ .Values.gpu.image.name }}:{{ .Values.gpu.image.tag }}"
+        - name: {{ .Chart.Name }}-socket
+          image: "{{ .Values.socket.image.name }}:{{ .Values.socket.image.tag }}"
           ports:
             - name: http
-              containerPort: {{ .Values.gpu.containerPort }}
+              containerPort: {{ .Values.socket.containerPort }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: {{ .Values.gpu.containerPort }}
+              port: {{ .Values.socket.containerPort }}
           env:
             - name: EXAMPLE_ENV
               value: dummy_value

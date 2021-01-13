@@ -1,11 +1,11 @@
-{{- if .Values.gpu.enabled -}}
+{{- if .Values.socket.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "lulc-helm.fullname" . }}-gpu
+  name: {{ template "lulc-helm.fullname" . }}-socket
   labels:
     app: {{ template "lulc-helm.name" . }}
-    component: gpu-service
+    component: socket-service
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
@@ -22,5 +22,5 @@ spec:
   selector:
     app: {{ template "lulc-helm.name" . }}
     release: {{ .Release.Name }}
-    run: {{ .Release.Name }}-gpu
+    run: {{ .Release.Name }}-socket
 {{- end }}
