@@ -1,0 +1,26 @@
+{{- if .Values.socket.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-socket
+  labels:
+    app: {{ template "lulc-helm.name" . }}
+    component: socket-service
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  {{- if eq .Values.environment "dev" }}
+  type: NodePort
+  {{- else }}
+  type: LoadBalancer
+  {{- end }}
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "lulc-helm.name" . }}
+    release: {{ .Release.Name }}
+    run: {{ .Release.Name }}-socket
+{{- end }}

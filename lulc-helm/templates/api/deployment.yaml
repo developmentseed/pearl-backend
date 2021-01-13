@@ -1,0 +1,39 @@
+{{- if .Values.api.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-api
+  labels:
+    component: api-deployment
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "lulc-helm.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-api
+  template:
+    metadata:
+      labels:
+        app: {{ template "lulc-helm.name" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-api
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-api
+          image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.api.containerPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.api.containerPort }}
+          env:
+            - name: EXAMPLE_ENV
+              value: dummy_value
+
+{{- end }}
