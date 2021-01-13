@@ -28,3 +28,8 @@ az ad sp create-for-rbac --sdk-auth
 
 * Resource Group > ACR > Access Keys > Enable Admin user
 * Copy username and password into Github secrets
+## Authorize and configure access to a cluster locally
+
+```
+az aks get-credentials --resource-group lulcStaging --name lulcStagingAks
+```
