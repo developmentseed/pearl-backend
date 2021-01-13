@@ -8,8 +8,7 @@ COPY ./ $HOME/gpu
 WORKDIR $HOME/gpu
 
 RUN apt-get update \
-    && apt-get install -y wget
+    && apt-get install -y wget python3 python3-pip \
+    && pip3 install -r requirements.txt
 
-RUN wget -qP /tmp https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh \
-    && chmod +x /tmp/Anaconda3-2020.02-Linux-x86_64.sh \
-    && /tmp/Anaconda3-2020.02-Linux-x86_64.sh -b
+CMD python3 worker.py
