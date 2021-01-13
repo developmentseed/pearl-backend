@@ -1,5 +1,10 @@
 name: Chartpress Publish
 on: push
+env:
+  STAGING_REGISTRY_NAME: sajjadhelmacr
+  STAGING_CLUSTER_NAME: sajjadAksCluster
+  CLUSTER_RESOURCE_GROUP: sajjadAksTest
+  NAMESPACE: default
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,16 +33,16 @@ jobs:
       uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
-        cluster-name: ${{ secrets.STAGING_CLUSTER_NAME }}
-        resource-group: ${{ secrets.CLUSTER_RESOURCE_GROUP }}
+        cluster-name: ${{ env.STAGING_CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
     - name: Create image pull secret for ACR
       uses: azure/k8s-create-secret@v1
       with:
-        container-registry-url: ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io
+        container-registry-url: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
         container-registry-username: ${{ secrets.STAGING_REGISTRY_USERNAME }}
         container-registry-password: ${{ secrets.STAGING_REGISTRY_PASSWORD }}
-        secret-name: ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
-        namespace: ${{ secrets.STAGING_NAMESPACE }}
+        secret-name: ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
+        namespace: ${{ env.NAMESPACE }}
     - uses: actions/checkout@v1
     # - name: Helm deploy
     #   run: helm upgrade lulc-test --wait lulc-helm
@@ -55,8 +60,8 @@ jobs:
       with:
         manifests: ${{ steps.bake.outputs.manifestsBundle }}
         images: |
-          ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-api:${{ github.sha }}
-          ${{ secrets.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-gpu:${{ github.sha }}
+          ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-api:${{ github.sha }}
+          ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io/lulc-gpu:${{ github.sha }}
         imagepullsecrets: |
-          ${{ secrets.STAGING_REGISTRY_NAME }}-registry-connection
-        namespace: ${{ secrets.STAGING_NAMESPACE }}
+          ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
+        namespace: ${{ env.NAMESPACE }}
