@@ -1,6 +1,6 @@
 charts:
   - name: lulc-helm
-    imagePrefix: sajjadhelmacr.azurecr.io/lulc-
+    imagePrefix: lulcstagingacr.azurecr.io/lulc-
     repo:
        git: developmentseed/lulc-chart
        published: https://devseed.com/lulc-chart
