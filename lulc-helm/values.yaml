@@ -4,11 +4,11 @@ api:
   replicaCount: 1
   containerPort: 2000
   image:
-    name: 'sajjadhelmacr.azurecr.io/lulc-api'
-    tag: '0.0.1-n064.hcb0fb96'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
 gpu:
   enabled: true
   containerPort: 1999
   image:
-    name: 'sajjadhelmacr.azurecr.io/lulc-gpu'
-    tag: '0.0.1-n064.hcb0fb96'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
