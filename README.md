@@ -31,3 +31,7 @@ by navigating to
 ```
 http://localhost:2000/docs
 ```
+
+### Deploy and CI
+
+Notes on deploy process and CI integration can be found [here](docs/deploy.md).
