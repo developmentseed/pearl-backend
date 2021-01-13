@@ -21,10 +21,6 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-gpu
     spec:
-      {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-      - name: {{ .Values.imagePullSecrets }}
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-gpu
           image: "{{ .Values.gpu.image.name }}:{{ .Values.gpu.image.tag }}"

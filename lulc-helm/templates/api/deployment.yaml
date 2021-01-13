@@ -21,10 +21,6 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-api
     spec:
-      {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-      - name: {{ .Values.imagePullSecrets }}
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-api
           image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
