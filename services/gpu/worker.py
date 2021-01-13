@@ -8,6 +8,8 @@ import time
 import datetime
 import collections
 import argparse
+import asyncio
+import websockets
 
 import numpy as np
 
@@ -77,6 +79,15 @@ def main():
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = "" if args.gpu_id is None else str(args.gpu_id)
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+    asyncio.get_event_loop().run_until_complete(
+        connection('ws://localhost:1999')
+    )
+
+async def connection(uri):
+    async with websockets.connect(uri) as websocket:
+        await websocket.send("Hello world!")
+        await websocket.recv()
 
 def load(model_type):
     model_type = model_configs[args.model_key]["type"]
