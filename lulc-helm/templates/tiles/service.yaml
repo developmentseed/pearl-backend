@@ -1,0 +1,23 @@
+{{- if .Values.tiles.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-tiles
+  labels:
+    app: {{ template "lulc-helm.name" . }}
+    component: tiles-service
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  {{- if eq .Values.environment "local" }}
+  type: NodePort
+  {{- else }}
+  type: LoadBalancer
+  {{- end }}
+  ports:
+    - port: 80
+  selector:
+    app: {{ template "lulc-helm.name" . }}
+    release: {{ .Release.Name }}
+    run: {{ .Release.Name }}-tiles
+{{- end }}
