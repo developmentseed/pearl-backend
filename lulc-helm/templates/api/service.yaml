@@ -16,9 +16,6 @@ spec:
   {{- end }}
   ports:
     - port: 80
-      targetPort: http
-      protocol: TCP
-      name: http
   selector:
     app: {{ template "lulc-helm.name" . }}
     release: {{ .Release.Name }}
