@@ -1,4 +1,4 @@
-environment: staging
+environment: dev
 api:
   enabled: true
   replicaCount: 1

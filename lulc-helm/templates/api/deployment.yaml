@@ -33,7 +33,12 @@ spec:
               path: /
               port: {{ .Values.api.containerPort }}
           env:
-            - name: EXAMPLE_ENV
-              value: dummy_value
-
+            - name: CookieSecret
+              value: {{ .Values.api.CookieSecret }}
+            - name: TokenSecret
+              value: {{ .Values.api.TokenSecret }}
+            - name: InstanceSecret
+              value: {{ .Values.api.InstanceSecret }}
+            - name: Postgres
+              value: {{ .Values.api.Postgres }}
 {{- end }}
