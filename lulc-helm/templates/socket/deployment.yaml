@@ -34,6 +34,6 @@ spec:
               port: {{ .Values.socket.containerPort }}
           env:
             - name: InstanceSecret
-              value: {{ .Values.api.InstanceSecret }}
+              value: {{ .Values.api.env.InstanceSecret }}
 
 {{- end }}

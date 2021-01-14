@@ -34,11 +34,11 @@ spec:
               port: {{ .Values.api.containerPort }}
           env:
             - name: CookieSecret
-              value: {{ .Values.api.CookieSecret }}
+              value: {{ .Values.api.env.CookieSecret }}
             - name: TokenSecret
-              value: {{ .Values.api.TokenSecret }}
+              value: {{ .Values.api.env.TokenSecret }}
             - name: InstanceSecret
-              value: {{ .Values.api.InstanceSecret }}
+              value: {{ .Values.api.env.InstanceSecret }}
             - name: Postgres
-              value: {{ .Values.api.Postgres }}
+              value: {{ .Values.api.env.Postgres }}
 {{- end }}
