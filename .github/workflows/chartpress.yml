@@ -32,9 +32,9 @@ jobs:
     - name: Staging - substitute secrets
       uses: bluwy/substitute-string-action@v1
       with:
-        _input-file: 'values.dev.template.yaml'
+        _input-file: './lulc-helm/values.dev.template.yaml'
         _format-key: '{{key}}'
-        _output-file: 'values.dev.yaml'
+        _output-file: './lulc-helm/values.dev.yaml'
         STAGING_COOKIE_SECRET: ${{ secrets.STAGING_COOKIE_SECRET }}
         STAGING_TOKEN_SECRET: ${{ secrets.STAGING_TOKEN_SECRET }}
         STAGING_INSTANCE_SECRET: ${{ secrets.STAGING_INSTANCE_SECRET }}
