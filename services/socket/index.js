@@ -4,6 +4,7 @@
 
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
+const Pool = require('./lib/pool');
 const argv = require('minimist')(process.argv, {
     boolean: ['prod', 'help']
 });
@@ -18,7 +19,7 @@ if (require.main === module) {
     configure(argv);
 }
 
-const pool = new Map();
+const pool = new Pool();
 
 function configure(argv = {}, cb) {
     Config.env(argv).then((config) => {
