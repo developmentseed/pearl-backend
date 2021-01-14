@@ -68,8 +68,12 @@ def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose debugging", default=False)
-    parser.add_argument("--port", action="store", type=int, help="Port we are listenning on", default=0)
     parser.add_argument("--gpu_id", action="store", dest="gpu_id", type=int, help="GPU to use", required=False)
+
+    parser.add_argument("--socket", action="store", type=str, help="websocket router url to connect to", default=None)
+    parser.add_argument("--api", action="store", type=str, help="api url to connect to", default=None)
+    parser.add_argument("--token", action="store", type=str, help="API token", default=None)
+
     args = parser.parse_args(sys.argv[1:])
 
     # Setup logging
@@ -80,8 +84,12 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = "" if args.gpu_id is None else str(args.gpu_id)
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+    os.environ["API"] = os.environ["API"] if os.environ.get("API") is not None else args.api
+    os.environ["SOCKET"] = os.environ["SOCKET"] if os.environ.get("SOCKET") is not None else args.socket
+    os.environ["TOKEN"] = os.environ["TOKEN"] if os.environ.get("TOKEN") is not None else args.token
+
     asyncio.get_event_loop().run_until_complete(
-        connection('ws://localhost:1999')
+        connection('ws://localhost:1999?token={}'.format(os.environ["TOKEN"]))
     )
 
 async def connection(uri):
