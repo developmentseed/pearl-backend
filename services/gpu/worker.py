@@ -3,6 +3,7 @@
 # vim:fenc=utf-8
 # pylint: disable=E1137,E1136,E0110
 import sys
+import jwt
 import os
 import time
 import datetime
@@ -64,6 +65,12 @@ class MyService(rpyc.Service):
     def exposed_load_state_from(self, directory):
         return self.model.load_state_from(directory)
 
+async def connection(uri):
+    async with websockets.connect(uri) as websocket:
+        await websocket.send("Hello world!")
+        await websocket.recv()
+
+
 def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")
 
@@ -72,7 +79,6 @@ def main():
 
     parser.add_argument("--socket", action="store", type=str, help="websocket router url to connect to", default=None)
     parser.add_argument("--api", action="store", type=str, help="api url to connect to", default=None)
-    parser.add_argument("--token", action="store", type=str, help="API token", default=None)
 
     args = parser.parse_args(sys.argv[1:])
 
@@ -84,18 +90,17 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = "" if args.gpu_id is None else str(args.gpu_id)
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-    os.environ["API"] = os.environ["API"] if os.environ.get("API") is not None else args.api
     os.environ["SOCKET"] = os.environ["SOCKET"] if os.environ.get("SOCKET") is not None else args.socket
-    os.environ["TOKEN"] = os.environ["TOKEN"] if os.environ.get("TOKEN") is not None else args.token
+    if os.environ["SigningSecret"] is None:
+        raise Exception("SigningSecret Env Var Required")
+
+    token = jwt.encode({
+        "t": "admin"
+    }, os.environ["SigningSecret"], algorithm="HS256")
 
     asyncio.get_event_loop().run_until_complete(
-        connection('ws://localhost:1999?token={}'.format(os.environ["TOKEN"]))
+        connection('ws://localhost:1999?token={}'.format(token))
     )
-
-async def connection(uri):
-    async with websockets.connect(uri) as websocket:
-        await websocket.send("Hello world!")
-        await websocket.recv()
 
 def load(model_type):
     model_type = model_configs[args.model_key]["type"]

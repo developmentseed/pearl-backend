@@ -421,7 +421,7 @@ class AuthToken {
     async validate(token) {
         let pgres, decoded;
         try {
-            decoded = jwt.verify(token, this.config.TokenSecret);
+            decoded = jwt.verify(token, this.config.SigningSecret);
 
             pgres = await this.pool.query(`
                 SELECT
@@ -449,7 +449,9 @@ class AuthToken {
         }
 
         // Token UID must equad DB UID
-        if (decoded.uid !== parseInt(pgres.rows[0].uid)) {
+        if (decoded.u !== parseInt(pgres.rows[0].uid)) {
+            throw new Err(401, null, 'Invalid token');
+        } else if (decoded.t !== 'api') {
             throw new Err(401, null, 'Invalid token');
         }
 
@@ -500,8 +502,9 @@ class AuthToken {
         }
 
         const token = jwt.sign({
-            uid: auth.uid
-        }, this.config.TokenSecret);
+            t: 'api',
+            u: auth.uid
+        }, this.config.SigningSecret);
 
         try {
             const pgres = await this.pool.query(`

@@ -94,7 +94,7 @@ async function server(argv, config, cb) {
             secure: argv.prod
         },
         saveUninitialized: true,
-        secret: config.CookieSecret
+        secret: config.SigningSecret
     }));
 
     app.use('/docs', express.static('./doc'));
