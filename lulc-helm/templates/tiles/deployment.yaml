@@ -1,0 +1,44 @@
+{{- if .Values.tiles.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-tiles
+  labels:
+    component: tiles-deployment
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.tiles.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "lulc-helm.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-tiles
+  template:
+    metadata:
+      labels:
+        app: {{ template "lulc-helm.name" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-tiles
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-tiles
+          image: "{{ .Values.tiles.image.name }}:{{ .Values.tiles.image.tag }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.tiles.containerPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.tiles.containerPort }}
+          env:
+            - name: PORT
+              value: {{ .Values.tiles.containerPort }}
+            - name: MOSAIC_BACKEND
+              value: {{ .Values.tiles.env.Backends }}
+            - name: MOSAIC_HOST
+              value: {{ .Values.tiles.env.Host }}
+
+}
+{{- end }}

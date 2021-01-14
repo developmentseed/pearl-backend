@@ -10,16 +10,7 @@ services:
     ports:
     - "8000:8000"
     environment:
-      - CPL_TMPDIR=/tmp
-      - GDAL_CACHEMAX=75%
-      - GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
-      - GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
-      - GDAL_HTTP_MULTIPLEX=YES
-      - GDAL_HTTP_VERSION=2
       - PORT=8000
-      - VSI_CACHE=TRUE
-      - VSI_CACHE_SIZE=536870912
-      - WORKERS_PER_CORE=1
       - MOSAIC_BACKEND=sqlite:///
       - MOSAIC_HOST=/tmp/data/mosaics.db
       - CACHE_ENDPOINT=redis://host.docker.internal:6379

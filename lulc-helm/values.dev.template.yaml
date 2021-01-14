@@ -13,3 +13,10 @@ socket:
   containerPort: 1999
   env:
     InstanceSecret: {{STAGING_INSTANCE_SECRET}}
+tiles:
+  enabled: true
+  replicaCount: 1
+  containerPort: 8000
+  env:
+    Backends: {{STAGING_MOSAIC_BACKEND}}
+    Host: {{STAGING_MOSAIC_HOST}}
