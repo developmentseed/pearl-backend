@@ -9,9 +9,6 @@ metadata:
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
-  {{- if eq .Values.environment "dev" }}
-  type: NodePort
-  {{- else }}
   type: LoadBalancer
   {{- end }}
   ports:
