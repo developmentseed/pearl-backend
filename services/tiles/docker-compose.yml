@@ -10,9 +10,6 @@ services:
     ports:
     - "8000:8000"
     environment:
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_REQUEST_PAYER=requester
       - CPL_TMPDIR=/tmp
       - GDAL_CACHEMAX=75%
       - GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
@@ -23,8 +20,8 @@ services:
       - VSI_CACHE=TRUE
       - VSI_CACHE_SIZE=536870912
       - WORKERS_PER_CORE=1
-      - MOSAIC_BACKEND=dynamodb://
-      - MOSAIC_HOST=us-west-2/ds-mosaics-labs
+      - MOSAIC_BACKEND=sqlite:///
+      - MOSAIC_HOST=/tmp/data/mosaics.db
       - CACHE_ENDPOINT=redis://host.docker.internal:6379
 
   cache:
