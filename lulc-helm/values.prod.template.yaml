@@ -4,13 +4,9 @@ api:
   replicaCount: 1
   containerPort: 2000
   env:
-    CookieSecret: {{PRODUCTION_COOKIE_SECRET}}
-    TokenSecret: {{PRODUCTION_TOKEN_SECRET}}
-    InstanceSecret: {{PRODUCTION_INSTANCE_SECRET}}
+    SigningSecret: {{PRODUCTION_SIGNING_SECRET}}
     Postgres: {{PRODUCTION_POSTGRES}}
 socket:
   enabled: true
   containerPort: 1999
-  env:
-    InstanceSecret: {{PRODUCTION_INSTANCE_SECRET}}
 
