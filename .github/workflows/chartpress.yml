@@ -3,8 +3,8 @@ on: push
 env:
   STAGING_REGISTRY_NAME: lulcstagingacr
   STAGING_CLUSTER_NAME: lulcStagingAks2
-  STAGING_MOSAIC_BACKEND: 'sqlite:///'
-  STAGING_MOSAIC_HOST: '/tmp/data/mosaics.db'
+  STAGING_MOSAIC_BACKEND: sqlite:///
+  STAGING_MOSAIC_HOST: /tmp/data/mosaics.db
   CLUSTER_RESOURCE_GROUP: lulcStaging
   NAMESPACE: default
 jobs:
