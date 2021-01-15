@@ -30,7 +30,7 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/
               port: {{ .Values.api.containerPort }}
           env:
             - name: CookieSecret
