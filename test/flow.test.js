@@ -145,7 +145,7 @@ test('new model', (t) => {
         delete body.created;
 
         t.deepEquals(body, {
-            id: 1,
+            id: 1
         }, 'expected body');
 
         t.end();
@@ -181,7 +181,7 @@ test('new instance', (t) => {
 
         t.deepEquals(body, {
             id: 1,
-            model_id: 1,
+            model_id: 1
         }, 'expected body');
 
         t.end();

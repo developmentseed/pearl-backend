@@ -21,7 +21,7 @@ class Config {
             throw new Error('SigningSecret env var must be set in production environment');
         }
 
-        this.SigningSecret = process.env.SigningSecret || 'dev-instance-secret';
+        this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
         this.API = args.api || process.env.API || 'http://localhost:2000'
 
