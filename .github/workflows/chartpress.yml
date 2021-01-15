@@ -2,7 +2,7 @@ name: Chartpress Publish
 on: push
 env:
   STAGING_REGISTRY_NAME: lulcstagingacr
-  STAGING_CLUSTER_NAME: lulcStagingAks
+  STAGING_CLUSTER_NAME: lulcStagingAks2
   CLUSTER_RESOURCE_GROUP: lulcStaging
   NAMESPACE: default
 jobs:
