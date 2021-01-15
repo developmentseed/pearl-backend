@@ -30,6 +30,10 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
+              path: /health
+              port: {{ .Values.socket.containerPort }}
+          livenessProbe:
+            httpGet:
               path: /
               port: {{ .Values.socket.containerPort }}
           env:
