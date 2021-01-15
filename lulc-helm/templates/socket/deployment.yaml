@@ -33,7 +33,7 @@ spec:
               path: /
               port: {{ .Values.socket.containerPort }}
           env:
-            - name: InstanceSecret
-              value: {{ .Values.api.env.InstanceSecret }}
+            - name: SigningSecret
+              value: {{ .Values.api.env.SigningSecret }}
 
 {{- end }}
