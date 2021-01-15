@@ -9,7 +9,7 @@ api:
     InstanceSecret: {{STAGING_INSTANCE_SECRET}}
     Postgres: {{STAGING_POSTGRES}}
 socket:
-  enabled: true
+  enabled: false
   containerPort: 1999
   env:
     InstanceSecret: {{STAGING_INSTANCE_SECRET}}
