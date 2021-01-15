@@ -89,7 +89,7 @@ function server(argv, config, cb) {
         if (cb) return cb((cb) => {
             timeout.close();
 
-            wss.close(() => {
+            srv.close(() => {
                 return cb();
             });
         });
