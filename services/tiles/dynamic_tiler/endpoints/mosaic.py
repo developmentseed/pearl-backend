@@ -198,4 +198,4 @@ class MosaicTilerFactory(BaseTilerFactory):
             return tjson
 
 
-router = MosaicTilerFactory(router_prefix="mosaicjson").router  # type: ignore
+router = MosaicTilerFactory(router_prefix="mosaic").router  # type: ignore
