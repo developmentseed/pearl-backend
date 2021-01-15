@@ -1,0 +1,11 @@
+environment: dev
+api:
+  enabled: true
+  replicaCount: 1
+  containerPort: 2000
+  env:
+    SigningSecret: {{STAGING_SIGNING_SECRET}}
+    Postgres: {{STAGING_POSTGRES}}
+socket:
+  enabled: true
+  containerPort: 1999
