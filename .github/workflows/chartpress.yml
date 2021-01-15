@@ -35,7 +35,7 @@ jobs:
         _input-file: './lulc-helm/values.dev.template.yaml'
         _format-key: '{{key}}'
         _output-file: './lulc-helm/values.dev.yaml'
-        STAGING_COOKIE_SECRET: ${{ secrets.STAGING_SIGNING_SECRET }}
+        STAGING_SIGNING_SECRET: ${{ secrets.STAGING_SIGNING_SECRET }}
         STAGING_POSTGRES: ${{ secrets.STAGING_POSTGRES }}
     - name: Set AKS context
       uses: azure/aks-set-context@v1
