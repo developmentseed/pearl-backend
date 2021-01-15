@@ -33,7 +33,7 @@ spec:
               path: /
               port: {{ .Values.socket.containerPort }}
           env:
-            - name: EXAMPLE_ENV
-              value: dummy_value
+            - name: SigningSecret
+              value: {{ .Values.api.env.SigningSecret }}
 
 {{- end }}

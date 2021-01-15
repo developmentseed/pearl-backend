@@ -1,0 +1,12 @@
+environment: prod
+api:
+  enabled: true
+  replicaCount: 1
+  containerPort: 2000
+  env:
+    SigningSecret: {{PRODUCTION_SIGNING_SECRET}}
+    Postgres: {{PRODUCTION_POSTGRES}}
+socket:
+  enabled: true
+  containerPort: 1999
+

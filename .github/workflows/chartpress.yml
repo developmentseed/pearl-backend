@@ -2,7 +2,7 @@ name: Chartpress Publish
 on: push
 env:
   STAGING_REGISTRY_NAME: lulcstagingacr
-  STAGING_CLUSTER_NAME: lulcStagingAks
+  STAGING_CLUSTER_NAME: lulcStagingAks2
   CLUSTER_RESOURCE_GROUP: lulcStaging
   NAMESPACE: default
 jobs:
@@ -29,6 +29,14 @@ jobs:
       run: chartpress --push # should eventually --publish-chart
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+    - name: Staging - substitute secrets
+      uses: bluwy/substitute-string-action@v1
+      with:
+        _input-file: './lulc-helm/values.dev.template.yaml'
+        _format-key: '{{key}}'
+        _output-file: './lulc-helm/values.dev.yaml'
+        STAGING_SIGNING_SECRET: ${{ secrets.STAGING_SIGNING_SECRET }}
+        STAGING_POSTGRES: ${{ secrets.STAGING_POSTGRES }}
     - name: Set AKS context
       uses: azure/aks-set-context@v1
       with:
@@ -48,6 +56,7 @@ jobs:
         renderEngine: 'helm'
         helmChart: './lulc-helm/'
         releaseName: lulc-test
+        overrideFiles: './lulc-helm/values.dev.yaml'
         helm-version: 'latest'
       id: bake
 

@@ -33,3 +33,32 @@ az ad sp create-for-rbac --sdk-auth
 ```
 az aks get-credentials --resource-group lulcStaging --name lulcStagingAks
 ```
+
+## Create an Azure Database for PostgreSQL server
+
+```
+az postgres server create --resource-group lulcStaging --name lulcDb  --location westeurope --admin-user lulc --admin-password <server_admin_password> --sku-name GP_Gen5_2
+```
+
+## Add your IP to connect to the PostgreSQL server
+
+```
+az postgres server firewall-rule create --resource-group lulcStaging --server lulcDb --name AllowMyIP --start-ip-address <your ip address> --end-ip-address <your ip address>
+```
+
+## Get PostgreSQL connection information
+
+```
+az postgres server show --resource-group lulcStaging --name lulcDb
+```
+
+## Connect via PSQL
+```
+psql -h lulcdb.postgres.database.azure.com -U lulc@lulcdb -d postgres
+```
+
+## Create a database
+
+```
+createdb -h lulcdb.postgres.database.azure.com -O lulc lulc
+```

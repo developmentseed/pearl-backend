@@ -9,16 +9,14 @@ metadata:
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
-  {{- if eq .Values.environment "dev" }}
+  {{- if eq .Values.environment "local" }}
   type: NodePort
   {{- else }}
   type: LoadBalancer
   {{- end }}
   ports:
     - port: 80
-      targetPort: http
-      protocol: TCP
-      name: http
+      targetPort: {{ .Values.api.containerPort }}
   selector:
     app: {{ template "lulc-helm.name" . }}
     release: {{ .Release.Name }}
