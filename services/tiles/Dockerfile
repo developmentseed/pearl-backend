@@ -11,7 +11,7 @@ RUN pip install . --no-cache-dir
 RUN rm -rf dynamic_tiler setup.py
 
 # Use WIP cogeo-misaic
-RUN pip install https://github.com/developmentseed/cogeo-mosaic/archive/SQLiteBackend.zip  --no-cache-dir -U
+RUN pip install https://github.com/developmentseed/cogeo-mosaic/zipball/master --no-cache-dir -U
 
 COPY data/mosaics.db.zip /tmp/data/mosaics.db.zip
 RUN cd /tmp/data/ && unzip mosaics.db.zip
