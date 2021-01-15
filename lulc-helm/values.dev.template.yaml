@@ -13,6 +13,6 @@ tiles:
   enabled: true
   replicaCount: 1
   containerPort: 8000
-  # env:
-  #   Backends: {{STAGING_MOSAIC_BACKEND}}
-  #   Host: {{STAGING_MOSAIC_HOST}}
+  env:
+    Backends: {{STAGING_MOSAIC_BACKEND}}
+    Host: {{STAGING_MOSAIC_HOST}}
