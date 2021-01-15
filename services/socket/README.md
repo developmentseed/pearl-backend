@@ -6,11 +6,10 @@
 
 ### Environment Variables
 
-#### `InstanceSecret`
+#### `SigningSecret`
 
-The `InstanceSecret` environment variable must be the same value as that of the api server.
-Documentation on this variable exists in the [API README](/services/api/README.md#instancesecret)
-
+The `SigningSecret` environment variable must be the same value as that of the api server.
+Documentation on this variable exists in the [API README](/services/api/README.md#signingsecret)
 
 ## API
 

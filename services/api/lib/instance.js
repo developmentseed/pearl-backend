@@ -18,9 +18,10 @@ class Instance {
 
         const token = jwt.sign({
             data: {
-                uid: auth.uid
+                t: 'inst',
+                u: auth.uid
             }
-        }, this.config.InstanceSecret, { expiresIn: '6h' });
+        }, this.config.SigningSecret, { expiresIn: '6h' });
 
         try {
             const pgres = await this.pool.query(`

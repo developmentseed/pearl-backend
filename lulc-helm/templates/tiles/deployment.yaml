@@ -39,6 +39,4 @@ spec:
               value: {{ .Values.tiles.env.Backends }}
             - name: MOSAIC_HOST
               value: {{ .Values.tiles.env.Host }}
-
-}
 {{- end }}

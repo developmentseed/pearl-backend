@@ -17,11 +17,11 @@ class Config {
      * @param {Object} args Command Line Arguments
      */
     static async env(args) {
-        if (args.prod && !process.env.InstanceSecret) {
-            throw new Error('InstanceSecret env var must be set in production environment');
+        if (args.prod && !process.env.SigningSecret) {
+            throw new Error('SigningSecret env var must be set in production environment');
         }
 
-        this.InstanceSecret = process.env.InstanceSecret || 'dev-instance-secret';
+        this.SigningSecret = process.env.SigningSecret || 'dev-instance-secret';
 
         this.API = args.api || process.env.API || 'http://localhost:2000'
 
@@ -49,7 +49,7 @@ class Config {
         console.error('Environment:');
         console.error('  Note: Environment variables take precedence over cli args');
         console.error();
-        console.error('  InstanceSecret [required]                  Shared API string to validate auth tokens');
+        console.error('  SigningSecret [required]                   Shared API string to validate auth tokens');
         console.error('  API                                        The API URL to connect to');
         console.error();
     }

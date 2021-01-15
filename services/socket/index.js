@@ -4,6 +4,7 @@
 
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
+const Pool = require('./lib/pool');
 const argv = require('minimist')(process.argv, {
     boolean: ['prod', 'help']
 });
@@ -18,7 +19,7 @@ if (require.main === module) {
     configure(argv);
 }
 
-const pool = new Map();
+const pool = new Pool();
 
 function configure(argv = {}, cb) {
     Config.env(argv).then((config) => {
@@ -42,8 +43,8 @@ function server(argv, config, cb) {
 
             if (!url.searchParams.has('token')) return cb(false, 401, 'Unauthorized');
 
-            jwt.verify(url.searchParams.get('token'), config.InstanceSecret, (err, decoded) => {
-                if (err) return cb(false, 401, 'Unauthorized');
+            jwt.verify(url.searchParams.get('token'), config.SigningSecret, (err, decoded) => {
+                if (err || (decoded.t !== 'inst' && decoded.t !== 'admin')) return cb(false, 401, 'Unauthorized');
 
                 info.req.user = decoded;
 

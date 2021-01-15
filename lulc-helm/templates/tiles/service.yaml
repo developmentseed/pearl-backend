@@ -16,6 +16,7 @@ spec:
   {{- end }}
   ports:
     - port: 80
+      targetPort: {{ .Values.tiles.containerPort }}
   selector:
     app: {{ template "lulc-helm.name" . }}
     release: {{ .Release.Name }}

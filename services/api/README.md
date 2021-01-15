@@ -31,21 +31,9 @@ See the main README for how to view API documentation once generated
 
 ### Environment Variables
 
-#### `CookieSecret` [required: prod]
+#### `SigningSecret` [required: prod]
 
-A string value that is used to securely sign session cookies.
-
-Not required in a dev environment, an insecure default is provided.
-
-#### `TokenSecret` [required: prod]
-
-A string value that is used to securely sign JSON Web Tokens used as API Access Tokens
-
-Not required in a dev environment, an insecure default is provided.
-
-#### `InstanceSecret` [required: prod]
-
-A string value that is used to securely sign JSON Web Tokens used for GPU Instance Tokens
+A string value that is used to securely sign session cookies, API Tokens, and Instance Sessions
 
 Not required in a dev environment, an insecure default is provided.
 
