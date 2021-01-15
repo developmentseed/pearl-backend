@@ -214,6 +214,67 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/mosaic/:layer",
+    "title": "Get TileJson",
+    "version": "1.0.0",
+    "name": "GetJson",
+    "group": "Mosaic",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Mosaic"
+  },
+  {
+    "type": "get",
+    "url": "/api/mosaic/:layer",
+    "title": "Get TileJson",
+    "version": "1.0.0",
+    "name": "GetJson",
+    "group": "Mosaic",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Mosaic"
+  },
+  {
+    "type": "get",
+    "url": "/api/mosaic",
+    "title": "List Mosaics",
+    "version": "1.0.0",
+    "name": "ListMosaic",
+    "group": "Mosaic",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of currently supported mosaic layers</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"mosaics\": [\n        \"naip.latest\"\n    ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Mosaic"
+  },
+  {
+    "type": "get",
     "url": "/health",
     "title": "Server Healthcheck",
     "version": "1.0.0",
@@ -265,40 +326,6 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "Server"
-  },
-  {
-    "type": "get",
-    "url": "/api/tile",
-    "title": "Get TileJson",
-    "version": "1.0.0",
-    "name": "GetJson",
-    "group": "Tile",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "filename": "./index.js",
-    "groupTitle": "Tile"
-  },
-  {
-    "type": "get",
-    "url": "/api/tile/:z/:x/:y",
-    "title": "Get Tile",
-    "version": "1.0.0",
-    "name": "GetTile",
-    "group": "Tile",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "filename": "./index.js",
-    "groupTitle": "Tile"
   },
   {
     "type": "post",

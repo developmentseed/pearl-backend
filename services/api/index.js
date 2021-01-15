@@ -73,6 +73,7 @@ async function server(argv, config, cb) {
         throw new Error(err);
     }
 
+    const proxy = new (require('./lib/proxy').Proxy)(config);
     const auth = new (require('./lib/auth').Auth)(pool);
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool);
@@ -592,24 +593,75 @@ async function server(argv, config, cb) {
         }
     });
 
+
     /**
-     * @api {get} /api/tile Get TileJson
+     * @api {get} /api/mosaic List Mosaics
      * @apiVersion 1.0.0
-     * @apiName GetJson
-     * @apiGroup Tile
+     * @apiName ListMosaic
+     * @apiGroup Mosaic
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a list of currently supported mosaic layers
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "mosaics": [
+     *           "naip.latest"
+     *       ]
+     *   }
      */
-    router.get('/tile', async (req, res) => {
+    router.get('/mosaic', async (req, res) => {
+        try {
+            await auth.is_auth(req);
+
+            return res.json({
+                mosaics: [
+                    'naip.latest'
+                ]
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
-     * @api {get} /api/tile/:z/:x/:y Get Tile
+     * @api {get} /api/mosaic/:layer Get TileJson
      * @apiVersion 1.0.0
-     * @apiName GetTile
-     * @apiGroup Tile
+     * @apiName GetJson
+     * @apiGroup Mosaic
      * @apiPermission user
      */
-    router.get('/tile/:z/:x/:y', async (req, res) => {
+    router.get('/mosaic/:layer', async (req, res) => {
+        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+
+        try {
+            await auth.is_auth(req);
+
+            await Proxy.request(req, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/mosaic/:layer Get TileJson
+     * @apiVersion 1.0.0
+     * @apiName GetJson
+     * @apiGroup Mosaic
+     * @apiPermission user
+     */
+    router.get('/mosaic/:layer', async (req, res) => {
+        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+
+        try {
+            await auth.is_auth(req);
+
+            await Proxy.request(req, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     router.all('*', (req, res) => {

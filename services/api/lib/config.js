@@ -7,6 +7,7 @@ class Config {
         }
 
         this.Postgres = process.env.Postgres || args.postgres || 'postgres://postgres@localhost:5432/lulc';
+        this.TileUrl = process.env.TileUrl || args.tileurl || false;
 
         this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 

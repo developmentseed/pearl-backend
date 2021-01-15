@@ -23,7 +23,8 @@
         "jsonwebtoken": "^8.5.1",
         "minimist": "^1.2.5",
         "morgan": "^1.10.0",
-        "pg": "^8.5.1"
+        "pg": "^8.5.1",
+        "request": "^2.88.2"
     },
     "devDependencies": {
         "apidoc-plugin-schema": "^0.1.8"
