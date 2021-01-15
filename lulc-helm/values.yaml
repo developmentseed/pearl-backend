@@ -7,7 +7,7 @@ api:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
 socket:
-  enabled: false
+  enabled: true
   containerPort: 1999
   image:
     name: 'chartpress_replace'
