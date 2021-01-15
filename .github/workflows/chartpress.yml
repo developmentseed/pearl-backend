@@ -3,6 +3,8 @@ on: push
 env:
   STAGING_REGISTRY_NAME: lulcstagingacr
   STAGING_CLUSTER_NAME: lulcStagingAks2
+  STAGING_MOSAIC_BACKEND: sqlite:///
+  STAGING_MOSAIC_HOST: /tmp/data/mosaics.db
   CLUSTER_RESOURCE_GROUP: lulcStaging
   NAMESPACE: default
 jobs:
@@ -37,6 +39,8 @@ jobs:
         _output-file: './lulc-helm/values.dev.yaml'
         STAGING_SIGNING_SECRET: ${{ secrets.STAGING_SIGNING_SECRET }}
         STAGING_POSTGRES: ${{ secrets.STAGING_POSTGRES }}
+        STAGING_MOSAIC_BACKEND: ${{ env.STAGING_MOSAIC_BACKEND }}
+        STAGING_MOSAIC_HOST: ${{ env.STAGING_MOSAIC_HOST }}
     - name: Set AKS context
       uses: azure/aks-set-context@v1
       with:

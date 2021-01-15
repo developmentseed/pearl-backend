@@ -1,11 +1,11 @@
-{{- if .Values.api.enabled -}}
+{{- if .Values.tiles.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "lulc-helm.fullname" . }}-api
+  name: {{ template "lulc-helm.fullname" . }}-tiles
   labels:
     app: {{ template "lulc-helm.name" . }}
-    component: api-service
+    component: tiles-service
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
@@ -16,9 +16,9 @@ spec:
   {{- end }}
   ports:
     - port: 80
-      targetPort: {{ .Values.api.containerPort }}
+      targetPort: {{ .Values.tiles.containerPort }}
   selector:
     app: {{ template "lulc-helm.name" . }}
     release: {{ .Release.Name }}
-    run: {{ .Release.Name }}-api
+    run: {{ .Release.Name }}-tiles
 {{- end }}

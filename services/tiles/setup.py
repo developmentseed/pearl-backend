@@ -2,7 +2,13 @@
 
 from setuptools import find_packages, setup
 
-inst_reqs = ["aiocache[redis]", "titiler==0.1.0a14", "rasterio==1.2b3", "ujson"]
+inst_reqs = [
+    "cogeo-mosaic @ git+https://github.com/developmentseed/cogeo-mosaic.git",
+    "aiocache[redis]",
+    "titiler==0.1.0a14",
+    "rasterio==1.2b3",
+    "ujson",
+]
 
 extra_reqs = {
     "test": ["pytest", "pytest-cov", "pytest-asyncio", "requests"],

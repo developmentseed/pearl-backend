@@ -9,8 +9,12 @@ charts:
       api:
         valuesPath: api.image
         contextPath: services/api/
-        dockerfilePath: services/api/Dockerfile        
+        dockerfilePath: services/api/Dockerfile
       socket:
         valuesPath: socket.image
         contextPath: services/socket/
         dockerfilePath: services/socket/Dockerfile
+      tiles:
+        valuesPath: tiles.image
+        contextPath: services/tiles/
+        dockerfilePath: services/tiles/Dockerfile
