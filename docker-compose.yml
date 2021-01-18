@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+    api:
+        build: ./services/api/
+        ports:
+            - "2000:2000"
+        environment:
+            - PORT=2000
+
+    socket:
+        build: ./services/socket/
+        ports:
+            - "1999:1999"
+        environment:
+            - PORT=1999
+
+    tiler:
+        build: ./services/tiles/
+        depends_on:
+            - cache
+        ports:
+            - "8000:8000"
+        environment:
+            - PORT=8000
+            - MOSAIC_BACKEND=sqlite:///
+            - MOSAIC_HOST=/tmp/data/mosaics.db
+            - CACHE_ENDPOINT=redis://host.docker.internal:6379
+
+    cache:
+        image: redis:latest
+        ports:
+            - 6379:6379
+
