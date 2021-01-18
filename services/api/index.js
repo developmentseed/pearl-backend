@@ -670,11 +670,17 @@ async function server(argv, config, cb) {
     });
 
     /**
-     * @api {get} /api/mosaic/:layer Get TileJson
+     * @api {get} /api/mosaic/:layer Get Tile
      * @apiVersion 1.0.0
-     * @apiName GetJson
+     * @apiName GetTile
      * @apiGroup Mosaic
      * @apiPermission user
+     *
+     * @apiSchema (Query) {jsonschema=./schema/tile.query.json} apiParam
+     *
+     * @apiDescription
+     *     Return an aerial imagery tile for a given set of mercator coordinates
+     *
      */
     router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
