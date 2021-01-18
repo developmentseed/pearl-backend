@@ -654,7 +654,7 @@ async function server(argv, config, cb) {
      * @apiGroup Mosaic
      * @apiPermission user
      */
-    router.get('/mosaic/:layer', async (req, res) => {
+    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
