@@ -10,8 +10,14 @@ class Proxy {
     }
 
     async request(req, res) {
+        const url = new URL(this.config.TileUrl + req.url);
+
+        for (const p of Object.keys(req.query)) {
+            url.searchParams.append(p, req.query[p]);
+        }
+
         const proxres = await request({
-            url: this.config.TileUrl + req.url,
+            url: url,
             method: 'GET'
         });
 

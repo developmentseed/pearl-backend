@@ -678,12 +678,21 @@ async function server(argv, config, cb) {
      *
      * @apiSchema (Query) {jsonschema=./schema/tile.query.json} apiParam
      *
+     * @apiParam {Integer} z Mercator Z coordinate
+     * @apiParam {Integer} x Mercator X coordinate
+     * @apiParam {Integer} y Mercator Y coordinate
+     * @apiParam {String} format Available values : png, npy, tif, jpg, jp2, webp, pngraw
+     *
      * @apiDescription
      *     Return an aerial imagery tile for a given set of mercator coordinates
      *
      */
     router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+
+        Param.int(req, res, 'z');
+        Param.int(req, res, 'x');
+        Param.int(req, res, 'y');
 
         try {
             await auth.is_auth(req);

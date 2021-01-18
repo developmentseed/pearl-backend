@@ -531,6 +531,36 @@ define({ "api": [
             "defaultValue": "true",
             "description": "<p>Add mask to the output data.</p>"
           }
+        ],
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "z",
+            "description": "<p>Mercator Z coordinate</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "x",
+            "description": "<p>Mercator X coordinate</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "y",
+            "description": "<p>Mercator Y coordinate</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "format",
+            "description": "<p>Available values : png, npy, tif, jpg, jp2, webp, pngraw</p>"
+          }
         ]
       }
     },
