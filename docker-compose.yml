@@ -7,6 +7,9 @@ services:
             - "2000:2000"
         environment:
             - PORT=2000
+            - TileUrl=http://localhost:8000
+            - SigningSecret=dev-signing-secret
+            - Postgres='postgres://postgres:postgrespass@localhost:5433/lulc'
 
     socket:
         build: ./services/socket/
@@ -14,6 +17,7 @@ services:
             - "1999:1999"
         environment:
             - PORT=1999
+            - SigningSecret=dev-signing-secret
 
     tiler:
         build: ./services/tiles/
@@ -26,6 +30,13 @@ services:
             - MOSAIC_BACKEND=sqlite:///
             - MOSAIC_HOST=/tmp/data/mosaics.db
             - CACHE_ENDPOINT=redis://host.docker.internal:6379
+
+    postgis:
+        image: postgis/postgis:12-3.1
+        ports:
+            - 5433:5432
+        environment:
+            - POSTGRES_PASSWORD=postgrespass
 
     cache:
         image: redis:latest
