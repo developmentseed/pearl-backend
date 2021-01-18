@@ -3,13 +3,15 @@ version: '3'
 services:
     api:
         build: ./services/api/
+        depends_on:
+            - postgis
         ports:
             - "2000:2000"
         environment:
             - PORT=2000
             - TileUrl=http://localhost:8000
             - SigningSecret=dev-signing-secret
-            - Postgres='postgres://postgres:postgrespass@localhost:5433/lulc'
+            - Postgres=postgres://lulc:postgrespass@postgis:5432/lulc
 
     socket:
         build: ./services/socket/
@@ -36,6 +38,7 @@ services:
         ports:
             - 5433:5432
         environment:
+            - POSTGRES_USER=lulc
             - POSTGRES_PASSWORD=postgrespass
 
     cache:
