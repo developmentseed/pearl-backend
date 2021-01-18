@@ -639,7 +639,9 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            await Proxy.request(req, res);
+            req.url = req.url + '/tilejson.json'
+
+            await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -658,7 +660,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            await Proxy.request(req, res);
+            await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }
