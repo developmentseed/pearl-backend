@@ -226,6 +226,16 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return a TileJSON object for a given mosaic layer</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"tilejson\": \"2.2.0\",\n    \"name\": \"naip.latest\",\n    \"version\": \"1.0.0\",\n    \"scheme\": \"xyz\",\n    \"tiles\": [ \"http://localhost:8000/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?\" ],\n    \"minzoom\": 12,\n    \"maxzoom\": 18,\n    \"bounds\": [\n        -124.81903735821528,\n        24.49673997373884,\n        -66.93084562551495,\n        49.44192498524237\n    ],\n    \"center\": [ -95.87494149186512, 36.9693324794906, 12 ]\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Mosaic"
   },
