@@ -192,6 +192,95 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"keras_example\"",
+              "\"random_forest\"",
+              "\"pytorch_example\"",
+              "\"pytorch_solar\""
+            ],
+            "optional": false,
+            "field": "model_type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_finetunelayer",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_numparams",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "model_inputshape",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object[]",
+            "optional": false,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "classes.color",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": false,
+            "field": "meta",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "description": "<p>Return a all information for a single model</p>",
     "filename": "./index.js",
     "groupTitle": "Model"

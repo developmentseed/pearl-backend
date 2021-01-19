@@ -585,6 +585,8 @@ async function server(argv, config, cb) {
      * @apiGroup Model
      * @apiPermission user
      *
+     * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
+     *
      * @apiDescription
      *     Return a all information for a single model
      */
