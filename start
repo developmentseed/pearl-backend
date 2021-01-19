@@ -12,7 +12,7 @@ else
     " | psql -U postgres
 fi
 
-killall -9 node
+killall -9 node || true
 
 # API Bootstrapping
 npm --prefix ./services/api/ install

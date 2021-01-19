@@ -55,9 +55,8 @@ function server(argv, config, cb) {
 
             if (!url.searchParams.has('token')) return cb(false, 401, 'Unauthorized');
 
-            console.error(url.searchParams.get('token'), config.SigningSecret)
             jwt.verify(url.searchParams.get('token'), config.SigningSecret, (err, decoded) => {
-                if (err || (decoded.data.t !== 'inst' && decoded.data.t !== 'admin')) return cb(false, 401, 'Unauthorized');
+                if (err || (decoded.t !== 'inst' && decoded.t !== 'admin')) return cb(false, 401, 'Unauthorized');
 
                 info.req.user = decoded;
 

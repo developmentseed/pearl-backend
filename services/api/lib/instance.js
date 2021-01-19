@@ -17,10 +17,8 @@ class Instance {
         }
 
         const token = jwt.sign({
-            data: {
-                t: 'inst',
-                u: auth.uid
-            }
+            t: 'inst',
+            u: auth.uid
         }, this.config.SigningSecret, { expiresIn: '6h' });
 
         try {
