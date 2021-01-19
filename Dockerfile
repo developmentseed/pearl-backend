@@ -5,6 +5,8 @@ EXPOSE 2000
 ENV HOME=/home/lulc
 WORKDIR $HOME
 
+ENV TEST=compose
+
 COPY ./package.json $HOME/
 COPY ./package-lock.json $HOME/
 COPY ./test $HOME/test

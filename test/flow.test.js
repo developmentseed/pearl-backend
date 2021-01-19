@@ -15,7 +15,9 @@ const test = require('tape');
 const flight = new Flight();
 const WebSocket = require('ws');
 
-flight.takeoff(test);
+if (process.env.TEST !== 'compose') {
+    flight.takeoff(test);
+}
 
 const session = request.jar();
 let token, instance;
@@ -198,5 +200,7 @@ test('gpu connection', (t) => {
     });
 });
 
-flight.landing(test);
+if (process.env.TEST !== 'compose') {
+    flight.landing(test);
+}
 
