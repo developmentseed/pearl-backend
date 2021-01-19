@@ -21,8 +21,8 @@ tiles:
     tag: 'chartpress_replace'
   resources:
     requests:
-      cpu: 3
-      memory: "4Gi"
+      cpu: 2
+      memory: "6Gi"
     limits:
-      cpu: 4
-      memory: "8Gi"
+      cpu: 2
+      memory: "6Gi"
