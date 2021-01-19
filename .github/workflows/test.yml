@@ -11,5 +11,5 @@ jobs:
             - name: Docker Build
               run: docker-compose build
 
-            - name: Docker Up
-              run: docker-compose up
+            - name: Docker Test Build
+              run: docker build -t test .
