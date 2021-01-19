@@ -28,6 +28,8 @@ spec:
             - name: http
               containerPort: {{ .Values.tiles.containerPort }}
               protocol: TCP
+          nodeSelector:
+            agentpool: {{ .Values.tiles.nodeSelector.agentpool }}
           livenessProbe:
             httpGet:
               path: /healthz
