@@ -21,6 +21,10 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-tiles
     spec:
+      {{- if .Values.tiles.nodeSelector.enabled }}
+      nodeSelector:
+        {{ .Values.tiles.nodeSelector.label_key }}: {{ .Values.tiles.nodeSelector.label_value }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-tiles
           image: "{{ .Values.tiles.image.name }}:{{ .Values.tiles.image.tag }}"
@@ -28,8 +32,6 @@ spec:
             - name: http
               containerPort: {{ .Values.tiles.containerPort }}
               protocol: TCP
-          nodeSelector:
-            agentpool: {{ .Values.tiles.nodeSelector.agentpool }}
           livenessProbe:
             httpGet:
               path: /healthz

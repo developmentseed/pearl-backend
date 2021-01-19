@@ -20,7 +20,9 @@ tiles:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
   nodeSelector:
-    agentpool: nodepool1
+    enabled: true
+    label_key: agentpool
+    label_value: nodepool1
   resources:
     requests:
       cpu: 2
