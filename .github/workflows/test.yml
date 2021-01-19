@@ -8,8 +8,15 @@ jobs:
         steps:
             - uses: actions/checkout@v1
 
+            - name: Docker Pull
+              run: docker-compose pull
+
+            - name: Docker Layer Caching
+              uses: satackey/action-docker-layer-caching@v0.0.11
+              continue-on-error: true
+
             - name: Docker Build
-              run: docker-compose build
+              run: docker-compose up --build
 
             - name: Docker Test Build
               run: docker build -t test .
