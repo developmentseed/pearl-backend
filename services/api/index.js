@@ -562,6 +562,8 @@ async function server(argv, config, cb) {
      *   }
      */
     router.delete('/model/:modelid', async (req, res) => {
+        Param.int(req, res, 'modelid');
+
         try {
             await auth.is_auth(req);
 
@@ -582,12 +584,17 @@ async function server(argv, config, cb) {
      * @apiName GetModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a all information for a single model
      */
     router.get('/model/:modelid', async (req, res) => {
+        Param.int(req, res, 'modelid');
+
         try {
             await auth.is_auth(req);
 
-            res.json(await model.get(req.body));
+            res.json(await model.get(req.params.modelid));
         } catch (err) {
             return Err.respond(err, res);
         }

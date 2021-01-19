@@ -2,6 +2,9 @@
 
 class PublicError {
     constructor(status, err, safe, print = true) {
+        // Wrap postgres errors to ensure stack trace (line nums) are returned
+        if (err && err.severity) err = new Error(err);
+
         if (print && status !== 400) console.error(err ? err : 'Error: ' + safe);
 
         this.status = status;
