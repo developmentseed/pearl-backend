@@ -62,3 +62,13 @@ psql -h lulcdb.postgres.database.azure.com -U lulc@lulcdb -d postgres
 ```
 createdb -h lulcdb.postgres.database.azure.com -O lulc lulc
 ```
+
+# Create an Azure Storage Account
+```
+az storage account create \
+    --name lulc \
+    --resource-group lulcStaging \
+    --location westeurope \
+    --sku Standard_ZRS \
+    --encryption-services blob
+```
