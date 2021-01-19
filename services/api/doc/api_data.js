@@ -192,6 +192,7 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return a all information for a single model</p>",
     "filename": "./index.js",
     "groupTitle": "Model"
   },
