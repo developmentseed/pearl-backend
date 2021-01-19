@@ -200,14 +200,14 @@
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>Human-readable name of the Model</p>"
           },
           {
             "group": "Body",
             "type": "Boolean",
             "optional": false,
             "field": "active",
-            "description": "<p>undefined</p>"
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Body",
@@ -220,7 +220,7 @@
             ],
             "optional": false,
             "field": "model_type",
-            "description": "<p>undefined</p>"
+            "description": "<p>Underlying model type</p>"
           },
           {
             "group": "Body",
@@ -248,14 +248,14 @@
             "type": "String",
             "optional": true,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": "<p>Blob storage location of the underlying model</p>"
           },
           {
             "group": "Body",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
           },
           {
             "group": "Body",
@@ -276,7 +276,7 @@
             "type": "Object",
             "optional": false,
             "field": "meta",
-            "description": "<p>undefined</p>"
+            "description": "<p>Generic key/value store for additional model metadata</p>"
           }
         ]
       }

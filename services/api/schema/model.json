@@ -13,13 +13,16 @@
     "additionalProperties": false,
     "properties": {
         "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable name of the Model"
         },
         "active": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Can the model be used for gpu instances"
         },
         "model_type": {
             "type": "string",
+            "description": "Underlying model type",
             "enum": [
                 "keras_example",
                 "random_forest",
@@ -42,10 +45,12 @@
             }
         },
         "storage": {
-            "type": "string"
+            "type": "string",
+            "description": "Blob storage location of the underlying model"
         },
         "classes": {
             "type": "array",
+            "description": "Named output classes & their associated colours",
             "items": {
                 "type": "object",
                 "additionalProperties": false,
@@ -64,7 +69,8 @@
             }
         },
         "meta": {
-            "type": "object"
+            "type": "object",
+            "description": "Generic key/value store for additional model metadata"
         }
     }
 }
