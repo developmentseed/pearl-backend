@@ -11,7 +11,18 @@ services:
             - PORT=2000
             - TileUrl=http://localhost:8000
             - SigningSecret=dev-signing-secret
-            - Postgres=postgres://lulc:postgrespass@postgis:5432/lulc
+            - Postgres=postgres://docker:docker@postgis:5432/gis
+
+    postgis:
+        image: kartoza/postgis:13.0
+        restart: 'always'
+        ports:
+            - 5433:5432
+        environment:
+            - ALLOW_IP_RANGE=0.0.0.0/0
+            - POSTGRES_DB=gis
+            - POSTGRES_USER=docker
+            - POSTGRES_PASS=docker
 
     socket:
         build: ./services/socket/
@@ -32,14 +43,6 @@ services:
             - MOSAIC_BACKEND=sqlite:///
             - MOSAIC_HOST=/tmp/data/mosaics.db
             - CACHE_ENDPOINT=redis://host.docker.internal:6379
-
-    postgis:
-        image: postgis/postgis:12-3.1
-        ports:
-            - 5433:5432
-        environment:
-            - POSTGRES_USER=lulc
-            - POSTGRES_PASSWORD=postgrespass
 
     cache:
         image: redis:latest
