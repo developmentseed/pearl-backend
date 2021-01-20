@@ -1,7 +1,7 @@
 environment: dev
 api:
   enabled: true
-  replicaCount: 1
+  replicaCount: 2
   containerPort: 2000
   env:
     SigningSecret: {{STAGING_SIGNING_SECRET}}
