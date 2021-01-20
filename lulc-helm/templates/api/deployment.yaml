@@ -32,6 +32,9 @@ spec:
             httpGet:
               path: /api/
               port: {{ .Values.api.containerPort }}
+          resources:
+            limits:
+              nvidia.com/gpu: 1
           env:
             - name: SigningSecret
               value: {{ .Values.api.env.SigningSecret }}
