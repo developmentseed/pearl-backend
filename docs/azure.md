@@ -114,3 +114,24 @@ az aks nodepool update \
   --min-count 3 \
   --max-count 5
 ```
+
+# Add the AKS specialized GPU image support (one time)
+
+```
+az feature register --name GPUDedicatedVHDPreview --namespace Microsoft.ContainerService
+```
+
+## Check the status
+```
+az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/GPUDedicatedVHDPreview')].{Name:name,State:properties.state}"
+```
+
+## Refresh the registration
+```
+az provider register --namespace Microsoft.ContainerService
+```
+
+## Use the AKS specialized GPU image on a cluster
+```
+az aks nodepool add --name gpu --cluster-name lulcStagingAks2 --resource-group lulcStaging --node-vm-size Standard_NC6 --node-count 1 --aks-custom-headers UseGPUDedicatedVHD=true
+```
