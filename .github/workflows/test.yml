@@ -20,3 +20,9 @@ jobs:
 
             - name: Docker Test Build
               run: docker build -t test .
+
+            - name: Docker Network
+              run: docker network ls
+
+            - name: Docker Test Run
+              run: docker run --network lulc-infra_default lulctest

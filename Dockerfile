@@ -6,10 +6,9 @@ ENV HOME=/home/lulc
 WORKDIR $HOME
 
 ENV TEST=compose
+ENV API=http://api:2000
 
-COPY ./package.json $HOME/
-COPY ./package-lock.json $HOME/
-COPY ./test $HOME/test
+COPY ./ $HOME/
 
 RUN apk add nodejs npm
 RUN npm install

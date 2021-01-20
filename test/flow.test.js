@@ -10,6 +10,8 @@
 const { Flight } = require('./util');
 const request = require('request');
 
+const API = process.env.API || 'http://localhost:2000'
+
 const test = require('tape');
 
 const flight = new Flight();
@@ -26,7 +28,7 @@ test('api running', (t) => {
     request({
         method: 'GET',
         json: true,
-        url: 'http://localhost:2000/api'
+        url: API + '/api'
     } , (err, res, body) => {
         t.error(err, 'no error');
 
@@ -44,7 +46,7 @@ test('new user', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/user',
+        url: API + '/api/user',
         body: {
             username: 'example',
             email: 'example@example.com',
@@ -68,7 +70,7 @@ test('new session', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/login',
+        url: API + '/api/login',
         jar: session,
         body: {
             username: 'example',
@@ -95,7 +97,7 @@ test('new token', (t) => {
         method: 'POST',
         json: true,
         jar: session,
-        url: 'http://localhost:2000/api/token',
+        url: API + '/api/token',
         body: {
             name: 'Access Token'
         }
@@ -129,7 +131,7 @@ test('new model', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/model',
+        url: API + '/api/model',
         body: { },
         headers: {
             Authorization: `Bearer ${token}`
@@ -158,7 +160,7 @@ test('new instance', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/instance',
+        url: API + '/api/instance',
         body: {
             model_id: 1
         },
