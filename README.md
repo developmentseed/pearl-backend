@@ -8,10 +8,10 @@
 
 ## Development
 
-Initial development can be bootstrapped by running the following script
+Initial development can be bootstrapped by running all of the services via docker-compose
 
 ```sh
-./start
+docker-compose up --build -d
 ```
 
 This script will ensure that you have a postgres database set up, and will configure and
