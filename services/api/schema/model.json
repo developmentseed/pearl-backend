@@ -1,6 +1,76 @@
 {
     "type": "object",
-    "required": [ ],
+    "required": [
+        "name",
+        "active",
+        "model_type",
+        "model_finetunelayer",
+        "model_numparams",
+        "model_inputshape",
+        "classes",
+        "meta"
+    ],
     "additionalProperties": false,
-    "properties": { }
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Human-readable name of the Model"
+        },
+        "active": {
+            "type": "boolean",
+            "description": "Can the model be used for gpu instances"
+        },
+        "model_type": {
+            "type": "string",
+            "description": "Underlying model type",
+            "enum": [
+                "keras_example",
+                "random_forest",
+                "pytorch_example",
+                "pytorch_solar"
+            ]
+        },
+        "model_finetunelayer": {
+            "type": "integer"
+        },
+        "model_numparams": {
+            "type": "integer"
+        },
+        "model_inputshape": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+                "type": "integer"
+            }
+        },
+        "storage": {
+            "type": "string",
+            "description": "Blob storage location of the underlying model"
+        },
+        "classes": {
+            "type": "array",
+            "description": "Named output classes & their associated colours",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "name",
+                    "color"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "color": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "meta": {
+            "type": "object",
+            "description": "Generic key/value store for additional model metadata"
+        }
+    }
 }

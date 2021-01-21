@@ -64,9 +64,30 @@ function configure(argv = {}, cb) {
  * @param {function} cb
  */
 async function server(argv, config, cb) {
-    const pool = new Pool({
-        connectionString: config.Postgres
-    });
+    let pool;
+
+    let retry = 5;
+    do {
+        try {
+            pool = new Pool({
+                connectionString: config.Postgres
+            });
+
+            await pool.query('SELECT NOW()');
+        } catch (err) {
+            pool = false;
+
+            if (retry === 0) {
+                console.error('not ok - terminating due to lack of postgres connection');
+                return process.exit(1);
+            }
+
+            retry--;
+            console.error(`not ok - unable to get postgres connection`);
+            console.error(`ok - retrying... (${5 - retry}/5)`);
+            await sleep(5000);
+        }
+    } while (!pool)
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
@@ -564,6 +585,8 @@ async function server(argv, config, cb) {
      *   }
      */
     router.delete('/model/:modelid', async (req, res) => {
+        Param.int(req, res, 'modelid');
+
         try {
             await auth.is_auth(req);
 
@@ -584,12 +607,19 @@ async function server(argv, config, cb) {
      * @apiName GetModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
+     *
+     * @apiDescription
+     *     Return a all information for a single model
      */
     router.get('/model/:modelid', async (req, res) => {
+        Param.int(req, res, 'modelid');
+
         try {
             await auth.is_auth(req);
 
-            res.json(await model.get(req.body));
+            res.json(await model.get(req.params.modelid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -740,6 +770,12 @@ async function server(argv, config, cb) {
         console.error(`ok - running http://localhost:${config.Port}`);
     });
 
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 module.exports = {

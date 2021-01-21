@@ -423,6 +423,15 @@ class AuthToken {
         try {
             decoded = jwt.verify(token, this.config.SigningSecret);
 
+            if (decoded.t === 'admin') {
+                return {
+                    uid: false,
+                    username: false,
+                    access: 'admin',
+                    email: false
+                };
+            }
+
             pgres = await this.pool.query(`
                 SELECT
                     users.id AS uid,

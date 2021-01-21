@@ -7,15 +7,23 @@
 // - Authenticate with WS router
 //
 
-const { Flight } = require('./util');
 const request = require('request');
+
+const API = process.env.API || 'http://localhost:2000'
+const SOCKET = process.env.SOCKET || 'http://localhost:1999'
 
 const test = require('tape');
 
-const flight = new Flight();
 const WebSocket = require('ws');
 
-flight.takeoff(test);
+const usr = 'example-' + Math.floor(Math.random() * Math.floor(10^1000));
+
+let flight;
+if (process.env.TEST !== 'compose') {
+    const { Flight } = require('./util');
+    flight = new Flight();
+    flight.takeoff(test);
+}
 
 const session = request.jar();
 let token, instance;
@@ -24,7 +32,7 @@ test('api running', (t) => {
     request({
         method: 'GET',
         json: true,
-        url: 'http://localhost:2000/api'
+        url: API + '/api'
     } , (err, res, body) => {
         t.error(err, 'no error');
 
@@ -42,10 +50,10 @@ test('new user', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/user',
+        url: API + '/api/user',
         body: {
-            username: 'example',
-            email: 'example@example.com',
+            username: usr ,
+            email: `${usr}@example.com`,
             password: 'password123'
         }
     } , (err, res, body) => {
@@ -66,10 +74,10 @@ test('new session', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/login',
+        url: API + '/api/login',
         jar: session,
         body: {
-            username: 'example',
+            username: usr,
             password: 'password123'
         }
     } , (err, res, body) => {
@@ -78,7 +86,7 @@ test('new session', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(body, {
-            username: 'example'
+            username: usr
         }, 'expected body');
 
         t.equals(res.headers['set-cookie'].length, 1, '1 cookie is set');
@@ -93,7 +101,7 @@ test('new token', (t) => {
         method: 'POST',
         json: true,
         jar: session,
-        url: 'http://localhost:2000/api/token',
+        url: API + '/api/token',
         body: {
             name: 'Access Token'
         }
@@ -109,13 +117,15 @@ test('new token', (t) => {
             'created'
         ], 'expected props');
 
+        t.ok(parseInt(body.id), 'id: <integer>');
+
         delete body.created;
+        delete body.id;
 
         token = body.token;
         delete body.token;
 
         t.deepEquals(body, {
-            id: 1,
             name: 'Access Token'
         }, 'expected body');
 
@@ -127,8 +137,22 @@ test('new model', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/model',
-        body: { },
+        url: API + '/api/model',
+        body: {
+            name: 'Example Model',
+            active: true,
+            model_type: 'keras_example',
+            model_finetunelayer: -2,
+            model_numparams: 563498,
+            model_inputshape: [100,100,4],
+            classes: [
+                { name: 'Water', color: '#0000FF'},
+                { name: 'Tree Canopy', color: '#008000'},
+                { name: 'Field', color: '#80FF80'},
+                { name: 'Built', color: '#806060'}
+            ],
+            meta: {}
+        },
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -142,10 +166,12 @@ test('new model', (t) => {
             'created'
         ], 'expected props');
 
+        t.ok(parseInt(body.id), 'id: <integer>');
+
         delete body.created;
+        delete body.id;
 
         t.deepEquals(body, {
-            id: 1
         }, 'expected body');
 
         t.end();
@@ -156,7 +182,7 @@ test('new instance', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/instance',
+        url: API + '/api/instance',
         body: {
             model_id: 1
         },
@@ -175,12 +201,13 @@ test('new instance', (t) => {
             'token'
         ], 'expected props');
 
+        t.ok(parseInt(body.id), 'id: <integer>');
+        delete body.id,
         delete body.created;
         instance = body.token;
         delete body.token;
 
         t.deepEquals(body, {
-            id: 1,
             model_id: 1
         }, 'expected body');
 
@@ -189,7 +216,7 @@ test('new instance', (t) => {
 });
 
 test('gpu connection', (t) => {
-    const ws = new WebSocket(`http://localhost:1999?token=${instance}`);
+    const ws = new WebSocket(SOCKET + `?token=${instance}`);
 
     ws.on('open', () => {
         t.ok('connection opened');
@@ -198,5 +225,7 @@ test('gpu connection', (t) => {
     });
 });
 
-flight.landing(test);
+if (process.env.TEST !== 'compose') {
+    flight.landing(test);
+}
 

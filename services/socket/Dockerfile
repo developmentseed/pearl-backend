@@ -10,5 +10,4 @@ WORKDIR $HOME/socket
 RUN apk add nodejs npm
 RUN npm install
 
-CMD npm run prod
-
+CMD npm run dev

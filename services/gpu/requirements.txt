@@ -1,4 +1,5 @@
 pyjwt==2.0.0
+requests==2.25.1
 websockets==8.1
 rasterio
 shapely
@@ -41,7 +42,6 @@ pyasn1-modules==0.2.8
 pyqt5-sip==4.19.18
 pyqtchart==5.12
 pyqtwebengine==5.12.1
-requests==2.24.0
 requests-oauthlib==1.3.0
 rpyc==4.1.5
 rsa==4.6
