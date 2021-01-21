@@ -15,6 +15,8 @@ const test = require('tape');
 
 const WebSocket = require('ws');
 
+const usr = 'example-' + Math.floor(Math.random() * Math.floor(10^1000));
+
 let flight;
 if (process.env.TEST !== 'compose') {
     const { Flight } = require('./util');
@@ -49,8 +51,8 @@ test('new user', (t) => {
         json: true,
         url: API + '/api/user',
         body: {
-            username: 'example',
-            email: 'example@example.com',
+            username: usr ,
+            email: `${usr}@example.com`,
             password: 'password123'
         }
     } , (err, res, body) => {
@@ -74,7 +76,7 @@ test('new session', (t) => {
         url: API + '/api/login',
         jar: session,
         body: {
-            username: 'example',
+            username: usr,
             password: 'password123'
         }
     } , (err, res, body) => {
@@ -83,7 +85,7 @@ test('new session', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(body, {
-            username: 'example'
+            username: usr
         }, 'expected body');
 
         t.equals(res.headers['set-cookie'].length, 1, '1 cookie is set');
