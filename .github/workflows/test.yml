@@ -26,7 +26,7 @@ jobs:
               run: docker network ls
 
             - name: Docker Test Run
-              run: docker run --network lulc-infra_default lulctest
+              run: docker run --network lulc-infra_default test
 
             - name: Docker Cleanup
               run: docker-compose kill
