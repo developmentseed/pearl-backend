@@ -14,7 +14,7 @@ socket:
     tag: 'chartpress_replace'
 tiles:
   enabled: true
-  replicaCount: 5
+  replicaCount: 8
   containerPort: 8000
   image:
     name: 'chartpress_replace'
