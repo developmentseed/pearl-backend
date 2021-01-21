@@ -7,6 +7,7 @@ const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
 const { Param } = require('./lib/util');
+const cors = require('cors');
 const session = require('express-session');
 const morgan = require('morgan');
 const minify = require('express-minify');
@@ -101,6 +102,7 @@ async function server(argv, config, cb) {
     const instance = new (require('./lib/instance').Instance)(pool, config);
 
     app.disable('x-powered-by');
+    app.use(cors());
     app.use(minify());
     app.use(session({
         name: argv.prod ? '__Host-session' : 'session',
