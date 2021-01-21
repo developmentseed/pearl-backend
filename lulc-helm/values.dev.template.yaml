@@ -1,7 +1,7 @@
 environment: dev
 api:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
   containerPort: 2000
   env:
     SigningSecret: {{STAGING_SIGNING_SECRET}}
@@ -11,7 +11,7 @@ socket:
   containerPort: 1999
 tiles:
   enabled: true
-  replicaCount: 1
+  replicaCount: 5
   containerPort: 8000
   env:
     Backends: {{STAGING_MOSAIC_BACKEND}}
