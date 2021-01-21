@@ -16,6 +16,7 @@
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
         "connect-pg-simple": "^6.2.1",
+        "cors": "^2.8.5",
         "express": "^4.17.1",
         "express-json-validator-middleware": "^2.1.1",
         "express-minify": "^1.0.0",
