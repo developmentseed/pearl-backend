@@ -11,4 +11,4 @@ RUN apk add nodejs npm
 RUN npm install \
     && npm run doc
 
-CMD npm run prod
+CMD npm run dev
