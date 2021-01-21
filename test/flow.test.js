@@ -7,17 +7,18 @@
 // - Authenticate with WS router
 //
 
-const { Flight } = require('./util');
 const request = require('request');
 
 const API = process.env.API || 'http://localhost:2000'
 
 const test = require('tape');
 
-const flight = new Flight();
 const WebSocket = require('ws');
 
+let flight;
 if (process.env.TEST !== 'compose') {
+    const { Flight } = require('./util');
+    flight = new Flight();
     flight.takeoff(test);
 }
 

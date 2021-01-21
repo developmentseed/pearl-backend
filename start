@@ -17,7 +17,7 @@ killall -9 node || true
 # API Bootstrapping
 npm --prefix ./services/api/ install
 npm --prefix ./services/api/ run doc
-npm --prefix ./services/api/ install
+npm --prefix ./services/socket/ install
 
 npm --prefix ./services/api/ run dev &
 
@@ -28,6 +28,7 @@ npm --prefix ./services/socket/ run dev &
 cd ./services/gpu/
 python3 -m venv venv
 source ./venv/bin/activate
+pip install -r requirements.txt
 
 export API='http://localhost:2000'
 export SOCKET='http://localhost:1999'
