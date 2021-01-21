@@ -17,7 +17,7 @@ jobs:
               continue-on-error: true
 
             - name: Docker Build
-              run: docker-compose up --build
+              run: docker-compose up --build -d
 
             - name: Docker Test Build
               run: docker build -t test .
@@ -27,3 +27,6 @@ jobs:
 
             - name: Docker Test Run
               run: docker run --network lulc-infra_default lulctest
+
+            - name: Docker Cleanup
+              run: docker-compose kill
