@@ -1,4 +1,3 @@
-const { makeInformer } = require('@kubernetes/client-node');
 const test = require('tape');
 const { Flight } = require('./util');
 const flight = new Flight();
