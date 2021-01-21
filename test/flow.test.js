@@ -10,6 +10,7 @@
 const request = require('request');
 
 const API = process.env.API || 'http://localhost:2000'
+const SOCKET = process.env.SOCKET || 'http://localhost:1999'
 
 const test = require('tape');
 
@@ -215,7 +216,7 @@ test('new instance', (t) => {
 });
 
 test('gpu connection', (t) => {
-    const ws = new WebSocket(`http://localhost:1999?token=${instance}`);
+    const ws = new WebSocket(SOCKET + `?token=${instance}`);
 
     ws.on('open', () => {
         t.ok('connection opened');

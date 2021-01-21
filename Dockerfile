@@ -7,6 +7,7 @@ WORKDIR $HOME
 
 ENV TEST=compose
 ENV API=http://api:2000
+ENV SOCKET=http://socket:1999
 
 COPY ./ $HOME/
 
