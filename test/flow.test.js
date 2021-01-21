@@ -116,13 +116,15 @@ test('new token', (t) => {
             'created'
         ], 'expected props');
 
+        t.ok(parseInt(body.id), 'id: <integer>');
+
         delete body.created;
+        delete body.id;
 
         token = body.token;
         delete body.token;
 
         t.deepEquals(body, {
-            id: 1,
             name: 'Access Token'
         }, 'expected body');
 
@@ -163,10 +165,12 @@ test('new model', (t) => {
             'created'
         ], 'expected props');
 
+        t.ok(parseInt(body.id), 'id: <integer>');
+
         delete body.created;
+        delete body.id;
 
         t.deepEquals(body, {
-            id: 1
         }, 'expected body');
 
         t.end();
@@ -196,12 +200,13 @@ test('new instance', (t) => {
             'token'
         ], 'expected props');
 
+        t.ok(parseInt(body.id), 'id: <integer>');
+        delete body.id,
         delete body.created;
         instance = body.token;
         delete body.token;
 
         t.deepEquals(body, {
-            id: 1,
             model_id: 1
         }, 'expected body');
 
