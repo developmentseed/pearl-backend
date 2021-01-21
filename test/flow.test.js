@@ -133,7 +133,21 @@ test('new model', (t) => {
         method: 'POST',
         json: true,
         url: API + '/api/model',
-        body: { },
+        body: {
+            name: 'Example Model',
+            active: true,
+            model_type: 'keras_example',
+            model_finetunelayer: -2,
+            model_numparams: 563498,
+            model_inputshape: [100,100,4],
+            classes: [
+                { name: 'Water', color: '#0000FF'},
+                { name: 'Tree Canopy', color: '#008000'},
+                { name: 'Field', color: '#80FF80'},
+                { name: 'Built', color: '#806060'}
+            ],
+            meta: {}
+        },
         headers: {
             Authorization: `Bearer ${token}`
         }
