@@ -9,6 +9,6 @@ spec:
     kind: Deployment
     name: {{ template "lulc-helm.fullname" . }}-tiles
   minReplicas: 8
-  maxReplicas: 15
+  maxReplicas: 25
   targetCPUUtilizationPercentage: 10
 
