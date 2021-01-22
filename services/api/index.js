@@ -672,6 +672,28 @@ async function server(argv, config, cb) {
         }
     });
 
+    /**
+     * @api {get} /api/model/:modelid/download Download Model
+     * @apiVersion 1.0.0
+     * @apiName DownloadModel
+     * @apiGroup Model
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return the model itself
+     */
+    router.get('/model/:modelid/download', async (req, res) => {
+        Param.int(req, res, 'modelid');
+
+        try {
+            await auth.is_auth(req);
+
+            await model.download(req.params.modelid, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
 
     /**
      * @api {get} /api/mosaic List Mosaics

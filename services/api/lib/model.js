@@ -61,15 +61,16 @@ class Model {
     }
 
     async upload(model_id) {
-        if (!this.config.AzureStorage) return new Err(424, null, 'Model storage not configured');
+        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
 
     }
 
     async download(id, res) {
-        if (!this.config.AzureStorage) return new Err(424, null, 'Model storage not configured');
+        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
 
         const model = await this.get(id);
-        if (!model.storage) return new Err(404, null, 'Model has not been uploaded');
+        if (!model.storage) throw new Err(404, null, 'Model has not been uploaded');
+        if (!model.active) throw new Err(410, null, 'Model is set as inactive');
 
         const blob_client = this.container_client.getBlockBlobClient(`model-${id}.h5`);
         const dwn = await blob_client.download(0);
@@ -103,6 +104,7 @@ class Model {
                     id: parseInt(r.id),
                     created: r.created,
                     active: r.active,
+                    uid: parseInt(r.uid),
                     name: r.name
                 };
             })
@@ -145,7 +147,7 @@ class Model {
             id: parseInt(pgres.rows[0].id),
             created: pgres.rows[0].created,
             active: pgres.rows[0].active,
-            uid: pgres.rows[0].uid,
+            uid: parseInt(pgres.rows[0].uid),
             name: pgres.rows[0].name,
             model_type: pgres.rows[0].model_type,
             model_finetunelayer: pgres.rows[0].model_findtunelayer,

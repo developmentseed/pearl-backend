@@ -272,6 +272,24 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/model/:modelid/download",
+    "title": "Download Model",
+    "version": "1.0.0",
+    "name": "DownloadModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return the model itself</p>",
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "get",
     "url": "/api/model/:modelid",
     "title": "Get Model",
     "version": "1.0.0",
