@@ -75,7 +75,7 @@ class Model {
         const blob_client = this.container_client.getBlockBlobClient(`model-${id}.h5`);
         const dwn = await blob_client.download(0);
 
-        res.send(dwn.readableStreamBody);
+        dwn.readableStreamBody.pipe(res);
     }
 
     async list() {
