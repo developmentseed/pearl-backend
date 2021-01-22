@@ -6,7 +6,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: kubesurfer
-  apiGroup: rbac.authorization.k8s.io
+  apiGroup: ""
 roleRef:
   kind: Role
   name: kubesurfer-role
