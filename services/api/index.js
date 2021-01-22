@@ -102,7 +102,11 @@ async function server(argv, config, cb) {
     const instance = new (require('./lib/instance').Instance)(pool, config);
 
     app.disable('x-powered-by');
-    app.use(cors());
+    app.use(cors({
+        origin: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true
+    }));
     app.use(minify());
     app.use(session({
         name: argv.prod ? '__Host-session' : 'session',
@@ -114,10 +118,10 @@ async function server(argv, config, cb) {
         }),
         cookie: {
             maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: argv.prod,
+            sameSite: argv.prod ? true : 'none',
             secure: argv.prod
         },
-        saveUninitialized: true,
+        saveUninitialized: false,
         secret: config.SigningSecret
     }));
 
