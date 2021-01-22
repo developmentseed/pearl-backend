@@ -118,7 +118,7 @@ async function server(argv, config, cb) {
         }),
         cookie: {
             maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: argv.prod ? true : 'none',
+            sameSite: argv.prod ? true : 'Lax',
             secure: argv.prod
         },
         saveUninitialized: false,
