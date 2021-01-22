@@ -1,9 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: kubesurfer-role
   namespace: default
+  name: kubesurfer-role
 rules:
-  — apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["list", "get", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]

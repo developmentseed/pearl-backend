@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: kubesurfer-role-binding
+  name: kubesurfer-rolebinding
   namespace: default
+subjects:
+- kind: ServiceAccount
+  name: kubesurfer
+  apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: kubesurfer-role
   apiGroup: rbac.authorization.k8s.io
-subjects:
-  — kind: ServiceAccount
-    name: kubesurfer
-    namespace: default
