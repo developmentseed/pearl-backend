@@ -58,7 +58,8 @@ class Model {
         return {
             id: parseInt(pgres.rows[0].id),
             created: pgres.rows[0].created,
-            active: pgres.rows[0].active
+            active: pgres.rows[0].active,
+            name: pgres.rows[0].name
         };
     }
 
@@ -97,7 +98,16 @@ class Model {
         return {
             id: parseInt(pgres.rows[0].id),
             created: pgres.rows[0].created,
-            active: pgres.rows[0].active
+            active: pgres.rows[0].active,
+            uid: pgres.rows[0].uid,
+            name: pgres.rows[0].name,
+            model_type: pgres.rows[0].model_type,
+            model_finetunelayer: pgres.rows[0].model_findtunelayer,
+            model_numparams: pgres.rows[0].numparams,
+            model_inputshape: pgres.rows[0].model_inputshape,
+            storage: pgres.rows[0].storage,
+            classes: pgres.rows[0].classes,
+            meta: pgres.rows[0].meta
         };
     }
 

@@ -531,6 +531,18 @@ async function server(argv, config, cb) {
      * @apiName CreateModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
+     *
+     * @apiDescription
+     *     Create a new model in the system
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "created": "<date>"
+     *   }
      */
     router.post(
         '/model',
@@ -552,6 +564,9 @@ async function server(argv, config, cb) {
      * @apiName ListModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiDescription
+     *     List information about a set of models
      */
     router.get(
         '/model',
@@ -607,8 +622,6 @@ async function server(argv, config, cb) {
      * @apiName GetModel
      * @apiGroup Model
      * @apiPermission user
-     *
-     * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
      *
      * @apiDescription
      *     Return a all information for a single model
