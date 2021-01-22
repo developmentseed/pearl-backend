@@ -21,7 +21,7 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-api
     spec:
-    serviceAccountName: kubesurfer
+      serviceAccountName: kubesurfer
       containers:
         - name: {{ .Chart.Name }}-api
           image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
