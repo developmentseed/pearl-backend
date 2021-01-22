@@ -10,19 +10,38 @@ class Model {
     /**
      * Create a new model
      */
-    async create() {
+    async create(model, auth) {
         let pgres;
 
         try {
             pgres = await this.pool.query(`
                 INSERT INTO models (
                     created,
-                    active
+                    active,
+                    uid,
+                    name,
+                    model_type,
+                    model_finetunelayer,
+                    model_numparams,
+                    model_inputshape,
+                    storage,
+                    classes,
+                    meta
                 ) VALUES (
-                    NOW(),
-                    true
+                    NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
                 ) RETURNING *
-            `, []);
+            `, [
+                model.active,
+                auth.uid,
+                model.name,
+                model.model_type,
+                model.model_finetunelayer,
+                model.numparams,
+                model.model_inputshape,
+                model.storage,
+                JSON.stringify(model.classes),
+                model.meta
+            ]);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }
