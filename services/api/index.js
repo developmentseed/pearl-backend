@@ -114,7 +114,7 @@ async function server(argv, config, cb) {
         }),
         cookie: {
             maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: true,
+            sameSite: argv.prod,
             secure: argv.prod
         },
         saveUninitialized: true,
@@ -181,8 +181,8 @@ async function server(argv, config, cb) {
     // Unified Auth
     router.use(async (req, res, next) => {
         if (req.session && req.session.auth && req.session.auth.username) {
-            req.auth = req.session.auth;
-            req.auth.type = 'session';
+            req.session.auth.type = 'session';
+            return next();
         } else if (req.header('authorization')) {
             const authorization = req.header('authorization').split(' ');
             if (authorization[0].toLowerCase() !== 'bearer') {
@@ -193,13 +193,13 @@ async function server(argv, config, cb) {
             }
 
             try {
-                req.auth = await authtoken.validate(authorization[1]);
-                req.auth.type = 'token';
+                req.session.auth = await authtoken.validate(authorization[1]);
+                req.session.auth.type = 'token';
             } catch (err) {
                 return Err.respond(err, res);
             }
         } else {
-            req.auth = false;
+            req.session.auth = false;
         }
 
         return next();
@@ -298,7 +298,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.list(req.auth));
+            return res.json(await authtoken.list(req.session.auth));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -331,7 +331,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                return res.json(await authtoken.generate(req.auth, req.body.name));
+                return res.json(await authtoken.generate(req.session.auth, req.body.name));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -361,7 +361,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.delete(req.auth, req.params.tokenid));
+            return res.json(await authtoken.delete(req.session.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -498,7 +498,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await instance.create(req.auth, req.body.model_id));
+                res.json(await instance.create(req.session.auth, req.body.model_id));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -531,6 +531,18 @@ async function server(argv, config, cb) {
      * @apiName CreateModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
+     *
+     * @apiDescription
+     *     Create a new model in the system
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "created": "<date>"
+     *   }
      */
     router.post(
         '/model',
@@ -539,7 +551,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await model.create(req.body));
+                res.json(await model.create(req.body, req.session.auth));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -552,6 +564,9 @@ async function server(argv, config, cb) {
      * @apiName ListModel
      * @apiGroup Model
      * @apiPermission user
+     *
+     * @apiDescription
+     *     List information about a set of models
      */
     router.get(
         '/model',
@@ -607,8 +622,6 @@ async function server(argv, config, cb) {
      * @apiName GetModel
      * @apiGroup Model
      * @apiPermission user
-     *
-     * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
      *
      * @apiDescription
      *     Return a all information for a single model
@@ -744,8 +757,6 @@ async function server(argv, config, cb) {
 
     router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {
-            console.error(err.validationErrors.body);
-
             Err.respond(
                 new Err(400, null, 'validation error'),
                 res,

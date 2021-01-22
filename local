@@ -19,10 +19,15 @@ npm --prefix ./services/api/ install
 npm --prefix ./services/api/ run doc
 npm --prefix ./services/socket/ install
 
-npm --prefix ./services/api/ run dev &
+npm --prefix ./services/api/ run dev&
 
 # Router Bootstrapping
-npm --prefix ./services/socket/ run dev &
+npm --prefix ./services/socket/ run dev&
+
+sleep 5
+
+# Data Population
+TEST=compose node test/flow.test.js
 
 # GPU Bootstrapping
 cd ./services/gpu/
@@ -32,6 +37,7 @@ pip install -r requirements.txt
 
 export API='http://localhost:2000'
 export SOCKET='http://localhost:1999'
+export MODEL_ID='1'
 python worker.py
 
 wait

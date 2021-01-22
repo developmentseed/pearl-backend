@@ -148,50 +148,6 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "filename": "./index.js",
-    "groupTitle": "Model"
-  },
-  {
-    "type": "delete",
-    "url": "/api/model/:modelid",
-    "title": "Delete Model",
-    "version": "1.0.0",
-    "name": "DeleteModel",
-    "group": "Model",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Mark a model as inactive, and disallow subsequent instances of this model Note: this will not affect currently running instances of the model</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Model deleted\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Model"
-  },
-  {
-    "type": "get",
-    "url": "/api/model/:modelid",
-    "title": "Get Model",
-    "version": "1.0.0",
-    "name": "GetModel",
-    "group": "Model",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
     "parameter": {
       "fields": {
         "Body": [
@@ -281,6 +237,60 @@ define({ "api": [
         ]
       }
     },
+    "description": "<p>Create a new model in the system</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "delete",
+    "url": "/api/model/:modelid",
+    "title": "Delete Model",
+    "version": "1.0.0",
+    "name": "DeleteModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Mark a model as inactive, and disallow subsequent instances of this model Note: this will not affect currently running instances of the model</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"Model deleted\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "get",
+    "url": "/api/model/:modelid",
+    "title": "Get Model",
+    "version": "1.0.0",
+    "name": "GetModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
     "description": "<p>Return a all information for a single model</p>",
     "filename": "./index.js",
     "groupTitle": "Model"
@@ -299,6 +309,7 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>List information about a set of models</p>",
     "filename": "./index.js",
     "groupTitle": "Model"
   },
