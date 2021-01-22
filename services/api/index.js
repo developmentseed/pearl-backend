@@ -186,7 +186,7 @@ async function server(argv, config, cb) {
     router.use(async (req, res, next) => {
         if (req.session && req.session.auth && req.session.auth.username) {
             req.session.auth.type = 'session';
-            return next();
+            req.auth = req.session.auth;
         } else if (req.header('authorization')) {
             const authorization = req.header('authorization').split(' ');
             if (authorization[0].toLowerCase() !== 'bearer') {
@@ -197,13 +197,13 @@ async function server(argv, config, cb) {
             }
 
             try {
-                req.session.auth = await authtoken.validate(authorization[1]);
-                req.session.auth.type = 'token';
+                req.auth = await authtoken.validate(authorization[1]);
+                req.auth.type = 'token';
             } catch (err) {
                 return Err.respond(err, res);
             }
         } else {
-            req.session.auth = false;
+            req.auth = false;
         }
 
         return next();
@@ -302,7 +302,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.list(req.session.auth));
+            return res.json(await authtoken.list(req.auth));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -335,7 +335,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                return res.json(await authtoken.generate(req.session.auth, req.body.name));
+                return res.json(await authtoken.generate(req.auth, req.body.name));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -365,7 +365,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.delete(req.session.auth, req.params.tokenid));
+            return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
         }

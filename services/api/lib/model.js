@@ -6,6 +6,12 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 class Model {
     constructor(pool, config) {
         this.pool = pool;
+
+        // don't access these services unless AzureStorage is truthy
+        if (this.config.AzureStorage) {
+            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
+            this.container_client = this.blob_client.getContainerClient('models');
+        }
     }
 
     /**
@@ -53,8 +59,15 @@ class Model {
         };
     }
 
-    async upload() {
-        client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
+    async upload(model_id) {
+        if (!this.config.AzureStorage) return new Err(424, null, 'Model storage not configured');
+
+    }
+
+    async download(model_id, res) {
+        if (!this.config.AzureStorage) return new Err(424, null, 'Model storage not configured');
+
+        this.blob = this.container_client.getBlockBlobClient(`${model_id}.h5`);
     }
 
     async list() {
