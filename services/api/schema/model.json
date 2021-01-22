@@ -44,10 +44,6 @@
                 "type": "integer"
             }
         },
-        "storage": {
-            "type": "string",
-            "description": "Blob storage location of the underlying model"
-        },
         "classes": {
             "type": "array",
             "description": "Named output classes & their associated colours",

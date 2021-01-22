@@ -6,6 +6,7 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 class Model {
     constructor(pool, config) {
         this.pool = pool;
+        this.config = config;
 
         // don't access these services unless AzureStorage is truthy
         if (this.config.AzureStorage) {
@@ -64,10 +65,16 @@ class Model {
 
     }
 
-    async download(model_id, res) {
+    async download(id, res) {
         if (!this.config.AzureStorage) return new Err(424, null, 'Model storage not configured');
 
-        this.blob = this.container_client.getBlockBlobClient(`${model_id}.h5`);
+        const model = await this.get(id);
+        if (!model.storage) return new Err(404, null, 'Model has not been uploaded');
+
+        const blob_client = this.container_client.getBlockBlobClient(`model-${id}.h5`);
+        const dwn = await blob_client.download(0);
+
+        res.send(dwn.readableStreamBody)
     }
 
     async list() {
@@ -90,13 +97,15 @@ class Model {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'No model found');
-
         return {
-            id: parseInt(pgres.rows[0].id),
-            created: pgres.rows[0].created,
-            active: pgres.rows[0].active,
-            name: pgres.rows[0].name
+            models: pgres.rows.map((r) => {
+                return {
+                    id: parseInt(r.id),
+                    created: r.created,
+                    active: r.active,
+                    name: r.name
+                };
+            })
         };
     }
 

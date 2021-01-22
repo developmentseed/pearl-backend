@@ -201,13 +201,6 @@ define({ "api": [
           },
           {
             "group": "Body",
-            "type": "String",
-            "optional": true,
-            "field": "storage",
-            "description": "<p>Blob storage location of the underlying model</p>"
-          },
-          {
-            "group": "Body",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
@@ -292,6 +285,15 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a all information for a single model</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_finetunelayer\": -2,\n    \"model_numparams\": 563498,\n    \"model_inputshape\": [100,100,4],\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Model"
   },
@@ -310,6 +312,15 @@ define({ "api": [
       }
     ],
     "description": "<p>List information about a set of models</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"models\": [{\n        \"id\": 1,\n        \"created\": \"<date>\",\n        \"active\": true,\n        \"name\": \"NA Model\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Model"
   },

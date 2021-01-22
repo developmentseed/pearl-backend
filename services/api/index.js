@@ -555,7 +555,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await model.create(req.body, req.session.auth));
+                res.json(await model.create(req.body, req.auth));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -571,6 +571,17 @@ async function server(argv, config, cb) {
      *
      * @apiDescription
      *     List information about a set of models
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "models": [{
+     *           "id": 1,
+     *           "created": "<date>",
+     *           "active": true,
+     *           "name": "NA Model"
+     *       }]
+     *   }
      */
     router.get(
         '/model',
@@ -629,6 +640,25 @@ async function server(argv, config, cb) {
      *
      * @apiDescription
      *     Return a all information for a single model
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "created": "<date>",
+     *       "active": true,
+     *       "uid": 1,
+     *       "name": "HCMC Sentinel 2019 Unsupervised",
+     *       "model_type": "keras_example",
+     *       "model_finetunelayer": -2,
+     *       "model_numparams": 563498,
+     *       "model_inputshape": [100,100,4],
+     *       "storage": true,
+     *       "classes": [
+     *           {"name": "Water", "color": "#0000FF"},
+     *       ],
+     *       "meta": {}
+     *   }
      */
     router.get('/model/:modelid', async (req, res) => {
         Param.int(req, res, 'modelid');
