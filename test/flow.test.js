@@ -9,14 +9,14 @@
 
 const request = require('request');
 
-const API = process.env.API || 'http://localhost:2000'
-const SOCKET = process.env.SOCKET || 'http://localhost:1999'
+const API = process.env.API || 'http://localhost:2000';
+const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 
 const test = require('tape');
 
 const WebSocket = require('ws');
 
-const usr = 'example-' + Math.floor(Math.random() * Math.floor(10^1000));
+const usr = 'example-' + Math.floor(Math.random() * Math.floor(10 ^ 1000));
 
 let flight;
 if (process.env.TEST !== 'compose') {
@@ -146,10 +146,10 @@ test('new model', (t) => {
             model_numparams: 563498,
             model_inputshape: [100,100,4],
             classes: [
-                { name: 'Water', color: '#0000FF'},
-                { name: 'Tree Canopy', color: '#008000'},
-                { name: 'Field', color: '#80FF80'},
-                { name: 'Built', color: '#806060'}
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
             ],
             meta: {}
         },

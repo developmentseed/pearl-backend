@@ -83,11 +83,11 @@ async function server(argv, config, cb) {
             }
 
             retry--;
-            console.error(`not ok - unable to get postgres connection`);
+            console.error('not ok - unable to get postgres connection');
             console.error(`ok - retrying... (${5 - retry}/5)`);
             await sleep(5000);
         }
-    } while (!pool)
+    } while (!pool);
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
@@ -516,7 +516,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission user
      */
-    router.delete('/instance/:instanceid', async (req, res) =>{
+    router.delete('/instance/:instanceid', async () =>{
     });
 
     /**
@@ -526,7 +526,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission user
      */
-    router.get('/instance/:instanceid', async (req, res) => {
+    router.get('/instance/:instanceid', async () => {
     });
 
     /**
@@ -762,7 +762,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            req.url = req.url + '/tilejson.json'
+            req.url = req.url + '/tilejson.json';
 
             await proxy.request(req, res);
         } catch (err) {
@@ -849,4 +849,4 @@ module.exports = {
     server,
     configure,
     Config
-}
+};

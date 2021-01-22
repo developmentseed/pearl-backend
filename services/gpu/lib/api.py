@@ -6,7 +6,7 @@ class API():
         self.url = url
         self.token = token
 
-    def model(self, model_id):
+    def model_meta(self, model_id):
         r = requests.get(self.url + '/api/model/' + model_id, headers={
             "authorization": "Bearer " + self.token
         })
@@ -14,3 +14,12 @@ class API():
         print(r.json())
 
         return r.json()
+
+    def model_download(self, model_id):
+        r = requests.get(self.url + '/api/model/' + model_id + '/download', headers={
+            "authorization": "Bearer " + self.token
+        })
+
+        open('/tmp/model.h5', 'wb').write(r.content)
+
+        return '/tmp/model.h5'

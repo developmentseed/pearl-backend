@@ -60,7 +60,7 @@ class Model {
         };
     }
 
-    async upload(model_id) {
+    async upload() {
         if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
 
     }
@@ -75,7 +75,7 @@ class Model {
         const blob_client = this.container_client.getBlockBlobClient(`model-${id}.h5`);
         const dwn = await blob_client.download(0);
 
-        res.send(dwn.readableStreamBody)
+        res.send(dwn.readableStreamBody);
     }
 
     async list() {
@@ -163,8 +163,9 @@ class Model {
      * Set a model as inactive and unusable
      */
     async delete(id) {
+        let pgres;
         try {
-            await this.pool.query(`
+            pgres = await this.pool.query(`
                 UPDATE
                     model
                 SET

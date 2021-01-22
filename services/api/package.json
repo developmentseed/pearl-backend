@@ -29,7 +29,9 @@
         "request": "^2.88.2"
     },
     "devDependencies": {
-        "apidoc-plugin-schema": "^0.1.8"
+        "apidoc-plugin-schema": "^0.1.8",
+        "eslint": "^7.17.0",
+        "eslint-plugin-node": "^11.1.0"
     },
     "apidoc": {
         "name": "Microsoft LULC API",

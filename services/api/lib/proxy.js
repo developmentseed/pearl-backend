@@ -1,4 +1,6 @@
-const {promisify} = require('util');
+'use strict';
+
+const { promisify } = require('util');
 const request = promisify(require('request'));
 
 /**
@@ -21,16 +23,16 @@ class Proxy {
             method: 'GET'
         });
 
-        res.status(proxres.statusCode)
+        res.status(proxres.statusCode);
 
         for (const h of ['content-type', 'content-length']) {
-            if (proxres.headers[h]) res.append(h, proxres.headers[h])
+            if (proxres.headers[h]) res.append(h, proxres.headers[h]);
         }
 
-        res.send(proxres.body)
+        res.send(proxres.body);
     }
 }
 
 module.exports = {
     Proxy
-}
+};
