@@ -1,9 +1,10 @@
 'use strict';
 
 const Err = require('./error');
+const { BlobServiceClient } = require('@azure/storage-blob');
 
 class Model {
-    constructor(pool) {
+    constructor(pool, config) {
         this.pool = pool;
     }
 
@@ -50,6 +51,10 @@ class Model {
             id: parseInt(pgres.rows[0].id),
             created: pgres.rows[0].created
         };
+    }
+
+    async upload() {
+        client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
     }
 
     async list() {

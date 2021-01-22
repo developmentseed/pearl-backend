@@ -98,7 +98,7 @@ async function server(argv, config, cb) {
     const proxy = new (require('./lib/proxy').Proxy)(config);
     const auth = new (require('./lib/auth').Auth)(pool);
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
-    const model = new (require('./lib/model').Model)(pool);
+    const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
 
     app.disable('x-powered-by');

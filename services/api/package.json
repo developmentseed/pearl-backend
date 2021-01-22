@@ -12,6 +12,7 @@
         "dev": "./index.js"
     },
     "dependencies": {
+        "@azure/storage-blob": "^12.4.0",
         "apidoc": "^0.25.0",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",

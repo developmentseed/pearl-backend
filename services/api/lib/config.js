@@ -6,6 +6,10 @@ class Config {
             throw new Error('SigningSecret env var must be set in production environment');
         }
 
+        this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
+
+        this.Environment = args.prod ? 'deploy' : 'local';
+
         this.Postgres = process.env.Postgres || args.postgres || 'postgres://postgres@localhost:5432/lulc';
         this.TileUrl = process.env.TileUrl || args.tileurl || false;
 

@@ -29,7 +29,28 @@ See the main README for how to view API documentation once generated
 
 ## Deployment
 
+### Azure Resources
+
+#### Blob Storage
+
+A basic blob storage resource must be created with the following containers:
+
+| Container | Notes |
+| --------- | ----- |
+| `models`  | Storage of raw base model data |
+
+Notes:
+
+- Each storage container can be set to `Private` as the `AZURE_STORAGE_CONNECTION_STRING` envronment
+variable will be used to connect.
+
 ### Environment Variables
+
+#### `AZURE_STORAGE_CONNECTION_STRING` [optionalish]
+
+Required in order to upload & save base models. If the `AZURE_STORAGE_CONNECTION_STRING` env var
+is not set, API endpoints that utilize this functionality are simply disabled.
+
 
 #### `SigningSecret` [required: prod]
 
