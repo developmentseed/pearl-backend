@@ -66,10 +66,10 @@ class MyService():
 async def connection(uri):
     async with websockets.connect(uri) as websocket:
         LOGGER.info("WebSocket Connection Initialized")
-        await websocket.send("Hello world!")
-        msg = await websocket.recv()
 
-        print('MSG: ', msg)
+        while True:
+            msg = await websocket.recv()
+            print('MSG: ', msg)
 
 
 def main():

@@ -75,12 +75,14 @@ function server(argv, config, cb) {
         ws.isAlive = true;
         ws.activity = +new Date();
         ws.auth = req.auth;
+        console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} connected`);
 
         Timeout.client(ws);
 
         pool.connected(ws);
 
         ws.on('close', () => {
+            console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} disconnected`);
             pool.disconnected(ws);
         });
 
