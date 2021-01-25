@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS models (
     model_numparams         BIGINT,
     model_inputshape        INT[],
 
-    storage                 TEXT,
+    storage                 BOOLEAN,
     classes                 JSONB,
     meta                    JSONB
 );

@@ -1,10 +1,18 @@
 'use strict';
 
 const Err = require('./error');
+const { BlobServiceClient } = require('@azure/storage-blob');
 
 class Model {
-    constructor(pool) {
+    constructor(pool, config) {
         this.pool = pool;
+        this.config = config;
+
+        // don't access these services unless AzureStorage is truthy
+        if (this.config.AzureStorage) {
+            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
+            this.container_client = this.blob_client.getContainerClient('models');
+        }
     }
 
     /**
@@ -52,6 +60,24 @@ class Model {
         };
     }
 
+    async upload() {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
+
+    }
+
+    async download(id, res) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
+
+        const model = await this.get(id);
+        if (!model.storage) throw new Err(404, null, 'Model has not been uploaded');
+        if (!model.active) throw new Err(410, null, 'Model is set as inactive');
+
+        const blob_client = this.container_client.getBlockBlobClient(`model-${id}.h5`);
+        const dwn = await blob_client.download(0);
+
+        dwn.readableStreamBody.pipe(res);
+    }
+
     async list() {
         let pgres;
 
@@ -72,13 +98,16 @@ class Model {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'No model found');
-
         return {
-            id: parseInt(pgres.rows[0].id),
-            created: pgres.rows[0].created,
-            active: pgres.rows[0].active,
-            name: pgres.rows[0].name
+            models: pgres.rows.map((r) => {
+                return {
+                    id: parseInt(r.id),
+                    created: r.created,
+                    active: r.active,
+                    uid: parseInt(r.uid),
+                    name: r.name
+                };
+            })
         };
     }
 
@@ -118,7 +147,7 @@ class Model {
             id: parseInt(pgres.rows[0].id),
             created: pgres.rows[0].created,
             active: pgres.rows[0].active,
-            uid: pgres.rows[0].uid,
+            uid: parseInt(pgres.rows[0].uid),
             name: pgres.rows[0].name,
             model_type: pgres.rows[0].model_type,
             model_finetunelayer: pgres.rows[0].model_findtunelayer,
@@ -134,8 +163,9 @@ class Model {
      * Set a model as inactive and unusable
      */
     async delete(id) {
+        let pgres;
         try {
-            await this.pool.query(`
+            pgres = await this.pool.query(`
                 UPDATE
                     model
                 SET

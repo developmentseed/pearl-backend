@@ -107,7 +107,10 @@ def main():
 
     api = API(os.environ["API"], token)
 
-    model = api.model(os.environ['MODEL_ID'])
+    model_id = os.environ['MODEL_ID']
+
+    model = api.model_meta(model_id)
+    model_fs = api.model_download(model_id)
 
     asyncio.get_event_loop().run_until_complete(
         connection('ws://localhost:1999?token={}'.format(token))

@@ -12,6 +12,7 @@
         "dev": "./index.js"
     },
     "dependencies": {
+        "@azure/storage-blob": "^12.4.0",
         "apidoc": "^0.25.0",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
@@ -28,7 +29,9 @@
         "request": "^2.88.2"
     },
     "devDependencies": {
-        "apidoc-plugin-schema": "^0.1.8"
+        "apidoc-plugin-schema": "^0.1.8",
+        "eslint": "^7.17.0",
+        "eslint-plugin-node": "^11.1.0"
     },
     "apidoc": {
         "name": "Microsoft LULC API",

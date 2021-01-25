@@ -83,11 +83,11 @@ async function server(argv, config, cb) {
             }
 
             retry--;
-            console.error(`not ok - unable to get postgres connection`);
+            console.error('not ok - unable to get postgres connection');
             console.error(`ok - retrying... (${5 - retry}/5)`);
             await sleep(5000);
         }
-    } while (!pool)
+    } while (!pool);
 
     try {
         await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
@@ -98,7 +98,7 @@ async function server(argv, config, cb) {
     const proxy = new (require('./lib/proxy').Proxy)(config);
     const auth = new (require('./lib/auth').Auth)(pool);
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
-    const model = new (require('./lib/model').Model)(pool);
+    const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
 
     app.disable('x-powered-by');
@@ -186,7 +186,7 @@ async function server(argv, config, cb) {
     router.use(async (req, res, next) => {
         if (req.session && req.session.auth && req.session.auth.username) {
             req.session.auth.type = 'session';
-            return next();
+            req.auth = req.session.auth;
         } else if (req.header('authorization')) {
             const authorization = req.header('authorization').split(' ');
             if (authorization[0].toLowerCase() !== 'bearer') {
@@ -197,13 +197,13 @@ async function server(argv, config, cb) {
             }
 
             try {
-                req.session.auth = await authtoken.validate(authorization[1]);
-                req.session.auth.type = 'token';
+                req.auth = await authtoken.validate(authorization[1]);
+                req.auth.type = 'token';
             } catch (err) {
                 return Err.respond(err, res);
             }
         } else {
-            req.session.auth = false;
+            req.auth = false;
         }
 
         return next();
@@ -302,7 +302,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.list(req.session.auth));
+            return res.json(await authtoken.list(req.auth));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -335,7 +335,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                return res.json(await authtoken.generate(req.session.auth, req.body.name));
+                return res.json(await authtoken.generate(req.auth, req.body.name));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -365,7 +365,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(await authtoken.delete(req.session.auth, req.params.tokenid));
+            return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -502,7 +502,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await instance.create(req.session.auth, req.body.model_id));
+                res.json(await instance.create(req.auth, req.body.model_id));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -516,7 +516,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission user
      */
-    router.delete('/instance/:instanceid', async (req, res) =>{
+    router.delete('/instance/:instanceid', async () =>{
     });
 
     /**
@@ -526,7 +526,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission user
      */
-    router.get('/instance/:instanceid', async (req, res) => {
+    router.get('/instance/:instanceid', async () => {
     });
 
     /**
@@ -555,7 +555,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await model.create(req.body, req.session.auth));
+                res.json(await model.create(req.body, req.auth));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -571,6 +571,17 @@ async function server(argv, config, cb) {
      *
      * @apiDescription
      *     List information about a set of models
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "models": [{
+     *           "id": 1,
+     *           "created": "<date>",
+     *           "active": true,
+     *           "name": "NA Model"
+     *       }]
+     *   }
      */
     router.get(
         '/model',
@@ -629,6 +640,25 @@ async function server(argv, config, cb) {
      *
      * @apiDescription
      *     Return a all information for a single model
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "created": "<date>",
+     *       "active": true,
+     *       "uid": 1,
+     *       "name": "HCMC Sentinel 2019 Unsupervised",
+     *       "model_type": "keras_example",
+     *       "model_finetunelayer": -2,
+     *       "model_numparams": 563498,
+     *       "model_inputshape": [100,100,4],
+     *       "storage": true,
+     *       "classes": [
+     *           {"name": "Water", "color": "#0000FF"},
+     *       ],
+     *       "meta": {}
+     *   }
      */
     router.get('/model/:modelid', async (req, res) => {
         Param.int(req, res, 'modelid');
@@ -637,6 +667,28 @@ async function server(argv, config, cb) {
             await auth.is_auth(req);
 
             res.json(await model.get(req.params.modelid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/model/:modelid/download Download Model
+     * @apiVersion 1.0.0
+     * @apiName DownloadModel
+     * @apiGroup Model
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return the model itself
+     */
+    router.get('/model/:modelid/download', async (req, res) => {
+        Param.int(req, res, 'modelid');
+
+        try {
+            await auth.is_auth(req);
+
+            await model.download(req.params.modelid, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -710,7 +762,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            req.url = req.url + '/tilejson.json'
+            req.url = req.url + '/tilejson.json';
 
             await proxy.request(req, res);
         } catch (err) {
@@ -797,4 +849,4 @@ module.exports = {
     server,
     configure,
     Config
-}
+};
