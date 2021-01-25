@@ -1,7 +1,15 @@
+'use strict';
+
+/**
+ * @class Pool
+ *
+ * @prop {Object} gpus instance_id to websocket connection map of GPU instances
+ * @prop {Object} clients instance_id to websocket connection map of clients
+ */
 class Pool {
     constructor() {
-        this.gpus = { };
-        this.clients = { };
+        this.gpus = new Map();
+        this.clients = new Map();
     }
 
     /**
@@ -11,7 +19,7 @@ class Pool {
         if (ws.auth.u === 'admin') {
             if (this.gpu(ws.auth.i)) this.gpu(ws.auth.i).terminate();
 
-            this.gpus[ws.auth.i] = ws;
+            this.gpus.set(ws.auth.i, ws);
 
             if (this.client(ws.auth.i)) {
                 this.client(ws.auth.i).send({
@@ -21,7 +29,7 @@ class Pool {
         } else if (ws.auth.u === 'inst') {
             if (this.client(ws.auth.i)) this.client(ws.auth.i).terminate();
 
-            this.clients[ws.auth.i] = ws;
+            this.clients.set(ws.auth.i, ws);
 
             if (this.client(ws.auth.i)) {
                 this.client(ws.auth.i).send({
@@ -33,17 +41,17 @@ class Pool {
 
     disconnected(ws) {
         if (ws.auth.u === 'admin') {
-            delete this.gpus[ws.auth.i];
+            this.gpus.delete(ws.auth.i);
 
-            if (this.client(ws.auth.i) {
+            if (this.client(ws.auth.i)) {
                 this.client(ws.auth.i).send({
                     message: 'info#disconnected'
                 });
             }
         } else if (ws.auth.u === 'inst') {
-            delete this.clients[ws.auth.i];
+            this.clients.delete(ws.auth.i);
 
-            if (this.client(ws.auth.i) {
+            if (this.client(ws.auth.i)) {
                 this.client(ws.auth.i).send({
                     message: 'info#disconnected'
                 });
@@ -62,25 +70,29 @@ class Pool {
                     }
                 });
             }
+
+            this.gpu(ws.auth.i).send(payload);
         } else if (ws.auth.t === 'admin') {
-            if (!this.gpu(ws.auth.i)) {
+            if (!this.client(ws.auth.i)) {
                 ws.send({
                     message: 'error',
                     data: {
                         error: 'Failed to communicate with Client Instance',
-                        detailed: 'No client websocket connection currently exists in router. Try to send the message again if a client connects'
+                        detailed: 'No client websocket connection currently exists in router. Try to send the message again if the client connects'
                     }
                 });
             }
+
+            this.client(ws.auth.i).send(payload);
         }
     }
 
     gpu(instance_id) {
-        return this.gpus[intsance_id];
+        return this.gpus.get(instance_id);
     }
 
     client(instance_id) {
-        return this.clients[instance_id];
+        return this.clients.get(instance_id);
     }
 
     gpus() {
