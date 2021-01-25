@@ -11,7 +11,7 @@ class API():
             "authorization": "Bearer " + self.token
         })
 
-        print(r.json())
+        r.raise_for_status()
 
         return r.json()
 
@@ -19,6 +19,8 @@ class API():
         r = requests.get(self.url + '/api/model/' + model_id + '/download', headers={
             "authorization": "Bearer " + self.token
         })
+
+        r.raise_for_status()
 
         open('/tmp/model.h5', 'wb').write(r.content)
 
