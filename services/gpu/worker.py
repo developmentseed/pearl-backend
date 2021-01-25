@@ -65,6 +65,7 @@ class MyService():
 
 async def connection(uri):
     async with websockets.connect(uri) as websocket:
+        LOGGER.info("WebSocket Connection Initialized")
         await websocket.send("Hello world!")
         msg = await websocket.recv()
 
@@ -106,7 +107,9 @@ def main():
 
     model_id = os.environ['MODEL_ID']
 
+    LOGGER.info("Downloading Model Metadata")
     model = api.model_meta(model_id)
+    LOGGER.info("Downloading Model")
     model_fs = api.model_download(model_id)
 
     asyncio.get_event_loop().run_until_complete(
