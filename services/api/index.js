@@ -502,7 +502,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await instance.create(req.session.auth, req.body.model_id));
+                res.json(await instance.create(req.auth, req.body.model_id));
             } catch (err) {
                 return Err.respond(err, res);
             }
