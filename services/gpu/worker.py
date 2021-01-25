@@ -78,6 +78,7 @@ def main():
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose debugging", default=False)
     parser.add_argument("--gpu_id", action="store", dest="gpu_id", type=int, help="GPU to use", required=False)
     parser.add_argument("--model_id", action="store", dest="model_id", type=int, help="Model to initiate", required=False)
+    parser.add_argument("--instance_id", action="store", dest="instance_id", type=int, help="ID of GPU Instance", required=False)
 
     parser.add_argument("--socket", action="store", type=str, help="websocket router url to connect to", default=None)
     parser.add_argument("--api", action="store", type=str, help="api url to connect to", default=None)
@@ -93,6 +94,7 @@ def main():
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
     os.environ['MODEL_ID'] = os.environ["MODEL_ID"] if os.environ.get("MODEL_ID") is not None else args.model_id
+    os.environ['INSTANCE_ID'] = os.environ["INSTANCE_ID"] if os.environ.get("INSTANCE_ID") is not None else args.instance_id
 
     os.environ["API"] = os.environ["API"] if os.environ.get("API") is not None else args.api
     os.environ["SOCKET"] = os.environ["SOCKET"] if os.environ.get("SOCKET") is not None else args.socket
@@ -100,7 +102,8 @@ def main():
         raise Exception("SigningSecret Env Var Required")
 
     token = jwt.encode({
-        "t": "admin"
+        "t": "admin",
+        "i": os.environ['INSTANCE_ID']
     }, os.environ["SigningSecret"], algorithm="HS256")
 
     api = API(os.environ["API"], token)
@@ -108,9 +111,9 @@ def main():
     model_id = os.environ['MODEL_ID']
 
     LOGGER.info("Downloading Model Metadata")
-    model = api.model_meta(model_id)
+    #model = api.model_meta(model_id)
     LOGGER.info("Downloading Model")
-    model_fs = api.model_download(model_id)
+    #model_fs = api.model_download(model_id)
 
     asyncio.get_event_loop().run_until_complete(
         connection('ws://localhost:1999?token={}'.format(token))
