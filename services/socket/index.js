@@ -78,10 +78,10 @@ function server(argv, config, cb) {
 
         Timeout.client(ws);
 
-        pool.connected(ws)
+        pool.connected(ws);
 
         ws.on('close', () => {
-            pool.disconnected(ws)
+            pool.disconnected(ws);
         });
 
         ws.on('message', (payload) => {

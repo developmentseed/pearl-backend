@@ -23,7 +23,7 @@ class Config {
 
         this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
-        this.API = args.api || process.env.API || 'http://localhost:2000'
+        this.API = args.api || process.env.API || 'http://localhost:2000';
 
         this.Port = args.port || 1999;
         this.Timeout = args.timeout || 15 * 60 * 1000; // default 15m

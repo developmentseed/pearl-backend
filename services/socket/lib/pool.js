@@ -13,7 +13,7 @@ class Pool {
 
             this.gpus[ws.auth.i] = ws;
 
-            if (this.client(ws.auth.i) {
+            if (this.client(ws.auth.i)) {
                 this.client(ws.auth.i).send({
                     message: 'info#connected'
                 });
@@ -23,7 +23,7 @@ class Pool {
 
             this.clients[ws.auth.i] = ws;
 
-            if (this.client(ws.auth.i) {
+            if (this.client(ws.auth.i)) {
                 this.client(ws.auth.i).send({
                     message: 'info#connected'
                 });
