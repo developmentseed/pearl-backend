@@ -74,7 +74,13 @@ async def connection(uri):
             except Exception:
                 LOGGER.error("Failed to decode websocket message")
 
-            print(msg)
+            action = msg.get('action')
+
+            if action == "terminate":
+                # Save Checkpoint
+                # Mark instance as terminated in API
+                # Shut down
+                break;
 
 def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")

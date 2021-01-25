@@ -4,9 +4,9 @@
  * @class Timeout
  */
 class Timeout {
-    constructor(config, pool) {
+    constructor(config, wss) {
         this.config = config;
-        this.pool = pool;
+        this.wss = wss;
 
         const self = this;
 
@@ -26,7 +26,7 @@ class Timeout {
     }
 
     timeoutBeat(self) {
-        self.pool.clients().forEach((ws) => {
+        self.wss.clients.forEach((ws) => {
             if ((+new Date()) - ws.activity > self.config.Timeout) {
                 ws.terminate();
             }
@@ -34,7 +34,7 @@ class Timeout {
     }
 
     aliveBeat(self) {
-        self.pool.clients().forEach((ws) => {
+        self.wss.clients.forEach((ws) => {
             if (ws.isAlive === false) return ws.terminate();
 
             ws.isAlive = false;
