@@ -74,13 +74,18 @@ function server(argv, config, cb) {
     wss.on('connection', (ws, req) => {
         ws.isAlive = true;
         ws.activity = +new Date();
+        ws.auth = req.auth;
 
         Timeout.client(ws);
 
-        pool.new(ws, req.auth)
+        pool.connected(ws)
+
+        ws.on('close', () => {
+            pool.disconnected(ws)
+        });
 
         ws.on('message', (payload) => {
-            console.error(payload);
+            pool.route(ws, payload);
         });
     });
 
