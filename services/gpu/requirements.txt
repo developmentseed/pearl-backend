@@ -43,7 +43,6 @@ pyqt5-sip==4.19.18
 pyqtchart==5.12
 pyqtwebengine==5.12.1
 requests-oauthlib==1.3.0
-rpyc==4.1.5
 rsa==4.6
 scipy==1.4.1
 tensorboard==2.2.2

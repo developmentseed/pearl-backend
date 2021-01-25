@@ -17,9 +17,6 @@ import numpy as np
 import logging
 LOGGER = logging.getLogger("server")
 
-import rpyc
-from rpyc.utils.server import OneShotServer, ThreadedServer
-
 from lib.api import API
 from web_tool.ModelSessionKerasExample import KerasDenseFineTune
 from web_tool.ModelSessionPytorchSolar import SolarFineTuning
@@ -29,7 +26,7 @@ from web_tool.Utils import setup_logging, serialize, deserialize
 
 from web_tool.Models import load_models
 
-class MyService(rpyc.Service):
+class MyService():
 
     def __init__(self, model):
         self.model = model
@@ -128,9 +125,6 @@ def load(model_type):
         model = ModelSessionRandomForest(**model_configs[args.model_key])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
-
-    t = OneShotServer(MyService(model), port=args.port)
-    t.start()
 
 if __name__ == "__main__":
     main()
