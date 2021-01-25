@@ -4,6 +4,7 @@
 # pylint: disable=E1137,E1136,E0110
 import sys
 import jwt
+import json
 import os
 import time
 import datetime
@@ -68,9 +69,12 @@ async def connection(uri):
         LOGGER.info("WebSocket Connection Initialized")
 
         while True:
-            msg = await websocket.recv()
-            print('MSG: ', msg)
+            try:
+                msg = json.load(await websocket.recv())
+            except Exception:
+                LOGGER.error("Failed to decode websocket message")
 
+            print(msg)
 
 def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")
