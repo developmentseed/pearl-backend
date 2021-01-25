@@ -28,15 +28,8 @@ from web_tool.Utils import setup_logging, serialize, deserialize
 from web_tool.Models import load_models
 
 class MyService():
-
     def __init__(self, model):
         self.model = model
-
-    def on_connect(self, conn):
-        pass
-
-    def on_disconnect(self, conn):
-        pass
 
     def exposed_last_tile(self):
         return serialize(self.model.last_tile)
@@ -121,16 +114,20 @@ def main():
     model_id = os.environ['MODEL_ID']
 
     LOGGER.info("Downloading Model Metadata")
-    #model = api.model_meta(model_id)
+    model = api.model_meta(model_id)
+
     LOGGER.info("Downloading Model")
-    #model_fs = api.model_download(model_id)
+    model_fs = api.model_download(model_id)
+
+    load(model, model_fs)
 
     asyncio.get_event_loop().run_until_complete(
         connection('ws://localhost:1999?token={}'.format(token))
     )
 
-def load(model_type):
-    model_type = model_configs[args.model_key]["type"]
+def load(model, model_fs):
+    model_type = model["model_type"]
+
     if model_type == "keras_example":
         model = KerasDenseFineTune(args.gpu_id, **model_configs[args.model_key])
     elif model_type == "pytorch_example":
@@ -141,6 +138,8 @@ def load(model_type):
         model = ModelSessionRandomForest(**model_configs[args.model_key])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
+
+    return model
 
 if __name__ == "__main__":
     main()

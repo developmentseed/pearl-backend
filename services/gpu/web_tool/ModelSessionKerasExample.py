@@ -24,7 +24,7 @@ class KerasDenseFineTune(ModelSession):
 
         self.model_fn = kwargs["fn"]
         tmodel = keras.models.load_model(self.model_fn, compile=False, custom_objects={
-            "jaccard_loss":keras.metrics.mean_squared_error, 
+            "jaccard_loss":keras.metrics.mean_squared_error,
             "loss":keras.metrics.mean_squared_error
         })
         self.model = keras.models.Model(inputs=tmodel.inputs, outputs=[tmodel.outputs[0], tmodel.layers[kwargs["fineTuneLayer"]].output])
@@ -42,9 +42,9 @@ class KerasDenseFineTune(ModelSession):
         self.augment_y_train = []
         self.augment_model = sklearn.base.clone(KerasDenseFineTune.AUGMENT_MODEL)
         self.augment_model_trained = False
-        
+
         self._last_tile = None
-     
+
     @property
     def last_tile(self):
         return self._last_tile
@@ -58,7 +58,7 @@ class KerasDenseFineTune(ModelSession):
 
         tile = tile / 255.0
         output, output_features = self.run_model_on_tile(tile)
-        
+
         if self.augment_model_trained:
             original_shape = output.shape
             output = output_features.reshape(-1, output_features.shape[2])
@@ -73,7 +73,7 @@ class KerasDenseFineTune(ModelSession):
     def retrain(self, **kwargs):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
-        
+
         if x_train.shape[0] == 0:
             return {
                 "message": "Need to add training samples in order to train",
@@ -86,7 +86,7 @@ class KerasDenseFineTune(ModelSession):
             LOGGER.debug("Fine-tuning accuracy: %0.4f" % (score))
 
             self.augment_model_trained = True
-            
+
             return {
                 "message": "Fine-tuning accuracy on data: %0.2f" % (score),
                 "success": True
@@ -98,7 +98,7 @@ class KerasDenseFineTune(ModelSession):
             }
 
     def add_sample_point(self, row, col, class_idx):
-        
+
         if self._last_tile is not None:
             self.augment_x_train.append(self._last_tile[row, col, :].copy())
             self.augment_y_train.append(class_idx)
@@ -141,7 +141,7 @@ class KerasDenseFineTune(ModelSession):
     def run_model_on_tile(self, tile, batch_size=32):
         height = tile.shape[0]
         width = tile.shape[1]
-        
+
         output = np.zeros((height, width, self.output_channels), dtype=np.float32)
         output_features = np.zeros((height, width, self.output_features), dtype=np.float32)
 
@@ -164,7 +164,7 @@ class KerasDenseFineTune(ModelSession):
                 batch_count+=1
 
         model_output = self.model.predict(np.array(batch), batch_size=batch_size, verbose=0)
-        
+
         for i, (y, x) in enumerate(batch_indices):
             output[y:y+self.input_size, x:x+self.input_size] += model_output[0][i] * kernel[..., np.newaxis]
             output_features[y:y+self.input_size, x:x+self.input_size] += model_output[1][i] * kernel[..., np.newaxis]
@@ -176,7 +176,7 @@ class KerasDenseFineTune(ModelSession):
         return output, output_features
 
     def save_state_to(self, directory):
-        
+
         np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
         np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
@@ -187,7 +187,7 @@ class KerasDenseFineTune(ModelSession):
                 f.write("")
 
         return {
-            "message": "Saved model state", 
+            "message": "Saved model state",
             "success": True
         }
 
@@ -205,6 +205,6 @@ class KerasDenseFineTune(ModelSession):
         self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         return {
-            "message": "Loaded model state", 
+            "message": "Loaded model state",
             "success": True
         }

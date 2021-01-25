@@ -1,4 +1,6 @@
 import requests
+import os.path
+from os import path
 
 class API():
 
@@ -16,12 +18,15 @@ class API():
         return r.json()
 
     def model_download(self, model_id):
-        r = requests.get(self.url + '/api/model/' + model_id + '/download', headers={
-            "authorization": "Bearer " + self.token
-        })
+        model_fs = '/tmp/model-{}.h5'.format(model_id)
 
-        r.raise_for_status()
+        if not path.exists(model_fs):
+            r = requests.get(self.url + '/api/model/' + model_id + '/download', headers={
+                "authorization": "Bearer " + self.token
+            })
 
-        open('/tmp/model.h5', 'wb').write(r.content)
+            r.raise_for_status()
 
-        return '/tmp/model.h5'
+            open(model_fs, 'wb').write(r.content)
+
+        return model_fs
