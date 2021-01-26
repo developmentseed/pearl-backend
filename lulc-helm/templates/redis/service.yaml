@@ -1,0 +1,19 @@
+{{- if .Values.redis.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-redis
+  labels:
+    app: {{ template "lulc-helm.name" . }}
+    component: redis-service
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    app: {{ template "lulc-helm.name" . }}
+    release: {{ .Release.Name }}
+    run: {{ .Release.Name }}-redis
+{{- end }}

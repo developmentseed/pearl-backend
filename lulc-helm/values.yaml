@@ -30,3 +30,5 @@ tiles:
     limits:
       cpu: 256m
       memory: 512Mi
+redis:
+  enabled: true
