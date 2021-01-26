@@ -80,7 +80,7 @@ async def connection(uri, model):
 
             action = msg.get('action')
 
-            if action == "terminate":
+            if action == "instance#terminate":
                 # Save Checkpoint
                 # Mark instance as terminated in API
                 # Shut down
