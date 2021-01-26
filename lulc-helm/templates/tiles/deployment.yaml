@@ -50,4 +50,6 @@ spec:
               value: {{ .Values.tiles.env.Backends }}
             - name: MOSAIC_HOST
               value: {{ .Values.tiles.env.Host }}
+            - name: CACHE_ENDPOINT
+              value: {{ .Release.Name }}-redis:6379
 {{- end }}
