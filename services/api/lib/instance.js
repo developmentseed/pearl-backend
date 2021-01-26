@@ -16,11 +16,6 @@ class Instance {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
-        const token = jwt.sign({
-            t: 'inst',
-            u: auth.uid
-        }, this.config.SigningSecret, { expiresIn: '6h' });
-
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO instances (
@@ -36,6 +31,12 @@ class Instance {
                 auth.uid,
                 model_id
             ]);
+
+            const token = jwt.sign({
+                t: 'inst',
+                u: auth.uid,
+                m: parseInt(pgres.rows[0].id)
+            }, this.config.SigningSecret, { expiresIn: '12h' });
 
             return {
                 id: parseInt(pgres.rows[0].id),

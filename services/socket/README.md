@@ -35,10 +35,62 @@ The websocket will then validate the instance token and accept or deny the conne
 
 ### Message Format
 
+There are two styles of message formats that can be delivered or received by the router.
+
+The first is an `action` message. It is sent from the client => GPU or the GPU => client
+when an action is expected to be performed by the recipient.
+
 ```json
 {
-    "action": "<category>:<action>",
+    "action": "<category>#<optional action>",
     "data": {}
+}
+```
+
+The second is the `message` type. It is sent from the client => GPU or the GPU => client
+either in response to an action  (ie returning requested data) or generally during the
+course of a session as informational messages
+
+```json
+{
+    "message": "<category>#<optional action>",
+    "data": {}
+}
+```
+
+### Supported Messages
+
+| Message               | Notes |
+| --------------------- | ----- |
+| `info#connection`     |       |
+| `info#disconnection`  |       |
+| `error`               |       |
+
+#### error
+
+```json
+{
+    "message": "error",
+    "data": {
+        "error": "Short, user safe error message",
+        "detailed": "More detailed debug message as to what is happening"
+    }
+}
+```
+
+#### info#connection
+
+```json
+{
+    "message": "info#connection",
+}
+```
+
+#### info#disconnection
+
+```json
+{
+    "message": "info#disconnection",
 }
 ```
 
@@ -46,6 +98,8 @@ The websocket will then validate the instance token and accept or deny the conne
 
 | Action                | Notes |
 | --------------------- | ----- |
+| 'connection'          |       |
+| 'error'               |       |
 | 'model:reset'         |       |
 | 'model:retrain'       |       |
 | 'pred:correct'        |       |
@@ -55,3 +109,11 @@ The websocket will then validate the instance token and accept or deny the conne
 | 'session:kill'        |       |
 | 'checkpoint:create'   |       |
 | 'checkpoint:list'     |       |
+
+#### Connection
+
+```JSON
+{
+    "type": "connection"
+}
+```

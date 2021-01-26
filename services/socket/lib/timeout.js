@@ -1,4 +1,4 @@
-const request = require('request');
+'use strict';
 
 /**
  * @class Timeout
@@ -8,14 +8,14 @@ class Timeout {
         this.config = config;
         this.wss = wss;
 
-        const self = this
+        const self = this;
 
-        this.timeout = setInterval(function() {
-            self.timeoutBeat(self)
+        this.timeout = setInterval(() => {
+            self.timeoutBeat(self);
         }, this.config.Timeout);
 
-        this.alive = setInterval(function() {
-            self.aliveBeat(self)
+        this.alive = setInterval(() => {
+            self.aliveBeat(self);
         }, this.config.Alive);
     }
 

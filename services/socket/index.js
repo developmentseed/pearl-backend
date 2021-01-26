@@ -50,15 +50,15 @@ function server(argv, config, cb) {
 
     const wss = new WebSocket.Server({
         server: srv,
-        verifyClient: (info, cb) => {
-            const url = new URL(`http://localhost:${config.Port}` + info.req.url);
+        verifyClient: ({ req }, cb) => {
+            const url = new URL(`http://localhost:${config.Port}` + req.url);
 
             if (!url.searchParams.has('token')) return cb(false, 401, 'Unauthorized');
 
             jwt.verify(url.searchParams.get('token'), config.SigningSecret, (err, decoded) => {
                 if (err || (decoded.t !== 'inst' && decoded.t !== 'admin')) return cb(false, 401, 'Unauthorized');
 
-                info.req.user = decoded;
+                req.auth = decoded;
 
                 return cb(true);
             });
@@ -71,14 +71,23 @@ function server(argv, config, cb) {
      * ws.isAlive {boolean} Store whether the connection is still alive
      * ws.activity {Date} Store the timestamp of th last user defined action
      */
-    wss.on('connection', (ws) => {
+    wss.on('connection', (ws, req) => {
         ws.isAlive = true;
         ws.activity = +new Date();
+        ws.auth = req.auth;
+        console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} connected`);
 
         Timeout.client(ws);
 
+        pool.connected(ws);
+
+        ws.on('close', () => {
+            console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} disconnected`);
+            pool.disconnected(ws);
+        });
+
         ws.on('message', (payload) => {
-            console.error(payload);
+            pool.route(ws, payload);
         });
     });
 
