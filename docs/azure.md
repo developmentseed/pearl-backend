@@ -24,6 +24,10 @@ az aks create -g lulcStaging -n lulcStagingAks --location westeurope --attach-ac
 az ad sp create-for-rbac --sdk-auth
 ```
 
+## Create a contributor scoped Service Principal for the Resource Group
+```
+az ad sp create-for-rbac --name lulc-frontend --role contributor --scopes /subscriptions/230383d9-08f3-4704-b6a5-d69e14bf02aa/resourceGroups/lulcStaging --sdk-auth
+```
 ## Find ACR credentials for Helm ImagePullSecrets
 
 * Resource Group > ACR > Access Keys > Enable Admin user
@@ -71,4 +75,63 @@ az storage account create \
     --location westeurope \
     --sku Standard_ZRS \
     --encryption-services blob
+```
+
+# Enable static website hosting from blob storage
+
+```
+az storage blob service-properties update --account-name lulc --static-website --404-document 404.html --index-document index.html
+```
+
+# Add a GPU nodepool to the cluster
+
+```
+az aks nodepool add \
+    --resource-group lulcStaging \
+    --cluster-name lulcStagingAks2 \
+    --name gpunodepool \
+    --node-count 1 \
+    --node-vm-size Standard_NC6 \
+    --no-wait
+```
+# Enable cluster autoscale
+```
+az aks nodepool update \
+  --resource-group lulcStaging \
+  --cluster-name lulcStagingAks2 \
+  --name nodepool1 \
+  --enable-cluster-autoscaler \
+  --min-count 3 \
+  --max-count 5
+```
+# Update cluster autoscale on an node pool (if needed to change min / max)
+```
+az aks nodepool update \
+  --resource-group lulcStaging \
+  --cluster-name lulcStagingAks2 \
+  --name nodepool1 \
+  --update-cluster-autoscaler \
+  --min-count 3 \
+  --max-count 5
+```
+
+# Add the AKS specialized GPU image support (one time)
+
+```
+az feature register --name GPUDedicatedVHDPreview --namespace Microsoft.ContainerService
+```
+
+## Check the status
+```
+az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/GPUDedicatedVHDPreview')].{Name:name,State:properties.state}"
+```
+
+## Refresh the registration
+```
+az provider register --namespace Microsoft.ContainerService
+```
+
+## Use the AKS specialized GPU image on a cluster
+```
+az aks nodepool add --name gpu --cluster-name lulcStagingAks2 --resource-group lulcStaging --node-vm-size Standard_NC6 --node-count 1 --aks-custom-headers UseGPUDedicatedVHD=true
 ```

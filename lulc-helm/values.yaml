@@ -14,8 +14,19 @@ socket:
     tag: 'chartpress_replace'
 tiles:
   enabled: true
-  replicaCount: 1
+  replicaCount: 8
   containerPort: 8000
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
+  nodeSelector:
+    enabled: true
+    label_key: agentpool
+    label_value: nodepool1
+  resources:
+    requests:
+      cpu: 256m
+      memory: 512Mi
+    limits:
+      cpu: 256m
+      memory: 512Mi
