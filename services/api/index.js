@@ -489,6 +489,8 @@ async function server(argv, config, cb) {
      *     Instruct the GPU pool to start a new model instance and return a time limited session
      *     token for accessing the websockets GPU API
      *
+     * @apiSchema (Body) {jsonschema=./schema/instance.json} apiParam
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
@@ -515,21 +517,24 @@ async function server(argv, config, cb) {
      * @apiName PatchInstance
      * @apiGroup Instance
      * @apiPermission admin
+     *
+     * @apiSchema (Body) {jsonschema=./schema/instance-patch.json} apiParam
      */
-    router.patch('/instance/:instanceid', async (req, res) =>{
-        Param.int(req, res, 'instanceid');
-    });
+    router.patch(
+        '/instance/:instanceid',
+        validate({ body: require('./schema/instance.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
 
-    /**
-     * @api {delete} /api/instance/:instance Delete Instance
-     * @apiVersion 1.0.0
-     * @apiName DeleteInstance
-     * @apiGroup Instance
-     * @apiPermission admin
-     */
-    router.delete('/instance/:instanceid', async (req, res) =>{
-        Param.int(req, res, 'instanceid');
-    });
+            try {
+                await auth.is_admin(req);
+
+                // TODO Allow patching
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     /**
      * @api {get} /api/instance List Instances

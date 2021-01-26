@@ -78,6 +78,10 @@ class Instance {
         };
     }
 
+    async patch(body) {
+
+    }
+
     async create(auth, model_id) {
         if (!auth.type) {
             throw new Err(400, null, 'Only an authenticated user can create a token');
