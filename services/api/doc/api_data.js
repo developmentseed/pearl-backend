@@ -8,9 +8,9 @@ define({ "api": [
     "group": "Instance",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
     "filename": "./index.js",
@@ -28,6 +28,92 @@ define({ "api": [
         "name": "user",
         "title": "User",
         "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "get",
+    "url": "/api/instance",
+    "title": "List Instances",
+    "version": "1.0.0",
+    "name": "ListInstances",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"active\"",
+              "\"inactive\"",
+              "\"all\""
+            ],
+            "optional": true,
+            "field": "status",
+            "defaultValue": "active",
+            "description": "<p>Filter instances by active status</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "uid",
+            "description": "<p>Query by user id</p>"
+          }
+        ]
+      }
+    },
+    "description": "<p>Return a list of instances. Note that users can only get their own instances and use of the <code>uid</code> field will be pinned to their own uid. Admins can filter by any uid or none.</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instances\": [{\n        \"id\": 1,\n        \"uid\": 123,\n        \"active\": true,\n        \"created\": \"<date>\",\n        \"model_id\": 1\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "patch",
+    "url": "/api/instance/:instance",
+    "title": "Patch Instance",
+    "version": "1.0.0",
+    "name": "PatchInstance",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
     "filename": "./index.js",
@@ -801,15 +887,8 @@ define({ "api": [
             "group": "Body",
             "type": "String",
             "optional": false,
-            "field": "username",
-            "description": "<p>username to authenticate with</p>"
-          },
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>password to authenticate with</p>"
+            "field": "name",
+            "description": "<p>name of the created token</p>"
           }
         ]
       }
@@ -938,7 +1017,7 @@ define({ "api": [
     "url": "/api/user",
     "title": "List Users",
     "version": "1.0.0",
-    "name": "list",
+    "name": "ListUsers",
     "group": "User",
     "permission": [
       {

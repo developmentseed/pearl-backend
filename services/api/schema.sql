@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS models (
 CREATE TABLE IF NOT EXISTS instances (
     id          BIGSERIAL PRIMARY KEY,
     uid         BIGINT,
+    active      BOOLEAN,
     created     TIMESTAMP,
     model_id    BIGINT
 );

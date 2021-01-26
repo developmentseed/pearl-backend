@@ -9,6 +9,63 @@ class Instance {
         this.config = config;
     }
 
+    /**
+     * Return a list of instances
+     *
+     * @param {Object} query - Query Object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Page of users to return
+     * @param {Number} [query.status=active] - Should the session be active? `active`, `inactive`, or `all`
+     * @param {Number} query.uid - Query by uid.
+     */
+    async list(query) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 1;
+        if (!query.status) query.status = 'active';
+
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+               SELECT
+                    count(*) OVER() AS count,
+                    id,
+                    uid,
+                    active,
+                    created,
+                    model_id
+                FROM
+                    instances
+                WHERE
+                    username iLIKE '%'||$3||'%'
+                    OR email iLIKE '%'||$3||'%'
+                LIMIT
+                    $1
+                OFFSET
+                    $2
+            `, [
+                query.limit,
+                query.page,
+
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to list instances');
+        }
+
+        return {
+            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
+            instances: pgres.rows.map((row) => {
+                return {
+                    id: parseInt(row.id),
+                    uid: parseInt(row.uid),
+                    active: row.active,
+                    created: row.created,
+                    model_id: parseInt(row.model_id)
+                };
+            })
+        };
+    }
+
     async create(auth, model_id) {
         if (!auth.type) {
             throw new Err(400, null, 'Only an authenticated user can create a token');
@@ -21,11 +78,13 @@ class Instance {
                 INSERT INTO instances (
                     uid,
                     created,
-                    model_id
+                    model_id,
+                    active
                 ) VALUES (
                     $1,
                     NOW(),
-                    $2
+                    $2,
+                    False
                 ) RETURNING *
             `, [
                 auth.uid,

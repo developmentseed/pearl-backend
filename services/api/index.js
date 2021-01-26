@@ -318,7 +318,7 @@ async function server(argv, config, cb) {
      * @apiDescription
      *     Create a new API token to perform API requests with
      *
-     * @apiSchema (Body) {jsonschema=./schema/login.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/token.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -374,7 +374,7 @@ async function server(argv, config, cb) {
     /**
      * @api {get} /api/user List Users
      * @apiVersion 1.0.0
-     * @apiName list
+     * @apiName ListUsers
      * @apiGroup User
      * @apiPermission admin
      *
@@ -510,13 +510,54 @@ async function server(argv, config, cb) {
     );
 
     /**
+     * @api {patch} /api/instance/:instance Patch Instance
+     * @apiVersion 1.0.0
+     * @apiName PatchInstance
+     * @apiGroup Instance
+     * @apiPermission admin
+     */
+    router.patch('/instance/:instanceid', async () =>{
+        Param.int(req, res, 'instanceid');
+    });
+
+    /**
      * @api {delete} /api/instance/:instance Delete Instance
      * @apiVersion 1.0.0
      * @apiName CreateInstance
      * @apiGroup Instance
-     * @apiPermission user
+     * @apiPermission admin
      */
     router.delete('/instance/:instanceid', async () =>{
+        Param.int(req, res, 'instanceid');
+    });
+
+    /**
+     * @api {get} /api/instance List Instances
+     * @apiVersion 1.0.0
+     * @apiName ListInstances
+     * @apiGroup Instance
+     * @apiPermission user
+     *
+     * @apiSchema (Query) {jsonschema=./schema/instance-list.query.json} apiParam
+
+     * @apiDescription
+     *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
+     *     field will be pinned to their own uid. Admins can filter by any uid or none.
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "instances": [{
+     *           "id": 1,
+     *           "uid": 123,
+     *           "active": true,
+     *           "created": "<date>",
+     *           "model_id": 1
+     *       }]
+     *   }
+     */
+    router.get('/instance', async () => {
     });
 
     /**
@@ -527,6 +568,7 @@ async function server(argv, config, cb) {
      * @apiPermission user
      */
     router.get('/instance/:instanceid', async () => {
+        Param.int(req, res, 'modelid');
     });
 
     /**
