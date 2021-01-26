@@ -20,14 +20,20 @@ class KerasDenseFineTune(ModelSession):
 
     AUGMENT_MODEL = RandomForestClassifier()
 
-    def __init__(self, gpu_id, **kwargs):
+    def __init__(self, gpu_id, model, model_fs):
 
-        self.model_fn = kwargs["fn"]
+        self.model_fn = model_fs
         tmodel = keras.models.load_model(self.model_fn, compile=False, custom_objects={
             "jaccard_loss":keras.metrics.mean_squared_error,
             "loss":keras.metrics.mean_squared_error
         })
-        self.model = keras.models.Model(inputs=tmodel.inputs, outputs=[tmodel.outputs[0], tmodel.layers[kwargs["fineTuneLayer"]].output])
+
+        self.model = keras.models.Model(
+            inputs=tmodel.inputs,
+            outputs=[tmodel.outputs[0],
+            tmodel.layers[model["model_finetunelayer"]].output]
+        )
+
         self.model.compile("sgd","mse")
 
         self.output_channels = self.model.output_shape[0][3]
@@ -70,7 +76,7 @@ class KerasDenseFineTune(ModelSession):
 
         return output
 
-    def retrain(self, **kwargs):
+    def retrain(self):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 

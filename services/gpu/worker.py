@@ -1,23 +1,13 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-# pylint: disable=E1137,E1136,E0110
+
 import sys
 import jwt
 import json
 import os
-import time
-import datetime
-import collections
 import argparse
 import asyncio
 import websockets
-
-import numpy as np
-
 import logging
-LOGGER = logging.getLogger("server")
-
 from lib.api import API
 from web_tool.ModelSessionKerasExample import KerasDenseFineTune
 from web_tool.ModelSessionPytorchSolar import SolarFineTuning
@@ -25,7 +15,8 @@ from web_tool.ModelSessionPyTorchExample import TorchFineTuning
 from web_tool.ModelSessionRandomForest import ModelSessionRandomForest
 from web_tool.Utils import setup_logging, serialize, deserialize
 
-from web_tool.Models import load_models
+LOGGER = logging.getLogger("server")
+
 
 class MyService():
     def __init__(self, model):
@@ -73,7 +64,7 @@ async def connection(uri):
                 # Save Checkpoint
                 # Mark instance as terminated in API
                 # Shut down
-                break;
+                break
 
 def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")
@@ -119,23 +110,23 @@ def main():
     LOGGER.info("Downloading Model")
     model_fs = api.model_download(model_id)
 
-    load(model, model_fs)
+    load(args.gpu_id, model, model_fs)
 
     asyncio.get_event_loop().run_until_complete(
         connection('ws://localhost:1999?token={}'.format(token))
     )
 
-def load(model, model_fs):
+def load(gpu_id, model, model_fs):
     model_type = model["model_type"]
 
     if model_type == "keras_example":
-        model = KerasDenseFineTune(args.gpu_id, **model_configs[args.model_key])
+        model = KerasDenseFineTune(gpu_id, model, model_fs)
     elif model_type == "pytorch_example":
-        model = TorchFineTuning(args.gpu_id, **model_configs[args.model_key])
+        model = TorchFineTuning(gpu_id, model, model_fs)
     elif model_type == "pytorch_solar":
-        model = SolarFineTuning(args.gpu_id, **model_configs[args.model_key])
+        model = SolarFineTuning(gpu_id, model, model_fs)
     elif model_type == "random_forest":
-        model = ModelSessionRandomForest(**model_configs[args.model_key])
+        model = ModelSessionRandomForest(model, model_fs)
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
