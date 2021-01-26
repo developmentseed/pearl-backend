@@ -119,6 +119,40 @@ class Instance {
             throw new Err(500, err, 'Failed to generate token');
         }
     }
+
+    /**
+     * Retrieve information about an instance
+     */
+    async get(id) {
+        let pgres;
+
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    id,
+                    uid,
+                    created,
+                    model_id,
+                    active
+                FROM
+                    instances
+                WHERE
+                    id = $1
+            `, [id]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal Instance Error');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
+
+        return {
+            id: parseInt(gres.rows[0].id),
+            uid: parseInt(gres.rows[0].uid),
+            created: pgres.rows[0].created,
+            model_id: parseInt(pgres.rows[0].model_id),
+            active: pgres.rows[0].id
+        };
+    }
 }
 
 module.exports = {

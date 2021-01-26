@@ -481,7 +481,7 @@ async function server(argv, config, cb) {
     /**
      * @api {get} /api/instance Create Instance
      * @apiVersion 1.0.0
-     * @apiName create
+     * @apiName CreateInstance
      * @apiGroup Instance
      * @apiPermission user
      *
@@ -523,7 +523,7 @@ async function server(argv, config, cb) {
     /**
      * @api {delete} /api/instance/:instance Delete Instance
      * @apiVersion 1.0.0
-     * @apiName CreateInstance
+     * @apiName DeleteInstance
      * @apiGroup Instance
      * @apiPermission admin
      */
@@ -539,7 +539,7 @@ async function server(argv, config, cb) {
      * @apiPermission user
      *
      * @apiSchema (Query) {jsonschema=./schema/instance-list.query.json} apiParam
-
+     *
      * @apiDescription
      *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
      *     field will be pinned to their own uid. Admins can filter by any uid or none.
@@ -578,7 +578,19 @@ async function server(argv, config, cb) {
      * @apiPermission user
      */
     router.get('/instance/:instanceid', async (req, res) => {
-        Param.int(req, res, 'modelid');
+        Param.int(req, res, 'instanceid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+
+            if (req.auth.access === 'admin') return res.json(inst);
+
+            if (req.auth.uid !== instance.uid) throw new Error(403, null, 'Cannot access models you don\'t own');
+
+            return res.json(inst);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
