@@ -598,6 +598,16 @@ async function server(argv, config, cb) {
         }
     });
 
+    router.get('/instance/:instanceid/checkpoints', async (req, res) => {
+        Param.int(req, res, 'instanceid');
+
+        try {
+
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     /**
      * @api {post} /api/model Create Model
      * @apiVersion 1.0.0
