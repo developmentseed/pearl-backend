@@ -8,7 +8,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ template "lulc-helm.fullname" . }}-tiles
-  minReplicas: 10
+  minReplicas: 2
   maxReplicas: 30
   targetCPUUtilizationPercentage: 10
 
