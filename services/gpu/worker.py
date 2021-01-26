@@ -9,6 +9,7 @@ import asyncio
 import websockets
 import logging
 from lib.api import API
+from lib.Model import Model
 from web_tool.ModelSessionKerasExample import KerasDenseFineTune
 from web_tool.ModelSessionPytorchSolar import SolarFineTuning
 from web_tool.ModelSessionPyTorchExample import TorchFineTuning
@@ -16,55 +17,6 @@ from web_tool.ModelSessionRandomForest import ModelSessionRandomForest
 from web_tool.Utils import setup_logging, serialize, deserialize
 
 LOGGER = logging.getLogger("server")
-
-
-class MyService():
-    def __init__(self, model):
-        self.model = model
-
-    def exposed_last_tile(self):
-        return serialize(self.model.last_tile)
-
-    def exposed_run(self, tile, inference_mode=False):
-        tile = deserialize(tile) # need to serialize/deserialize numpy arrays
-        output = self.model.run(tile, inference_mode)
-        return serialize(output) # need to serialize/deserialize numpy arrays
-
-    def exposed_retrain(self):
-        return self.model.retrain()
-
-    def exposed_add_sample_point(self, row, col, class_idx):
-        return self.model.add_sample_point(row, col, class_idx)
-
-    def exposed_undo(self):
-        return self.model.undo()
-
-    def exposed_reset(self):
-        return self.model.reset()
-
-    def exposed_save_state_to(self, directory):
-        return self.model.save_state_to(directory)
-
-    def exposed_load_state_from(self, directory):
-        return self.model.load_state_from(directory)
-
-async def connection(uri):
-    async with websockets.connect(uri) as websocket:
-        LOGGER.info("WebSocket Connection Initialized")
-
-        while True:
-            try:
-                msg = json.load(await websocket.recv())
-            except Exception:
-                LOGGER.error("Failed to decode websocket message")
-
-            action = msg.get('action')
-
-            if action == "terminate":
-                # Save Checkpoint
-                # Mark instance as terminated in API
-                # Shut down
-                break
 
 def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")
@@ -110,11 +62,33 @@ def main():
     LOGGER.info("Downloading Model")
     model_fs = api.model_download(model_id)
 
-    load(args.gpu_id, model, model_fs)
+    model = load(args.gpu_id, model, model_fs)
 
     asyncio.get_event_loop().run_until_complete(
-        connection('ws://localhost:1999?token={}'.format(token))
+        connection('ws://localhost:1999?token={}'.format(token), model)
     )
+
+async def connection(uri, model):
+    async with websockets.connect(uri) as websocket:
+        LOGGER.info("WebSocket Connection Initialized")
+
+        while True:
+            try:
+                msg = json.load(await websocket.recv())
+            except Exception:
+                LOGGER.error("Failed to decode websocket message")
+
+            action = msg.get('action')
+
+            if action == "terminate":
+                # Save Checkpoint
+                # Mark instance as terminated in API
+                # Shut down
+                break
+            elif action == "model#reset":
+                model.reset()
+            elif action == "model#undo":
+                mode.undo()
 
 def load(gpu_id, model, model_fs):
     model_type = model["model_type"]
@@ -130,7 +104,7 @@ def load(gpu_id, model, model_fs):
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
-    return model
+    return Model(model)
 
 if __name__ == "__main__":
     main()
