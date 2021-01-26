@@ -516,7 +516,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission admin
      */
-    router.patch('/instance/:instanceid', async () =>{
+    router.patch('/instance/:instanceid', async (req, res) =>{
         Param.int(req, res, 'instanceid');
     });
 
@@ -527,7 +527,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission admin
      */
-    router.delete('/instance/:instanceid', async () =>{
+    router.delete('/instance/:instanceid', async (req, res) =>{
         Param.int(req, res, 'instanceid');
     });
 
@@ -557,7 +557,17 @@ async function server(argv, config, cb) {
      *       }]
      *   }
      */
-    router.get('/instance', async () => {
+    router.get('/instance', async (req, res) => {
+        try {
+            await auth.is_auth(req);
+
+            // Only admins can see all running instances
+            if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
+
+            res.json(await instance.list(req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -567,7 +577,7 @@ async function server(argv, config, cb) {
      * @apiGroup Instance
      * @apiPermission user
      */
-    router.get('/instance/:instanceid', async () => {
+    router.get('/instance/:instanceid', async (req, res) => {
         Param.int(req, res, 'modelid');
     });
 

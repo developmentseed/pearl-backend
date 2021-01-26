@@ -24,6 +24,20 @@ class Instance {
         if (!query.page) query.page = 1;
         if (!query.status) query.status = 'active';
 
+        let WHERE = [];
+
+        if (query.status === 'active') {
+            WHERE.push('active IS true');
+        } else if (query.status === 'inactive') {
+            WHERE.push('active IS false');
+        }
+
+        if (query.uid) {
+            WHERE.push('uid = ', parseInt(query.uid));
+        }
+
+        if (WHERE.length) WHERE = 'WHERE ' + WHERE.join(' AND ');
+
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -36,16 +50,14 @@ class Instance {
                     model_id
                 FROM
                     instances
-                WHERE
-                    username iLIKE '%'||$3||'%'
-                    OR email iLIKE '%'||$3||'%'
+                ${WHERE}
                 LIMIT
                     $1
                 OFFSET
                     $2
             `, [
                 query.limit,
-                query.page,
+                query.page
 
             ]);
         } catch (err) {
