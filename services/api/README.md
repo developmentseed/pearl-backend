@@ -7,13 +7,25 @@ that exists in the database.
 
 ## Development
 
-It is generally recommended to run the bootstrap scripts described in the main project README.
+To setup a development environment for the API it is recommended to run the ExpressJS server outside Docker, with the remaining parts of the stack in containers. You can start them with Docker Compose from the repository root directory:
 
-If it is desired to run the API without other parts of the project, run the following
+```sh
+docker-compose up --build postgis socket tiler cache
+```
+
+Make sure you are running the required Node.js version included in [.nvmrc](.nvmrc) or activate it with [nvm](https://github.com/nvm-sh/nvm):
+
+```sh
+nvm i
+```
+
+Start the development server:
 
 ```sh
 npm run dev
 ```
+
+The API will be available at http://localhost:2000 and restart on every change.
 
 ## API Documentation
 
