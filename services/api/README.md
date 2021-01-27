@@ -62,10 +62,12 @@ In development mode it is easier to add a `.env` to this folder to set environme
 
 #### Authentication with Auth0
 
-Please refer to [Auth0 guide on Express configuration](https://auth0.com/blog/complete-guide-to-nodejs-express-user-authentication/) and set the following variables:
+Set the following variables with Auth0 settings:
 
 - AUTH0_ISSUER_BASE_URL
 - AUTH0_CLIENT_ID
+
+Please refer to [Auth0 guide on Express configuration](https://auth0.com/blog/complete-guide-to-nodejs-express-user-authentication/) for details.
 
 #### `AZURE_STORAGE_CONNECTION_STRING` [optionalish]
 
