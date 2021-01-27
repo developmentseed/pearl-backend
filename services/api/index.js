@@ -836,7 +836,7 @@ async function server(argv, config, cb) {
 
         if (cb) return cb(srv, pool);
 
-        console.error(`ok - running http://localhost:${config.Port}`);
+        console.error(`ok - running ${config.BaseUrl}`);
     });
 
 }
