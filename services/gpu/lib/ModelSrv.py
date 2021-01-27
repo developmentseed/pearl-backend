@@ -1,7 +1,13 @@
 from web_tool.Utils import serialize, deserialize
 
-class Model():
+class ModelSrv():
     def __init__(self, model):
+
+        os.makedirs("/tmp/checkpoints/", exist_ok=True)
+        os.makedirs("/tmp/downloads/", exist_ok=True)
+        os.makedirs("/tmp/output/", exist_ok=True)
+        os.makedirs("/tmp/session/", exist_ok=True)
+
         self.model = model
 
     def last_tile(self):

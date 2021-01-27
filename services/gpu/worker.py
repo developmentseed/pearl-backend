@@ -9,7 +9,7 @@ import asyncio
 import websockets
 import logging
 from lib.api import API
-from lib.Model import Model
+from lib.ModelSrv import ModelSrv
 from web_tool.ModelSessionKerasExample import KerasDenseFineTune
 from web_tool.ModelSessionPytorchSolar import SolarFineTuning
 from web_tool.ModelSessionPyTorchExample import TorchFineTuning
@@ -64,6 +64,12 @@ def main():
 
     model = load(args.gpu_id, model, model_fs)
 
+    #
+    # TODO Fetch dataset layer & Checkpoint,
+    # These settings should probably be set in a new checkpoint
+    # And a CHECKPOINT_ID send to the server instead of MODEL_ID which
+    # can be back filled
+
     asyncio.get_event_loop().run_until_complete(
         connection('ws://localhost:1999?token={}'.format(token), model)
     )
@@ -85,10 +91,19 @@ async def connection(uri, model):
                 # Mark instance as terminated in API
                 # Shut down
                 break
+            elif action == "model#run":
+                model.run()
             elif action == "model#reset":
                 model.reset()
             elif action == "model#undo":
-                mode.undo()
+                model.undo()
+            elif action == "model#last_tile":
+                model.last_tile()
+            elif action = "model#add_sample":
+                model.add_sample_point()
+            elif action = "model#checkpoint":
+                model.save_state_to()
+
 
 def load(gpu_id, model, model_fs):
     model_type = model["model_type"]
@@ -104,7 +119,7 @@ def load(gpu_id, model, model_fs):
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
-    return Model(model)
+    return ModelSrv(model)
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,6 @@ import base64
 import json
 import logging
 import os
-os.environ["CURL_CA_BUNDLE"] = "/etc/ssl/certs/ca-certificates.crt" 
 
 import sys
 import time
@@ -32,100 +31,26 @@ from web_tool.SessionHandler import SessionHandler
 from web_tool.Checkpoints import Checkpoints
 SESSION_HANDLER = None
 
-import bottle 
+import bottle
 bottle.TEMPLATE_PATH.insert(0, "./" + ROOT_DIR + "/views") # let bottle know where we are storing the template files
 import cheroot.wsgi
 import beaker.middleware
-
-SESSION_TIMEOUT_SECONDS = 900
-
-#---------------------------------------------------------------------------------------
-# Session handling endpoints
-#---------------------------------------------------------------------------------------
 
 def create_session():
     bottle.response.content_type = 'application/json'
     data = bottle.request.json
 
     SESSION_HANDLER.create_session(bottle.request.session.id, data["dataset"], data["model"], data["checkpoint"])
-    
-    bottle.response.status = 200
-    return json.dumps(data)
-
-
-def kill_session():
-    bottle.response.content_type = 'application/json'
-    data = bottle.request.json
-
-    try:
-        SESSION_HANDLER.kill_session(bottle.request.session.id)
-        SESSION_HANDLER.cleanup_expired_session(bottle.request.session.id)
-    except ValueError as e:
-        LOGGER.info(e)
-
-    bottle.request.session.delete()
-    bottle.response.status = 200
-    return json.dumps(data)
-
-def get_session_status():
-    bottle.response.content_type = 'application/json'
-    data = bottle.request.json
-    
-    data["sessionID"] = str(bottle.request.session.id)
-    data["isActive"] = SESSION_HANDLER.is_active(bottle.request.session.id)
 
     bottle.response.status = 200
     return json.dumps(data)
-
-def whoami():
-    page = f"""
-    Your <b>bottle</b> session object: {str(bottle.request.session)} <br/>
-    Your <b>bottle</b> session id: {str(bottle.request.session.id)} <br /> <br />
-
-    List of <b>bottle</b> session ids that the server has registered as valid <i>Session</i> objects:
-    <ul>
-    """
-
-    for session_id, session in SESSION_HANDLER._SESSION_MAP.items():
-        page += f"<li>{str(session_id)}</li>"
-    page += "</ul>"
-
-    active_session = SESSION_HANDLER.is_active(bottle.request.session.id)
-    page += f"<br/><br/>Your session is active: {active_session}"
-
-    return page
-
-
-#---------------------------------------------------------------------------------------
-# API endpoints
-#---------------------------------------------------------------------------------------
-
-def reset_model():
-    bottle.response.content_type = 'application/json'
-    data = bottle.request.json
-    
-    result = SESSION_HANDLER.get_session(bottle.request.session.id).reset()
-
-    bottle.response.status = 200 if result["success"] else 500
-    return json.dumps(result)
-
 
 def retrain_model():
     bottle.response.content_type = 'application/json'
     data = bottle.request.json
-    
+
     result = SESSION_HANDLER.get_session(bottle.request.session.id).model.retrain(**data["retrainArgs"])
-    
-    bottle.response.status = 200 if result["success"] else 500
-    return json.dumps(result)
 
-
-def do_undo():
-    bottle.response.content_type = 'application/json'
-    data = bottle.request.json
-
-    result = SESSION_HANDLER.get_session(bottle.request.session.id).model.undo()
-    
     bottle.response.status = 200 if result["success"] else 500
     return json.dumps(result)
 
@@ -224,7 +149,7 @@ def pred_tile():
     model_idx = data["modelIdx"]
 
     if dataset not in DATALOADERS:
-        raise ValueError("Dataset doesn't seem to be valid, do the datasets in js/tile_layers.js correspond to those in TileLayers.py")    
+        raise ValueError("Dataset doesn't seem to be valid, do the datasets in js/tile_layers.js correspond to those in TileLayers.py")
     else:
         current_data_loader = DATALOADERS[dataset]
 
@@ -234,12 +159,12 @@ def pred_tile():
     except NotImplementedError as e: # Example of how to handle errors from the rest of the server
         bottle.response.status = 400
         return json.dumps({"error": "Cannot currently download imagery with 'Basemap' based datasets"})
-    
+
     output_raster = current_session.pred_tile(input_raster)
     if output_raster.shape[2] > len(color_list):
        LOGGER.warning("The number of output channels is larger than the given color list, cropping output to number of colors (you probably don't want this to happen")
        output_raster.data = output_raster.data[:,:,:len(color_list)]
-    
+
     output_hard = output_raster.data.argmax(axis=2)
     nodata_mask = np.sum(input_raster.data == 0, axis=2) == input_raster.shape[2]
     output_hard[nodata_mask] = 255
@@ -267,7 +192,7 @@ def pred_tile():
     new_profile['compress'] = "lzw"
     new_profile['count'] = 1
     new_profile['transform'] = output_raster.transform
-    new_profile['height'] = output_hard.shape[0] 
+    new_profile['height'] = output_hard.shape[0]
     new_profile['width'] = output_hard.shape[1]
     new_profile['nodata'] = 255
     with rasterio.open("tmp/downloads/%s.tif" % (tmp_id), 'w', **new_profile) as f:
@@ -310,7 +235,7 @@ def get_input():
     bottle.response.content_type = 'application/json'
     data = bottle.request.json
     current_session = SESSION_HANDLER.get_session(bottle.request.session.id)
-    
+
     current_session.add_entry(data) # record this interaction
 
     # Inputs
@@ -325,7 +250,7 @@ def get_input():
     input_raster = current_data_loader.get_data_from_extent(extent)
     warped_output_raster = warp_data_to_3857(input_raster) # warp image to 3857
     cropped_warped_output_raster = crop_data_by_extent(warped_output_raster, extent) # crop to the desired extent
-    
+
     img = cropped_warped_output_raster.data[:,:,:3].copy().astype(np.uint8) # keep the RGB channels to save as a color image
     img = cv2.imencode(".png", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))[1].tostring()
     img = base64.b64encode(img).decode("utf-8")
@@ -343,7 +268,7 @@ def checkpoint_wrapper(disable_checkpoints):
     def create_checkpoint():
         bottle.response.content_type = 'application/json'
         data = bottle.request.json
-        
+
         if disable_checkpoints:
             result = {
                 "success": False,
@@ -364,20 +289,14 @@ def get_checkpoints():
 # Static file serving endpoints
 #---------------------------------------------------------------------------------------
 
-def get_landing_page():
-    return bottle.static_file("landing_page.html", root="./" + ROOT_DIR + "/")
-
 def get_basemap_data(filepath):
-    return bottle.static_file(filepath, root="./data/basemaps/")
+    return bottle.static_file(filepath, root="/data/basemaps/")
 
 def get_zone_data(filepath):
     return bottle.static_file(filepath, root="./data/zones/")
 
 def get_downloads(filepath):
-    return bottle.static_file(filepath, root="./tmp/downloads/")
-
-def get_favicon():
-    return
+    return bottle.static_file(filepath, root="/tmp/downloads/")
 
 def get_everything_else(filepath):
     return bottle.static_file(filepath, root="./" + ROOT_DIR + "/")
@@ -387,40 +306,6 @@ def get_everything_else(filepath):
 #---------------------------------------------------------------------------------------
 
 def main():
-    global SESSION_HANDLER
-    parser = argparse.ArgumentParser(description="AI for Earth Land Cover")
-
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose debugging", default=False)
-    parser.add_argument("--host", action="store", dest="host", type=str, help="Host to bind to", default="0.0.0.0")
-    parser.add_argument("--port", action="store", dest="port", type=int, help="Port to listen on", default=8080)
-
-    parser.add_argument("--disable_checkpoints", action="store_true", help="Disables the ability to save checkpoints on the server")
-
-
-    args = parser.parse_args(sys.argv[1:])
-
-    # Create session factory to handle incoming requests
-    SESSION_HANDLER = SessionHandler(args)
-    SESSION_HANDLER.start_monitor(SESSION_TIMEOUT_SECONDS)
-
-    # Setup logging
-    log_path = os.path.join(os.getcwd(), "tmp/logs/")
-    setup_logging(log_path, "server")
-
-    # Make sure some directories exist
-    os.makedirs("tmp/checkpoints/", exist_ok=True)
-    os.makedirs("tmp/downloads/", exist_ok=True)
-    os.makedirs("tmp/logs/", exist_ok=True)
-    os.makedirs("tmp/output/", exist_ok=True) # TODO: Remove this after we rework  
-    os.makedirs("tmp/session/", exist_ok=True)
-
-
-
-    # Setup the bottle server 
-    app = bottle.Bottle()
-
-    app.add_hook("after_request", enable_cors)
-    app.add_hook("before_request", manage_sessions) # before every request we want to check to make sure there are no session issues
 
     # API paths
     app.route('/predPatch', method="POST", callback=pred_patch)
@@ -429,50 +314,15 @@ def main():
     app.route('/getInput', method="POST", callback=get_input)
     app.route('/recordCorrection', method="POST", callback=record_correction)
     app.route('/retrainModel', method="POST", callback=retrain_model)
-    app.route('/resetModel', method="POST", callback=reset_model)
-    app.route("/doUndo", method="POST", callback=do_undo)
-    app.route("/createSession", method="POST", callback=create_session)
-    app.route("/killSession", method="POST", callback=kill_session)
-    app.route("/getSessionStatus", method="POST", callback=get_session_status)
 
     # Checkpoints
     app.route("/createCheckpoint", method="POST", callback=checkpoint_wrapper(args.disable_checkpoints))
     app.route("/getCheckpoints", method="GET", callback=get_checkpoints)
-
-    # Sessions
-    app.route("/whoami", method="GET", callback=whoami)
 
     # Content paths
     app.route("/", method="GET", callback=get_landing_page)
     app.route("/data/basemaps/<filepath:re:.*>", method="GET", callback=get_basemap_data)
     app.route("/data/zones/<filepath:re:.*>", method="GET", callback=get_zone_data)
     app.route("/tmp/downloads/<filepath:re:.*>", method="GET", callback=get_downloads)
-    app.route("/favicon.ico", method="GET", callback=get_favicon)
     app.route("/<filepath:re:.*>", method="GET", callback=get_everything_else)
 
-
-    manage_session_folders()
-    session_opts = {
-        'session.type': 'file',
-        #'session.cookie_expires': 3000, # session cookie
-        'session.data_dir': SESSION_FOLDER,
-        'session.auto': True
-    }
-    app = beaker.middleware.SessionMiddleware(app, session_opts)
-
-    server = cheroot.wsgi.Server(
-        (args.host, args.port),
-        app
-    )
-    server.max_request_header_size = 2**13
-    server.max_request_body_size = 2**27
-
-    LOGGER.info("Server initialized")
-    try:
-        server.start()
-    finally:
-        server.stop()
-
-
-if __name__ == "__main__":
-    main()
