@@ -8,6 +8,15 @@ class API():
         self.url = url
         self.token = token
 
+    def instance_meta(self, instance_id):
+        r = requests.get(self.url + '/api/instance/' + model_id, headers={
+            "authorization": "Bearer " + self.token
+        })
+
+        r.raise_for_status()
+
+        return r.json()
+
     def model_meta(self, model_id):
         r = requests.get(self.url + '/api/model/' + model_id, headers={
             "authorization": "Bearer " + self.token

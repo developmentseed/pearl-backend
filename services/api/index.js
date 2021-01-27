@@ -100,6 +100,7 @@ async function server(argv, config, cb) {
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
+    const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -494,6 +495,10 @@ async function server(argv, config, cb) {
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
+     *       "id": 1,
+     *       "created": "<date",
+     *       "model_id": 1,
+     *       "mosaic": "naip.latest",
      *       "url": "ws://<websocket-connection-url>",
      *       "token": "websocket auth token"
      *   }
@@ -504,7 +509,9 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await instance.create(req.auth, req.body.model_id));
+                const inst = await instance.create(req.auth, req.body);
+
+                res.json(inst);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -558,7 +565,8 @@ async function server(argv, config, cb) {
      *           "uid": 123,
      *           "active": true,
      *           "created": "<date>",
-     *           "model_id": 1
+     *           "model_id": 1,
+     *           "mosaic": "naip.latest"
      *       }]
      *   }
      */
@@ -581,6 +589,20 @@ async function server(argv, config, cb) {
      * @apiName GetInstance
      * @apiGroup Instance
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all information about a given instance
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "uid": 123,
+     *       "active": true,
+     *       "created": "<date>",
+     *       "model_id": 1,
+     *       "mosaic": "naip.latest"
+     *   }
      */
     router.get('/instance/:instanceid', async (req, res) => {
         Param.int(req, res, 'instanceid');
@@ -796,11 +818,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json({
-                mosaics: [
-                    'naip.latest'
-                ]
-            });
+            return res.json(Mosaic.list())
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -54,7 +54,8 @@ CREATE TABLE IF NOT EXISTS instances (
     uid         BIGINT,
     active      BOOLEAN,
     created     TIMESTAMP,
-    model_id    BIGINT
+    model_id    BIGINT,
+    mosaic      TEXT
 );
 
 CREATE TABLE IF NOT EXISTS checkpoints (

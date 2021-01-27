@@ -47,7 +47,8 @@ class Instance {
                     uid,
                     active,
                     created,
-                    model_id
+                    model_id,
+                    mosaic
                 FROM
                     instances
                 ${WHERE}
@@ -72,7 +73,8 @@ class Instance {
                     uid: parseInt(row.uid),
                     active: row.active,
                     created: row.created,
-                    model_id: parseInt(row.model_id)
+                    model_id: parseInt(row.model_id),
+                    mosaic: row.mosaic
                 };
             })
         };
@@ -82,7 +84,7 @@ class Instance {
 
     }
 
-    async create(auth, model_id) {
+    async create(auth, instance) {
         if (!auth.type) {
             throw new Err(400, null, 'Only an authenticated user can create a token');
         } else if (!auth.uid) {
@@ -95,16 +97,19 @@ class Instance {
                     uid,
                     created,
                     model_id,
-                    active
+                    active,
+                    mosaic
                 ) VALUES (
                     $1,
                     NOW(),
                     $2,
-                    False
+                    False,
+                    $3
                 ) RETURNING *
             `, [
                 auth.uid,
-                model_id
+                instance.model_id,
+                instance.mosaic
             ]);
 
             const token = jwt.sign({
@@ -117,7 +122,8 @@ class Instance {
                 id: parseInt(pgres.rows[0].id),
                 created: pgres.rows[0].created,
                 model_id: parseInt(pgres.rows[0].model_id),
-                token: token
+                token: token,
+                mosaic: pgres.rows[0].mosaic
             };
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');
@@ -137,7 +143,8 @@ class Instance {
                     uid,
                     created,
                     model_id,
-                    active
+                    active,
+                    mosaic
                 FROM
                     instances
                 WHERE
@@ -154,7 +161,8 @@ class Instance {
             uid: parseInt(gres.rows[0].uid),
             created: pgres.rows[0].created,
             model_id: parseInt(pgres.rows[0].model_id),
-            active: pgres.rows[0].id
+            active: pgres.rows[0].active,
+            mosaic: pgres.rows[0].mosaic
         };
     }
 }

@@ -139,12 +139,12 @@ test('new model', (t) => {
         json: true,
         url: API + '/api/model',
         body: {
-            name: 'Example Model',
+            name: 'NAIP Supervised',
             active: true,
             model_type: 'keras_example',
-            model_finetunelayer: -2,
-            model_numparams: 563498,
-            model_inputshape: [100,100,4],
+            model_finetunelayer: -4,
+            model_numparams: 7790949,
+            model_inputshape: [240,240,4],
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },

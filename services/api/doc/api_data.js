@@ -1,18 +1,48 @@
 define({ "api": [
   {
-    "type": "delete",
-    "url": "/api/instance/:instance",
-    "title": "Delete Instance",
+    "type": "get",
+    "url": "/api/instance",
+    "title": "Create Instance",
     "version": "1.0.0",
     "name": "CreateInstance",
     "group": "Instance",
     "permission": [
       {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be an admin to use this endpoint</p>"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Instruct the GPU pool to start a new model instance and return a time limited session token for accessing the websockets GPU API</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_id",
+            "description": "<p>The model id to start an instance with</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "mosaic",
+            "description": "<p>The mosaic ID to run the model with</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Instance"
   },
@@ -116,32 +146,18 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
-    "filename": "./index.js",
-    "groupTitle": "Instance"
-  },
-  {
-    "type": "get",
-    "url": "/api/instance",
-    "title": "Create Instance",
-    "version": "1.0.0",
-    "name": "create",
-    "group": "Instance",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "active",
+            "description": "<p>Is the instance currently running</p>"
+          }
+        ]
       }
-    ],
-    "description": "<p>Instruct the GPU pool to start a new model instance and return a time limited session token for accessing the websockets GPU API</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
-          "type": "json"
-        }
-      ]
     },
     "filename": "./index.js",
     "groupTitle": "Instance"
