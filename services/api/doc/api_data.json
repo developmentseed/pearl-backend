@@ -38,7 +38,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\",\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
           "type": "json"
         }
       ]
@@ -60,6 +60,16 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return all information about a given instance</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Instance"
   },
@@ -124,7 +134,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instances\": [{\n        \"id\": 1,\n        \"uid\": 123,\n        \"active\": true,\n        \"created\": \"<date>\",\n        \"model_id\": 1\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instances\": [{\n        \"id\": 1,\n        \"uid\": 123,\n        \"active\": true,\n        \"created\": \"<date>\",\n        \"model_id\": 1,\n        \"mosaic\": \"naip.latest\"\n    }]\n}",
           "type": "json"
         }
       ]

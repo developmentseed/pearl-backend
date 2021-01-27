@@ -35,39 +35,23 @@ def main():
     setup_logging(log_path, "worker")
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "" if args.gpu_id is None else str(args.gpu_id)
+    os.environ["CUDA_VISIBLE_DEVICES"] = arg([args.gpu_id], "")
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-    os.environ['INSTANCE_ID'] = os.environ["INSTANCE_ID"] if os.environ.get("INSTANCE_ID") is not None else args.instance_id
+    os.environ['INSTANCE_ID'] = arg([os.environ.get('INSTANCE_ID'), args.instance_id])
+    os.environ["API"] = arg([os.environ.get("API"), args.api], 'http://localhost:2000')
 
-    os.environ["API"] = os.environ["API"] if os.environ.get("API") is not None else args.api
-    os.environ["SOCKET"] = os.environ["SOCKET"] if os.environ.get("SOCKET") is not None else args.socket
-    if os.environ["SigningSecret"] is None:
-        raise Exception("SigningSecret Env Var Required")
+    os.environ["SOCKET"] = arg([os.environ.get("SOCKET"), args.socket], 'http://localhost:1999')
+    os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], 'dev-secret')
 
     token = jwt.encode({
         "t": "admin",
         "i": os.environ['INSTANCE_ID']
     }, os.environ["SigningSecret"], algorithm="HS256")
 
-    api = API(os.environ["API"], token)
+    api = API(os.environ["API"], token, os.environ['INSTANCE_ID'])
 
-    LOGGER.info("Downloading Instance Metadata")
-    instance = api.instance_meta(os.environ['INSTANCE_ID'])
-
-    LOGGER.info("Downloading Model Metadata")
-    model = api.model_meta(instance['model_id'])
-
-    LOGGER.info("Downloading Model")
-    model_fs = api.model_download(instance['model_id'])
-
-    model = load(args.gpu_id, model, model_fs)
-
-    #
-    # TODO Fetch dataset layer & Checkpoint,
-    # These settings should probably be set in a new checkpoint
-    # And a CHECKPOINT_ID send to the server instead of MODEL_ID which
-    # can be back filled
+    model = load(args.gpu_id, api)
 
     asyncio.get_event_loop().run_until_complete(
         connection('ws://localhost:1999?token={}'.format(token), model)
@@ -75,7 +59,7 @@ def main():
 
 async def connection(uri, model):
     async with websockets.connect(uri) as websocket:
-        LOGGER.info("WebSocket Connection Initialized")
+        LOGGER.info("ok - WebSocket Connection Initialized")
 
         while True:
             try:
@@ -98,27 +82,36 @@ async def connection(uri, model):
                 model.undo()
             elif action == "model#last_tile":
                 model.last_tile()
-            elif action = "model#add_sample":
+            elif action == "model#add_sample":
                 model.add_sample_point()
-            elif action = "model#checkpoint":
+            elif action == "model#checkpoint":
                 model.save_state_to()
 
 
-def load(gpu_id, model, model_fs):
-    model_type = model["model_type"]
+def load(gpu_id, api):
+    model_type = api.model["model_type"]
 
     if model_type == "keras_example":
-        model = KerasDenseFineTune(gpu_id, model, model_fs)
+        model = KerasDenseFineTune(gpu_id, api.model, api.model_fs)
     elif model_type == "pytorch_example":
-        model = TorchFineTuning(gpu_id, model, model_fs)
+        model = TorchFineTuning(gpu_id, api.model, api.model_fs)
     elif model_type == "pytorch_solar":
-        model = SolarFineTuning(gpu_id, model, model_fs)
+        model = SolarFineTuning(gpu_id, api.model, api.model_fs)
     elif model_type == "random_forest":
-        model = ModelSessionRandomForest(model, model_fs)
+        model = ModelSessionRandomForest(api.model, api.model_fs)
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
     return ModelSrv(model)
+
+def arg(iterable, default=False, pred=None):
+    """Returns the first true value in the iterable.
+       If no true value is found, returns *default*
+       If *pred* is not None, returns the first item
+       for which pred(item) is true.
+    """
+    return next(filter(pred, iterable), default)
+
 
 if __name__ == "__main__":
     main()

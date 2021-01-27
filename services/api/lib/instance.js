@@ -157,8 +157,8 @@ class Instance {
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
         return {
-            id: parseInt(gres.rows[0].id),
-            uid: parseInt(gres.rows[0].uid),
+            id: parseInt(pgres.rows[0].id),
+            uid: parseInt(pgres.rows[0].uid),
             created: pgres.rows[0].created,
             model_id: parseInt(pgres.rows[0].model_id),
             active: pgres.rows[0].active,
