@@ -2,6 +2,8 @@
 
 'use strict';
 
+require('dotenv').config()
+
 const fs = require('fs');
 const Err = require('./lib/error');
 const path = require('path');
