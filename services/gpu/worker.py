@@ -63,29 +63,32 @@ async def connection(uri, model):
 
         while True:
             try:
-                msg = json.load(await websocket.recv())
+                msg = await websocket.recv()
+                msg = json.load(msg)
+
+                action = msg.get('action')
+
+                if action == "instance#terminate":
+                    # Save Checkpoint
+                    # Mark instance as terminated in API
+                    # Shut down
+                    break
+                elif action == "model#run":
+                    model.run()
+                elif action == "model#reset":
+                    model.reset()
+                elif action == "model#undo":
+                    model.undo()
+                elif action == "model#last_tile":
+                    model.last_tile()
+                elif action == "model#add_sample":
+                    model.add_sample_point()
+                elif action == "model#checkpoint":
+                    model.save_state_to()
+
             except Exception:
                 LOGGER.error("Failed to decode websocket message")
-
-            action = msg.get('action')
-
-            if action == "instance#terminate":
-                # Save Checkpoint
-                # Mark instance as terminated in API
-                # Shut down
-                break
-            elif action == "model#run":
-                model.run()
-            elif action == "model#reset":
-                model.reset()
-            elif action == "model#undo":
-                model.undo()
-            elif action == "model#last_tile":
-                model.last_tile()
-            elif action == "model#add_sample":
-                model.add_sample_point()
-            elif action == "model#checkpoint":
-                model.save_state_to()
+                LOGGER.error(msg)
 
 
 def load(gpu_id, api):
