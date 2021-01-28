@@ -1,6 +1,7 @@
 import os
 from web_tool.Utils import serialize, deserialize
 
+
 class ModelSrv():
     def __init__(self, model):
 
@@ -15,9 +16,9 @@ class ModelSrv():
         return serialize(self.model.last_tile)
 
     def run(self, tile, inference_mode=False):
-        tile = deserialize(tile) # need to serialize/deserialize numpy arrays
+        tile = deserialize(tile)  # need to serialize/deserialize numpy arrays
         output = self.model.run(tile, inference_mode)
-        return serialize(output) # need to serialize/deserialize numpy arrays
+        return serialize(output)  # need to serialize/deserialize numpy arrays
 
     def retrain(self):
         return self.model.retrain()
@@ -36,4 +37,3 @@ class ModelSrv():
 
     def load_state_from(self, directory):
         return self.model.load_state_from(directory)
-

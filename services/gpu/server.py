@@ -34,16 +34,6 @@ SESSION_HANDLER = None
 import bottle
 bottle.TEMPLATE_PATH.insert(0, "./" + ROOT_DIR + "/views") # let bottle know where we are storing the template files
 import cheroot.wsgi
-import beaker.middleware
-
-def create_session():
-    bottle.response.content_type = 'application/json'
-    data = bottle.request.json
-
-    SESSION_HANDLER.create_session(bottle.request.session.id, data["dataset"], data["model"], data["checkpoint"])
-
-    bottle.response.status = 200
-    return json.dumps(data)
 
 def retrain_model():
     bottle.response.content_type = 'application/json'
@@ -96,9 +86,7 @@ def pred_patch():
     # Inputs
     extent = data["extent"]
     dataset = data["dataset"]
-    class_list = data["classes"]
-    name_list = [item["name"] for item in class_list]
-    color_list = [item["color"] for item in class_list]
+    color_list = [item["color"] for item in data["classes"]]
 
     if dataset not in DATALOADERS:
         raise ValueError("Dataset doesn't seem to be valid, do the datasets in js/tile_layers.js correspond to those in TileLayers.py")
@@ -133,12 +121,6 @@ def pred_patch():
 
 
 def pred_tile():
-    bottle.response.content_type = 'application/json'
-    data = bottle.request.json
-    current_session = SESSION_HANDLER.get_session(bottle.request.session.id)
-
-    current_session.add_entry(data) # record this interaction
-
     # Inputs
     geom = data["polygon"]
     class_list = data["classes"]

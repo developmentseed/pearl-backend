@@ -14,7 +14,7 @@ from web_tool.ModelSessionKerasExample import KerasDenseFineTune
 from web_tool.ModelSessionPytorchSolar import SolarFineTuning
 from web_tool.ModelSessionPyTorchExample import TorchFineTuning
 from web_tool.ModelSessionRandomForest import ModelSessionRandomForest
-from web_tool.Utils import setup_logging, serialize, deserialize
+from web_tool.Utils import setup_logging
 
 LOGGER = logging.getLogger("server")
 

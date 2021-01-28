@@ -509,7 +509,7 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                if (!body.mosaic || !Mosaic.list().includes(body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
+                if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
 
                 const inst = await instance.create(req.auth, req.body);
 
