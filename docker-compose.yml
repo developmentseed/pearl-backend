@@ -9,7 +9,7 @@ services:
             - "2000:2000"
         environment:
             - PORT=2000
-            - TileUrl=http://localhost:8000
+            - TileUrl=http://tiler:8000
             - Postgres=postgres://docker:docker@postgis:5432/gis
 
     postgis:
