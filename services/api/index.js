@@ -100,6 +100,7 @@ async function server(argv, config, cb) {
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
+    const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -318,7 +319,7 @@ async function server(argv, config, cb) {
      * @apiDescription
      *     Create a new API token to perform API requests with
      *
-     * @apiSchema (Body) {jsonschema=./schema/login.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/token.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -374,7 +375,7 @@ async function server(argv, config, cb) {
     /**
      * @api {get} /api/user List Users
      * @apiVersion 1.0.0
-     * @apiName list
+     * @apiName ListUsers
      * @apiGroup User
      * @apiPermission admin
      *
@@ -481,7 +482,7 @@ async function server(argv, config, cb) {
     /**
      * @api {get} /api/instance Create Instance
      * @apiVersion 1.0.0
-     * @apiName create
+     * @apiName CreateInstance
      * @apiGroup Instance
      * @apiPermission user
      *
@@ -489,9 +490,15 @@ async function server(argv, config, cb) {
      *     Instruct the GPU pool to start a new model instance and return a time limited session
      *     token for accessing the websockets GPU API
      *
+     * @apiSchema (Body) {jsonschema=./schema/instance.json} apiParam
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
+     *       "id": 1,
+     *       "created": "<date",
+     *       "model_id": 1,
+     *       "mosaic": "naip.latest",
      *       "url": "ws://<websocket-connection-url>",
      *       "token": "websocket auth token"
      *   }
@@ -502,7 +509,11 @@ async function server(argv, config, cb) {
             try {
                 await auth.is_auth(req);
 
-                res.json(await instance.create(req.auth, req.body.model_id));
+                if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
+
+                const inst = await instance.create(req.auth, req.body);
+
+                res.json(inst);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -510,13 +521,68 @@ async function server(argv, config, cb) {
     );
 
     /**
-     * @api {delete} /api/instance/:instance Delete Instance
+     * @api {patch} /api/instance/:instance Patch Instance
      * @apiVersion 1.0.0
-     * @apiName CreateInstance
+     * @apiName PatchInstance
+     * @apiGroup Instance
+     * @apiPermission admin
+     *
+     * @apiSchema (Body) {jsonschema=./schema/instance-patch.json} apiParam
+     */
+    router.patch(
+        '/instance/:instanceid',
+        validate({ body: require('./schema/instance.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+
+            try {
+                await auth.is_admin(req);
+
+                // TODO Allow patching
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/instance List Instances
+     * @apiVersion 1.0.0
+     * @apiName ListInstances
      * @apiGroup Instance
      * @apiPermission user
+     *
+     * @apiSchema (Query) {jsonschema=./schema/instance-list.query.json} apiParam
+     *
+     * @apiDescription
+     *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
+     *     field will be pinned to their own uid. Admins can filter by any uid or none.
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "instances": [{
+     *           "id": 1,
+     *           "uid": 123,
+     *           "active": true,
+     *           "created": "<date>",
+     *           "model_id": 1,
+     *           "mosaic": "naip.latest"
+     *       }]
+     *   }
      */
-    router.delete('/instance/:instanceid', async () =>{
+    router.get('/instance', async (req, res) => {
+        try {
+            await auth.is_auth(req);
+
+            // Only admins can see all running instances
+            if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
+
+            res.json(await instance.list(req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -525,8 +591,45 @@ async function server(argv, config, cb) {
      * @apiName GetInstance
      * @apiGroup Instance
      * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all information about a given instance
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "uid": 123,
+     *       "active": true,
+     *       "created": "<date>",
+     *       "model_id": 1,
+     *       "mosaic": "naip.latest"
+     *   }
      */
-    router.get('/instance/:instanceid', async () => {
+    router.get('/instance/:instanceid', async (req, res) => {
+        Param.int(req, res, 'instanceid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+
+            if (req.auth.access === 'admin') return res.json(inst);
+
+            if (req.auth.uid !== instance.uid) throw new Error(403, null, 'Cannot access models you don\'t own');
+
+            return res.json(inst);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    router.get('/instance/:instanceid/checkpoints', async (req, res) => {
+        Param.int(req, res, 'instanceid');
+
+        try {
+
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -717,11 +820,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json({
-                mosaics: [
-                    'naip.latest'
-                ]
-            });
+            return res.json(Mosaic.list())
         } catch (err) {
             return Err.respond(err, res);
         }

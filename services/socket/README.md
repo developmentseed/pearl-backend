@@ -98,22 +98,30 @@ course of a session as informational messages
 
 | Action                | Notes |
 | --------------------- | ----- |
-| 'connection'          |       |
-| 'error'               |       |
-| 'model:reset'         |       |
-| 'model:retrain'       |       |
-| 'pred:correct'        |       |
-| 'pred:patch'          |       |
-| 'pred:tile'           |       |
-| 'download:all'        |       |
-| 'session:kill'        |       |
-| 'checkpoint:create'   |       |
-| 'checkpoint:list'     |       |
+| 'instance#terminate'  |       |
+| 'model#reset'         |       |
+| 'model#undo'          |       |
 
-#### Connection
+#### instance#terminate
 
 ```JSON
 {
-    "type": "connection"
+    "action": "instance#terminate"
+}
+```
+
+#### model#reset
+
+```JSON
+{
+    "action": "model#reset"
+}
+```
+
+#### model#undo
+
+```JSON
+{
+    "action": "model#reset"
 }
 ```

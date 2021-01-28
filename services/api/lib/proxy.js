@@ -18,18 +18,23 @@ class Proxy {
             url.searchParams.append(p, req.query[p]);
         }
 
-        const proxres = await request({
-            url: url,
-            method: 'GET'
-        });
+        try {
+            const proxres = await request({
+                url: url,
+                method: 'GET'
+            });
 
-        res.status(proxres.statusCode);
+            res.status(proxres.statusCode);
 
-        for (const h of ['content-type', 'content-length']) {
-            if (proxres.headers[h]) res.append(h, proxres.headers[h]);
+            for (const h of ['content-type', 'content-length']) {
+                if (proxres.headers[h]) res.append(h, proxres.headers[h]);
+            }
+
+            res.send(proxres.body);
+        } catch (err) {
+            throw new Error(err);
         }
 
-        res.send(proxres.body);
     }
 }
 

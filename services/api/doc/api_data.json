@@ -1,8 +1,8 @@
 [
   {
-    "type": "delete",
-    "url": "/api/instance/:instance",
-    "title": "Delete Instance",
+    "type": "get",
+    "url": "/api/instance",
+    "title": "Create Instance",
     "version": "1.0.0",
     "name": "CreateInstance",
     "group": "Instance",
@@ -13,6 +13,36 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Instruct the GPU pool to start a new model instance and return a time limited session token for accessing the websockets GPU API</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_id",
+            "description": "<p>The model id to start an instance with</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "mosaic",
+            "description": "<p>The mosaic ID to run the model with</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\",\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Instance"
   },
@@ -30,15 +60,25 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return all information about a given instance</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Instance"
   },
   {
     "type": "get",
     "url": "/api/instance",
-    "title": "Create Instance",
+    "title": "List Instances",
     "version": "1.0.0",
-    "name": "create",
+    "name": "ListInstances",
     "group": "Instance",
     "permission": [
       {
@@ -47,15 +87,87 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Instruct the GPU pool to start a new model instance and return a time limited session token for accessing the websockets GPU API</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"active\"",
+              "\"inactive\"",
+              "\"all\""
+            ],
+            "optional": true,
+            "field": "status",
+            "defaultValue": "active",
+            "description": "<p>Filter instances by active status</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "uid",
+            "description": "<p>Query by user id</p>"
+          }
+        ]
+      }
+    },
+    "description": "<p>Return a list of instances. Note that users can only get their own instances and use of the <code>uid</code> field will be pinned to their own uid. Admins can filter by any uid or none.</p>",
     "success": {
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instances\": [{\n        \"id\": 1,\n        \"uid\": 123,\n        \"active\": true,\n        \"created\": \"<date>\",\n        \"model_id\": 1,\n        \"mosaic\": \"naip.latest\"\n    }]\n}",
           "type": "json"
         }
       ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "patch",
+    "url": "/api/instance/:instance",
+    "title": "Patch Instance",
+    "version": "1.0.0",
+    "name": "PatchInstance",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "active",
+            "description": "<p>Is the instance currently running</p>"
+          }
+        ]
+      }
     },
     "filename": "./index.js",
     "groupTitle": "Instance"
@@ -801,15 +913,8 @@
             "group": "Body",
             "type": "String",
             "optional": false,
-            "field": "username",
-            "description": "<p>username to authenticate with</p>"
-          },
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>password to authenticate with</p>"
+            "field": "name",
+            "description": "<p>name of the created token</p>"
           }
         ]
       }
@@ -938,7 +1043,7 @@
     "url": "/api/user",
     "title": "List Users",
     "version": "1.0.0",
-    "name": "list",
+    "name": "ListUsers",
     "group": "User",
     "permission": [
       {

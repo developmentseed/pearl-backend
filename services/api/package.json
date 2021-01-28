@@ -9,7 +9,7 @@
         "doc": "apidoc -i ./ -f index.js -e node_modules --private",
         "lint": "eslint index.js lib/**.js",
         "prod": "./index.js --prod",
-        "dev": "./index.js"
+        "dev": "nodemon ./index.js"
     },
     "dependencies": {
         "@azure/storage-blob": "^12.4.0",
@@ -29,6 +29,7 @@
         "request": "^2.88.2"
     },
     "devDependencies": {
+        "nodemon": "^2.0.7",
         "apidoc-plugin-schema": "^0.1.8",
         "eslint": "^7.17.0",
         "eslint-plugin-node": "^11.1.0"

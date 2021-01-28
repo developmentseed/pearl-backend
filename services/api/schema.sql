@@ -52,6 +52,15 @@ CREATE TABLE IF NOT EXISTS models (
 CREATE TABLE IF NOT EXISTS instances (
     id          BIGSERIAL PRIMARY KEY,
     uid         BIGINT,
+    active      BOOLEAN,
     created     TIMESTAMP,
-    model_id    BIGINT
+    model_id    BIGINT,
+    mosaic      TEXT
+);
+
+CREATE TABLE IF NOT EXISTS checkpoints (
+    id          BIGSERIAL PRIMARY KEY,
+    instance_id BIGINT,
+    created     TIMESTAMP,
+    storage     BOOLEAN
 );
