@@ -62,18 +62,16 @@ In development mode it is easier to add a `.env` to this folder to set environme
 
 #### Authentication with Auth0
 
-Set the following variables with Auth0 settings:
+Create an API in Auth0 and set the following environment variables:
 
 - AUTH0_ISSUER_BASE_URL
 - AUTH0_CLIENT_ID
-
-Please refer to [Auth0 guide on Express configuration](https://auth0.com/blog/complete-guide-to-nodejs-express-user-authentication/) for details.
+- AUTH0_AUDIENCE
 
 #### `AZURE_STORAGE_CONNECTION_STRING` [optionalish]
 
 Required in order to upload & save base models. If the `AZURE_STORAGE_CONNECTION_STRING` env var
 is not set, API endpoints that utilize this functionality are simply disabled.
-
 
 #### `SigningSecret` [required: prod]
 

@@ -9,8 +9,9 @@ const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
 const { Param } = require('./lib/util');
+const jwt = require('express-jwt');
+const jwks = require('jwks-rsa');
 const cors = require('cors');
-const session = require('express-session');
 const morgan = require('morgan');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
@@ -22,7 +23,6 @@ const argv = require('minimist')(process.argv, {
     string: ['postgres', 'port']
 });
 
-const pgSession = require('connect-pg-simple')(session);
 const router = express.Router();
 const app = express();
 const { Pool } = require('pg');
@@ -98,8 +98,6 @@ async function server(argv, config, cb) {
     }
 
     const proxy = new (require('./lib/proxy').Proxy)(config);
-    const auth = new (require('./lib/auth').Auth)(pool);
-    const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
 
@@ -110,22 +108,35 @@ async function server(argv, config, cb) {
         credentials: true
     }));
     app.use(minify());
-    app.use(session({
-        name: argv.prod ? '__Host-session' : 'session',
-        proxy: argv.prod,
-        resave: false,
-        store: new pgSession({
-            pool: pool,
-            tableName : 'session'
-        }),
-        cookie: {
-            maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: argv.prod ? true : 'Lax',
-            secure: argv.prod
-        },
-        saveUninitialized: false,
-        secret: config.SigningSecret
-    }));
+    // app.use(session({
+    //     name: argv.prod ? '__Host-session' : 'session',
+    //     proxy: argv.prod,
+    //     resave: false,
+    //     store: new pgSession({
+    //         pool: pool,
+    //         tableName : 'session'
+    //     }),
+    //     cookie: {
+    //         maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
+    //         sameSite: argv.prod ? true : 'Lax',
+    //         secure: argv.prod
+    //     },
+    //     saveUninitialized: false,
+    //     secret: config.SigningSecret
+    // }));
+
+    // Setup JWT with Auth0
+    const checkJwt = jwt({
+        secret: jwks.expressJwtSecret({
+            cache: true,
+            rateLimit: true,
+            jwksRequestsPerMinute: 5,
+            jwksUri: `${config.Auth0IssuerBaseUrl}/.well-known/jwks.json`
+      }),
+      audience: config.Audience,
+      issuer: `${config.Auth0IssuerBaseUrl}/`,
+      algorithms: ['RS256']
+    });
 
     app.use('/docs', express.static('./doc'));
 
@@ -185,31 +196,31 @@ async function server(argv, config, cb) {
     }));
 
     // Unified Auth
-    router.use(async (req, res, next) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
-            req.session.auth.type = 'session';
-            req.auth = req.session.auth;
-        } else if (req.header('authorization')) {
-            const authorization = req.header('authorization').split(' ');
-            if (authorization[0].toLowerCase() !== 'bearer') {
-                return res.status(401).json({
-                    status: 401,
-                    message: 'Only "Bearer" authorization header is allowed'
-                });
-            }
+    // router.use(async (req, res, next) => {
+    //     if (req.session && req.session.auth && req.session.auth.username) {
+    //         req.session.auth.type = 'session';
+    //         req.auth = req.session.auth;
+    //     } else if (req.header('authorization')) {
+    //         const authorization = req.header('authorization').split(' ');
+    //         if (authorization[0].toLowerCase() !== 'bearer') {
+    //             return res.status(401).json({
+    //                 status: 401,
+    //                 message: 'Only "Bearer" authorization header is allowed'
+    //             });
+    //         }
 
-            try {
-                req.auth = await authtoken.validate(authorization[1]);
-                req.auth.type = 'token';
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        } else {
-            req.auth = false;
-        }
+    //         try {
+    //             req.auth = await authtoken.validate(authorization[1]);
+    //             req.auth.type = 'token';
+    //         } catch (err) {
+    //             return Err.respond(err, res);
+    //         }
+    //     } else {
+    //         req.auth = false;
+    //     }
 
-        return next();
-    });
+    //     return next();
+    // });
 
     /**
      * @api {get} /api/login Session Info
@@ -552,6 +563,7 @@ async function server(argv, config, cb) {
      */
     router.post(
         '/model',
+        checkJwt,
         validate({ body: require('./schema/model.json') }),
         async (req, res) => {
             try {
@@ -662,12 +674,10 @@ async function server(argv, config, cb) {
      *       "meta": {}
      *   }
      */
-    router.get('/model/:modelid', async (req, res) => {
+    router.get('/model/:modelid', checkJwt, async (req, res) => {
         Param.int(req, res, 'modelid');
 
         try {
-            await auth.is_auth(req);
-
             res.json(await model.get(req.params.modelid));
         } catch (err) {
             return Err.respond(err, res);

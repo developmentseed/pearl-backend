@@ -22,6 +22,7 @@ class Config {
         }
         this.Auth0IssuerBaseUrl = process.env.AUTH0_ISSUER_BASE_URL;
         this.Auth0ClientId = process.env.AUTH0_CLIENT_ID;
+        this.Auth0Audience = process.env.AUTH0_AUDIENCE;
 
         this.BaseUrl = `http://localhost:${this.Port}`;
 
