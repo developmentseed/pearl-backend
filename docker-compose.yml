@@ -10,7 +10,6 @@ services:
         environment:
             - PORT=2000
             - TileUrl=http://localhost:8000
-            - SigningSecret=dev-signing-secret
             - Postgres=postgres://docker:docker@postgis:5432/gis
 
     postgis:
@@ -30,7 +29,6 @@ services:
             - "1999:1999"
         environment:
             - PORT=1999
-            - SigningSecret=dev-signing-secret
 
     tiler:
         build: ./services/tiles/
