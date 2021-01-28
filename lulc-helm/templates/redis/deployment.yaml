@@ -1,0 +1,31 @@
+{{- if .Values.redis.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-redis
+  labels:
+    component: redis-deployment
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "lulc-helm.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-redis
+  template:
+    metadata:
+      labels:
+        app: {{ template "lulc-helm.name" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-redis
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-redis
+          image: "redis:latest"
+          ports:
+            - name: http
+              containerPort: 6379
+              protocol: TCP
+{{- end }}
