@@ -18,13 +18,15 @@ class ModelSrv():
 
         tiles = api.get_tile_by_geom(body.get('polygon'))
 
+        output = self.model.run(input_raster.data, True)
+        assert input_raster.shape[0] == output.shape[0] and input_raster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
+
+        output = InMemoryRaster(output, input_raster.crs, input_raster.transform, input_raster.bounds)
+
+        return serialize(output)
+
     def last_tile(self):
         return serialize(self.model.last_tile)
-
-    def run(self, tile, inference_mode=False):
-        tile = deserialize(tile)  # need to serialize/deserialize numpy arrays
-        output = self.model.run(tile, inference_mode)
-        return serialize(output)  # need to serialize/deserialize numpy arrays
 
     def retrain(self):
         return self.model.retrain()

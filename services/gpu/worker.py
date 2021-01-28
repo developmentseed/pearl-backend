@@ -74,9 +74,6 @@ async def connection(uri, model):
                     # Shut down
                     break
 
-                elif action == "model#run":
-                    model.run()
-
                 elif action == "model#reset":
                     model.reset()
 
