@@ -3,14 +3,20 @@ from web_tool.Utils import serialize, deserialize
 
 
 class ModelSrv():
-    def __init__(self, model):
+    def __init__(self, api, model):
 
         os.makedirs("/tmp/checkpoints/", exist_ok=True)
         os.makedirs("/tmp/downloads/", exist_ok=True)
         os.makedirs("/tmp/output/", exist_ok=True)
         os.makedirs("/tmp/session/", exist_ok=True)
 
+        self.api = api
         self.model = model
+
+    def prediction(self, body):
+        body.get('polygon')
+
+        tiles = api.get_tile_by_geom(body.get('polygon'))
 
     def last_tile(self):
         return serialize(self.model.last_tile)

@@ -34,8 +34,15 @@ class API():
 
         return r.json()
 
-    def get_tile(self, x, y, z, format='npi'):
-        url = self.url + '/api/mosaic/' + str(instance_id)
+    def get_tile_by_geom(self, geom):
+        poly = shape(geojson.loads(payload))
+        project = partial(pyproj.transform, pyproj.Proj(init="epsg:4326"), pyproj.Proj(init="epsg:3857"))
+        poly = transform(project, poly)
+
+        tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
+
+    def get_tile(self, z, x, y, iformat='npi'):
+        url = self.url + '/api/mosaic/{}/{}/{}/{}.{}'.format(mosaic_id, z, x, y, iformat)
 
         LOGGER.info("ok - GET " + url)
         r = requests.get(url, headers={

@@ -73,16 +73,26 @@ async def connection(uri, model):
                     # Mark instance as terminated in API
                     # Shut down
                     break
+
                 elif action == "model#run":
                     model.run()
+
                 elif action == "model#reset":
                     model.reset()
+
                 elif action == "model#undo":
                     model.undo()
+
+                # Return a prediction for a given extent
+                elif action == "model#prediction":
+                    model.prediction(msg.get('data'))
+
                 elif action == "model#last_tile":
                     model.last_tile()
+
                 elif action == "model#add_sample":
                     model.add_sample_point()
+
                 elif action == "model#checkpoint":
                     model.save_state_to()
 
@@ -105,7 +115,7 @@ def load(gpu_id, api):
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
-    return ModelSrv(model)
+    return ModelSrv(model, api)
 
 def arg(iterable, default=False, pred=None):
     """Returns the first true value in the iterable.
