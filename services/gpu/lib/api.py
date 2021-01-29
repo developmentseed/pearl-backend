@@ -45,13 +45,19 @@ class API():
 
     def get_tile_by_geom(self, geom):
         poly = shape(geojson.loads(json.dumps(geom)))
-        project = partial(pyproj.transform, pyproj.Proj(init="epsg:4326"), pyproj.Proj(init="epsg:3857"))
+        project = partial(pyproj.transform, pyproj.Proj("EPSG:4326"), pyproj.Proj("EPSG:3857"))
         poly = transform(project, poly)
 
-        tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
+        zxys = tilecover.cover_geometry(tiler, poly, 18)
+
+        tiles = []
+        for zxy in zxys:
+            tiles.append(self.get_tile(zxy.z, zxy.x, zxy.y))
+
+        return tiles
 
     def get_tile(self, z, x, y, iformat='npi'):
-        url = self.url + '/api/mosaic/{}/{}/{}/{}.{}'.format(mosaic_id, z, x, y, iformat)
+        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}'.format(self.mosaic_id, z, x, y, iformat)
 
         LOGGER.info("ok - GET " + url)
         r = requests.get(url, headers={
