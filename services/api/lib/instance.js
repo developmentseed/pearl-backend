@@ -115,7 +115,7 @@ class Instance {
             const token = jwt.sign({
                 t: 'inst',
                 u: auth.uid,
-                m: parseInt(pgres.rows[0].id)
+                i: parseInt(pgres.rows[0].id)
             }, this.config.SigningSecret, { expiresIn: '12h' });
 
             return {
