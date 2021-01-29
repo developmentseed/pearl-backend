@@ -87,30 +87,35 @@ async def connection(uri, model):
 
                         LOGGER.info('ok - action: ' + str(action))
 
-                        if action == "instance#terminate":
-                            # Save Checkpoint
-                            # Mark instance as terminated in API
-                            # Shut down
-                            break
+                        try: 
+                            if action == "instance#terminate":
+                                # Save Checkpoint
+                                # Mark instance as terminated in API
+                                # Shut down
+                                break
 
-                        elif action == "model#reset":
-                            model.reset()
+                            elif action == "model#reset":
+                                model.reset()
 
-                        elif action == "model#undo":
-                            model.undo()
+                            elif action == "model#undo":
+                                model.undo()
 
-                        # Return a prediction for a given extent
-                        elif action == "model#prediction":
-                            model.prediction(msg.get('data'))
+                            # Return a prediction for a given extent
+                            elif action == "model#prediction":
+                                model.prediction(msg.get('data'))
 
-                        elif action == "model#last_tile":
-                            model.last_tile()
+                            elif action == "model#last_tile":
+                                model.last_tile()
 
-                        elif action == "model#add_sample":
-                            model.add_sample_point()
+                            elif action == "model#add_sample":
+                                model.add_sample_point()
 
-                        elif action == "model#checkpoint":
-                            model.save_state_to()
+                            elif action == "model#checkpoint":
+                                model.save_state_to()
+                        except Exception as e:
+                            LOGGER.error("not ok - failed to perform action")
+                            LOGGER.error(e)
+                            continue
         except Exception as e:
             LOGGER.error("not ok - failed to connect to router, reattempting")
             time.sleep(1)

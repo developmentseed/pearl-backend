@@ -234,7 +234,25 @@ test('gpu connection', (t) => {
     });
 
     ws.on('message', (msg) => {
-        console.error(msg)
+        msg = JSON.parse(msg)
+
+        if (msg.message === 'info#connected') {
+            ws.send(JSON.stringify({
+                action: 'model#prediction',
+                data: {
+                    polygon: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [ -73.11444282531738, 41.30779368219147 ],
+                            [ -73.0854320526123, 41.30779368219147 ],
+                            [ -73.0854320526123, 41.33602709588135 ],
+                            [ -73.11444282531738, 41.33602709588135 ],
+                            [ -73.11444282531738, 41.30779368219147 ]
+                        ]]
+                    }
+                }
+            }));
+        }
     });
 });
 

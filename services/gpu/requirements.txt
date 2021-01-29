@@ -1,4 +1,7 @@
+pyproj==2.6.0
 pyjwt==2.0.0
+tiletanic==1.1.0
+geojson==2.5.0
 requests==2.25.1
 websockets==8.1
 rasterio==1.2.0

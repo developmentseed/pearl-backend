@@ -3,7 +3,7 @@ from web_tool.Utils import serialize, deserialize
 
 
 class ModelSrv():
-    def __init__(self, api, model):
+    def __init__(self, model, api):
 
         os.makedirs("/tmp/checkpoints/", exist_ok=True)
         os.makedirs("/tmp/downloads/", exist_ok=True)
@@ -16,7 +16,7 @@ class ModelSrv():
     def prediction(self, body):
         body.get('polygon')
 
-        tiles = api.get_tile_by_geom(body.get('polygon'))
+        tiles = self.api.get_tile_by_geom(body.get('polygon'))
 
         output = self.model.run(input_raster.data, True)
         assert input_raster.shape[0] == output.shape[0] and input_raster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"

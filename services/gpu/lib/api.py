@@ -1,10 +1,19 @@
+import json
 import requests
+import pyproj
 import numpy as np
 from os import path
 import logging
+import geojson
+from shapely.ops import transform
+from functools import partial
+from shapely.geometry import shape
+from tiletanic import tilecover, tileschemes
+import mercantile
 
 LOGGER = logging.getLogger("server")
 
+tiler = tileschemes.WebMercator()
 
 class API():
 
@@ -35,7 +44,7 @@ class API():
         return r.json()
 
     def get_tile_by_geom(self, geom):
-        poly = shape(geojson.loads(payload))
+        poly = shape(geojson.loads(json.dumps(geom)))
         project = partial(pyproj.transform, pyproj.Proj(init="epsg:4326"), pyproj.Proj(init="epsg:3857"))
         poly = transform(project, poly)
 
