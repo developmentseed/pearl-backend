@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+import time
 import sys
 import jwt
 import json
@@ -58,44 +59,61 @@ def main():
     )
 
 async def connection(uri, model):
-    async with websockets.connect(uri) as websocket:
-        LOGGER.info("ok - WebSocket Connection Initialized")
+    while True:
+        try:
+            async with websockets.connect(uri) as websocket:
+                LOGGER.info("ok - WebSocket Connection Initialized")
 
-        while True:
-            try:
-                msg = await websocket.recv()
-                msg = json.load(msg)
+                while True:
+                    try:
+                        if not websocket.open:
+                            LOGGER.warning("ok - websocket disconnected, attempting reconnection")
+                            break
 
-                action = msg.get('action')
+                        msg = await websocket.recv()
+                        msg = json.loads(msg)
 
-                if action == "instance#terminate":
-                    # Save Checkpoint
-                    # Mark instance as terminated in API
-                    # Shut down
-                    break
+                    except Exception as e:
+                        LOGGER.error("not ok - failed to decode websocket message")
+                        LOGGER.error(e)
+                        continue
 
-                elif action == "model#reset":
-                    model.reset()
+                    if msg.get('message') is not None:
+                        message = msg.get('message')
 
-                elif action == "model#undo":
-                    model.undo()
+                        LOGGER.info('ok - message: ' + str(message))
+                    elif msg.get('action') is not None:
+                        action = msg.get('action')
 
-                # Return a prediction for a given extent
-                elif action == "model#prediction":
-                    model.prediction(msg.get('data'))
+                        LOGGER.info('ok - action: ' + str(action))
 
-                elif action == "model#last_tile":
-                    model.last_tile()
+                        if action == "instance#terminate":
+                            # Save Checkpoint
+                            # Mark instance as terminated in API
+                            # Shut down
+                            break
 
-                elif action == "model#add_sample":
-                    model.add_sample_point()
+                        elif action == "model#reset":
+                            model.reset()
 
-                elif action == "model#checkpoint":
-                    model.save_state_to()
+                        elif action == "model#undo":
+                            model.undo()
 
-            except Exception:
-                LOGGER.error("Failed to decode websocket message")
-                LOGGER.error(msg)
+                        # Return a prediction for a given extent
+                        elif action == "model#prediction":
+                            model.prediction(msg.get('data'))
+
+                        elif action == "model#last_tile":
+                            model.last_tile()
+
+                        elif action == "model#add_sample":
+                            model.add_sample_point()
+
+                        elif action == "model#checkpoint":
+                            model.save_state_to()
+        except Exception as e:
+            LOGGER.error("not ok - failed to connect to router, reattempting")
+            time.sleep(1)
 
 
 def load(gpu_id, api):

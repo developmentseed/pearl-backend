@@ -12,6 +12,9 @@ const request = require('request');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 
+const TEST = process.env.TEST;
+const GPU = process.env.GPU;
+
 const test = require('tape');
 
 const WebSocket = require('ws');
@@ -223,8 +226,15 @@ test('gpu connection', (t) => {
 
     ws.on('open', () => {
         t.ok('connection opened');
-        ws.close();
-        t.end();
+
+        if (!process.env.GPU) {
+            ws.close();
+            t.end();
+        }
+    });
+
+    ws.on('message', (msg) => {
+        console.error(msg)
     });
 });
 
