@@ -54,7 +54,7 @@ class API():
         print(self.mosaic)
         poly = transform(project.transform, poly)
 
-        zxys = tilecover.cover_geometry(tiler, poly, 18)
+        zxys = tilecover.cover_geometry(tiler, poly, self.mosaic['maxzoom'])
 
         tiles = []
         for zxy in zxys:
