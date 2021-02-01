@@ -14,6 +14,31 @@ class Kube {
     const res = await this.k8sApi.listNamespacedPod(this.namespace);
     return res.body;
   }
+
+  makePodSpec() {
+    return {
+      apiVersion: "v1",
+      kind: "Pod",
+      metadata: {
+        name: "pod-test"
+      },
+      spec: {
+        containers: [
+          {
+            name: "ubuntu",
+            image: "ubuntu:trusty",
+            command: ["echo"],
+            args: ["Hello!"]
+          }
+        ]
+      }
+    };
+  }
+
+  async createpod(podSpec) {
+    const res = await this.k8sApi.createNamespacedPod('default', podSpec);
+    return res.body;
+  }
 }
 
 module.exports = {
