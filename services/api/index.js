@@ -783,7 +783,7 @@ async function server(argv, config, cb) {
      *       "meta": {}
      *   }
      */
-    router.get('/model/:modelid', checkJwt, async (req, res) => {
+    router.get('/model/:modelid', requiresAuth, async (req, res) => {
         Param.int(req, res, 'modelid');
 
         try {
