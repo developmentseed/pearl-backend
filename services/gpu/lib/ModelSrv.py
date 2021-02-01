@@ -23,7 +23,7 @@ class ModelSrv():
         for in_memraster in memrasters:
             output = self.model.run(in_memraster.data, False)
 
-            assert memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
+            assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
 
             out_memraster = MemRaster(output, in_memraster.crs, in_memraster.bounds)
 

@@ -80,7 +80,9 @@ class API():
 
             res = np.load(BytesIO(r.content))
 
-            assert res.shape == (4, 256, 256)
+            assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
+            res = np.moveaxis(res, 0, -1)
+            assert res.shape == (256, 256, 4), "Failed to reshape numpy array"
 
             memraster = MemRaster(
                 res,
