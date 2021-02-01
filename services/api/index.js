@@ -2,7 +2,7 @@
 
 'use strict';
 
-require('dotenv').config()
+require('dotenv').config();
 
 const fs = require('fs');
 const Err = require('./lib/error');
@@ -98,6 +98,8 @@ async function server(argv, config, cb) {
     }
 
     const proxy = new (require('./lib/proxy').Proxy)(config);
+    const auth = new (require('./lib/auth').Auth)(pool);
+    const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
     const Mosaic = require('./lib/mosaic');
@@ -109,35 +111,6 @@ async function server(argv, config, cb) {
         credentials: true
     }));
     app.use(minify());
-    // app.use(session({
-    //     name: argv.prod ? '__Host-session' : 'session',
-    //     proxy: argv.prod,
-    //     resave: false,
-    //     store: new pgSession({
-    //         pool: pool,
-    //         tableName : 'session'
-    //     }),
-    //     cookie: {
-    //         maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-    //         sameSite: argv.prod ? true : 'Lax',
-    //         secure: argv.prod
-    //     },
-    //     saveUninitialized: false,
-    //     secret: config.SigningSecret
-    // }));
-
-    // Setup JWT with Auth0
-    const checkJwt = jwt({
-        secret: jwks.expressJwtSecret({
-            cache: true,
-            rateLimit: true,
-            jwksRequestsPerMinute: 5,
-            jwksUri: `${config.Auth0IssuerBaseUrl}/.well-known/jwks.json`
-      }),
-      audience: config.Audience,
-      issuer: `${config.Auth0IssuerBaseUrl}/`,
-      algorithms: ['RS256']
-    });
 
     app.use('/docs', express.static('./doc'));
 
@@ -196,32 +169,65 @@ async function server(argv, config, cb) {
         limit: '50mb'
     }));
 
-    // Unified Auth
-    // router.use(async (req, res, next) => {
-    //     if (req.session && req.session.auth && req.session.auth.username) {
-    //         req.session.auth.type = 'session';
-    //         req.auth = req.session.auth;
-    //     } else if (req.header('authorization')) {
-    //         const authorization = req.header('authorization').split(' ');
-    //         if (authorization[0].toLowerCase() !== 'bearer') {
-    //             return res.status(401).json({
-    //                 status: 401,
-    //                 message: 'Only "Bearer" authorization header is allowed'
-    //             });
-    //         }
 
-    //         try {
-    //             req.auth = await authtoken.validate(authorization[1]);
-    //             req.auth.type = 'token';
-    //         } catch (err) {
-    //             return Err.respond(err, res);
-    //         }
-    //     } else {
-    //         req.auth = false;
-    //     }
+    /*
+     * Validate Auth0 JWT tokens
+     */
+    const validateAuth0Token = jwt({
+        secret: jwks.expressJwtSecret({
+            cache: true,
+            rateLimit: true,
+            jwksRequestsPerMinute: 5,
+            jwksUri: `${config.Auth0IssuerBaseUrl}/.well-known/jwks.json`
+        }),
+        audience: config.Audience,
+        issuer: `${config.Auth0IssuerBaseUrl}/`,
+        algorithms: ['RS256'],
+        getToken: (req) => req.jwt.token
+    });
 
-    //     return next();
-    // });
+    /*
+     * Validate API tokens
+     */
+    const validateApiToken = async (req, res, next) => {
+        try {
+            req.auth = await authtoken.validate(req.token);
+            next();
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    };
+    
+    /**
+     * Auth middleware
+     */
+    const requiresAuth = [
+        (req, res, next) => {
+            if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+                const token = req.headers.authorization.split(' ')[1];
+
+                // Self-signed tokens are prefixed with 'api.'
+                if (token.indexOf('api.') ===  0) {
+                    req.jwt = {
+                        type: 'api',
+                        token: token.substr(4) // remove prefix
+                    };
+                } else {
+                    req.jwt = {
+                        type: 'auth0',
+                        token: token
+                    };
+                }
+                next();
+            } else {
+                throw new Err(401, null, 'Authentication Required');
+            }
+        },
+        (req, res, next) => {
+            req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
+        }
+    ];
+
 
     /**
      * @api {get} /api/login Session Info
