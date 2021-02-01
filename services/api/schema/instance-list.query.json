@@ -1,0 +1,30 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "type": "integer",
+            "default": 100,
+            "description": "Limit number of returned runs"
+        },
+        "page": {
+            "type": "integer",
+            "default": 0,
+            "description": "The offset based on limit to return"
+        },
+        "status": {
+            "type": "string",
+            "default": "active",
+            "description": "Filter instances by active status",
+            "enum": [
+                "active",
+                "inactive",
+                "all"
+            ]
+        },
+        "uid": {
+            "type": "integer",
+            "description": "Query by user id"
+        }
+    }
+}

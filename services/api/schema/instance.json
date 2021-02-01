@@ -8,6 +8,10 @@
         "model_id": {
             "type": "integer",
             "description": "The model id to start an instance with"
+        },
+        "mosaic": {
+            "type": "string",
+            "description": "The mosaic ID to run the model with"
         }
     }
 }

@@ -139,12 +139,12 @@ test('new model', (t) => {
         json: true,
         url: API + '/api/model',
         body: {
-            name: 'Example Model',
+            name: 'NAIP Supervised',
             active: true,
             model_type: 'keras_example',
-            model_finetunelayer: -2,
-            model_numparams: 563498,
-            model_inputshape: [100,100,4],
+            model_finetunelayer: -4,
+            model_numparams: 7790949,
+            model_inputshape: [240,240,4],
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -184,7 +184,8 @@ test('new instance', (t) => {
         json: true,
         url: API + '/api/instance',
         body: {
-            model_id: 1
+            model_id: 1,
+            mosaic: 'naip.latest'
         },
         headers: {
             Authorization: `Bearer ${token}`
@@ -198,7 +199,8 @@ test('new instance', (t) => {
             'id',
             'created',
             'model_id',
-            'token'
+            'token',
+            'mosaic'
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
@@ -208,7 +210,8 @@ test('new instance', (t) => {
         delete body.token;
 
         t.deepEquals(body, {
-            model_id: 1
+            model_id: 1,
+            mosaic: 'naip.latest'
         }, 'expected body');
 
         t.end();

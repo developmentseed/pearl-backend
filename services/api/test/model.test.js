@@ -41,6 +41,7 @@ async function main() {
             }
         }, (err, res) => {
             t.error(err, 'no errors');
+
             t.equals(res.statusCode, 404, 'status: 404');
 
             t.deepEquals(res.body, {
@@ -63,13 +64,24 @@ async function main() {
             }
         }, (err, res) => {
             t.error(err, 'no errors');
-            t.equals(res.statusCode, 404, 'status: 404');
 
-            t.deepEquals(res.body, {
-                status: 404,
-                message: 'No model found',
-                messages: []
-            }, 'body');
+            if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
+                t.equals(res.statusCode, 404, 'status: 404');
+
+                t.deepEquals(res.body, {
+                    status: 404,
+                    message: 'No model found',
+                    messages: []
+                }, 'body');
+            } else {
+                t.equals(res.statusCode, 424, 'status: 424');
+
+                t.deepEquals(res.body, {
+                    status: 424,
+                    message: 'Model storage not configured',
+                    messages: []
+                }, 'body');
+            }
 
             t.end();
         });
@@ -151,7 +163,7 @@ async function main() {
             t.equals(res.statusCode, 200, 'status: 200');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'active', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'name', 'storage', 'uid'
+                'active', 'classes', 'created', 'id', 'meta', 'model_finetunelayer', 'model_inputshape', 'model_numparams', 'model_type', 'name', 'storage', 'uid'
             ], 'body');
 
             delete res.body.created;
@@ -162,6 +174,8 @@ async function main() {
                 uid: 1,
                 name: 'NAIP Supervised',
                 model_type: 'keras_example',
+                model_finetunelayer: -4,
+                model_numparams: 7790949,
                 model_inputshape: [ 240, 240, 4 ],
                 storage: null,
                 classes: [
@@ -190,7 +204,7 @@ async function main() {
             t.equals(res.statusCode, 200, 'status: 200');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'active', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'name', 'storage', 'uid'
+                'active', 'classes', 'created', 'id', 'meta', 'model_finetunelayer', 'model_inputshape', 'model_numparams', 'model_type', 'name', 'storage', 'uid'
             ], 'body');
 
             delete res.body.created;
@@ -202,6 +216,8 @@ async function main() {
                 name: 'NAIP Supervised',
                 model_type: 'keras_example',
                 model_inputshape: [ 240, 240, 4 ],
+                model_finetunelayer: -4,
+                model_numparams: 7790949,
                 storage: null,
                 classes: [
                     { name: 'Water', color: '#0000FF' },
