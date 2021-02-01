@@ -1,6 +1,7 @@
 import json
 import requests
 import pyproj
+from io import BytesIO
 import numpy as np
 from os import path
 import logging
@@ -8,6 +9,7 @@ import geojson
 from shapely.ops import transform
 from shapely.geometry import shape
 from tiletanic import tilecover, tileschemes
+from .MemRaster import MemRaster
 import mercantile
 
 LOGGER = logging.getLogger("server")
@@ -42,7 +44,7 @@ class API():
 
         return r.json()
 
-    def get_tile_by_geom(self, geom):
+    def get_tile_by_geom(self, geom, iformat='npy'):
         poly = shape(geojson.loads(json.dumps(geom)))
 
         project = pyproj.Transformer.from_proj(
@@ -51,19 +53,19 @@ class API():
             always_xy=True
         )
 
-        print(self.mosaic)
         poly = transform(project.transform, poly)
 
         zxys = tilecover.cover_geometry(tiler, poly, self.mosaic['maxzoom'])
 
-        tiles = []
+        rasters = []
         for zxy in zxys:
-            tiles.append(self.get_tile(zxy.z, zxy.x, zxy.y))
+            rasters.append(self.get_tile(zxy.z, zxy.x, zxy.y))
+        LOGGER.info("ok - got all tiles")
 
-        return tiles
+        return rasters
 
     def get_tile(self, z, x, y, iformat='npy'):
-        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}'.format(self.mosaic_id, z, x, y, iformat)
+        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
 
         LOGGER.info("ok - GET " + url)
         r = requests.get(url, headers={
@@ -72,8 +74,21 @@ class API():
 
         r.raise_for_status()
 
-        if format == 'npi':
-            return np.load(r.content)
+        if iformat == 'npy':
+            with open("f.npy", "wb") as f:
+                f.write(r.content)
+
+            res = np.load(BytesIO(r.content))
+
+            assert res.shape == (4, 256, 256)
+
+            memraster = MemRaster(
+                res,
+                "epsg:3857",
+                mercantile.bounds(x, y, z)
+            )
+
+            return memraster
         else:
             return r.content
 

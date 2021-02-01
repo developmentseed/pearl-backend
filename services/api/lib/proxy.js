@@ -1,7 +1,6 @@
 'use strict';
 
-const { promisify } = require('util');
-const request = promisify(require('request'));
+const request = require('request');
 
 /**
  * @class Proxy
@@ -19,18 +18,15 @@ class Proxy {
         }
 
         try {
-            const proxres = await request({
+            request({
                 url: url,
                 method: 'GET'
-            });
-
-            res.status(proxres.statusCode);
-
-            for (const h of ['content-type', 'content-length']) {
-                if (proxres.headers[h]) res.append(h, proxres.headers[h]);
-            }
-
-            res.send(proxres.body);
+            }).on('response', (proxres) => {
+                res.status(proxres.statusCode);
+                for (const h of ['content-type', 'content-length', 'content-encoding']) {
+                    if (proxres.headers[h]) res.append(h, proxres.headers[h]);
+                }
+            }).pipe(res);
         } catch (err) {
             throw new Error(err);
         }

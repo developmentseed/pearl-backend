@@ -1,5 +1,6 @@
 import os
 from web_tool.Utils import serialize, deserialize
+from .MemRaster import MemRaster
 
 
 class ModelSrv():
@@ -16,14 +17,19 @@ class ModelSrv():
     def prediction(self, body):
         body.get('polygon')
 
-        tiles = self.api.get_tile_by_geom(body.get('polygon'))
+        memrasters = self.api.get_tile_by_geom(body.get('polygon'), iformat='npy')
 
-        output = self.model.run(input_raster.data, True)
-        assert input_raster.shape[0] == output.shape[0] and input_raster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
+        outputs = []
+        for in_memraster in memrasters:
+            output = self.model.run(in_memraster.data, False)
 
-        output = InMemoryRaster(output, input_raster.crs, input_raster.transform, input_raster.bounds)
+            assert memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
 
-        return serialize(output)
+            out_memraster = MemRaster(output, in_memraster.crs, in_memraster.bounds)
+
+            outputs.append(serialize(output))
+
+        return outputs
 
     def last_tile(self):
         return serialize(self.model.last_tile)
