@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS aois (
     id          BIGSERIAL PRIMARY KEY,
     instance_id BIGINT,
     bounds      GEOMETRY(POLYGON, 4326),
-    created     TIMESTAMP
+    created     TIMESTAMP,
+    storage     BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS checkpoints (

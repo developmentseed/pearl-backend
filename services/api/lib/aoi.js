@@ -37,7 +37,8 @@ class Aoi {
                     count(*) OVER() AS count,
                     id,
                     ST_AsGeoJSON(bounds)::JSON,
-                    created
+                    created,
+                    storage
                 FROM
                     aois
                 WHERE
@@ -63,7 +64,8 @@ class Aoi {
                 return {
                     id: parseInt(row.id),
                     bounds: row.bounds,
-                    created: row.created
+                    created: row.created,
+                    storage: row.storage
                 };
             })
         };
@@ -82,11 +84,13 @@ class Aoi {
                 INSERT INTO aois (
                     instance_id,
                     bounds,
-                    created
+                    created,
+                    storage
                 ) VALUES (
                     $1,
                     ST_GeomFromGeoJSON($2),
-                    NOW()
+                    NOW(),
+                    False
                 ) RETURNING *
             `, [
                 instanceid,
@@ -97,7 +101,8 @@ class Aoi {
                 id: parseInt(pgres.rows[0].id),
                 instance_id: instanceid,
                 created: pgres.rows[0].created,
-                bounds: aoi.bounds
+                bounds: aoi.bounds,
+                storage: pgres.rows[0].storage
             };
         } catch (err) {
             throw new Err(500, err, 'Failed to create aoi');

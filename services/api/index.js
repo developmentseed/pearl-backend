@@ -640,6 +640,7 @@ async function server(argv, config, cb) {
      *       "instance_id": 123,
      *       "aois": [{
      *           "id": 1432,
+     *           "storage": true,
      *           "created": "<date>",
      *           "bounds": { "GeoJSON "}
      *       }]
@@ -680,6 +681,7 @@ async function server(argv, config, cb) {
      *   {
      *       "id": 1432,
      *       "instance_id": 124,
+     *       "storage": true,
      *       "created": "<date>",
      *       "bounds": { "GeoJSON" }
      *   }

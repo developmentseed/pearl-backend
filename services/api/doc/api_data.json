@@ -48,7 +48,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
           "type": "json"
         }
       ]
@@ -97,7 +97,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
           "type": "json"
         }
       ]
