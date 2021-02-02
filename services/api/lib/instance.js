@@ -85,9 +85,7 @@ class Instance {
     }
 
     async create(auth, instance) {
-        if (!auth.type) {
-            throw new Err(400, null, 'Only an authenticated user can create a token');
-        } else if (!auth.uid) {
+        if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
