@@ -16,6 +16,10 @@ const test = require('tape');
 
 const WebSocket = require('ws');
 
+const argv = require('minimist')(process.argv, {
+    boolean: ['prod'],
+    string: ['postgres', 'port']
+});
 const { Client, Pool } = require('pg');
 const Config = require('../services/api/lib/config');
 
@@ -24,12 +28,12 @@ main();
 async function main() {
 
     // Setup auth client to create user programmatically
-    const config = await Config.env();
+    const config = await Config.env(argv);
     const client = new Client({
-        connectionString: 'postgres://docker:docker@localhost:5433/gis'
+        connectionString: config.Postgres
     });
     const pool = new Pool({
-        connectionString: 'postgres://docker:docker@localhost:5433/gis'
+        connectionString: config.Postgres
     });
 
     let flight;
