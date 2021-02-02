@@ -80,7 +80,7 @@ class Instance {
         };
     }
 
-    async patch(body) {
+    async patch() {
 
     }
 
@@ -115,7 +115,7 @@ class Instance {
             const token = jwt.sign({
                 t: 'inst',
                 u: auth.uid,
-                m: parseInt(pgres.rows[0].id)
+                i: parseInt(pgres.rows[0].id)
             }, this.config.SigningSecret, { expiresIn: '12h' });
 
             return {
@@ -132,8 +132,10 @@ class Instance {
 
     /**
      * Retrieve information about an instance
+     *
+     * @param {Number} instanceid Instance ID to get
      */
-    async get(id) {
+    async get(instanceid) {
         let pgres;
 
         try {
@@ -149,7 +151,7 @@ class Instance {
                     instances
                 WHERE
                     id = $1
-            `, [id]);
+            `, [instanceid]);
         } catch (err) {
             throw new Err(500, err, 'Internal Instance Error');
         }
