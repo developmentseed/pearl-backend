@@ -58,6 +58,33 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/instance/:instance/checkpoint",
+    "title": "Create Checkpoint",
+    "version": "1.0.0",
+    "name": "CreateCheckpoint",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new Checkpoint during an instance Note: this is an internal API that is called by the websocket GPU</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
     "url": "/api/instance/:instance/aoi",
     "title": "List AOIs",
     "version": "1.0.0",
@@ -104,6 +131,55 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
+    "url": "/api/instance/:instance/aoi",
+    "title": "List Checkpoints",
+    "version": "1.0.0",
+    "name": "ListCheckpoints",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all checkpoints for a given instance</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned checkpoints</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The offset based on limit to return</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
   },
   {
     "type": "get",
