@@ -98,15 +98,32 @@ course of a session as informational messages
 
 | Action                | Notes |
 | --------------------- | ----- |
-| 'instance#terminate'  |       |
-| 'model#reset'         |       |
-| 'model#undo'          |       |
+| `instance#terminate`  |       |
+| `model#prediction`    | Inference a GeoJSON polygon |
+| `model#reset`         |       |
+| `model#undo`          |       |
 
 #### instance#terminate
 
 ```JSON
 {
     "action": "instance#terminate"
+}
+```
+
+#### model#prediction
+
+Submit a GeoJSON Polygon for inferencing.
+
+```JSON
+{
+    "action": "model#prediction",
+    "data": {
+        "polygon": {
+            "type": "Polygon",
+            "coordinates": []
+        }
+    }
 }
 ```
 
