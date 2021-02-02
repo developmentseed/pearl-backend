@@ -4,6 +4,7 @@ const api = require('../index');
 const { Client } = require('pg');
 const request = require('request');
 const session = request.jar();
+const Config = require('../lib/config');
 
 class Flight {
 
@@ -45,15 +46,17 @@ class Flight {
                 return t.end();
             }
 
+            const config = await Config.env();
+
             const client = new Client({
-                connectionString: 'postgres://postgres@localhost:5432/postgres'
+                connectionString: config.Postgres
             });
 
             try {
                 await client.connect();
 
                 await client.query(`
-                    DROP DATABASE lulc;
+                    DROP DATABASE IF EXISTS lulc;
                 `);
 
                 await client.query(`
