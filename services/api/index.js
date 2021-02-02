@@ -100,6 +100,7 @@ async function server(argv, config, cb) {
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
+    const checkpoint = new (require('./lib/checkpoint').Checkpoint)(pool, config);
     const aoi = new (require('./lib/aoi').Aoi)(pool, config);
     const Mosaic = require('./lib/mosaic');
 
@@ -703,8 +704,44 @@ async function server(argv, config, cb) {
         }
     );
 
-    router.get('/instance/:instanceid/checkpoints', async (req, res) => {
-        Param.int(req, res, 'instanceid');
+    /**
+     * @api {get} /api/instance/:instance/aoi List Checkpoints
+     * @apiVersion 1.0.0
+     * @apiName ListCheckpoints
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all checkpoints for a given instance
+     *
+     * @apiSchema (Query) {jsonschema=./schema/checkpoint.query.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "instance_id": 123,
+     *       "checkpoints": [{
+     *           "id": 1432,
+     *           "storage": true,
+     *           "created": "<date>"
+     *       }]
+     *   }
+     */
+    router.get('/instance/:instanceid/checkpoint', async (req, res) => {
+        validate({ query: require('./schema/checkpoint.query.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+                return res.json(await checkpoint.list(req.params.instanceid, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
     });
 
     /**

@@ -14,21 +14,12 @@ class Aoi {
      * @param {Number} instanceid - AOIS related to a specific instance
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
-     * @param {Number} [query.page=0] - Page of users to return
-     * @param {Number} query.uid - Query by uid.
+     * @param {Number} [query.page=0] - Page to return
      */
     async list(instanceid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 1;
-
-        const WHERE = [];
-
-        if (query.status === 'active') {
-            WHERE.push('active IS true');
-        } else if (query.status === 'inactive') {
-            WHERE.push('active IS false');
-        }
 
         let pgres;
         try {
