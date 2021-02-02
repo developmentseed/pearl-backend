@@ -4,50 +4,50 @@ const { Flight } = require('./util');
 
 const flight = new Flight();
 
-main();
+flight.takeoff(test);
 
-async function main() {
-    flight.takeoff(test);
+let token;
+test('user', async (t) => {
+    token = await flight.user(t);
+    t.end();
+});
 
-    const token = await flight.user(test);
+test('GET /api/mosaic', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/mosaic',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
 
-    test('GET /api/mosaic', (t) => {
-        request({
-            json: true,
-            url: 'http://localhost:2000/api/mosaic',
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }, (err, res) => {
-            t.error(err, 'no errors');
-            t.equals(res.statusCode, 200, 'status: 200');
-
-            t.deepEquals(res.body, {
-                mosaics: [
-                    'naip.latest'
-                ]
-            });
-
-            t.end();
+        t.deepEquals(res.body, {
+            mosaics: [
+                'naip.latest'
+            ]
         });
+
+        t.end();
     });
+});
 
-    test('GET /api/mosaic/naip.latest', (t) => {
-        request({
-            json: true,
-            url: 'http://localhost:2000/api/mosaic/naip.latest',
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }, (err, res) => {
-            t.error(err, 'no errors');
-            t.equals(res.statusCode, 404, 'status: 404');
+test('GET /api/mosaic/naip.latest', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/mosaic/naip.latest',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 404, 'status: 404');
 
-            t.end();
-        });
+        t.end();
     });
+});
 
-    flight.landing(test);
-}
+flight.landing(test);

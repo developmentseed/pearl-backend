@@ -24,12 +24,6 @@ const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const Config = require('./lib/config');
 
-const validator = new Validator({
-    allErrors: true
-});
-
-const validate = validator.validate;
-
 if (require.main === module) {
     configure(argv);
 }
@@ -64,6 +58,13 @@ function configure(argv = {}, cb) {
 async function server(argv, config, cb) {
     const app = express();
     const router = express.Router();
+
+
+    const validator = new Validator({
+        allErrors: true
+    });
+
+    const validate = validator.validate;
 
     let pool;
 

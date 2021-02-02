@@ -70,11 +70,11 @@ class Flight {
     /**
      * Create a new user & return an access token
      *
-     * @param {Tape} test tape instance to run new user creation on
+     * @param {Tape} t active tape instance to run new user creation on
      */
-    user(test) {
+    user(t) {
         return new Promise((resolve, reject) => {
-            test('api online', (t) => {
+            t.test('api online', (t) => {
                 request({
                     method: 'GET',
                     json: true,
@@ -92,7 +92,7 @@ class Flight {
                 });
             });
 
-            test('new user', (t) => {
+            t.test('new user', (t) => {
                 request({
                     method: 'POST',
                     json: true,
@@ -116,7 +116,7 @@ class Flight {
                 });
             });
 
-            test('new session', (t) => {
+            t.test('new session', (t) => {
                 request({
                     method: 'POST',
                     json: true,
@@ -142,7 +142,7 @@ class Flight {
                 });
             });
 
-            test('new token', (t) => {
+            t.test('new token', (t) => {
                 request({
                     method: 'POST',
                     json: true,
@@ -187,14 +187,15 @@ class Flight {
      * @param {Tape} test tape instance to run landing action on
      */
     landing(test) {
-        test('test server landing - api', async (t) => {
+        test('test server landing - api', (t) => {
             t.ok(this.srv, 'server object returned');
             t.ok(this.pool, 'pool object returned');
 
-            await this.pool.end();
-            await this.srv.close();
-
-            t.end();
+            this.pool.end(() => {
+                this.srv.close(() => {
+                    t.end();
+                });
+            });
         });
     }
 }
