@@ -672,7 +672,6 @@ async function server(argv, config, cb) {
      */
     router.post(
         '/model',
-        checkJwt,
         validate({ body: require('./schema/model.json') }),
         async (req, res) => {
             try {
