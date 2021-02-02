@@ -80,7 +80,7 @@ class Instance {
         };
     }
 
-    async patch(body) {
+    async patch() {
 
     }
 

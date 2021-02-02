@@ -2,6 +2,63 @@ define({ "api": [
   {
     "type": "get",
     "url": "/api/instance/:instance/aoi",
+    "title": "Create AOI",
+    "version": "1.0.0",
+    "name": "CreateAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new AOI during an instance Note: this is an internal API that is called by the websocket GPU</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>GeoJSON Polygon</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Polygon\""
+            ],
+            "optional": false,
+            "field": "bounds.type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds.coordinates",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
+    "url": "/api/instance/:instance/aoi",
     "title": "List AOIs",
     "version": "1.0.0",
     "name": "ListAOIs",

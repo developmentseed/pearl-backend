@@ -10,6 +10,8 @@ class CheckPoint {
 
     /**
      * Return a list of checkpoints for a given instance
+     *
+     * @param {Number} instance_id Instance ID to list checkpoints for
      */
     async list(instance_id) {
         let pgres;
@@ -34,10 +36,12 @@ class CheckPoint {
         return {
             total: pgres.rows.length,
             checkpoints: pgres.rows.map((row) => {
-                id: parseInt(row.id),
-                instance_id: parseInt(row.instance_id),
-                created: row.created,
-                storage: row.storage
+                return {
+                    id: parseInt(row.id),
+                    instance_id: parseInt(row.instance_id),
+                    created: row.created,
+                    storage: row.storage
+                };
             })
         };
     }

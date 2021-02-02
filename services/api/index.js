@@ -645,27 +645,64 @@ async function server(argv, config, cb) {
      *       }]
      *   }
      */
-    router.get('/instance/:instanceid/aoi', async (req, res) => {
-        Param.int(req, res, 'instanceid');
+    router.get(
+        '/instance/:instanceid/aoi',
+        validate({ query: require('./schema/aoi.query.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
 
-        try {
-            const inst = await instance.get(req.params.instanceid);
-            if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
-            return res.json(await aoi.list(req.params.instanceid, req.query));
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(await aoi.list(req.params.instanceid, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
+
+    /**
+     * @api {get} /api/instance/:instance/aoi Create AOI
+     * @apiVersion 1.0.0
+     * @apiName CreateAOI
+     * @apiGroup AOI
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Create a new AOI during an instance
+     *     Note: this is an internal API that is called by the websocket GPU
+     *
+     * @apiSchema (Body) {jsonschema=./schema/aoi.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "instance_id": 124,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON" }
+     *   }
+     */
+    router.post(
+        '/instance/:instanceid/aoi',
+        validate({ body: require('./schema/model.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+                return res.json(await aoi.create(req.params.instanceid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     router.get('/instance/:instanceid/checkpoints', async (req, res) => {
         Param.int(req, res, 'instanceid');
-
-        try {
-
-        } catch (err) {
-            return Err.respond(err, res);
-        }
     });
 
     /**
@@ -856,7 +893,7 @@ async function server(argv, config, cb) {
         try {
             await auth.is_auth(req);
 
-            return res.json(Mosaic.list())
+            return res.json(Mosaic.list());
         } catch (err) {
             return Err.respond(err, res);
         }
