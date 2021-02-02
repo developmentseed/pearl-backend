@@ -1,6 +1,9 @@
 import os
 from web_tool.Utils import serialize, deserialize
 from .MemRaster import MemRaster
+import logging
+
+LOGGER = logging.getLogger("server")
 
 
 class ModelSrv():
@@ -26,9 +29,11 @@ class ModelSrv():
             assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
 
             out_memraster = MemRaster(output, in_memraster.crs, in_memraster.bounds)
+            LOGGER.info("ok - generated inference");
 
             outputs.append(serialize(output))
 
+        LOGGER.info("ok - returning inferences");
         return outputs
 
     def last_tile(self):
