@@ -100,7 +100,7 @@ async function server(argv, config, cb) {
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
-    const checkpoint = new (require('./lib/checkpoint').Checkpoint)(pool, config);
+    const checkpoint = new (require('./lib/checkpoint').CheckPoint)(pool, config);
     const aoi = new (require('./lib/aoi').Aoi)(pool, config);
     const Mosaic = require('./lib/mosaic');
 
@@ -728,7 +728,8 @@ async function server(argv, config, cb) {
      *       }]
      *   }
      */
-    router.get('/instance/:instanceid/checkpoint', async (req, res) => {
+    router.get(
+        '/instance/:instanceid/checkpoint',
         validate({ query: require('./schema/checkpoint.query.json') }),
         async (req, res) => {
             Param.int(req, res, 'instanceid');
@@ -742,7 +743,7 @@ async function server(argv, config, cb) {
                 return Err.respond(err, res);
             }
         }
-    });
+    );
 
     /**
      * @api {get} /api/instance/:instance/checkpoint Create Checkpoint

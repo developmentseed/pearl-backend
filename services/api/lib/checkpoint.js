@@ -17,7 +17,7 @@ class CheckPoint {
      * @param {Number} [query.limit=100] - Max number of checkpoints to return
      * @param {Number} [query.page=0] - Page to return
      */
-    async list(instanceid) {
+    async list(instanceid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 1;
@@ -68,7 +68,9 @@ class CheckPoint {
      * @param {Number} instanceid - Checkpoint related to a specific instance
      * @param {Object} checkpoint - Checkpoint Object
      */
-    async create(instanceid, aoi) {
+    async create(instanceid, checkpoint) {
+        if (!checkpoint) checkpoint = {};
+
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoint (
