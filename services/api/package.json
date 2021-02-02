@@ -10,7 +10,7 @@
         "lint": "eslint index.js lib/**.js",
         "prod": "./index.js --prod",
         "dev": "nodemon ./index.js",
-        "test": "tape test/**.test.js"
+        "test": "tape test/index.test.js"
     },
     "dependencies": {
         "@azure/storage-blob": "^12.4.0",

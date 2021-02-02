@@ -3,9 +3,16 @@
 const api = require('../index');
 const { Client } = require('pg');
 const request = require('request');
-const session = request.jar();
 const Config = require('../lib/config');
 
+const { Pool } = require('pg');
+let auth;
+let authtoken;
+const testUser = {
+    username: 'example',
+    email: 'example@example.com',
+    password: 'password123'
+};
 class Flight {
 
     constructor() {
@@ -18,10 +25,10 @@ class Flight {
      *
      * @param {Tape} test tape instance to run takeoff action on
      */
-    takeoff(test) {
+    async takeoff(test) {
         this.rebuild(test);
 
-        test('test server takeoff', (t) => {
+        await test('test server takeoff', (t) => {
             api.configure({}, (srv, pool) => {
                 t.ok(srv, 'server object returned');
                 t.ok(pool, 'pool object returned');
@@ -52,15 +59,22 @@ class Flight {
                 connectionString: config.Postgres
             });
 
+            // Setup auth client to create user programatically
+            const pool = new Pool({
+                connectionString: config.Postgres
+            });
+            auth = new (require('../lib/auth').Auth)(pool);
+            authtoken = new (require('../lib/auth').AuthToken)(pool, config);
+
             try {
                 await client.connect();
 
                 await client.query(`
-                    DROP DATABASE IF EXISTS lulc;
-                `);
-
-                await client.query(`
-                    CREATE DATABASE lulc;
+                    DROP TABLE IF EXISTS users;
+                    DROP TABLE IF EXISTS users_reset;
+                    DROP TABLE IF EXISTS models;
+                    DROP TABLE IF EXISTS instances;
+                    DROP TABLE IF EXISTS checkpoints;
                 `);
 
                 await client.end();
@@ -95,92 +109,25 @@ class Flight {
                 });
             });
 
-            test('new user', (t) => {
-                request({
-                    method: 'POST',
-                    json: true,
-                    url: 'http://localhost:2000/api/user',
-                    body: {
-                        username: 'example',
-                        email: 'example@example.com',
-                        password: 'password123'
-                    }
-                } , (err, res, body) => {
-                    t.error(err, 'no error');
+            test('new user', async (t) => {
 
-                    t.equals(res.statusCode, 200, '200 status code');
+                await auth.register(testUser);
 
-                    t.deepEquals(body, {
-                        status: 200,
-                        message: 'User Created'
-                    }, 'expected body');
+                const user = await auth.login(testUser);
 
-                    t.end();
-                });
+                const token = await authtoken.generate(user, 'API Token');
+
+                t.deepEquals(Object.keys(token), [
+                    'id',
+                    'name',
+                    'token',
+                    'created'
+                ], 'expected props');
+
+                resolve(token);
             });
 
-            test('new session', (t) => {
-                request({
-                    method: 'POST',
-                    json: true,
-                    url: 'http://localhost:2000/api/login',
-                    jar: session,
-                    body: {
-                        username: 'example',
-                        password: 'password123'
-                    }
-                } , (err, res, body) => {
-                    t.error(err, 'no error');
 
-                    t.equals(res.statusCode, 200, '200 status code');
-
-                    t.deepEquals(body, {
-                        username: 'example'
-                    }, 'expected body');
-
-                    t.equals(res.headers['set-cookie'].length, 1, '1 cookie is set');
-                    t.equals(res.headers['set-cookie'][0].split('=')[0], 'session', 'session cookie is set');
-
-                    t.end();
-                });
-            });
-
-            test('new token', (t) => {
-                request({
-                    method: 'POST',
-                    json: true,
-                    jar: session,
-                    url: 'http://localhost:2000/api/token',
-                    body: {
-                        name: 'Access Token'
-                    }
-                } , (err, res, body) => {
-                    t.error(err, 'no error');
-
-                    t.equals(res.statusCode, 200, '200 status code');
-
-                    t.deepEquals(Object.keys(body), [
-                        'id',
-                        'name',
-                        'token',
-                        'created'
-                    ], 'expected props');
-
-                    delete body.created;
-
-                    const token = body.token;
-                    delete body.token;
-
-                    t.deepEquals(body, {
-                        id: 1,
-                        name: 'Access Token'
-                    }, 'expected body');
-
-                    resolve(token);
-
-                    t.end();
-                });
-            });
         });
     }
 

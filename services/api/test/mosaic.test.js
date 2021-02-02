@@ -1,15 +1,9 @@
+'use strict';
+
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
 
-const flight = new Flight();
-
-main();
-
-async function main() {
-    flight.takeoff(test);
-
-    const token = await flight.user(test);
+module.exports = async function(flight, token) {
 
     test('GET /api/mosaic', (t) => {
         request({
@@ -17,7 +11,7 @@ async function main() {
             url: 'http://localhost:2000/api/mosaic',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -39,7 +33,7 @@ async function main() {
             url: 'http://localhost:2000/api/mosaic/naip.latest',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -49,5 +43,4 @@ async function main() {
         });
     });
 
-    flight.landing(test);
-}
+};

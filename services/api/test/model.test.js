@@ -1,23 +1,16 @@
+'use strict';
+
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
 
-const flight = new Flight();
-
-main();
-
-async function main() {
-    flight.takeoff(test);
-
-    const token = await flight.user(test);
-
+module.exports = async function(flight, token) {
     test('GET /api/model (empty)', (t) => {
         request({
             json: true,
             url: 'http://localhost:2000/api/model',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -37,7 +30,7 @@ async function main() {
             url: 'http://localhost:2000/api/model/1',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -60,7 +53,7 @@ async function main() {
             url: 'http://localhost:2000/api/model/1/download',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -93,7 +86,7 @@ async function main() {
             url: 'http://localhost:2000/api/model',
             method: 'POST',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             },
             body: {
                 name: 'NAIP Supervised',
@@ -103,10 +96,10 @@ async function main() {
                 model_numparams: 7790949,
                 model_inputshape: [240,240,4],
                 classes: [
-                    { name: 'Water', color: '#0000FF'},
-                    { name: 'Tree Canopy', color: '#008000'},
-                    { name: 'Field', color: '#80FF80'},
-                    { name: 'Built', color: '#806060'}
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Tree Canopy', color: '#008000' },
+                    { name: 'Field', color: '#80FF80' },
+                    { name: 'Built', color: '#806060' }
                 ],
                 meta: {}
             }
@@ -127,7 +120,7 @@ async function main() {
             url: 'http://localhost:2000/api/model',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -156,7 +149,7 @@ async function main() {
             url: 'http://localhost:2000/api/model/1',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -176,7 +169,7 @@ async function main() {
                 model_type: 'keras_example',
                 model_finetunelayer: -4,
                 model_numparams: 7790949,
-                model_inputshape: [ 240, 240, 4 ],
+                model_inputshape: [240, 240, 4],
                 storage: null,
                 classes: [
                     { name: 'Water', color: '#0000FF' },
@@ -197,7 +190,7 @@ async function main() {
             url: 'http://localhost:2000/api/model/1',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer api.${token}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -215,7 +208,7 @@ async function main() {
                 uid: 1,
                 name: 'NAIP Supervised',
                 model_type: 'keras_example',
-                model_inputshape: [ 240, 240, 4 ],
+                model_inputshape: [240, 240, 4],
                 model_finetunelayer: -4,
                 model_numparams: 7790949,
                 storage: null,
@@ -254,7 +247,7 @@ async function main() {
                 url: 'http://localhost:2000/api/model/1/download',
                 method: 'GET',
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer api.${token}`
                 }
             }, (err, res) => {
                 t.error(err, 'no errors');
@@ -265,6 +258,4 @@ async function main() {
             });
         });
     }
-
-    flight.landing(test);
 }

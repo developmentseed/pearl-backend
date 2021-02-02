@@ -18,14 +18,6 @@ class Auth {
         ];
     }
 
-    async is_auth(req) {
-        if (!req.auth || !req.auth.access || !['session', 'token'].includes(req.auth.type)) {
-            throw new Err(401, null, 'Authentication Required');
-        }
-
-        return true;
-    }
-
     async reset(user) {
         if (!user.token) throw new Err(400, null, 'token required');
         if (!user.password) throw new Err(400, null, 'password required');
@@ -502,9 +494,7 @@ class AuthToken {
     }
 
     async generate(auth, name) {
-        if (auth.type !== 'session') {
-            throw new Err(400, null, 'Only a user session can create a token');
-        } else if (!auth.uid) {
+        if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
         } else if (!name || !name.trim()) {
             throw new Err(400, null, 'Token name required');

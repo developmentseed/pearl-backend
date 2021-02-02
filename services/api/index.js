@@ -191,13 +191,13 @@ async function server(argv, config, cb) {
      */
     const validateApiToken = async (req, res, next) => {
         try {
-            req.auth = await authtoken.validate(req.token);
+            req.auth = await authtoken.validate(req.jwt.token);
             next();
         } catch (err) {
             return Err.respond(err, res);
         }
     };
-    
+
     /**
      * Auth middleware
      */
@@ -292,7 +292,7 @@ async function server(argv, config, cb) {
                     password: req.body.password
                 });
 
-                req.session.auth = user;
+                req.auth = user;
 
                 return res.json({
                     username: user.username
@@ -318,10 +318,8 @@ async function server(argv, config, cb) {
      *       "name": "Token Name"
      *   }]
      */
-    router.get('/token', async (req, res) => {
+    router.get('/token', requiresAuth, async (req, res) => {
         try {
-            await auth.is_auth(req);
-
             return res.json(await authtoken.list(req.auth));
         } catch (err) {
             return Err.respond(err, res);
@@ -350,11 +348,10 @@ async function server(argv, config, cb) {
      *   }
      */
     router.post('/token',
+        requiresAuth,
         validate({ body: require('./schema/token.json') }),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 return res.json(await authtoken.generate(req.auth, req.body.name));
             } catch (err) {
                 return Err.respond(err, res);
@@ -379,12 +376,10 @@ async function server(argv, config, cb) {
      *       "message": "Token Deleted"
      *   }
      */
-    router.delete('/token/:tokenid', async (req, res) => {
+    router.delete('/token/:tokenid', requiresAuth, async (req, res) => {
         Param.int(req, res, 'tokenid');
 
         try {
-            await auth.is_auth(req);
-
             return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
@@ -418,11 +413,10 @@ async function server(argv, config, cb) {
      */
     router.get(
         '/user',
+        requiresAuth,
         validate({ query: require('./schema/user-list.query.json') }),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
-
                 const users = await auth.list(req.query);
 
                 return res.json(users);
@@ -523,11 +517,10 @@ async function server(argv, config, cb) {
      *   }
      */
     router.post('/instance',
+        requiresAuth,
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
 
                 const inst = await instance.create(req.auth, req.body);
@@ -591,10 +584,8 @@ async function server(argv, config, cb) {
      *       }]
      *   }
      */
-    router.get('/instance', async (req, res) => {
+    router.get('/instance', requiresAuth, async (req, res) => {
         try {
-            await auth.is_auth(req);
-
             // Only admins can see all running instances
             if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
 
@@ -672,11 +663,10 @@ async function server(argv, config, cb) {
      */
     router.post(
         '/model',
+        requiresAuth,
         validate({ body: require('./schema/model.json') }),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 res.json(await model.create(req.body, req.auth));
             } catch (err) {
                 return Err.respond(err, res);
@@ -707,10 +697,9 @@ async function server(argv, config, cb) {
      */
     router.get(
         '/model',
+        requiresAuth,
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 res.json(await model.list());
             } catch (err) {
                 return Err.respond(err, res);
@@ -736,12 +725,10 @@ async function server(argv, config, cb) {
      *       "message": "Model deleted"
      *   }
      */
-    router.delete('/model/:modelid', async (req, res) => {
+    router.delete('/model/:modelid', requiresAuth, async (req, res) => {
         Param.int(req, res, 'modelid');
 
         try {
-            await auth.is_auth(req);
-
             await model.delete(req.params.modelid);
 
             return res.status(200).json({
@@ -802,12 +789,10 @@ async function server(argv, config, cb) {
      * @apiDescription
      *     Return the model itself
      */
-    router.get('/model/:modelid/download', async (req, res) => {
+    router.get('/model/:modelid/download', requiresAuth, async (req, res) => {
         Param.int(req, res, 'modelid');
 
         try {
-            await auth.is_auth(req);
-
             await model.download(req.params.modelid, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -833,11 +818,9 @@ async function server(argv, config, cb) {
      *       ]
      *   }
      */
-    router.get('/mosaic', async (req, res) => {
+    router.get('/mosaic', requiresAuth, async (req, res) => {
         try {
-            await auth.is_auth(req);
-
-            return res.json(Mosaic.list())
+            return res.json(Mosaic.list());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -872,12 +855,10 @@ async function server(argv, config, cb) {
      *       "center": [ -95.87494149186512, 36.9693324794906, 12 ]
      *   }
      */
-    router.get('/mosaic/:layer', async (req, res) => {
+    router.get('/mosaic/:layer', requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            await auth.is_auth(req);
-
             req.url = req.url + '/tilejson.json';
 
             await proxy.request(req, res);
@@ -904,7 +885,7 @@ async function server(argv, config, cb) {
      *     Return an aerial imagery tile for a given set of mercator coordinates
      *
      */
-    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', async (req, res) => {
+    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         Param.int(req, res, 'z');
@@ -912,8 +893,6 @@ async function server(argv, config, cb) {
         Param.int(req, res, 'y');
 
         try {
-            await auth.is_auth(req);
-
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
