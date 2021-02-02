@@ -1,6 +1,55 @@
 [
   {
     "type": "get",
+    "url": "/api/instance/:instance/aoi",
+    "title": "List AOIs",
+    "version": "1.0.0",
+    "name": "ListAOIs",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all aois for a given instance</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned aois</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The offset based on limit to return</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
     "url": "/api/instance",
     "title": "Create Instance",
     "version": "1.0.0",

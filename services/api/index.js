@@ -100,6 +100,7 @@ async function server(argv, config, cb) {
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
+    const aoi = new (require('./lib/aoi').Aoi)(pool, config);
     const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
@@ -612,11 +613,46 @@ async function server(argv, config, cb) {
         try {
             const inst = await instance.get(req.params.instanceid);
 
-            if (req.auth.access === 'admin') return res.json(inst);
-
-            if (req.auth.uid !== instance.uid) throw new Error(403, null, 'Cannot access models you don\'t own');
+            if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
             return res.json(inst);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/instance/:instance/aoi List AOIs
+     * @apiVersion 1.0.0
+     * @apiName ListAOIs
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all aois for a given instance
+     *
+     * @apiSchema (Query) {jsonschema=./schema/aoi.query.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "instance_id": 123,
+     *       "aois": [{
+     *           "id": 1432,
+     *           "created": "<date>",
+     *           "bounds": { "GeoJSON "}
+     *       }]
+     *   }
+     */
+    router.get('/instance/:instanceid/aoi', async (req, res) => {
+        Param.int(req, res, 'instanceid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            return res.json(await aoi.list(req.params.instanceid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
