@@ -21,8 +21,6 @@ const argv = require('minimist')(process.argv, {
 });
 
 const pgSession = require('connect-pg-simple')(session);
-const router = express.Router();
-const app = express();
 const { Pool } = require('pg');
 const Config = require('./lib/config');
 
@@ -64,6 +62,9 @@ function configure(argv = {}, cb) {
  * @param {function} cb
  */
 async function server(argv, config, cb) {
+    const app = express();
+    const router = express.Router();
+
     let pool;
 
     let retry = 5;
