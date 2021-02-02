@@ -689,7 +689,7 @@ async function server(argv, config, cb) {
      */
     router.post(
         '/instance/:instanceid/aoi',
-        validate({ body: require('./schema/model.json') }),
+        validate({ body: require('./schema/aoi.json') }),
         async (req, res) => {
             Param.int(req, res, 'instanceid');
 
@@ -743,6 +743,45 @@ async function server(argv, config, cb) {
             }
         }
     });
+
+    /**
+     * @api {get} /api/instance/:instance/checkpoint Create Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName CreateCheckpoint
+     * @apiGroup AOI
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Create a new Checkpoint during an instance
+     *     Note: this is an internal API that is called by the websocket GPU
+     *
+     * @apiSchema (Body) {jsonschema=./schema/checkpoint.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "instance_id": 124,
+     *       "storage": true,
+     *       "created": "<date>"
+     *   }
+     */
+    router.post(
+        '/instance/:instanceid/checkpoint',
+        validate({ body: require('./schema/checkpoint.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+                return res.json(await checkpoint.create(req.params.instanceid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     /**
      * @api {post} /api/model Create Model

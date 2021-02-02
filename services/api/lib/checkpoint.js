@@ -60,6 +60,40 @@ class CheckPoint {
             })
         };
     }
+
+
+    /**
+     * Create a new Checkpoint
+     *
+     * @param {Number} instanceid - Checkpoint related to a specific instance
+     * @param {Object} checkpoint - Checkpoint Object
+     */
+    async create(instanceid, aoi) {
+        try {
+            const pgres = await this.pool.query(`
+                INSERT INTO checkpoint (
+                    instance_id,
+                    created,
+                    storage
+                ) VALUES (
+                    $1,
+                    NOW(),
+                    False
+                ) RETURNING *
+            `, [
+                instanceid
+            ]);
+
+            return {
+                id: parseInt(pgres.rows[0].id),
+                instance_id: instanceid,
+                created: pgres.rows[0].created,
+                storage: pgres.rows[0].storage
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to create checkpoint');
+        }
+    }
 }
 
 module.exports = {

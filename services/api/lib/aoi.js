@@ -63,7 +63,7 @@ class Aoi {
     }
 
     /**
-     * Return a list of aois
+     * Create a new AOI
      *
      * @param {Number} instanceid - AOIS related to a specific instance
      * @param {Object} aoi - AOI Object
