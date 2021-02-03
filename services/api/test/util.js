@@ -21,20 +21,13 @@ class Flight {
      *
      * @param {Tape} test tape instance to run takeoff action on
      */
-    async takeoff(test) {
+    takeoff(test) {
         this.rebuild(test);
 
         test('test server takeoff', (t) => {
-            process.exit();
             api.configure({}, async (srv, pool) => {
                 t.ok(srv, 'server object returned');
                 t.ok(pool, 'pool object returned');
-
-                let pgres = await pool.query(`
-                    SELECT count(*) FROM users;
-                `);
-
-                t.equals(pgres.rows.length, 0, 'users wiped');
 
                 this.srv = srv;
                 this.pool = pool;
@@ -72,11 +65,11 @@ class Flight {
                 `);
 
                 await client.end();
-
-                t.end();
             } catch (err) {
                 t.error(err);
             }
+
+            t.end();
         });
     }
 
