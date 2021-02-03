@@ -23,28 +23,16 @@ const argv = require('minimist')(process.argv, {
     string: ['postgres', 'port']
 });
 
-const router = express.Router();
-const app = express();
 const { Pool } = require('pg');
 const Config = require('./lib/config');
-
-const validator = new Validator({
-    allErrors: true
-});
-
-const validate = validator.validate;
 
 if (require.main === module) {
     configure(argv);
 }
 
 function configure(argv = {}, cb) {
-    Config.env(argv).then((config) => {
-        return server(argv, config, cb);
-    }).catch((err) => {
-        console.error(err);
-        process.exit(1);
-    });
+    const config = Config.env(argv);
+    return server(config, cb);
 }
 
 /**
@@ -61,11 +49,19 @@ function configure(argv = {}, cb) {
  */
 
 /**
- * @param {Object} argv
  * @param {Config} config
  * @param {function} cb
  */
-async function server(argv, config, cb) {
+async function server(config, cb) {
+    const app = express();
+    const router = express.Router();
+
+    const validator = new Validator({
+        allErrors: true
+    });
+
+    const validate = validator.validate;
+
     let pool;
 
     let retry = 5;
@@ -102,6 +98,8 @@ async function server(argv, config, cb) {
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
+    const checkpoint = new (require('./lib/checkpoint').CheckPoint)(pool, config);
+    const aoi = new (require('./lib/aoi').Aoi)(pool, config);
     const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
@@ -622,9 +620,7 @@ async function server(argv, config, cb) {
         try {
             const inst = await instance.get(req.params.instanceid);
 
-            if (req.auth.access === 'admin') return res.json(inst);
-
-            if (req.auth.uid !== instance.uid) throw new Error(403, null, 'Cannot access models you don\'t own');
+            if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
             return res.json(inst);
         } catch (err) {
@@ -632,15 +628,167 @@ async function server(argv, config, cb) {
         }
     });
 
-    router.get('/instance/:instanceid/checkpoints', async (req, res) => {
-        Param.int(req, res, 'instanceid');
+    /**
+     * @api {get} /api/instance/:instance/aoi List AOIs
+     * @apiVersion 1.0.0
+     * @apiName ListAOIs
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all aois for a given instance
+     *
+     * @apiSchema (Query) {jsonschema=./schema/aoi.query.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "instance_id": 123,
+     *       "aois": [{
+     *           "id": 1432,
+     *           "storage": true,
+     *           "created": "<date>",
+     *           "bounds": { "GeoJSON "}
+     *       }]
+     *   }
+     */
+    router.get(
+        '/instance/:instanceid/aoi',
+        validate({ query: require('./schema/aoi.query.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
 
-        try {
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(await aoi.list(req.params.instanceid, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
+
+    /**
+     * @api {get} /api/instance/:instance/aoi Create AOI
+     * @apiVersion 1.0.0
+     * @apiName CreateAOI
+     * @apiGroup AOI
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Create a new AOI during an instance
+     *     Note: this is an internal API that is called by the websocket GPU
+     *
+     * @apiSchema (Body) {jsonschema=./schema/aoi.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "instance_id": 124,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON" }
+     *   }
+     */
+    router.post(
+        '/instance/:instanceid/aoi',
+        validate({ body: require('./schema/aoi.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+                return res.json(await aoi.create(req.params.instanceid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/instance/:instance/aoi List Checkpoints
+     * @apiVersion 1.0.0
+     * @apiName ListCheckpoints
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all checkpoints for a given instance
+     *
+     * @apiSchema (Query) {jsonschema=./schema/checkpoint.query.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "instance_id": 123,
+     *       "checkpoints": [{
+     *           "id": 1432,
+     *           "storage": true,
+     *           "created": "<date>"
+     *       }]
+     *   }
+     */
+    router.get(
+        '/instance/:instanceid/checkpoint',
+        validate({ query: require('./schema/checkpoint.query.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+                return res.json(await checkpoint.list(req.params.instanceid, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/instance/:instance/checkpoint Create Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName CreateCheckpoint
+     * @apiGroup AOI
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Create a new Checkpoint during an instance
+     *     Note: this is an internal API that is called by the websocket GPU
+     *
+     * @apiSchema (Body) {jsonschema=./schema/checkpoint.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "instance_id": 124,
+     *       "storage": true,
+     *       "created": "<date>"
+     *   }
+     */
+    router.post(
+        '/instance/:instanceid/checkpoint',
+        validate({ body: require('./schema/checkpoint.json') }),
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+                return res.json(await checkpoint.create(req.params.instanceid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     /**
      * @api {post} /api/model Create Model

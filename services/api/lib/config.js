@@ -1,7 +1,7 @@
 'use strict';
 
 class Config {
-    static async env(args = {}) {
+    static env(args = {}) {
         if (args.prod && !process.env.SigningSecret) {
             throw new Error('SigningSecret env var must be set in production environment');
         }

@@ -17,6 +17,8 @@ class Model {
 
     /**
      * Create a new model
+     *
+     * @param {Object} model Model
      */
     async create(model, auth) {
         let pgres;

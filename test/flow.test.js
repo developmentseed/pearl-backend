@@ -109,7 +109,7 @@ async function main() {
                 meta: {}
             },
             headers: {
-                Authorization: `Bearer api.${token}`
+                Authorization: `Bearer ${token}`
             }
         } , (err, res, body) => {
             t.error(err, 'no error');
@@ -143,7 +143,7 @@ async function main() {
                 mosaic: 'naip.latest'
             },
             headers: {
-                Authorization: `Bearer api.${token}`
+                Authorization: `Bearer ${token}`
             }
         } , (err, res, body) => {
             t.error(err, 'no error');
@@ -187,4 +187,5 @@ async function main() {
         flight.landing(test);
     }
 }
+
 

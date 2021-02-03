@@ -527,7 +527,7 @@ class AuthToken {
             return {
                 id: parseInt(pgres.rows[0].id),
                 name: pgres.rows[0].name,
-                token: pgres.rows[0].token,
+                token: 'api.' + pgres.rows[0].token,
                 created: pgres.rows[0].created
             };
         } catch (err) {

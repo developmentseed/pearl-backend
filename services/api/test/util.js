@@ -3,16 +3,12 @@
 const api = require('../index');
 const { Client } = require('pg');
 const request = require('request');
-const Config = require('../lib/config');
+const pkg = require('../package.json');
+const { Config } = require('../index');
+
+const config = Config.env();
 
 const { Pool } = require('pg');
-let auth;
-let authtoken;
-const testUser = {
-    username: 'example',
-    email: 'example@example.com',
-    password: 'password123'
-};
 class Flight {
 
     constructor() {
@@ -25,11 +21,11 @@ class Flight {
      *
      * @param {Tape} test tape instance to run takeoff action on
      */
-    async takeoff(test) {
+    takeoff(test) {
         this.rebuild(test);
 
-        await test('test server takeoff', (t) => {
-            api.configure({}, (srv, pool) => {
+        test('test server takeoff', (t) => {
+            api.configure({}, async (srv, pool) => {
                 t.ok(srv, 'server object returned');
                 t.ok(pool, 'pool object returned');
 
@@ -50,48 +46,41 @@ class Flight {
         test('test database wipe', async (t) => {
             if (this.srv) {
                 t.fail('Cannot wipe database while server is running');
-                return t.end();
+                t.end();
             }
 
-            const config = await Config.env();
-
             const client = new Client({
-                connectionString: config.Postgres
+                connectionString: 'postgres://postgres@localhost:5432/postgres'
             });
-
-            // Setup auth client to create user programatically
-            const pool = new Pool({
-                connectionString: config.Postgres
-            });
-            auth = new (require('../lib/auth').Auth)(pool);
-            authtoken = new (require('../lib/auth').AuthToken)(pool, config);
 
             try {
                 await client.connect();
 
                 await client.query(`
-                    DROP TABLE IF EXISTS users;
-                    DROP TABLE IF EXISTS users_reset;
-                    DROP TABLE IF EXISTS models;
-                    DROP TABLE IF EXISTS instances;
-                    DROP TABLE IF EXISTS checkpoints;
+                    DROP DATABASE lulc;
+                `);
+
+                await client.query(`
+                    CREATE DATABASE lulc;
                 `);
 
                 await client.end();
             } catch (err) {
                 t.error(err);
             }
+
+            t.end();
         });
     }
 
     /**
      * Create a new user & return an access token
      *
-     * @param {Tape} test tape instance to run new user creation on
+     * @param {Tape} t active tape instance to run new user creation on
      */
-    user(test) {
+    user(t) {
         return new Promise((resolve, reject) => {
-            test('api online', (t) => {
+            t.test('api online', (t) => {
                 request({
                     method: 'GET',
                     json: true,
@@ -102,19 +91,26 @@ class Flight {
                     t.equals(res.statusCode, 200);
 
                     t.deepEquals(body, {
-                        version: '1.0.0'
+                        version: pkg.version
                     });
 
                     t.end();
                 });
             });
 
-            test('new user', async (t) => {
+            t.test('new user', async (t) => {
+                const auth = new (require('../lib/auth').Auth)(this.pool);
+                const authtoken = new (require('../lib/auth').AuthToken)(this.pool, config);
+
+                const testUser = {
+                    username: 'example',
+                    email: 'example@example.com',
+                    password: 'password123'
+                };
 
                 await auth.register(testUser);
 
                 const user = await auth.login(testUser);
-
                 const token = await authtoken.generate(user, 'API Token');
 
                 t.deepEquals(Object.keys(token), [
@@ -126,8 +122,6 @@ class Flight {
 
                 resolve(token);
             });
-
-
         });
     }
 
@@ -137,14 +131,15 @@ class Flight {
      * @param {Tape} test tape instance to run landing action on
      */
     landing(test) {
-        test('test server landing - api', async (t) => {
+        test('test server landing - api', (t) => {
             t.ok(this.srv, 'server object returned');
             t.ok(this.pool, 'pool object returned');
 
-            await this.pool.end();
-            await this.srv.close();
-
-            t.end();
+            this.pool.end(() => {
+                this.srv.close(() => {
+                    t.end();
+                });
+            });
         });
     }
 }

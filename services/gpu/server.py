@@ -77,22 +77,6 @@ def record_correction():
 
 
 def pred_patch():
-    bottle.response.content_type = 'application/json'
-    data = bottle.request.json
-    current_session = SESSION_HANDLER.get_session(bottle.request.session.id)
-
-    current_session.add_entry(data) # record this interaction
-
-    # Inputs
-    extent = data["extent"]
-    dataset = data["dataset"]
-    color_list = [item["color"] for item in data["classes"]]
-
-    if dataset not in DATALOADERS:
-        raise ValueError("Dataset doesn't seem to be valid, do the datasets in js/tile_layers.js correspond to those in TileLayers.py")
-    else:
-        current_data_loader = DATALOADERS[dataset]
-
     input_raster = current_data_loader.get_data_from_extent(extent)
     current_session.latest_input_raster = input_raster
 
@@ -129,11 +113,6 @@ def pred_tile():
     dataset = data["dataset"]
     zone_layer_name = data["zoneLayerName"]
     model_idx = data["modelIdx"]
-
-    if dataset not in DATALOADERS:
-        raise ValueError("Dataset doesn't seem to be valid, do the datasets in js/tile_layers.js correspond to those in TileLayers.py")
-    else:
-        current_data_loader = DATALOADERS[dataset]
 
     try:
         input_raster = current_data_loader.get_data_from_geometry(geom["geometry"])
@@ -271,9 +250,6 @@ def get_checkpoints():
 # Static file serving endpoints
 #---------------------------------------------------------------------------------------
 
-def get_basemap_data(filepath):
-    return bottle.static_file(filepath, root="/data/basemaps/")
-
 def get_zone_data(filepath):
     return bottle.static_file(filepath, root="./data/zones/")
 
@@ -290,7 +266,6 @@ def get_everything_else(filepath):
 def main():
 
     # API paths
-    app.route('/predPatch', method="POST", callback=pred_patch)
     app.route('/predTile', method="POST", callback=pred_tile)
     app.route('/downloadAll', method="POST", callback=download_all)
     app.route('/getInput', method="POST", callback=get_input)
@@ -303,7 +278,6 @@ def main():
 
     # Content paths
     app.route("/", method="GET", callback=get_landing_page)
-    app.route("/data/basemaps/<filepath:re:.*>", method="GET", callback=get_basemap_data)
     app.route("/data/zones/<filepath:re:.*>", method="GET", callback=get_zone_data)
     app.route("/tmp/downloads/<filepath:re:.*>", method="GET", callback=get_downloads)
     app.route("/<filepath:re:.*>", method="GET", callback=get_everything_else)
