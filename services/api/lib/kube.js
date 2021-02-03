@@ -18,6 +18,11 @@ class Kube {
   }
 
   makePodSpec(name) {
+    const nodeSelectorKey = process.env.nodeSelectorKey;
+    const nodeSelectorValue = process.env.nodeSelectorValue;
+    const gpuImageName = process.env.GpuImageName;
+    const gpuImageTag = process.env.GpuImageTag;
+
     return {
       apiVersion: "v1",
       kind: "Pod",
@@ -28,9 +33,19 @@ class Kube {
         containers: [
           {
             name: `gpu-${name}`,
-            image: `${process.env.GpuImageName}:${process.env.GpuImageTag}`,
+            image: `${gpuImageName}:${gpuImageTag}`,
+            resources: {
+              limits: {
+                'nvidia.com/gpu': 1
+              }
+            },
+            env: {
+              name: 'test',
+              value: 'test'
+            }
           }
-        ]
+        ],
+        nodeSelector: `${nodeSelectorKey}:${nodeSelectorValue}`
       }
     };
   }
