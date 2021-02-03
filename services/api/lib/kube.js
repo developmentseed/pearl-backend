@@ -1,7 +1,6 @@
 'use strict';
 
 const k8s = require('@kubernetes/client-node');
-
 class Kube {
   constructor(namespace) {
     this.kc = new k8s.KubeConfig();
@@ -15,20 +14,18 @@ class Kube {
     return res.body;
   }
 
-  makePodSpec() {
+  makePodSpec(name) {
     return {
       apiVersion: "v1",
       kind: "Pod",
       metadata: {
-        name: "pod-test"
+        name: `gpu-${name}`
       },
       spec: {
         containers: [
           {
-            name: "ubuntu",
-            image: "ubuntu:trusty",
-            command: ["echo"],
-            args: ["Hello!"]
+            name: `gpu-${name}`,
+            image: `${process.env.GpuImageName}:${process.env.GpuImageTag}`,
           }
         ]
       }
