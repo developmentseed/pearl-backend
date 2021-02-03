@@ -8,12 +8,15 @@
 //
 
 const request = require('request');
+const { Pool } = require('pg');
 
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 
 const TEST = process.env.TEST;
 const GPU = process.env.GPU;
+
+const { Client } = require('pg');
 
 const test = require('tape');
 
@@ -49,7 +52,23 @@ test('api running', (t) => {
 });
 
 test('user', async (t) => {
-    token = (await flight.api.user(t)).token;
+    const config = require('../services/api/index').Config.env();
+    const pool = new Pool({
+        connectionString: config.Postgres
+    });
+
+    const auth = new (require('../services/api/lib/auth').Auth)(pool);
+    const authtoken = new (require('../services/api/lib/auth').AuthToken)(pool, config);
+    const testUser = {
+        username: 'example',
+        email: 'example@example.com',
+        password: 'password123'
+    };
+    await auth.register(testUser);
+    const user = await auth.login(testUser);
+    token = (await authtoken.generate(user, 'API Token')).token;
+
+    pool.end();
     t.end();
 });
 
