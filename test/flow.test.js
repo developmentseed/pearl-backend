@@ -19,55 +19,16 @@ const test = require('tape');
 
 const WebSocket = require('ws');
 
-const argv = require('minimist')(process.argv, {
-    boolean: ['prod'],
-    string: ['postgres', 'port']
-});
-const { Client, Pool } = require('pg');
-const Config = require('../services/api/lib/config');
-
-// Setup auth client to create user programmatically
-const config = await Config.env(argv);
-const client = new Client({
-    connectionString: config.Postgres
-});
-const pool = new Pool({
-    connectionString: config.Postgres
-});
+const usr = 'example-' + Math.floor(Math.random() * Math.floor(10 ^ 1000));
 
 let flight;
 if (process.env.TEST !== 'compose') {
     const { Flight } = require('./util');
     flight = new Flight();
     flight.takeoff(test);
-} else {
-    // Serve should be running already, clean tables
-    await client.connect();
-    await client.query(`
-        TRUNCATE TABLE users;
-        TRUNCATE TABLE users_reset;
-        TRUNCATE TABLE models;
-        TRUNCATE TABLE instances;
-        TRUNCATE TABLE checkpoints;
-    `);
-    await client.end();
-
 }
 
-// Create a user in the database, generate a token to be
-// used in the API
-const auth = new (require('../services/api/lib/auth').Auth)(pool);
-const authtoken = new (require('../services/api/lib/auth').AuthToken)(pool, config);
-const testUser = {
-    username: 'example',
-    email: 'example@example.com',
-    password: 'password123'
-};
-await auth.register(testUser);
-const user = await auth.login(testUser);
-const { token } = await authtoken.generate(user, 'API Token');
-
-let instance;
+let token, instance;
 
 test('api running', (t) => {
     request({
@@ -82,6 +43,66 @@ test('api running', (t) => {
         t.deepEquals(body, {
             version: '1.0.0'
         });
+
+        t.end();
+    });
+});
+
+test('new user', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: API + '/api/user',
+        body: {
+            username: usr ,
+            email: `${usr}@example.com`,
+            password: 'password123'
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, '200 status code');
+
+        t.deepEquals(body, {
+            status: 200,
+            message: 'User Created'
+        }, 'expected body');
+
+        t.end();
+    });
+});
+
+test('new token', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: API + '/api/token',
+        body: {
+            name: 'Access Token'
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, '200 status code');
+
+        t.deepEquals(Object.keys(body), [
+            'id',
+            'name',
+            'token',
+            'created'
+        ], 'expected props');
+
+        t.ok(parseInt(body.id), 'id: <integer>');
+
+        delete body.created;
+        delete body.id;
+
+        token = body.token;
+        delete body.token;
+
+        t.deepEquals(body, {
+            name: 'Access Token'
+        }, 'expected body');
 
         t.end();
     });
@@ -108,7 +129,7 @@ test('new model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer api.${token}`
+            Authorization: `Bearer ${token}`
         }
     } , (err, res, body) => {
         t.error(err, 'no error');
@@ -142,7 +163,7 @@ test('new instance', (t) => {
             mosaic: 'naip.latest'
         },
         headers: {
-            Authorization: `Bearer api.${token}`
+            Authorization: `Bearer ${token}`
         }
     } , (err, res, body) => {
         t.error(err, 'no error');
@@ -210,4 +231,5 @@ test('gpu connection', (t) => {
 if (process.env.TEST !== 'compose') {
     flight.landing(test);
 }
+
 

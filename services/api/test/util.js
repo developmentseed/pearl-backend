@@ -3,17 +3,12 @@
 const api = require('../index');
 const { Client } = require('pg');
 const request = require('request');
-const Config = require('../lib/config');
 const pkg = require('../package.json');
+const { Config } = require('../index');
+
+const config = Config.env();
 
 const { Pool } = require('pg');
-let auth;
-let authtoken;
-const testUser = {
-    username: 'example',
-    email: 'example@example.com',
-    password: 'password123'
-};
 class Flight {
 
     constructor() {
@@ -29,10 +24,17 @@ class Flight {
     async takeoff(test) {
         this.rebuild(test);
 
-        await test('test server takeoff', (t) => {
-            api.configure({}, (srv, pool) => {
+        test('test server takeoff', (t) => {
+            process.exit();
+            api.configure({}, async (srv, pool) => {
                 t.ok(srv, 'server object returned');
                 t.ok(pool, 'pool object returned');
+
+                let pgres = await pool.query(`
+                    SELECT count(*) FROM users;
+                `);
+
+                t.equals(pgres.rows.length, 0, 'users wiped');
 
                 this.srv = srv;
                 this.pool = pool;
@@ -51,34 +53,27 @@ class Flight {
         test('test database wipe', async (t) => {
             if (this.srv) {
                 t.fail('Cannot wipe database while server is running');
-                return t.end();
+                t.end();
             }
 
-            const config = await Config.env();
-
             const client = new Client({
-                connectionString: config.Postgres
+                connectionString: 'postgres://postgres@localhost:5432/postgres'
             });
-
-            // Setup auth client to create user programatically
-            const pool = new Pool({
-                connectionString: config.Postgres
-            });
-            auth = new (require('../lib/auth').Auth)(pool);
-            authtoken = new (require('../lib/auth').AuthToken)(pool, config);
 
             try {
                 await client.connect();
 
                 await client.query(`
-                    DROP TABLE IF EXISTS users;
-                    DROP TABLE IF EXISTS users_reset;
-                    DROP TABLE IF EXISTS models;
-                    DROP TABLE IF EXISTS instances;
-                    DROP TABLE IF EXISTS checkpoints;
+                    DROP DATABASE lulc;
+                `);
+
+                await client.query(`
+                    CREATE DATABASE lulc;
                 `);
 
                 await client.end();
+
+                t.end();
             } catch (err) {
                 t.error(err);
             }
@@ -111,6 +106,15 @@ class Flight {
             });
 
             t.test('new user', async (t) => {
+                const auth = new (require('../lib/auth').Auth)(this.pool);
+                const authtoken = new (require('../lib/auth').AuthToken)(this.pool, config);
+
+                const testUser = {
+                    username: 'example',
+                    email: 'example@example.com',
+                    password: 'password123'
+                };
+
                 await auth.register(testUser);
 
                 const user = await auth.login(testUser);

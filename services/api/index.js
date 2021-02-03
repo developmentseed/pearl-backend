@@ -31,12 +31,8 @@ if (require.main === module) {
 }
 
 function configure(argv = {}, cb) {
-    Config.env(argv).then((config) => {
-        return server(argv, config, cb);
-    }).catch((err) => {
-        console.error(err);
-        process.exit(1);
-    });
+    const config = Config.env(argv);
+    return server(config, cb);
 }
 
 /**
@@ -53,11 +49,10 @@ function configure(argv = {}, cb) {
  */
 
 /**
- * @param {Object} argv
  * @param {Config} config
  * @param {function} cb
  */
-async function server(argv, config, cb) {
+async function server(config, cb) {
     const app = express();
     const router = express.Router();
 
