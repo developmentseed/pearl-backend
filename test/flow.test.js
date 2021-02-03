@@ -12,6 +12,9 @@ const request = require('request');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 
+const TEST = process.env.TEST;
+const GPU = process.env.GPU;
+
 const test = require('tape');
 
 const WebSocket = require('ws');
@@ -23,168 +26,188 @@ const argv = require('minimist')(process.argv, {
 const { Client, Pool } = require('pg');
 const Config = require('../services/api/lib/config');
 
-main();
+// Setup auth client to create user programmatically
+const config = await Config.env(argv);
+const client = new Client({
+    connectionString: config.Postgres
+});
+const pool = new Pool({
+    connectionString: config.Postgres
+});
 
-async function main() {
+let flight;
+if (process.env.TEST !== 'compose') {
+    const { Flight } = require('./util');
+    flight = new Flight();
+    flight.takeoff(test);
+} else {
+    // Serve should be running already, clean tables
+    await client.connect();
+    await client.query(`
+        TRUNCATE TABLE users;
+        TRUNCATE TABLE users_reset;
+        TRUNCATE TABLE models;
+        TRUNCATE TABLE instances;
+        TRUNCATE TABLE checkpoints;
+    `);
+    await client.end();
 
-    // Setup auth client to create user programmatically
-    const config = await Config.env(argv);
-    const client = new Client({
-        connectionString: config.Postgres
-    });
-    const pool = new Pool({
-        connectionString: config.Postgres
-    });
+}
 
-    let flight;
-    if (process.env.TEST !== 'compose') {
-        const { Flight } = require('./util');
-        flight = new Flight();
-        flight.takeoff(test);
-    } else {
-        // Serve should be running already, clean tables
-        await client.connect();
-        await client.query(`
-            TRUNCATE TABLE users;
-            TRUNCATE TABLE users_reset;
-            TRUNCATE TABLE models;
-            TRUNCATE TABLE instances;
-            TRUNCATE TABLE checkpoints;
-        `);
-        await client.end();
+// Create a user in the database, generate a token to be
+// used in the API
+const auth = new (require('../services/api/lib/auth').Auth)(pool);
+const authtoken = new (require('../services/api/lib/auth').AuthToken)(pool, config);
+const testUser = {
+    username: 'example',
+    email: 'example@example.com',
+    password: 'password123'
+};
+await auth.register(testUser);
+const user = await auth.login(testUser);
+const { token } = await authtoken.generate(user, 'API Token');
 
-    }
+let instance;
 
-    // Create a user in the database, generate a token to be
-    // used in the API
-    const auth = new (require('../services/api/lib/auth').Auth)(pool);
-    const authtoken = new (require('../services/api/lib/auth').AuthToken)(pool, config);
-    const testUser = {
-        username: 'example',
-        email: 'example@example.com',
-        password: 'password123'
-    };
-    await auth.register(testUser);
-    const user = await auth.login(testUser);
-    const { token } = await authtoken.generate(user, 'API Token');
+test('api running', (t) => {
+    request({
+        method: 'GET',
+        json: true,
+        url: API + '/api'
+    } , (err, res, body) => {
+        t.error(err, 'no error');
 
-    let instance;
+        t.equals(res.statusCode, 200);
 
-    test('api running', (t) => {
-        request({
-            method: 'GET',
-            json: true,
-            url: API + '/api'
-        } , (err, res, body) => {
-            t.error(err, 'no error');
-
-            t.equals(res.statusCode, 200);
-
-            t.deepEquals(body, {
-                version: '1.0.0'
-            });
-
-            t.end();
+        t.deepEquals(body, {
+            version: '1.0.0'
         });
+
+        t.end();
     });
+});
 
-    test('new model', (t) => {
-        request({
-            method: 'POST',
-            json: true,
-            url: API + '/api/model',
-            body: {
-                name: 'NAIP Supervised',
-                active: true,
-                model_type: 'keras_example',
-                model_finetunelayer: -4,
-                model_numparams: 7790949,
-                model_inputshape: [240,240,4],
-                classes: [
-                    { name: 'Water', color: '#0000FF' },
-                    { name: 'Tree Canopy', color: '#008000' },
-                    { name: 'Field', color: '#80FF80' },
-                    { name: 'Built', color: '#806060' }
-                ],
-                meta: {}
-            },
-            headers: {
-                Authorization: `Bearer api.${token}`
-            }
-        } , (err, res, body) => {
-            t.error(err, 'no error');
+test('new model', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: API + '/api/model',
+        body: {
+            name: 'NAIP Supervised',
+            active: true,
+            model_type: 'keras_example',
+            model_finetunelayer: -4,
+            model_numparams: 7790949,
+            model_inputshape: [240,240,4],
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            meta: {}
+        },
+        headers: {
+            Authorization: `Bearer api.${token}`
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
 
-            t.equals(res.statusCode, 200, '200 status code');
+        t.equals(res.statusCode, 200, '200 status code');
 
-            t.deepEquals(Object.keys(body), [
-                'id',
-                'created'
-            ], 'expected props');
+        t.deepEquals(Object.keys(body), [
+            'id',
+            'created'
+        ], 'expected props');
 
-            t.ok(parseInt(body.id), 'id: <integer>');
+        t.ok(parseInt(body.id), 'id: <integer>');
 
-            delete body.created;
-            delete body.id;
+        delete body.created;
+        delete body.id;
 
-            t.deepEquals(body, {
-            }, 'expected body');
+        t.deepEquals(body, {
+        }, 'expected body');
 
-            t.end();
-        });
+        t.end();
     });
+});
 
-    test('new instance', (t) => {
-        request({
-            method: 'POST',
-            json: true,
-            url: API + '/api/instance',
-            body: {
-                model_id: 1,
-                mosaic: 'naip.latest'
-            },
-            headers: {
-                Authorization: `Bearer api.${token}`
-            }
-        } , (err, res, body) => {
-            t.error(err, 'no error');
+test('new instance', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: API + '/api/instance',
+        body: {
+            model_id: 1,
+            mosaic: 'naip.latest'
+        },
+        headers: {
+            Authorization: `Bearer api.${token}`
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
 
-            t.equals(res.statusCode, 200, '200 status code');
+        t.equals(res.statusCode, 200, '200 status code');
 
-            t.deepEquals(Object.keys(body), [
-                'id',
-                'created',
-                'model_id',
-                'token',
-                'mosaic'
-            ], 'expected props');
+        t.deepEquals(Object.keys(body), [
+            'id',
+            'created',
+            'model_id',
+            'token',
+            'mosaic'
+        ], 'expected props');
 
-            t.ok(parseInt(body.id), 'id: <integer>');
-            delete body.id,
-            delete body.created;
-            instance = body.token;
-            delete body.token;
+        t.ok(parseInt(body.id), 'id: <integer>');
+        delete body.id,
+        delete body.created;
+        instance = body.token;
+        delete body.token;
 
-            t.deepEquals(body, {
-                model_id: 1,
-                mosaic: 'naip.latest'
-            }, 'expected body');
+        t.deepEquals(body, {
+            model_id: 1,
+            mosaic: 'naip.latest'
+        }, 'expected body');
 
-            t.end();
-        });
+        t.end();
     });
+});
 
-    test('gpu connection', (t) => {
-        const ws = new WebSocket(SOCKET + `?token=${instance}`);
+test('gpu connection', (t) => {
+    const ws = new WebSocket(SOCKET + `?token=${instance}`);
 
-        ws.on('open', () => {
-            t.ok('connection opened');
+    ws.on('open', () => {
+        t.ok('connection opened');
+
+        if (!process.env.GPU) {
             ws.close();
             t.end();
-        });
+        }
     });
 
-    if (process.env.TEST !== 'compose') {
-        flight.landing(test);
-    }
+    ws.on('message', (msg) => {
+        msg = JSON.parse(msg)
+
+        if (msg.message === 'info#connected') {
+            ws.send(JSON.stringify({
+                action: 'model#prediction',
+                data: {
+                    polygon: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [ -79.37724530696869, 38.83428180092151 ],
+                            [ -79.37677592039108, 38.83428180092151 ],
+                            [ -79.37677592039108, 38.83455550411051 ],
+                            [ -79.37724530696869, 38.83455550411051 ],
+                            [ -79.37724530696869, 38.83428180092151 ]
+                        ]]
+                    }
+                }
+            }));
+        }
+    });
+});
+
+if (process.env.TEST !== 'compose') {
+    flight.landing(test);
 }
 

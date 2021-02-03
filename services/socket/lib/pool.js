@@ -17,23 +17,38 @@ class Pool {
      */
     connected(ws) {
         if (ws.auth.t === 'admin') {
-            if (this.gpu(ws.auth.i)) this.gpu(ws.auth.i).terminate();
+            this.add_gpu(ws);
 
-            this.gpus.set(ws.auth.i, ws);
+            if (this.has_client(ws.auth.i)) {
+                this.gpu(ws.auth.i).send(JSON.stringify({
+                    message: 'info#connected'
+                }));
 
-            if (this.client(ws.auth.i)) {
                 this.client(ws.auth.i).send(JSON.stringify({
                     message: 'info#connected'
                 }));
+            } else {
+                // Notify the GPU that there is no active client
+                this.gpu(ws.auth.i).send(JSON.stringify({
+                    message: 'info#disconnected'
+                }));
             }
         } else if (ws.auth.t === 'inst') {
-            if (this.client(ws.auth.i)) this.client(ws.auth.i).terminate();
+            if (this.has_client(ws.auth.i)) this.client(ws.auth.i).terminate();
 
             this.clients.set(ws.auth.i, ws);
 
-            if (this.client(ws.auth.i)) {
+            if (this.has_gpu(ws.auth.i)) {
                 this.client(ws.auth.i).send(JSON.stringify({
                     message: 'info#connected'
+                }));
+
+                this.gpu(ws.auth.i).send(JSON.stringify({
+                    message: 'info#connected'
+                }));
+            } else {
+                this.client(ws.auth.i).send(JSON.stringify({
+                    message: 'info#disconnected'
                 }));
             }
         }
@@ -43,7 +58,7 @@ class Pool {
         if (ws.auth.t === 'admin') {
             this.gpus.delete(ws.auth.i);
 
-            if (this.client(ws.auth.i)) {
+            if (this.has_client(ws.auth.i)) {
                 this.client(ws.auth.i).send(JSON.stringify({
                     message: 'info#disconnected'
                 }));
@@ -51,8 +66,8 @@ class Pool {
         } else if (ws.auth.t === 'inst') {
             this.clients.delete(ws.auth.i);
 
-            if (this.client(ws.auth.i)) {
-                this.client(ws.auth.i).send(JSON.stringify({
+            if (this.has_gpu(ws.auth.i)) {
+                this.gpu(ws.auth.i).send(JSON.stringify({
                     message: 'info#disconnected'
                 }));
             }
@@ -61,7 +76,7 @@ class Pool {
 
     route(ws, payload) {
         if (ws.auth.t === 'inst') {
-            if (!this.gpu(ws.auth.i)) {
+            if (!this.has_gpu(ws.auth.i)) {
                 ws.send(JSON.stringify({
                     message: 'error',
                     data: {
@@ -73,7 +88,7 @@ class Pool {
 
             this.gpu(ws.auth.i).send(payload);
         } else if (ws.auth.t === 'admin') {
-            if (!this.client(ws.auth.i)) {
+            if (!this.has_client(ws.auth.i)) {
                 ws.send(JSON.stringify({
                     message: 'error',
                     data: {
@@ -87,20 +102,30 @@ class Pool {
         }
     }
 
+    add_gpu(ws) {
+        if (this.has_gpu(ws.auth.i)) this.gpu(ws.auth.i).terminate();
+        this.gpus.set(parseInt(ws.auth.i), ws);
+    }
+
+    has_gpu(instance_id) {
+        return this.gpus.has(parseInt(instance_id));
+    }
+
     gpu(instance_id) {
-        return this.gpus.get(instance_id);
+        return this.gpus.get(parseInt(instance_id));
+    }
+
+    add_client(ws) {
+        if (this.has_client(ws.auth.i)) this.client(ws.auth.i).terminate();
+        this.clients.set(parseInt(ws.auth.i), ws);
+    }
+
+    has_client(instance_id) {
+        return this.clients.has(parseInt(instance_id));
     }
 
     client(instance_id) {
-        return this.clients.get(instance_id);
-    }
-
-    gpus() {
-        return this.gpus.values();
-    }
-
-    clients() {
-        return this.clients.values();
+        return this.clients.get(parseInt(instance_id));
     }
 }
 

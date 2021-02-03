@@ -58,6 +58,14 @@ CREATE TABLE IF NOT EXISTS instances (
     mosaic      TEXT
 );
 
+CREATE TABLE IF NOT EXISTS aois (
+    id          BIGSERIAL PRIMARY KEY,
+    instance_id BIGINT,
+    bounds      GEOMETRY(POLYGON, 4326),
+    created     TIMESTAMP,
+    storage     BOOLEAN
+);
+
 CREATE TABLE IF NOT EXISTS checkpoints (
     id          BIGSERIAL PRIMARY KEY,
     instance_id BIGINT,

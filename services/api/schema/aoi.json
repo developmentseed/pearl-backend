@@ -1,0 +1,26 @@
+{
+    "type": "object",
+    "required": [
+        "bounds"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "bounds": {
+            "type": "object",
+            "description": "GeoJSON Polygon",
+            "required": [
+                "type",
+                "coordinates"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [ "Polygon" ]
+                },
+                "coordinates": {
+                }
+            }
+        }
+    }
+}

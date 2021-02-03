@@ -4,6 +4,7 @@ const api = require('../index');
 const { Client } = require('pg');
 const request = require('request');
 const Config = require('../lib/config');
+const pkg = require('../package.json');
 
 const { Pool } = require('pg');
 let auth;
@@ -87,11 +88,11 @@ class Flight {
     /**
      * Create a new user & return an access token
      *
-     * @param {Tape} test tape instance to run new user creation on
+     * @param {Tape} t active tape instance to run new user creation on
      */
-    user(test) {
+    user(t) {
         return new Promise((resolve, reject) => {
-            test('api online', (t) => {
+            t.test('api online', (t) => {
                 request({
                     method: 'GET',
                     json: true,
@@ -102,19 +103,17 @@ class Flight {
                     t.equals(res.statusCode, 200);
 
                     t.deepEquals(body, {
-                        version: '1.0.0'
+                        version: pkg.version
                     });
 
                     t.end();
                 });
             });
 
-            test('new user', async (t) => {
-
+            t.test('new user', async (t) => {
                 await auth.register(testUser);
 
                 const user = await auth.login(testUser);
-
                 const token = await authtoken.generate(user, 'API Token');
 
                 t.deepEquals(Object.keys(token), [
@@ -126,8 +125,6 @@ class Flight {
 
                 resolve(token);
             });
-
-
         });
     }
 
@@ -137,14 +134,15 @@ class Flight {
      * @param {Tape} test tape instance to run landing action on
      */
     landing(test) {
-        test('test server landing - api', async (t) => {
+        test('test server landing - api', (t) => {
             t.ok(this.srv, 'server object returned');
             t.ok(this.pool, 'pool object returned');
 
-            await this.pool.end();
-            await this.srv.close();
-
-            t.end();
+            this.pool.end(() => {
+                this.srv.close(() => {
+                    t.end();
+                });
+            });
         });
     }
 }

@@ -1,10 +1,20 @@
+import json
 import requests
+import pyproj
+from io import BytesIO
 import numpy as np
 from os import path
 import logging
+import geojson
+from shapely.ops import transform
+from shapely.geometry import shape
+from tiletanic import tilecover, tileschemes
+from .MemRaster import MemRaster
+import mercantile
 
 LOGGER = logging.getLogger("server")
 
+tiler = tileschemes.WebMercator()
 
 class API():
 
@@ -34,8 +44,28 @@ class API():
 
         return r.json()
 
-    def get_tile(self, x, y, z, format='npi'):
-        url = self.url + '/api/mosaic/' + str(instance_id)
+    def get_tile_by_geom(self, geom, iformat='npy'):
+        poly = shape(geojson.loads(json.dumps(geom)))
+
+        project = pyproj.Transformer.from_proj(
+            pyproj.Proj('epsg:4326'),
+            pyproj.Proj('epsg:3857'),
+            always_xy=True
+        )
+
+        poly = transform(project.transform, poly)
+
+        zxys = tilecover.cover_geometry(tiler, poly, self.mosaic['maxzoom'])
+
+        rasters = []
+        for zxy in zxys:
+            rasters.append(self.get_tile(zxy.z, zxy.x, zxy.y))
+        LOGGER.info("ok - got all tiles")
+
+        return rasters
+
+    def get_tile(self, z, x, y, iformat='npy'):
+        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
 
         LOGGER.info("ok - GET " + url)
         r = requests.get(url, headers={
@@ -44,8 +74,23 @@ class API():
 
         r.raise_for_status()
 
-        if format == 'npi':
-            return np.load(r.content)
+        if iformat == 'npy':
+            with open("f.npy", "wb") as f:
+                f.write(r.content)
+
+            res = np.load(BytesIO(r.content))
+
+            assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
+            res = np.moveaxis(res, 0, -1)
+            assert res.shape == (256, 256, 4), "Failed to reshape numpy array"
+
+            memraster = MemRaster(
+                res,
+                "epsg:3857",
+                mercantile.bounds(x, y, z)
+            )
+
+            return memraster
         else:
             return r.content
 
