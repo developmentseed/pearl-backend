@@ -48,64 +48,9 @@ test('api running', (t) => {
     });
 });
 
-test('new user', (t) => {
-    request({
-        method: 'POST',
-        json: true,
-        url: API + '/api/user',
-        body: {
-            username: usr ,
-            email: `${usr}@example.com`,
-            password: 'password123'
-        }
-    } , (err, res, body) => {
-        t.error(err, 'no error');
-
-        t.equals(res.statusCode, 200, '200 status code');
-
-        t.deepEquals(body, {
-            status: 200,
-            message: 'User Created'
-        }, 'expected body');
-
-        t.end();
-    });
-});
-
-test('new token', (t) => {
-    request({
-        method: 'POST',
-        json: true,
-        url: API + '/api/token',
-        body: {
-            name: 'Access Token'
-        }
-    } , (err, res, body) => {
-        t.error(err, 'no error');
-
-        t.equals(res.statusCode, 200, '200 status code');
-
-        t.deepEquals(Object.keys(body), [
-            'id',
-            'name',
-            'token',
-            'created'
-        ], 'expected props');
-
-        t.ok(parseInt(body.id), 'id: <integer>');
-
-        delete body.created;
-        delete body.id;
-
-        token = body.token;
-        delete body.token;
-
-        t.deepEquals(body, {
-            name: 'Access Token'
-        }, 'expected body');
-
-        t.end();
-    });
+test('user', async (t) => {
+    token = (await flight.api.user(t)).token;
+    t.end();
 });
 
 test('new model', (t) => {
