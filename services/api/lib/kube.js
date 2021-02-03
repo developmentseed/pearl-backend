@@ -11,6 +11,9 @@ class Kube {
 
   async listPods() {
     const res = await this.k8sApi.listNamespacedPod(this.namespace);
+    if (res.statusCode >= 400) {
+      return `Request failed: ${res.statusMessage}`
+    }
     return res.body;
   }
 
@@ -32,8 +35,27 @@ class Kube {
     };
   }
 
-  async createpod(podSpec) {
-    const res = await this.k8sApi.createNamespacedPod('default', podSpec);
+  async createPod(podSpec) {
+    const res = await this.k8sApi.createNamespacedPod(this.namespace, podSpec);
+    if (res.statusCode >= 400) {
+      return `Request failed: ${res.statusMessage}`
+    }
+    return res.body;
+  }
+
+  async getPod(name) {
+    const res = await this.k8sApi.readNamespacedPod(name, this.namespace)
+    if (res.statusCode >= 400) {
+      return `Request failed: ${res.statusMessage}`
+    }
+    return res.body;
+  }
+
+  async getPodStatus(name) {
+    const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace)
+    if (res.statusCode >= 400) {
+      return `Request failed: ${res.statusMessage}`
+    }
     return res.body;
   }
 }
