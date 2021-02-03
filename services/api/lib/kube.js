@@ -2,6 +2,10 @@
 
 const k8s = require('@kubernetes/client-node');
 class Kube {
+  /**
+   * Kubernetes Client
+   * Create a client using a namespace. Default is default.
+   */
   constructor(namespace) {
     this.kc = new k8s.KubeConfig();
     this.kc.loadFromDefault();
@@ -10,6 +14,9 @@ class Kube {
   }
 
   async listPods() {
+    /**
+     * Method to list pods in the cluster
+     */
     const res = await this.k8sApi.listNamespacedPod(this.namespace);
     if (res.statusCode >= 400) {
       return `Request failed: ${res.statusMessage}`
@@ -17,7 +24,11 @@ class Kube {
     return res.body;
   }
 
-  makePodSpec(name) {
+  makePodSpec(name, env) {
+    /**
+     * Create a podspec for a gpu pod based on a given name and env vars.
+     * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
+     */
     const nodeSelectorKey = process.env.nodeSelectorKey;
     const nodeSelectorValue = process.env.nodeSelectorValue;
     const gpuImageName = process.env.GpuImageName;
@@ -39,10 +50,7 @@ class Kube {
                 'nvidia.com/gpu': 1
               }
             },
-            env: {
-              name: 'test',
-              value: 'test'
-            }
+            env: env
           }
         ],
         nodeSelector: `${nodeSelectorKey}:${nodeSelectorValue}`
@@ -51,6 +59,9 @@ class Kube {
   }
 
   async createPod(podSpec) {
+    /**
+     * Create a pod based on podSpec
+     */
     const res = await this.k8sApi.createNamespacedPod(this.namespace, podSpec);
     if (res.statusCode >= 400) {
       return `Request failed: ${res.statusMessage}`
@@ -59,6 +70,9 @@ class Kube {
   }
 
   async getPod(name) {
+    /**
+     * Get pod details
+     */
     const res = await this.k8sApi.readNamespacedPod(name, this.namespace)
     if (res.statusCode >= 400) {
       return `Request failed: ${res.statusMessage}`
@@ -67,6 +81,9 @@ class Kube {
   }
 
   async getPodStatus(name) {
+    /**
+     * Get pod status.
+     */
     const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace)
     if (res.statusCode >= 400) {
       return `Request failed: ${res.statusMessage}`
