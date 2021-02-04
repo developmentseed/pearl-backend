@@ -497,7 +497,9 @@ class AuthToken {
     }
 
     async generate(auth, name) {
-        if (!auth.uid) {
+        if (auth.type !== 'auth0') {
+            throw new Err(400, null, 'Only an Auth0 token can create a API token');
+        } else if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
         } else if (!name || !name.trim()) {
             throw new Err(400, null, 'Token name required');

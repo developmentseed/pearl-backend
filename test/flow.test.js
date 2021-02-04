@@ -66,7 +66,7 @@ async function main() {
     };
     await auth.register(testUser);
     const user = await auth.login(testUser);
-    const { token } = await authtoken.generate(user, 'API Token');
+    const { token } = await authtoken.generate({ type: 'auth0', user }, 'API Token');
 
     let instance;
 

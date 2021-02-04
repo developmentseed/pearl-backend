@@ -190,6 +190,7 @@ async function server(config, cb) {
     const validateApiToken = async (req, res, next) => {
         try {
             req.auth = await authtoken.validate(req.jwt.token);
+            req.auth.type = 'api';
             next();
         } catch (err) {
             return Err.respond(err, res);
@@ -257,6 +258,7 @@ async function server(config, cb) {
 
                     // Add user to request
                     req.auth = await auth.user(req.user.sub, 'auth0_id');
+                    req.auth.type = 'auth0';
                 }
             }
             next();
