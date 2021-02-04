@@ -27,6 +27,12 @@ npm run dev
 
 The API will be available at http://localhost:2000 and restart on every change.
 
+To run tests, halt the development server, close any connections to the database and run:
+
+```sh
+npm run test
+```
+
 ## API Documentation
 
 It is generally recommended to run the bootstrap scripts described in the main project README

@@ -50,7 +50,7 @@ class Flight {
             }
 
             const client = new Client({
-                connectionString: 'postgres://postgres@localhost:5432/postgres'
+                connectionString: 'postgres://docker:docker@localhost:5433/gis'
             });
 
             try {
