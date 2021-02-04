@@ -57,7 +57,7 @@ class Flight {
                 await client.connect();
 
                 await client.query(`
-                    DROP DATABASE lulc;
+                    DROP DATABASE IF EXISTS lulc;
                 `);
 
                 await client.query(`
