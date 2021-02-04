@@ -8,7 +8,7 @@ const fs = require('fs');
 const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
-const { Param } = require('./lib/util');
+const { Param, fetchJSON } = require('./lib/util');
 const jwt = require('express-jwt');
 const jwks = require('jwks-rsa');
 const cors = require('cors');
@@ -223,6 +223,43 @@ async function server(config, cb) {
         },
         (req, res, next) => {
             req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
+        },
+        (err, req, res, next) => {
+            // Catch Auth0 errors
+            if (err.name === 'UnauthorizedError') {
+                return Err.respond(err.inner, res, 'Failed to validate token');
+            }
+            next();
+        },
+        async (req, res, next) => {
+            if (req.jwt.type === 'auth0') {
+                try {
+                    // Load user from database, if exists
+                    const user = await auth.user(req.user.sub, 'auth0_id');
+                    req.auth = user;
+                } catch (err) {
+                    // Fetch user metadata from Auth0
+                    const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${req.jwt.token}`
+                        }
+                    });
+
+                    // Create user in database
+                    await auth.register({
+                        auth0Id: auth0User.sub,
+                        username: auth0User.name,
+                        email: auth0User.email,
+                        password: 'insecure password'
+                    });
+
+                    // Add user to request
+                    req.auth = await auth.user(req.user.sub, 'auth0_id');
+                }
+            }
+            next();
         }
     ];
 

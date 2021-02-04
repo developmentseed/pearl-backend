@@ -250,7 +250,7 @@ class Auth {
         };
     }
 
-    async user(uid) {
+    async user(uid, idField = 'id') {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -263,7 +263,7 @@ class Auth {
                 FROM
                     users
                 WHERE
-                    id = $1
+                    ${idField} = $1
             `, [
                 uid
             ]);
@@ -347,19 +347,22 @@ class Auth {
                         username,
                         email,
                         password,
+                        auth0_id,
                         access,
                         flags
                     ) VALUES (
                         $1,
                         $2,
                         $3,
+                        $4,
                         'user',
                         '{}'::JSONB
                     )
                 `, [
                     user.username,
                     user.email,
-                    hash
+                    hash,
+                    user.auth0Id
                 ], (err) => {
                     if (err && err.code === '23505') {
                         return reject(new Err(400, err, 'Cannot create duplicate user'));
