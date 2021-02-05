@@ -52,7 +52,8 @@ jobs:
         cluster-name: ${{ env.STAGING_CLUSTER_NAME }}
         resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
 
-    - name: Create image pull secret for ACR
+    - name: Staging / Test - create image pull secret for ACR
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
       uses: azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
