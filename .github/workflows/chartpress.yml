@@ -45,7 +45,7 @@ jobs:
         STAGING_MOSAIC_HOST: ${{ env.STAGING_MOSAIC_HOST }}
 
     - name: Staging / Test — set AKS context
-      if: github.ref == 'refs/heads/develop' || github.ref = 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
       uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
@@ -62,7 +62,7 @@ jobs:
         namespace: ${{ env.NAMESPACE }}
 
     - name: Staging — bake manifest
-      if: github.ref == 'refs/heads/develop' || github.ref = 'refs/heads/staging'
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
       uses: azure/k8s-bake@v1
       with:
         renderEngine: 'helm'
@@ -86,7 +86,7 @@ jobs:
     # Deploy app to staging AKS
     - name: Staging - deploy
       uses: azure/k8s-deploy@v1
-      if: github.ref == 'refs/heads/develop' || github.ref = 'refs/heads/staging'
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
       with:
         manifests: ${{ steps.staging-bake.outputs.manifestsBundle }}
         imagepullsecrets: |
