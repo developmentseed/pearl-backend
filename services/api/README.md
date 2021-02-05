@@ -7,12 +7,30 @@ that exists in the database.
 
 ## Development
 
-It is generally recommended to run the bootstrap scripts described in the main project README.
+To setup a development environment for the API it is recommended to run the ExpressJS server outside Docker, with the remaining parts of the stack in containers. You can start them with Docker Compose from the repository root directory:
 
-If it is desired to run the API without other parts of the project, run the following
+```sh
+docker-compose up --build postgis socket tiler cache
+```
+
+Make sure you are running the required Node.js version included in [.nvmrc](.nvmrc) or activate it with [nvm](https://github.com/nvm-sh/nvm):
+
+```sh
+nvm i
+```
+
+Start the development server:
 
 ```sh
 npm run dev
+```
+
+The API will be available at http://localhost:2000 and restart on every change.
+
+To run tests, halt the development server, close any connections to the database and run:
+
+```sh
+npm run test
 ```
 
 ## API Documentation
@@ -46,11 +64,20 @@ variable will be used to connect.
 
 ### Environment Variables
 
+In development mode it is easier to add a `.env` to this folder to set environment variables, as the server loads them using [dotenv](https://www.npmjs.com/package/dotenv) module.
+
+#### Authentication with Auth0
+
+Create an API in Auth0 and set the following environment variables:
+
+- AUTH0_ISSUER_BASE_URL
+- AUTH0_CLIENT_ID
+- AUTH0_AUDIENCE
+
 #### `AZURE_STORAGE_CONNECTION_STRING` [optionalish]
 
 Required in order to upload & save base models. If the `AZURE_STORAGE_CONNECTION_STRING` env var
 is not set, API endpoints that utilize this functionality are simply disabled.
-
 
 #### `SigningSecret` [required: prod]
 

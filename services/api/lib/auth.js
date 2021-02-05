@@ -18,132 +18,6 @@ class Auth {
         ];
     }
 
-    async is_auth(req) {
-        if (!req.auth || !req.auth.access || !['session', 'token'].includes(req.auth.type)) {
-            throw new Err(401, null, 'Authentication Required');
-        }
-
-        return true;
-    }
-
-    async reset(user) {
-        if (!user.token) throw new Err(400, null, 'token required');
-        if (!user.password) throw new Err(400, null, 'password required');
-
-        let pgres;
-        try {
-            pgres = await this.pool.query(`
-                SELECT
-                    uid
-                FROM
-                    users_reset
-                WHERE
-                    expires > NOW()
-                    AND token = $1
-            `, [user.token]);
-        } catch (err) {
-            throw new Err(500, err, 'User Reset Error');
-        }
-
-        if (pgres.rows.length !== 1) {
-            throw new Err(401, null, 'Invalid or Expired Reset Token');
-        }
-
-        const uid = pgres.rows[0].uid;
-
-        try {
-            const userhash = await hash(user.password, 10);
-
-            await this.pool.query(`
-                UPDATE users
-                    SET
-                        password = $1
-                    WHERE
-                        id = $2
-            `, [
-                userhash,
-                uid
-            ]);
-
-            await this.pool.query(`
-                DELETE FROM users_reset
-                    WHERE uid = $1
-            `, [
-                uid
-            ]);
-
-            return {
-                status: 200,
-                message: 'User Reset'
-            };
-        } catch (err) {
-            throw new Err(500, err, 'Failed to create user');
-        }
-    }
-
-    /**
-     * Given a username or email, generate a password reset email
-     * @param {string} user username or email to reset
-     */
-    async forgot(user) {
-        if (!user || !user.length) throw new Err(400, null, 'user must not be empty');
-
-        let pgres;
-        try {
-            pgres = await this.pool.query(`
-                SELECT
-                    id,
-                    username,
-                    email
-                FROM
-                    users
-                WHERE
-                    username = $1
-                    OR email = $1
-            `, [user]);
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
-
-        if (pgres.rows.length !== 1) return;
-        const u = pgres.rows[0];
-        u.id = parseInt(u.id);
-
-        try {
-            await this.pool.query(`
-                DELETE FROM
-                    users_reset
-                WHERE
-                    uid = $1
-            `, [u.id]);
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
-
-        try {
-            const buffer = await randomBytes(40);
-
-            await this.pool.query(`
-                INSERT INTO
-                    users_reset (uid, expires, token)
-                VALUES (
-                    $1,
-                    NOW() + interval '1 hour',
-                    $2
-                )
-            `, [u.id, buffer.toString('hex')]);
-
-            return {
-                uid: u.id,
-                username: u.username,
-                email: u.email,
-                token: buffer.toString('hex')
-            };
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
-    }
-
     async is_flag(req, flag) {
         await this.is_auth(req);
 
@@ -258,7 +132,7 @@ class Auth {
         };
     }
 
-    async user(uid) {
+    async user(uid, idField = 'id') {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -271,7 +145,7 @@ class Auth {
                 FROM
                     users
                 WHERE
-                    id = $1
+                    ${idField} = $1
             `, [
                 uid
             ]);
@@ -284,6 +158,7 @@ class Auth {
         }
 
         return {
+            uid: parseInt(pgres.rows[0].id),
             username: pgres.rows[0].username,
             email: pgres.rows[0].email,
             access: pgres.rows[0].access,
@@ -291,70 +166,18 @@ class Auth {
         };
     }
 
-    async login(user) {
+    async create(user) {
         if (!user.username) throw new Err(400, null, 'username required');
-        if (!user.password) throw new Err(400, null, 'password required');
-
-        if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
-
-        let pgres;
-        try {
-            pgres = await this.pool.query(`
-                SELECT
-                    id,
-                    username,
-                    access,
-                    email,
-                    password,
-                    flags
-                FROM
-                    users
-                WHERE
-                    username = $1 OR
-                    email = $1;
-            `, [
-                user.username
-            ]);
-        } catch (err) {
-            throw new Err(500, err, 'Internal Login Error');
-        }
-
-        if (pgres.rows.length === 0) {
-            throw new Error(403, null, 'Invalid Username or Pass');
-        }
-
-        return new Promise((resolve, reject) => {
-            bcrypt.compare(user.password, pgres.rows[0].password, (err, res) => {
-                if (err) return reject(new Err(500, err, 'Internal Login Error'));
-                if (!res) return reject(new Error(403, null, 'Invalid Username or Pass'));
-
-                return resolve({
-                    uid: parseInt(pgres.rows[0].id),
-                    username: pgres.rows[0].username,
-                    access: pgres.rows[0].access,
-                    email: pgres.rows[0].email,
-                    flags: pgres.rows[0].flags
-                });
-            });
-        });
-    }
-
-    async register(user) {
-        if (!user.username) throw new Err(400, null, 'username required');
-        if (!user.password) throw new Err(400, null, 'password required');
         if (!user.email) throw new Err(400, null, 'email required');
 
         if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
-        return new Promise((resolve, reject) => {
-            bcrypt.hash(user.password, 10, (err, hash) => {
-                if (err) return reject(new Err(500, err, 'Failed to hash password'));
-
-                this.pool.query(`
+        try {
+            await this.pool.query(`
                     INSERT INTO users (
                         username,
                         email,
-                        password,
+                        auth0_id,
                         access,
                         flags
                     ) VALUES (
@@ -365,23 +188,20 @@ class Auth {
                         '{}'::JSONB
                     )
                 `, [
-                    user.username,
-                    user.email,
-                    hash
-                ], (err) => {
-                    if (err && err.code === '23505') {
-                        return reject(new Err(400, err, 'Cannot create duplicate user'));
-                    } else if (err) {
-                        return reject(new Err(500, err, 'Failed to create user'));
-                    }
+                user.username,
+                user.email,
+                user.auth0Id
+            ]);
+        } catch (err) {
+            if (err && err.code === '23505') {
+                throw new Err(400, err, 'Cannot create duplicate user');
+            } else if (err) {
+                throw new Err(500, err, 'Failed to create user');
+            }
+        }
 
-                    return resolve({
-                        status: 200,
-                        message: 'User Created'
-                    });
-                });
-            });
-        });
+        // return created user
+        return this.user(user.email, 'email');
     }
 }
 
@@ -502,8 +322,8 @@ class AuthToken {
     }
 
     async generate(auth, name) {
-        if (auth.type !== 'session') {
-            throw new Err(400, null, 'Only a user session can create a token');
+        if (auth.type !== 'auth0') {
+            throw new Err(400, null, 'Only an Auth0 token can create a API token');
         } else if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
         } else if (!name || !name.trim()) {
@@ -537,7 +357,7 @@ class AuthToken {
             return {
                 id: parseInt(pgres.rows[0].id),
                 name: pgres.rows[0].name,
-                token: pgres.rows[0].token,
+                token: 'api.' + pgres.rows[0].token,
                 created: pgres.rows[0].created
             };
         } catch (err) {

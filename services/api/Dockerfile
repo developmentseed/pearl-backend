@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM node:14-alpine3.12
 
 EXPOSE 2000
 
@@ -7,7 +7,6 @@ WORKDIR $HOME
 COPY ./ $HOME/api
 WORKDIR $HOME/api
 
-RUN apk add nodejs npm
 RUN npm install \
     && npm run doc
 

@@ -2,13 +2,16 @@
 
 'use strict';
 
+require('dotenv').config();
+
 const fs = require('fs');
 const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
-const { Param } = require('./lib/util');
+const { Param, fetchJSON } = require('./lib/util');
+const jwt = require('express-jwt');
+const jwks = require('jwks-rsa');
 const cors = require('cors');
-const session = require('express-session');
 const morgan = require('morgan');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
@@ -20,7 +23,6 @@ const argv = require('minimist')(process.argv, {
     string: ['postgres', 'port']
 });
 
-const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const Config = require('./lib/config');
 
@@ -29,12 +31,8 @@ if (require.main === module) {
 }
 
 function configure(argv = {}, cb) {
-    Config.env(argv).then((config) => {
-        return server(argv, config, cb);
-    }).catch((err) => {
-        console.error(err);
-        process.exit(1);
-    });
+    const config = Config.env(argv);
+    return server(config, cb);
 }
 
 /**
@@ -51,14 +49,12 @@ function configure(argv = {}, cb) {
  */
 
 /**
- * @param {Object} argv
  * @param {Config} config
  * @param {function} cb
  */
-async function server(argv, config, cb) {
+async function server(config, cb) {
     const app = express();
     const router = express.Router();
-
 
     const validator = new Validator({
         allErrors: true
@@ -113,22 +109,6 @@ async function server(argv, config, cb) {
         credentials: true
     }));
     app.use(minify());
-    app.use(session({
-        name: argv.prod ? '__Host-session' : 'session',
-        proxy: argv.prod,
-        resave: false,
-        store: new pgSession({
-            pool: pool,
-            tableName : 'session'
-        }),
-        cookie: {
-            maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
-            sameSite: argv.prod ? true : 'Lax',
-            secure: argv.prod
-        },
-        saveUninitialized: false,
-        secret: config.SigningSecret
-    }));
 
     app.use('/docs', express.static('./doc'));
 
@@ -187,106 +167,101 @@ async function server(argv, config, cb) {
         limit: '50mb'
     }));
 
-    // Unified Auth
-    router.use(async (req, res, next) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
-            req.session.auth.type = 'session';
-            req.auth = req.session.auth;
-        } else if (req.header('authorization')) {
-            const authorization = req.header('authorization').split(' ');
-            if (authorization[0].toLowerCase() !== 'bearer') {
-                return res.status(401).json({
-                    status: 401,
-                    message: 'Only "Bearer" authorization header is allowed'
-                });
-            }
 
-            try {
-                req.auth = await authtoken.validate(authorization[1]);
-                req.auth.type = 'token';
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        } else {
-            req.auth = false;
-        }
-
-        return next();
+    /*
+     * Validate Auth0 JWT tokens
+     */
+    const validateAuth0Token = jwt({
+        secret: jwks.expressJwtSecret({
+            cache: true,
+            rateLimit: true,
+            jwksRequestsPerMinute: 5,
+            jwksUri: `${config.Auth0IssuerBaseUrl}/.well-known/jwks.json`
+        }),
+        audience: config.Audience,
+        issuer: `${config.Auth0IssuerBaseUrl}/`,
+        algorithms: ['RS256'],
+        getToken: (req) => req.jwt.token
     });
 
-    /**
-     * @api {get} /api/login Session Info
-     * @apiVersion 1.0.0
-     * @apiName get
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return information about the currently logged in user
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *       "email": "example@example.com",
-     *       "access": "admin",
-     *       "flags": {}
-     *   }
+    /*
+     * Validate API tokens
      */
-    router.get('/login', async (req, res) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
-            return res.json({
-                username: req.session.auth.username,
-                email: req.session.auth.email,
-                access: req.session.auth.access,
-                flags: req.session.auth.flags
-            });
-        } else {
-            return res.status(401).json({
-                status: 401,
-                message: 'Invalid session'
-            });
+    const validateApiToken = async (req, res, next) => {
+        try {
+            req.auth = await authtoken.validate(req.jwt.token);
+            req.auth.type = 'api';
+            next();
+        } catch (err) {
+            return Err.respond(err, res);
         }
-    });
+    };
 
-    /**
-     * @api {post} /api/login Create Session
-     * @apiVersion 1.0.0
-     * @apiName login
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Log a user into the service and create an authenticated cookie
-     *
-     * @apiSchema (Body) {jsonschema=./schema/login.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *   }
+    /*
+     * Auth middleware
      */
-    router.post(
-        '/login',
-        validate({ body: require('./schema/login.json') }),
-        async (req, res) => {
-            try {
-                const user = await auth.login({
-                    username: req.body.username,
-                    password: req.body.password
-                });
+    const requiresAuth = [
+        (req, res, next) => {
+            if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+                const token = req.headers.authorization.split(' ')[1];
 
-                req.session.auth = user;
-
-                return res.json({
-                    username: user.username
-                });
-            } catch (err) {
-                return Err.respond(err, res);
+                // Self-signed tokens are prefixed with 'api.'
+                if (token.indexOf('api.') ===  0) {
+                    req.jwt = {
+                        type: 'api',
+                        token: token.substr(4) // remove prefix
+                    };
+                } else {
+                    req.jwt = {
+                        type: 'auth0',
+                        token: token
+                    };
+                }
+                next();
+            } else {
+                return Err.respond(new Err(401, null, 'Authentication Required'), res);
             }
+        },
+        (req, res, next) => {
+            req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
+        },
+        (err, req, res, next) => {
+            // Catch Auth0 errors
+            if (err.name === 'UnauthorizedError') {
+                return Err.respond(err.inner, res, 'Failed to validate token');
+            }
+            next();
+        },
+        async (req, res, next) => {
+            if (req.jwt.type === 'auth0') {
+                try {
+                    // Load user from database, if exists
+                    const user = await auth.user(req.user.sub, 'auth0_id');
+                    req.auth = user;
+                } catch (err) {
+                    // Fetch user metadata from Auth0
+                    const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${req.jwt.token}`
+                        }
+                    });
+
+                    // Create user, add to request
+                    req.auth = await auth.create({
+                        auth0Id: auth0User.sub,
+                        username: auth0User.name,
+                        email: auth0User.email
+                    });
+
+                    // Set auth type
+                    req.auth.type = 'auth0';
+                }
+            }
+            next();
         }
-    );
+    ];
 
     /**
      * @api {get} /api/token List Tokens
@@ -303,10 +278,8 @@ async function server(argv, config, cb) {
      *       "name": "Token Name"
      *   }]
      */
-    router.get('/token', async (req, res) => {
+    router.get('/token', requiresAuth, async (req, res) => {
         try {
-            await auth.is_auth(req);
-
             return res.json(await authtoken.list(req.auth));
         } catch (err) {
             return Err.respond(err, res);
@@ -335,11 +308,10 @@ async function server(argv, config, cb) {
      *   }
      */
     router.post('/token',
+        requiresAuth,
         validate({ body: require('./schema/token.json') }),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 return res.json(await authtoken.generate(req.auth, req.body.name));
             } catch (err) {
                 return Err.respond(err, res);
@@ -364,12 +336,10 @@ async function server(argv, config, cb) {
      *       "message": "Token Deleted"
      *   }
      */
-    router.delete('/token/:tokenid', async (req, res) => {
+    router.delete('/token/:tokenid', requiresAuth, async (req, res) => {
         Param.int(req, res, 'tokenid');
 
         try {
-            await auth.is_auth(req);
-
             return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
@@ -403,50 +373,13 @@ async function server(argv, config, cb) {
      */
     router.get(
         '/user',
+        requiresAuth,
         validate({ query: require('./schema/user-list.query.json') }),
         async (req, res) => {
             try {
-                await auth.is_admin(req);
-
                 const users = await auth.list(req.query);
 
                 return res.json(users);
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        }
-    );
-
-    /**
-     * @api {post} /api/user Create User
-     * @apiVersion 1.0.0
-     * @apiName Create
-     * @apiGroup User
-     * @apiPermission public
-     *
-     * @apiSchema (Body) {jsonschema=./schema/user.json} apiParam
-     *
-     * @apiDescription
-     *     Create a new user
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "status": 200,
-     *       "message": "User Created"
-     *   }
-     */
-    router.post(
-        '/user',
-        validate({ body: require('./schema/user.json') }),
-        async (req, res) => {
-            try {
-                await auth.register(req.body);
-
-                return res.json({
-                    status: 200,
-                    message: 'User Created'
-                });
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -472,15 +405,13 @@ async function server(argv, config, cb) {
      *       "flags": {}
      *   }
      */
-    router.get('/user/me', async (req, res) => {
-        if (req.session && req.session.auth && req.session.auth.uid) {
-            return res.json(await auth.user(req.session.auth.uid));
-        } else {
-            return res.status(401).json({
-                status: 401,
-                message: 'Invalid session'
-            });
-        }
+    router.get('/user/me', requiresAuth, async (req, res) => {
+        return res.json({
+            username: req.auth.username,
+            email: req.auth.email,
+            access: req.auth.access,
+            flags: req.auth.flags
+        });
     });
 
     /**
@@ -508,11 +439,10 @@ async function server(argv, config, cb) {
      *   }
      */
     router.post('/instance',
+        requiresAuth,
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
 
                 const inst = await instance.create(req.auth, req.body);
@@ -576,10 +506,8 @@ async function server(argv, config, cb) {
      *       }]
      *   }
      */
-    router.get('/instance', async (req, res) => {
+    router.get('/instance', requiresAuth, async (req, res) => {
         try {
-            await auth.is_auth(req);
-
             // Only admins can see all running instances
             if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
 
@@ -807,11 +735,10 @@ async function server(argv, config, cb) {
      */
     router.post(
         '/model',
+        requiresAuth,
         validate({ body: require('./schema/model.json') }),
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 res.json(await model.create(req.body, req.auth));
             } catch (err) {
                 return Err.respond(err, res);
@@ -842,10 +769,9 @@ async function server(argv, config, cb) {
      */
     router.get(
         '/model',
+        requiresAuth,
         async (req, res) => {
             try {
-                await auth.is_auth(req);
-
                 res.json(await model.list());
             } catch (err) {
                 return Err.respond(err, res);
@@ -871,12 +797,10 @@ async function server(argv, config, cb) {
      *       "message": "Model deleted"
      *   }
      */
-    router.delete('/model/:modelid', async (req, res) => {
+    router.delete('/model/:modelid', requiresAuth, async (req, res) => {
         Param.int(req, res, 'modelid');
 
         try {
-            await auth.is_auth(req);
-
             await model.delete(req.params.modelid);
 
             return res.status(200).json({
@@ -917,12 +841,10 @@ async function server(argv, config, cb) {
      *       "meta": {}
      *   }
      */
-    router.get('/model/:modelid', async (req, res) => {
+    router.get('/model/:modelid', requiresAuth, async (req, res) => {
         Param.int(req, res, 'modelid');
 
         try {
-            await auth.is_auth(req);
-
             res.json(await model.get(req.params.modelid));
         } catch (err) {
             return Err.respond(err, res);
@@ -939,12 +861,10 @@ async function server(argv, config, cb) {
      * @apiDescription
      *     Return the model itself
      */
-    router.get('/model/:modelid/download', async (req, res) => {
+    router.get('/model/:modelid/download', requiresAuth, async (req, res) => {
         Param.int(req, res, 'modelid');
 
         try {
-            await auth.is_auth(req);
-
             await model.download(req.params.modelid, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -970,10 +890,8 @@ async function server(argv, config, cb) {
      *       ]
      *   }
      */
-    router.get('/mosaic', async (req, res) => {
+    router.get('/mosaic', requiresAuth, async (req, res) => {
         try {
-            await auth.is_auth(req);
-
             return res.json(Mosaic.list());
         } catch (err) {
             return Err.respond(err, res);
@@ -1009,12 +927,10 @@ async function server(argv, config, cb) {
      *       "center": [ -95.87494149186512, 36.9693324794906, 12 ]
      *   }
      */
-    router.get('/mosaic/:layer', async (req, res) => {
+    router.get('/mosaic/:layer', requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            await auth.is_auth(req);
-
             req.url = req.url + '/tilejson.json';
 
             await proxy.request(req, res);
@@ -1041,7 +957,7 @@ async function server(argv, config, cb) {
      *     Return an aerial imagery tile for a given set of mercator coordinates
      *
      */
-    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', async (req, res) => {
+    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         Param.int(req, res, 'z');
@@ -1049,8 +965,6 @@ async function server(argv, config, cb) {
         Param.int(req, res, 'y');
 
         try {
-            await auth.is_auth(req);
-
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -1087,7 +1001,7 @@ async function server(argv, config, cb) {
 
         if (cb) return cb(srv, pool);
 
-        console.error(`ok - running http://localhost:${config.Port}`);
+        console.error(`ok - running ${config.BaseUrl}`);
     });
 
 }

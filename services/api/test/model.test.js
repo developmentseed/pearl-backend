@@ -3,12 +3,12 @@ const request = require('request');
 const { Flight } = require('./util');
 
 const flight = new Flight();
+
 flight.takeoff(test);
 
 let token;
-
 test('user', async (t) => {
-    token = await flight.user(t);
+    token = (await flight.user(t)).token;
     t.end();
 });
 
