@@ -31,7 +31,9 @@ jobs:
       run: chartpress --push # should eventually --publish-chart
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-    - name: Staging - substitute secrets
+
+    - name: Staging / Test - substitute secrets
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
       uses: bluwy/substitute-string-action@v1
       with:
         _input-file: './lulc-helm/values.dev.template.yaml'
@@ -41,13 +43,17 @@ jobs:
         STAGING_POSTGRES: ${{ secrets.STAGING_POSTGRES }}
         STAGING_MOSAIC_BACKEND: ${{ env.STAGING_MOSAIC_BACKEND }}
         STAGING_MOSAIC_HOST: ${{ env.STAGING_MOSAIC_HOST }}
-    - name: Set AKS context
+
+    - name: Staging / Test — set AKS context
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
       uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
         cluster-name: ${{ env.STAGING_CLUSTER_NAME }}
         resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
-    - name: Create image pull secret for ACR
+
+    - name: Staging / Test - create image pull secret for ACR
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
       uses: azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
@@ -55,19 +61,44 @@ jobs:
         container-registry-password: ${{ secrets.STAGING_REGISTRY_PASSWORD }}
         secret-name: ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
         namespace: ${{ env.NAMESPACE }}
-    - uses: azure/k8s-bake@v1
+
+    - name: Staging — bake manifest
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
+      uses: azure/k8s-bake@v1
+      with:
+        renderEngine: 'helm'
+        helmChart: './lulc-helm/'
+        releaseName: lulc-staging
+        overrideFiles: './lulc-helm/values.dev.yaml'
+        helm-version: 'latest'
+      id: staging-bake
+
+    - name: Test — bake manifest
+      if: startsWith(github.event.head_commit.message, '[deploy]')
+      uses: azure/k8s-bake@v1
       with:
         renderEngine: 'helm'
         helmChart: './lulc-helm/'
         releaseName: lulc-test
         overrideFiles: './lulc-helm/values.dev.yaml'
         helm-version: 'latest'
-      id: bake
+      id: test-bake
 
-    # Deploy app to AKS
-    - uses: azure/k8s-deploy@v1
+    # Deploy app to staging AKS
+    - name: Staging - deploy
+      uses: azure/k8s-deploy@v1
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
       with:
-        manifests: ${{ steps.bake.outputs.manifestsBundle }}
+        manifests: ${{ steps.staging-bake.outputs.manifestsBundle }}
+        imagepullsecrets: |
+          ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
+        namespace: ${{ env.NAMESPACE }}
+
+    - name: Test - deploy
+      uses: azure/k8s-deploy@v1
+      if: startsWith(github.event.head_commit.message, '[deploy]')
+      with:
+        manifests: ${{ steps.test-bake.outputs.manifestsBundle }}
         imagepullsecrets: |
           ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
         namespace: ${{ env.NAMESPACE }}
