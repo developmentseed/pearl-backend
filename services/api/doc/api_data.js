@@ -1,6 +1,6 @@
 define({ "api": [
   {
-    "type": "get",
+    "type": "post",
     "url": "/api/instance/:instance/aoi",
     "title": "Create AOI",
     "version": "1.0.0",
@@ -203,13 +203,20 @@ define({ "api": [
             "group": "Body",
             "type": "Integer",
             "optional": false,
+            "field": "project_id",
+            "description": "<p>The project to start this instance under</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
             "field": "model_id",
             "description": "<p>The model id to start an instance with</p>"
           },
           {
             "group": "Body",
             "type": "String",
-            "optional": true,
+            "optional": false,
             "field": "mosaic",
             "description": "<p>The mosaic ID to run the model with</p>"
           }
@@ -220,7 +227,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\",\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"model_id\": 1,\n    \"project_id\": 2,\n    \"mosaic\": \"naip.latest\",\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
           "type": "json"
         }
       ]
@@ -353,80 +360,6 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "Instance"
-  },
-  {
-    "type": "get",
-    "url": "/api/login",
-    "title": "Session Info",
-    "version": "1.0.0",
-    "name": "get",
-    "group": "Login",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Return information about the currently logged in user</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Login"
-  },
-  {
-    "type": "post",
-    "url": "/api/login",
-    "title": "Create Session",
-    "version": "1.0.0",
-    "name": "login",
-    "group": "Login",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Log a user into the service and create an authenticated cookie</p>",
-    "parameter": {
-      "fields": {
-        "Body": [
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>username to authenticate with</p>"
-          },
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>password to authenticate with</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Login"
   },
   {
     "type": "post",
@@ -1020,6 +953,95 @@ define({ "api": [
     "groupTitle": "Mosaic"
   },
   {
+    "type": "post",
+    "url": "/api/project",
+    "title": "Create Project",
+    "version": "1.0.0",
+    "name": "CreateProject",
+    "group": "Project",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new project</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the Project</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Project"
+  },
+  {
+    "type": "post",
+    "url": "/api/instance",
+    "title": "List Projects",
+    "version": "1.0.0",
+    "name": "ListProjects",
+    "group": "Projects",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned runs</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The offset based on limit to return</p>"
+          }
+        ]
+      }
+    },
+    "description": "<p>Return a list of projects</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Projects"
+  },
+  {
     "type": "get",
     "url": "/health",
     "title": "Server Healthcheck",
@@ -1165,60 +1187,6 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "Token"
-  },
-  {
-    "type": "post",
-    "url": "/api/user",
-    "title": "Create User",
-    "version": "1.0.0",
-    "name": "Create",
-    "group": "User",
-    "permission": [
-      {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
-      }
-    ],
-    "parameter": {
-      "fields": {
-        "Body": [
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>username</p>"
-          },
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>password</p>"
-          },
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "email",
-            "description": "<p>email</p>"
-          }
-        ]
-      }
-    },
-    "description": "<p>Create a new user</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"status\": 200,\n    \"message\": \"User Created\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "User"
   },
   {
     "type": "get",

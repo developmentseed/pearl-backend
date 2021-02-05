@@ -27,7 +27,6 @@ class Model {
         try {
             pgres = await this.pool.query(`
                 INSERT INTO models (
-                    created,
                     active,
                     uid,
                     name,
@@ -39,7 +38,7 @@ class Model {
                     classes,
                     meta
                 ) VALUES (
-                    NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
                 ) RETURNING *
             `, [
                 model.active,

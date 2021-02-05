@@ -1,10 +1,10 @@
 'use strict';
 
 const api = require('../index');
-const { Client } = require('pg');
 const request = require('request');
 const pkg = require('../package.json');
 const { Config } = require('../index');
+const drop = require('./drop');
 
 const config = Config.env();
 
@@ -49,22 +49,8 @@ class Flight {
                 t.end();
             }
 
-            const client = new Client({
-                connectionString: 'postgres://docker:docker@localhost:5433/gis'
-            });
-
             try {
-                await client.connect();
-
-                await client.query(`
-                    DROP DATABASE IF EXISTS lulc;
-                `);
-
-                await client.query(`
-                    CREATE DATABASE lulc;
-                `);
-
-                await client.end();
+                await drop();
             } catch (err) {
                 t.error(err);
             }
@@ -103,9 +89,9 @@ class Flight {
                 const authtoken = new (require('../lib/auth').AuthToken)(this.pool, config);
 
                 const testUser = {
+                    auth0Id: 1,
                     username: 'example',
-                    email: 'example@example.com',
-                    password: 'password123'
+                    email: 'example@example.com'
                 };
 
                 const user = await auth.create(testUser);

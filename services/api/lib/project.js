@@ -2,22 +2,21 @@
 
 const Err = require('./error');
 
-class CheckPoint {
+class Project {
     constructor(pool, config) {
         this.pool = pool;
         this.config = config;
     }
 
     /**
-     * Return a list of checkpoints for a given instance
+     * Return a list of projects
      *
-     * @param {Number} instanceid Instance ID to list checkpoints for
-     *
+     * @param {Number} instanceid - AOIS related to a specific instance
      * @param {Object} query - Query Object
-     * @param {Number} [query.limit=100] - Max number of checkpoints to return
+     * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    async list(instanceid, query) {
+    async list(uid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 1;
@@ -28,13 +27,12 @@ class CheckPoint {
                SELECT
                     count(*) OVER() AS count,
                     id,
-                    instance_id,
-                    created,
-                    storage
+                    name,
+                    created
                 FROM
-                    checkpoints
+                    projects
                 WHERE
-                    instance_id = $3
+                    uid = $3
                 LIMIT
                     $1
                 OFFSET
@@ -42,58 +40,56 @@ class CheckPoint {
             `, [
                 query.limit,
                 query.page,
-                instanceid
+                uid
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to list checkpoints');
+            throw new Err(500, new Error(err), 'Failed to list projects');
         }
 
         return {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            instance_id: instanceid,
-            checkpoints: pgres.rows.map((row) => {
+            projects: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
-                    created: row.created,
-                    storage: row.storage
+                    name: row.name,
+                    created: row.created
                 };
             })
         };
     }
 
-
     /**
-     * Create a new Checkpoint
+     * Create a new project
      *
-     * @param {Number} instanceid - Checkpoint related to a specific instance
-     * @param {Object} checkpoint - Checkpoint Object
+     * @param {Object} project - Project Object
+     * @param {Object} project.name - Project Name
      */
-    async create(instanceid, checkpoint) {
-        if (!checkpoint) checkpoint = {};
-
+    async create(uid, project) {
         try {
             const pgres = await this.pool.query(`
-                INSERT INTO checkpoint (
-                    instance_id
+                INSERT INTO projects (
+                    uid,
+                    name
                 ) VALUES (
-                    $1
+                    $1,
+                    $2
                 ) RETURNING *
             `, [
-                instanceid
+                uid,
+                project.name
             ]);
 
             return {
                 id: parseInt(pgres.rows[0].id),
-                instance_id: instanceid,
-                created: pgres.rows[0].created,
-                storage: pgres.rows[0].storage
+                name: pgres.rows[0].name,
+                created: pgres.rows[0].created
             };
         } catch (err) {
-            throw new Err(500, err, 'Failed to create checkpoint');
+            throw new Err(500, err, 'Failed to create project');
         }
     }
 }
 
 module.exports = {
-    CheckPoint
+    Project
 };

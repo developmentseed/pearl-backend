@@ -3,7 +3,7 @@ const { Flight } = require('./util');
 const flight = new Flight();
 const { Kube } = require('../lib/kube');
 
-main();
+//main();
 
 async function main() {
   flight.takeoff(test);
