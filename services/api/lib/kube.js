@@ -2,6 +2,7 @@
 
 const k8s = require('@kubernetes/client-node');
 class Kube {
+
     /**
    * Kubernetes Client
    * Create a client using a namespace. Default is default.
@@ -13,10 +14,10 @@ class Kube {
         this.namespace = namespace || 'default';
     }
 
-    async listPods() {
     /**
      * Method to list pods in the cluster
      */
+    async listPods() {
         const res = await this.k8sApi.listNamespacedPod(this.namespace);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
@@ -24,11 +25,11 @@ class Kube {
         return res.body;
     }
 
-    makePodSpec(name, env) {
     /**
      * Create a podspec for a gpu pod based on a given name and env vars.
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      */
+    makePodSpec(name, env) {
         const nodeSelectorKey = process.env.nodeSelectorKey;
         const nodeSelectorValue = process.env.nodeSelectorValue;
         const gpuImageName = process.env.GpuImageName;
@@ -58,10 +59,10 @@ class Kube {
         };
     }
 
-    async createPod(podSpec) {
     /**
      * Create a pod based on podSpec
      */
+    async createPod(podSpec) {
         const res = await this.k8sApi.createNamespacedPod(this.namespace, podSpec);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
@@ -69,10 +70,10 @@ class Kube {
         return res.body;
     }
 
-    async getPod(name) {
     /**
      * Get pod details
      */
+    async getPod(name) {
         const res = await this.k8sApi.readNamespacedPod(name, this.namespace);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
@@ -80,10 +81,10 @@ class Kube {
         return res.body;
     }
 
-    async getPodStatus(name) {
     /**
      * Get pod status.
      */
+    async getPodStatus(name) {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
