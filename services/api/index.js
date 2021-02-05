@@ -265,35 +265,6 @@ async function server(config, cb) {
         }
     ];
 
-
-    /**
-     * @api {get} /api/login Session Info
-     * @apiVersion 1.0.0
-     * @apiName get
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return information about the currently logged in user
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *       "email": "example@example.com",
-     *       "access": "admin",
-     *       "flags": {}
-     *   }
-     */
-    router.get('/login', requiresAuth, async (req, res) => {
-        return res.json({
-            username: req.auth.username,
-            email: req.auth.email,
-            access: req.auth.access,
-            flags: req.auth.flags
-        });
-    });
-
     /**
      * @api {get} /api/token List Tokens
      * @apiVersion 1.0.0
@@ -436,15 +407,13 @@ async function server(config, cb) {
      *       "flags": {}
      *   }
      */
-    router.get('/user/me', async (req, res) => {
-        if (req.session && req.session.auth && req.session.auth.uid) {
-            return res.json(await auth.user(req.session.auth.uid));
-        } else {
-            return res.status(401).json({
-                status: 401,
-                message: 'Invalid session'
-            });
-        }
+    router.get('/user/me', requiresAuth, async (req, res) => {
+        return res.json({
+            username: req.auth.username,
+            email: req.auth.email,
+            access: req.auth.access,
+            flags: req.auth.flags
+        });
     });
 
     /**

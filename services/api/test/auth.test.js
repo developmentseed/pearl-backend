@@ -13,10 +13,10 @@ test('user', async (t) => {
     t.end();
 });
 
-test('GET /api/login (valid token - 200 success)', (t) => {
+test('GET /api/user/me (valid token - 200 success)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/login',
+        url: 'http://localhost:2000/api/user/me',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -31,10 +31,10 @@ test('GET /api/login (valid token - 200 success)', (t) => {
     });
 });
 
-test('GET /api/login (public)', (t) => {
+test('GET /api/user/me (public)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/login',
+        url: 'http://localhost:2000/api/user/me',
         method: 'GET'
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -59,6 +59,27 @@ test('POST /api/login', (t) => {
         t.equals(res.statusCode, 404, 'status: 404');
 
         t.deepEquals(res.body, { status: 404, message: 'API endpoint does not exist!' });
+
+        t.end();
+    });
+});
+
+test('POST /api/token', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/token',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'API Token'
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 400, 'status: 404');
+
+        t.deepEquals(res.body, { status: 400, message: 'Only an Auth0 token can create a API token', messages: [] });
 
         t.end();
     });
