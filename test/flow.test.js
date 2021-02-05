@@ -202,8 +202,32 @@ test('gpu connection', (t) => {
 
     ws.on('open', () => {
         t.ok('connection opened');
-        ws.close();
-        t.end();
+
+        if (!process.env.GPU) {
+            ws.close();
+            t.end();
+        }
+    });
+
+    ws.on('message', (msg) => {
+        msg = JSON.parse(msg)
+
+        if (msg.message === 'info#connected') {
+            ws.send(JSON.stringify({
+                action: 'model#prediction',
+                data: {
+                    polygon: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [ -79.37724530696869, 38.83428180092151 ],
+                            [ -79.37677592039108, 38.83428180092151 ],
+                            [ -79.37677592039108, 38.83455550411051 ],
+                            [ -79.37724530696869, 38.83455550411051 ],
+                            [ -79.37724530696869, 38.83428180092151 ]
+                        ]]
+                    }
+                }
+            }));
+        }
     });
 });
-
