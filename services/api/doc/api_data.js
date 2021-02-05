@@ -203,13 +203,20 @@ define({ "api": [
             "group": "Body",
             "type": "Integer",
             "optional": false,
+            "field": "project_id",
+            "description": "<p>The project to start this instance under</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
             "field": "model_id",
             "description": "<p>The model id to start an instance with</p>"
           },
           {
             "group": "Body",
             "type": "String",
-            "optional": true,
+            "optional": false,
             "field": "mosaic",
             "description": "<p>The mosaic ID to run the model with</p>"
           }
@@ -220,7 +227,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\",\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"model_id\": 1,\n    \"project_id\": 2,\n    \"mosaic\": \"naip.latest\",\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
           "type": "json"
         }
       ]

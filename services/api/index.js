@@ -434,6 +434,7 @@ async function server(config, cb) {
      *       "id": 1,
      *       "created": "<date",
      *       "model_id": 1,
+     *       "project_id": 2,
      *       "mosaic": "naip.latest",
      *       "url": "ws://<websocket-connection-url>",
      *       "token": "websocket auth token"

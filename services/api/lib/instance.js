@@ -142,6 +142,7 @@ class Instance {
                     uid,
                     created,
                     model_id,
+                    project_id,
                     active,
                     mosaic
                 FROM
@@ -160,6 +161,7 @@ class Instance {
             uid: parseInt(pgres.rows[0].uid),
             created: pgres.rows[0].created,
             model_id: parseInt(pgres.rows[0].model_id),
+            project_id: parseInt(pgres.rows[0].project_id),
             active: pgres.rows[0].active,
             mosaic: pgres.rows[0].mosaic
         };
