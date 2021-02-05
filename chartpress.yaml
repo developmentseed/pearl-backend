@@ -18,3 +18,7 @@ charts:
         valuesPath: tiles.image
         contextPath: services/tiles/
         dockerfilePath: services/tiles/Dockerfile
+      gpu:
+        valuesPath: gpu.image
+        contextPath: services/gpu/
+        dockerfilePath: services/gpu/Dockerfile
