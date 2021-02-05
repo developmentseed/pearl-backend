@@ -219,7 +219,7 @@ async function server(config, cb) {
                 }
                 next();
             } else {
-                throw new Err(401, null, 'Authentication Required');
+                return Err.respond(new Err(401, null, 'Authentication Required'), res);
             }
         },
         (req, res, next) => {
@@ -285,60 +285,14 @@ async function server(config, cb) {
      *       "flags": {}
      *   }
      */
-    router.get('/login', async (req, res) => {
-        if (req.session && req.session.auth && req.session.auth.username) {
-            return res.json({
-                username: req.session.auth.username,
-                email: req.session.auth.email,
-                access: req.session.auth.access,
-                flags: req.session.auth.flags
-            });
-        } else {
-            return res.status(401).json({
-                status: 401,
-                message: 'Invalid session'
-            });
-        }
+    router.get('/login', requiresAuth, async (req, res) => {
+        return res.json({
+            username: req.auth.username,
+            email: req.auth.email,
+            access: req.auth.access,
+            flags: req.auth.flags
+        });
     });
-
-    /**
-     * @api {post} /api/login Create Session
-     * @apiVersion 1.0.0
-     * @apiName login
-     * @apiGroup Login
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Log a user into the service and create an authenticated cookie
-     *
-     * @apiSchema (Body) {jsonschema=./schema/login.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *   }
-     */
-    router.post(
-        '/login',
-        validate({ body: require('./schema/login.json') }),
-        async (req, res) => {
-            try {
-                const user = await auth.login({
-                    username: req.body.username,
-                    password: req.body.password
-                });
-
-                req.auth = user;
-
-                return res.json({
-                    username: user.username
-                });
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        }
-    );
 
     /**
      * @api {get} /api/token List Tokens
