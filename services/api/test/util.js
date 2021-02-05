@@ -50,7 +50,7 @@ class Flight {
             }
 
             const client = new Client({
-                connectionString: 'postgres://docker:docker@localhost:5433/gis'
+                connectionString: 'postgres://postgres@localhost:5432'
             });
 
             try {
@@ -103,9 +103,9 @@ class Flight {
                 const authtoken = new (require('../lib/auth').AuthToken)(this.pool, config);
 
                 const testUser = {
+                    auth0Id: 1,
                     username: 'example',
-                    email: 'example@example.com',
-                    password: 'password123'
+                    email: 'example@example.com'
                 };
 
                 const user = await auth.create(testUser);
