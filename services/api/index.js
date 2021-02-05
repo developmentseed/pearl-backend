@@ -418,42 +418,6 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {post} /api/user Create User
-     * @apiVersion 1.0.0
-     * @apiName Create
-     * @apiGroup User
-     * @apiPermission public
-     *
-     * @apiSchema (Body) {jsonschema=./schema/user.json} apiParam
-     *
-     * @apiDescription
-     *     Create a new user
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "status": 200,
-     *       "message": "User Created"
-     *   }
-     */
-    router.post(
-        '/user',
-        validate({ body: require('./schema/user.json') }),
-        async (req, res) => {
-            try {
-                await auth.register(req.body);
-
-                return res.json({
-                    status: 200,
-                    message: 'User Created'
-                });
-            } catch (err) {
-                return Err.respond(err, res);
-            }
-        }
-    );
-
-    /**
      * @api {get} /api/user/me Get User Session Metadata
      * @apiVersion 1.0.0
      * @apiName self
