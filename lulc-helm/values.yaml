@@ -32,3 +32,7 @@ tiles:
       memory: 512Mi
 redis:
   enabled: true
+gpu:
+  image:
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'

@@ -21,6 +21,7 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-api
     spec:
+      serviceAccountName: kubesurfer
       containers:
         - name: {{ .Chart.Name }}-api
           image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
@@ -40,4 +41,8 @@ spec:
               value: {{ .Values.api.env.SigningSecret }}
             - name: Postgres
               value: {{ .Values.api.env.Postgres }}
+            - name: GpuImageName
+              value: {{ .Values.gpu.image.name }}
+            - name: GpuImageTag
+              value: {{ .Values.gpu.image.tag }}
 {{- end }}
