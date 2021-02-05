@@ -14,8 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     access      TEXT NOT NULL,
     flags       JSONB NOT NULL,
     username    TEXT UNIQUE NOT NULL,
-    email       TEXT UNIQUE NOT NULL,
-    password    TEXT NOT NULL
+    email       TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_tokens (

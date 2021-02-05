@@ -64,8 +64,7 @@ async function main() {
         email: 'example@example.com',
         password: 'password123'
     };
-    await auth.register(testUser);
-    const user = await auth.login(testUser);
+    const user = await auth.create(testUser);
     const { token } = await authtoken.generate({ type: 'auth0', user }, 'API Token');
 
     let instance;

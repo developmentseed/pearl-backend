@@ -108,9 +108,7 @@ class Flight {
                     password: 'password123'
                 };
 
-                await auth.register(testUser);
-
-                const user = await auth.login(testUser);
+                const user = await auth.create(testUser);
                 const token = await authtoken.generate({ type: 'auth0', ...user }, 'API Token');
 
                 t.deepEquals(Object.keys(token), [

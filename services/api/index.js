@@ -248,16 +248,14 @@ async function server(config, cb) {
                         }
                     });
 
-                    // Create user in database
-                    await auth.register({
+                    // Create user, add to request
+                    req.auth = await auth.create({
                         auth0Id: auth0User.sub,
                         username: auth0User.name,
-                        email: auth0User.email,
-                        password: 'insecure password'
+                        email: auth0User.email
                     });
 
-                    // Add user to request
-                    req.auth = await auth.user(req.user.sub, 'auth0_id');
+                    // Set auth type
                     req.auth.type = 'auth0';
                 }
             }
