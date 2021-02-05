@@ -5,7 +5,6 @@ EXPOSE 2000
 ENV HOME=/home/lulc
 WORKDIR $HOME
 
-ENV TEST=compose
 ENV API=http://api:2000
 ENV SOCKET=http://socket:1999
 ENV Postgres='postgres://docker:docker@postgis:5432/gis'

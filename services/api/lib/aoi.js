@@ -74,14 +74,10 @@ class Aoi {
             const pgres = await this.pool.query(`
                 INSERT INTO aois (
                     instance_id,
-                    bounds,
-                    created,
-                    storage
+                    bounds
                 ) VALUES (
                     $1,
                     ST_GeomFromGeoJSON($2),
-                    NOW(),
-                    False
                 ) RETURNING *
             `, [
                 instanceid,

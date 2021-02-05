@@ -93,20 +93,19 @@ class Instance {
             const pgres = await this.pool.query(`
                 INSERT INTO instances (
                     uid,
-                    created,
                     model_id,
-                    active,
+                    project_id,
                     mosaic
                 ) VALUES (
                     $1,
-                    NOW(),
                     $2,
-                    False,
-                    $3
+                    $3,
+                    $4
                 ) RETURNING *
             `, [
                 auth.uid,
                 instance.model_id,
+                instance.project_id,
                 instance.mosaic
             ]);
 

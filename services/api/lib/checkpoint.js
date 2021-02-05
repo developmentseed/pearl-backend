@@ -74,13 +74,9 @@ class CheckPoint {
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoint (
-                    instance_id,
-                    created,
-                    storage
+                    instance_id
                 ) VALUES (
-                    $1,
-                    NOW(),
-                    False
+                    $1
                 ) RETURNING *
             `, [
                 instanceid
