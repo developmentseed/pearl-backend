@@ -93,6 +93,7 @@ async function server(config, cb) {
         throw new Error(err);
     }
 
+    const project = new (require('./lib/project').Project)(pool, config);
     const proxy = new (require('./lib/proxy').Proxy)(config);
     const auth = new (require('./lib/auth').Auth)(pool);
     const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
@@ -465,6 +466,7 @@ async function server(config, cb) {
      */
     router.patch(
         '/instance/:instanceid',
+        requiresAuth,
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
             Param.int(req, res, 'instanceid');
@@ -473,6 +475,70 @@ async function server(config, cb) {
                 await auth.is_admin(req);
 
                 // TODO Allow patching
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/instance List Projects
+     * @apiVersion 1.0.0
+     * @apiName ListProjects
+     * @apiGroup Projects
+     * @apiPermission user
+     *
+     * @apiSchema (Query) {jsonschema=./schema/project-list.query.json} apiParam
+     *
+     * @apiDescription
+     *     Return a list of projects
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "projects": [{
+     *           "id": 1,
+     *           "name": 123,
+     *           "created": "<date>"
+     *       }]
+     *   }
+     */
+    router.get('/project', requiresAuth, async (req, res) => {
+        try {
+            res.json(await project.list(req.auth.uid, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/project Create Project
+     * @apiVersion 1.0.0
+     * @apiName CreateProject
+     * @apiGroup Project
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new project
+     *
+     * @apiSchema (Body) {jsonschema=./schema/project.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "name": "Test Project",
+     *       "created": "<date>"
+     *   }
+     */
+    router.post(
+        '/project',
+        requiresAuth,
+        validate({ body: require('./schema/project.json') }),
+        async (req, res) => {
+            try {
+                return res.json(await project.create(req.auth.uid, req.body));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -538,7 +604,7 @@ async function server(config, cb) {
      *       "mosaic": "naip.latest"
      *   }
      */
-    router.get('/instance/:instanceid', async (req, res) => {
+    router.get('/instance/:instanceid', requiresAuth, async (req, res) => {
         Param.int(req, res, 'instanceid');
 
         try {
@@ -579,6 +645,7 @@ async function server(config, cb) {
      */
     router.get(
         '/instance/:instanceid/aoi',
+        requiresAuth,
         validate({ query: require('./schema/aoi.query.json') }),
         async (req, res) => {
             Param.int(req, res, 'instanceid');
@@ -595,7 +662,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/instance/:instance/aoi Create AOI
+     * @api {post} /api/instance/:instance/aoi Create AOI
      * @apiVersion 1.0.0
      * @apiName CreateAOI
      * @apiGroup AOI
@@ -619,6 +686,7 @@ async function server(config, cb) {
      */
     router.post(
         '/instance/:instanceid/aoi',
+        requiresAuth,
         validate({ body: require('./schema/aoi.json') }),
         async (req, res) => {
             Param.int(req, res, 'instanceid');
@@ -660,6 +728,7 @@ async function server(config, cb) {
      */
     router.get(
         '/instance/:instanceid/checkpoint',
+        requiresAuth,
         validate({ query: require('./schema/checkpoint.query.json') }),
         async (req, res) => {
             Param.int(req, res, 'instanceid');
@@ -699,6 +768,7 @@ async function server(config, cb) {
      */
     router.post(
         '/instance/:instanceid/checkpoint',
+        requiresAuth,
         validate({ body: require('./schema/checkpoint.json') }),
         async (req, res) => {
             Param.int(req, res, 'instanceid');

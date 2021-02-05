@@ -16,7 +16,7 @@ class Project {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    async list(instanceid, query) {
+    async list(uid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 1;
@@ -27,13 +27,12 @@ class Project {
                SELECT
                     count(*) OVER() AS count,
                     id,
-                    ST_AsGeoJSON(bounds)::JSON,
-                    created,
-                    storage
+                    name,
+                    created
                 FROM
-                    aois
+                    projects
                 WHERE
-                    instance_id = $3
+                    uid = $3
                 LIMIT
                     $1
                 OFFSET
@@ -41,66 +40,56 @@ class Project {
             `, [
                 query.limit,
                 query.page,
-                instanceid
-
+                uid
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to list instances');
+            throw new Err(500, new Error(err), 'Failed to list projects');
         }
 
         return {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            instance_id: instanceid,
-            aois: pgres.rows.map((row) => {
+            projects: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
-                    bounds: row.bounds,
-                    created: row.created,
-                    storage: row.storage
+                    name: row.name,
+                    created: row.created
                 };
             })
         };
     }
 
     /**
-     * Create a new AOI
+     * Create a new project
      *
-     * @param {Number} instanceid - AOIS related to a specific instance
-     * @param {Object} aoi - AOI Object
-     * @param {Object} aoi.bounds - AOI Bounds GeoJSON
+     * @param {Object} project - Project Object
+     * @param {Object} project.name - Project Name
      */
-    async create(instanceid, aoi) {
+    async create(uid, project) {
         try {
             const pgres = await this.pool.query(`
-                INSERT INTO aois (
-                    instance_id,
-                    bounds,
-                    created,
-                    storage
+                INSERT INTO projects (
+                    uid,
+                    name
                 ) VALUES (
                     $1,
-                    ST_GeomFromGeoJSON($2),
-                    NOW(),
-                    False
+                    $2
                 ) RETURNING *
             `, [
-                instanceid,
-                aoi.bounds
+                uid,
+                project.name
             ]);
 
             return {
                 id: parseInt(pgres.rows[0].id),
-                instance_id: instanceid,
-                created: pgres.rows[0].created,
-                bounds: aoi.bounds,
-                storage: pgres.rows[0].storage
+                name: pgres.rows[0].name,
+                created: pgres.rows[0].created
             };
         } catch (err) {
-            throw new Err(500, err, 'Failed to create aoi');
+            throw new Err(500, err, 'Failed to create project');
         }
     }
 }
 
 module.exports = {
-    Aoi
+    Project
 };

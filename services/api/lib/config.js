@@ -10,7 +10,7 @@ class Config {
 
         this.Environment = args.prod ? 'deploy' : 'local';
 
-        this.Postgres = process.env.Postgres || args.postgres || 'postgres://docker:docker@localhost:5433/lulc';
+        this.Postgres = process.env.Postgres || args.postgres || 'postgres://postgres@localhost:5432/lulc';
 
         this.TileUrl = process.env.TileUrl || args.tileurl || false;
 

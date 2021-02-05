@@ -1,16 +1,8 @@
 CREATE EXTENSION IF NOT EXISTS POSTGIS;
 
-CREATE TABLE IF NOT EXISTS session (
-    sid         VARCHAR NOT NULL COLLATE "default",
-    sess        JSON NOT NULL,
-    expire      TIMESTAMP(6) NOT NULL,
-    UNIQUE (sid) NOT DEFERRABLE INITIALLY IMMEDIATE
-) WITH (OIDS=FALSE);
-CREATE INDEX IF NOT EXISTS idx_session_expire ON session ("expire");
-
 CREATE TABLE IF NOT EXISTS users (
     id          BIGSERIAL PRIMARY KEY,
-    auth0_id    UNIQUE TEXT,
+    auth0_id    TEXT UNIQUE NOT NULL,
     access      TEXT NOT NULL,
     flags       JSONB NOT NULL,
     username    TEXT UNIQUE NOT NULL,
@@ -19,22 +11,22 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS users_tokens (
     id          BIGSERIAL,
-    name        TEXT,
+    name        TEXT NOT NULL,
     token       TEXT PRIMARY KEY,
-    created     TIMESTAMP,
-    uid         BIGINT
+    created     TIMESTAMP NOT NULL DEFAULT NOW(),
+    uid         BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS projects (
     id                      BIGSERIAL PRIMARY KEY,
-    uid                     BIGINT,
+    uid                     BIGINT NOT NULL,
     name                    TEXT NOT NULL,
-    created                 TIMESTAMP,
-)
+    created                 TIMESTAMP NOT NULL DEFAULT NOW()
+);
 
 CREATE TABLE IF NOT EXISTS models (
     id                      BIGSERIAL PRIMARY KEY,
-    created                 TIMESTAMP,
+    created                 TIMESTAMP NOT NULL DEFAULT NOW(),
     active                  BOOLEAN,
     uid                     BIGINT,
 
@@ -52,24 +44,25 @@ CREATE TABLE IF NOT EXISTS models (
 
 CREATE TABLE IF NOT EXISTS instances (
     id          BIGSERIAL PRIMARY KEY,
-    uid         BIGINT,
-    active      BOOLEAN,
-    created     TIMESTAMP,
-    model_id    BIGINT,
-    mosaic      TEXT
+    project_id  BIGINT NOT NULL,
+    uid         BIGINT NOT NULL,
+    active      BOOLEAN NOT NULL DEFAULT False,
+    created     TIMESTAMP NOT NULL DEFAULT NOW(),
+    model_id    BIGINT NOT NULL,
+    mosaic      TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS aois (
     id          BIGSERIAL PRIMARY KEY,
-    instance_id BIGINT,
+    instance_id  BIGINT NOT NULL,
     bounds      GEOMETRY(POLYGON, 4326),
-    created     TIMESTAMP,
-    storage     BOOLEAN
+    created     TIMESTAMP NOT NULL DEFAULT NOW(),
+    storage     BOOLEAN NOT NULL DEFAULT False
 );
 
 CREATE TABLE IF NOT EXISTS checkpoints (
     id          BIGSERIAL PRIMARY KEY,
-    instance_id BIGINT,
-    created     TIMESTAMP,
-    storage     BOOLEAN
+    instance_id BIGINT NOT NULL,
+    created     TIMESTAMP NOT NULL DEFAULT NOW(),
+    storage     BOOLEAN NOT NULL DEFAULT False
 );
