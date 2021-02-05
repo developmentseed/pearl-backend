@@ -10,7 +10,7 @@ CREATE INDEX IF NOT EXISTS idx_session_expire ON session ("expire");
 
 CREATE TABLE IF NOT EXISTS users (
     id          BIGSERIAL PRIMARY KEY,
-    auth0_id    TEXT,
+    auth0_id    UNIQUE TEXT,
     access      TEXT NOT NULL,
     flags       JSONB NOT NULL,
     username    TEXT UNIQUE NOT NULL,
@@ -25,11 +25,12 @@ CREATE TABLE IF NOT EXISTS users_tokens (
     uid         BIGINT
 );
 
-CREATE TABLE IF NOT EXISTS users_reset (
-    uid         BIGINT,
-    expires     TIMESTAMP,
-    token       TEXT
-);
+CREATE TABLE IF NOT EXISTS projects (
+    id                      BIGSERIAL PRIMARY KEY,
+    uid                     BIGINT,
+    name                    TEXT NOT NULL,
+    created                 TIMESTAMP,
+)
 
 CREATE TABLE IF NOT EXISTS models (
     id                      BIGSERIAL PRIMARY KEY,
