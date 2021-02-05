@@ -8,6 +8,7 @@ inst_reqs = [
     "titiler==0.1.0a14",
     "rasterio==1.2b3",
     "ujson",
+    "tilebench",
 ]
 
 extra_reqs = {
