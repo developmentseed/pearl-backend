@@ -12,6 +12,8 @@ ENV Postgres='postgres://docker:docker@postgis:5432/gis'
 COPY ./ $HOME/
 
 RUN apk add nodejs npm
-RUN npm install --build-from-source=bcrypt
+
+RUN npm install \
+    && npm --prefix ./services/api/ install
 
 CMD npm test
