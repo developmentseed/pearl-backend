@@ -18,9 +18,10 @@ class Model {
     /**
      * Create a new model
      *
-     * @param {Object} model Model
+     * @param {Object} model Model object
+     * @param {Object} user User with uid
      */
-    async create(model, auth) {
+    async create(model, user) {
         let pgres;
 
         try {
@@ -42,7 +43,7 @@ class Model {
                 ) RETURNING *
             `, [
                 model.active,
-                auth.uid,
+                user.uid,
                 model.name,
                 model.model_type,
                 model.model_finetunelayer,
@@ -114,8 +115,10 @@ class Model {
     }
 
     /**
-     * Retrieve information about a model
-     */
+      * Retrieve information about a model
+      *
+      * @param {String} id Model id
+      */
     async get(id) {
         let pgres;
 
@@ -163,6 +166,8 @@ class Model {
 
     /**
      * Set a model as inactive and unusable
+     *
+     * @param {String} id Model id
      */
     async delete(id) {
         let pgres;

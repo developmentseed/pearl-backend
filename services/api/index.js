@@ -197,7 +197,7 @@ async function server(config, cb) {
         }
     };
 
-    /**
+    /*
      * Auth middleware
      */
     const requiresAuth = [
