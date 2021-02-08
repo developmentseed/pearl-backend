@@ -102,7 +102,7 @@ async def connection(uri, model):
 
                             # Return a prediction for a given extent
                             elif action == "model#prediction":
-                                model.prediction(msg.get('data'))
+                                await model.prediction(msg.get('data'), websocket)
 
                             elif action == "model#last_tile":
                                 model.last_tile()

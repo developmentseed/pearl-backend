@@ -228,6 +228,8 @@ test('gpu connection', (t) => {
                     }
                 }
             }));
+        } else {
+            console.error(JSON.stringify(msg, null, 4))
         }
     });
 });

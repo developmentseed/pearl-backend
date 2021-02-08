@@ -1,5 +1,9 @@
 import os
-from web_tool.Utils import serialize, deserialize
+import base64
+import json
+import numpy as np
+import cv2
+from web_tool.Utils import serialize, deserialize, class_prediction_to_img
 from .MemRaster import MemRaster
 import logging
 
@@ -17,24 +21,37 @@ class ModelSrv():
         self.api = api
         self.model = model
 
-    def prediction(self, body):
+    async def prediction(self, body, websocket):
         body.get('polygon')
 
         memrasters = self.api.get_tile_by_geom(body.get('polygon'), iformat='npy')
 
-        outputs = []
+        color_list = [item["color"] for item in self.api.model['classes']]
+
         for in_memraster in memrasters:
             output = self.model.run(in_memraster.data, False)
 
             assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
 
-            out_memraster = MemRaster(output, in_memraster.crs, in_memraster.bounds)
             LOGGER.info("ok - generated inference");
 
-            outputs.append(serialize(output))
+            if output.shape[2] > len(color_list):
+                LOGGER.warning("The number of output channels is larger than the given color list, cropping output to number of colors (you probably don't want this to happen")
+                output = output[:,:,:len(color_list)]
 
-        LOGGER.info("ok - returning inferences");
-        return outputs
+            # Create color versions of predictions
+            img_soft = class_prediction_to_img(output, False, color_list)
+            img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
+            img_soft = base64.b64encode(img_soft).decode("utf-8")
+
+            LOGGER.info("ok - returning inference");
+            await websocket.send(json.dumps({
+                'message': 'model#prediction',
+                'data': {
+                    'bounds': in_memraster.bounds,
+                    'image': img_soft
+                }
+            }))
 
     def last_tile(self):
         return serialize(self.model.last_tile)

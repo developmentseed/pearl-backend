@@ -6,6 +6,7 @@ requests==2.25.1
 websockets==8.1
 rasterio==1.2.0
 shapely==1.7.1
+opencv-python==4.5.1.48
 rtree
 fiona
 numpy
