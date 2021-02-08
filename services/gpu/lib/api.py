@@ -9,6 +9,7 @@ import geojson
 from shapely.ops import transform
 from shapely.geometry import shape
 from tiletanic import tilecover, tileschemes
+from shapely.geometry import box, mapping
 from .MemRaster import MemRaster
 import mercantile
 
@@ -22,15 +23,45 @@ class API():
         self.url = url
         self.token = token
 
+        self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
 
+        self.project_id = self.instance['project_id']
         self.instance_id = instance_id
         self.model_id = self.instance['model_id']
         self.mosaic_id = self.instance['mosaic']
 
         self.mosaic = self.get_tilejson()
+        self.project = self.project_meta()
         self.model = self.model_meta()
         self.model_fs = self.model_download()
+
+    def server_meta(self):
+        url = self.url + '/api'
+
+        LOGGER.info("ok - GET " + url)
+        r = requests.get(url, headers={
+            "authorization": "Bearer " + self.token
+        })
+
+        r.raise_for_status()
+
+        return r.json()
+
+    def create_aoi(self, bounds):
+        url = self.url + '/api/instance/' + self.instance_id + '/aoi'
+
+        LOGGER.info("ok - POST " + url)
+        r = requests.post(url, headers={
+            "authorization": "Bearer " + self.token
+        },
+        data = {
+            bounds: mapping(box(*bounds))
+        })
+
+        r.raise_for_status()
+
+        return r.json()
 
     def get_tilejson(self):
         url = self.url + '/api/mosaic/' + self.mosaic_id
@@ -96,6 +127,18 @@ class API():
 
     def instance_meta(self, instance_id):
         url = self.url + '/api/instance/' + str(instance_id)
+
+        LOGGER.info("ok - GET " + url)
+        r = requests.get(url, headers={
+            "authorization": "Bearer " + self.token
+        })
+
+        r.raise_for_status()
+
+        return r.json()
+
+    def project_meta(self):
+        url = self.url + '/api/project/' + str(self.project_id)
 
         LOGGER.info("ok - GET " + url)
         r = requests.get(url, headers={

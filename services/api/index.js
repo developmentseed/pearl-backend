@@ -123,15 +123,23 @@ async function server(config, cb) {
      * @apiDescription
      *     Return basic metadata about server configuration
      *
+     *     limits.live_inference: The area in metres that can be live inferenced
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
      *       "version": "1.0.0"
+     *       "limits": {
+     *           "live_inference": 1000
+     *       }
      *   }
      */
     app.get('/api', (req, res) => {
         return res.json({
             version: pkg.version
+            limits: {
+                live_inference: 1000
+            }
         });
     });
 
