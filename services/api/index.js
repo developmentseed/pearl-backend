@@ -610,8 +610,7 @@ async function server(config, cb) {
 
         try {
             const inst = await instance.get(req.params.instanceid);
-
-            if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
             return res.json(inst);
         } catch (err) {
@@ -653,7 +652,7 @@ async function server(config, cb) {
 
             try {
                 const inst = await instance.get(req.params.instanceid);
-                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
                 return res.json(await aoi.list(req.params.instanceid, req.query));
             } catch (err) {
@@ -694,7 +693,7 @@ async function server(config, cb) {
 
             try {
                 const inst = await instance.get(req.params.instanceid);
-                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
                 return res.json(await aoi.create(req.params.instanceid, req.body));
             } catch (err) {
@@ -736,7 +735,7 @@ async function server(config, cb) {
 
             try {
                 const inst = await instance.get(req.params.instanceid);
-                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
                 return res.json(await checkpoint.list(req.params.instanceid, req.query));
             } catch (err) {
@@ -776,7 +775,7 @@ async function server(config, cb) {
 
             try {
                 const inst = await instance.get(req.params.instanceid);
-                if (res.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
                 return res.json(await checkpoint.create(req.params.instanceid, req.body));
             } catch (err) {

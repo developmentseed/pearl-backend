@@ -50,7 +50,7 @@ def main():
         "i": os.environ['INSTANCE_ID']
     }, os.environ["SigningSecret"], algorithm="HS256")
 
-    api = API(os.environ["API"], token, os.environ['INSTANCE_ID'])
+    api = API(os.environ["API"], 'api.' + token, os.environ['INSTANCE_ID'])
 
     model = load(args.gpu_id, api)
 
@@ -102,7 +102,7 @@ async def connection(uri, model):
 
                             # Return a prediction for a given extent
                             elif action == "model#prediction":
-                                model.prediction(msg.get('data'))
+                                await model.prediction(msg.get('data'), websocket)
 
                             elif action == "model#last_tile":
                                 model.last_tile()

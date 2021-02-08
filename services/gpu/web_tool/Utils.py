@@ -167,7 +167,7 @@ def class_prediction_to_img(y_pred, hard=True, color_list=None):
             for ch in range(3):
                 img[:, :, ch] += y_pred[:, :, c] * colour_map[c, ch]
     return img
-    
+
 def nlcd_to_img(img):
     return np.vectorize(NLCD_COLOR_MAP.__getitem__, signature='()->(n)')(img).astype(np.uint8)
 

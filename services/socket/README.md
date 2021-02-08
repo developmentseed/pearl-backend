@@ -64,6 +64,7 @@ course of a session as informational messages
 | --------------------- | ----- |
 | `info#connection`     |       |
 | `info#disconnection`  |       |
+| `model#prediction`    | PNG Inference |
 | `error`               |       |
 
 #### error
@@ -74,6 +75,19 @@ course of a session as informational messages
     "data": {
         "error": "Short, user safe error message",
         "detailed": "More detailed debug message as to what is happening"
+    }
+}
+```
+
+#### model#prediction
+
+
+```json
+{
+    "message": "model#prediction",
+    "data": {
+        "bounds": [ 1, 1, 1, 1]
+        "image": "<base64 encoded png>"
     }
 }
 ```
