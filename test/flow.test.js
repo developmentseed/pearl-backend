@@ -142,13 +142,12 @@ test('new project', (t) => {
             'created',
         ], 'expected props');
 
-        t.ok(parseInt(body.id), 'id: <integer>');
         t.ok(body.created, 'created: <date>');
 
-        delete body.id,
         delete body.created;
 
         t.deepEquals(body, {
+            id: 1,
             name: 'Test Project',
         }, 'expected body');
 

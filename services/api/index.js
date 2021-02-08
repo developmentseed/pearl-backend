@@ -136,7 +136,7 @@ async function server(config, cb) {
      */
     app.get('/api', (req, res) => {
         return res.json({
-            version: pkg.version
+            version: pkg.version,
             limits: {
                 live_inference: 1000
             }
@@ -491,7 +491,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {post} /api/instance List Projects
+     * @api {post} /api/project List Projects
      * @apiVersion 1.0.0
      * @apiName ListProjects
      * @apiGroup Projects
@@ -516,6 +516,39 @@ async function server(config, cb) {
     router.get('/project', requiresAuth, async (req, res) => {
         try {
             res.json(await project.list(req.auth.uid, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:projectid Get Project
+     * @apiVersion 1.0.0
+     * @apiName GetProject
+     * @apiGroup Projects
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all information about a given project
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "name": "Test Project",
+     *       "created": "<date>"
+     *   }
+     */
+    router.get('/project/:projectid', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceid');
+
+        try {
+            const project = await project.get(req.param.projectid);
+
+            if (req.auth.uid !== project.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+
+            delete project.uid;
+            res.json(project);
         } catch (err) {
             return Err.respond(err, res);
         }

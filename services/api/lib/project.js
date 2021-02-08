@@ -88,6 +88,40 @@ class Project {
             throw new Err(500, err, 'Failed to create project');
         }
     }
+
+    /**
+     * Get a specific project
+     *
+     * @param {Integer} projectid - Project Id to get
+     */
+    async get(projectid) {
+        try {
+            const pgres = await this.pool.query(`
+                SELECT
+                    id,
+                    uid,
+                    name,
+                    created
+                FROM
+                    projets
+                WHERE
+                    id = $1
+            `, [
+                projectid
+            ]);
+
+            if (!pgres.rows.length) throw new Err(404, null, 'No project found');
+
+            return {
+                id: parseInt(pgres.rows[0].id),
+                uid: parseInt(pgres.rows[0].uid),
+                name: pgres.rows[0].name,
+                created: pgres.rows[0].created
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to get project');
+        }
+    }
 }
 
 module.exports = {

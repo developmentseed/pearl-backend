@@ -993,8 +993,35 @@ define({ "api": [
     "groupTitle": "Project"
   },
   {
+    "type": "get",
+    "url": "/api/project/:projectid",
+    "title": "Get Project",
+    "version": "1.0.0",
+    "name": "GetProject",
+    "group": "Projects",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all information about a given project</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Projects"
+  },
+  {
     "type": "post",
-    "url": "/api/instance",
+    "url": "/api/project",
     "title": "List Projects",
     "version": "1.0.0",
     "name": "ListProjects",
@@ -1082,12 +1109,12 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
-    "description": "<p>Return basic metadata about server configuration</p>",
+    "description": "<p>Return basic metadata about server configuration</p> <pre><code>limits.live_inference: The area in metres that can be live inferenced</code></pre>",
     "success": {
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 1000\n    }\n}",
           "type": "json"
         }
       ]
