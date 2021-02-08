@@ -75,19 +75,7 @@ class API():
 
         return r.json()
 
-    def get_tile_by_geom(self, geom, iformat='npy'):
-        poly = shape(geojson.loads(json.dumps(geom)))
-
-        project = pyproj.Transformer.from_proj(
-            pyproj.Proj('epsg:4326'),
-            pyproj.Proj('epsg:3857'),
-            always_xy=True
-        )
-
-        poly = transform(project.transform, poly)
-
-        zxys = tilecover.cover_geometry(tiler, poly, self.mosaic['maxzoom'])
-
+    def get_tiles(self, zxys, iformat='npy'):
         rasters = []
         for zxy in zxys:
             rasters.append(self.get_tile(zxy.z, zxy.x, zxy.y))

@@ -3,6 +3,7 @@ import base64
 import json
 import numpy as np
 import cv2
+from .AOI import AOI
 from web_tool.Utils import serialize, deserialize, class_prediction_to_img
 from .MemRaster import MemRaster
 import logging
@@ -22,9 +23,9 @@ class ModelSrv():
         self.model = model
 
     async def prediction(self, body, websocket):
-        body.get('polygon')
+        poly = body.get('polygon')
 
-        memrasters = self.api.get_tile_by_geom(body.get('polygon'), iformat='npy')
+        aoi = AOI(self.api, poly)
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
