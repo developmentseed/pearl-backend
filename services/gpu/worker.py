@@ -87,7 +87,7 @@ async def connection(uri, model):
 
                         LOGGER.info('ok - action: ' + str(action))
 
-                        try: 
+                        try:
                             if action == "instance#terminate":
                                 # Save Checkpoint
                                 # Mark instance as terminated in API

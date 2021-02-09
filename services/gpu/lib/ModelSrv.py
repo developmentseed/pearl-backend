@@ -28,7 +28,7 @@ class ModelSrv():
             await websocket.send(json.dumps({
                 'message': 'error',
                 'data': {
-                    'error': 'Cannot create AOI while another is still processing'
+                    'error': 'Previous AOI still processing',
                     'detailed': 'The API is only capable of handling a single AOI at a time. Wait until the AOI is complete and resubmit'
                 }
             }))
