@@ -660,7 +660,40 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instance/aoi List AOIs
+     * @api {get} /api/instance/:instanceid/aoi/:aoiid Get AOI
+     * @apiVersion 1.0.0
+     * @apiName GetAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all information about a given AOI
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON "}
+     *   }
+     */
+    router.get('/instance/:instanceid/aoi/:aoiid', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceid');
+        Param.int(req, res, 'aoiid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            return res.json(await aoi.get(req.params.instanceid, req.params.aoiid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/instance/:instanceid/aoi List AOIs
      * @apiVersion 1.0.0
      * @apiName ListAOIs
      * @apiGroup AOI

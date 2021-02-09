@@ -9,6 +9,46 @@ class Aoi {
     }
 
     /**
+     * Return a single aoi
+     *
+     * @param {Number} instanceid - AOIS related to a specific instance
+     * @param {Number} aoiid - Specific AOI id
+     */
+    async get(instanceid, aoiid) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+               SELECT
+                    id,
+                    ST_AsGeoJSON(bounds)::JSON,
+                    created,
+                    storage
+                FROM
+                    aois
+                WHERE
+                    instance_id = $1
+                    AND aoi.id = $2
+            `, [
+                instanceid,
+                aoiid
+
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to get AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+
+        const row = pgres.rows[0];
+        return {
+            id: parseInt(row.id),
+            bounds: row.bounds,
+            created: row.created,
+            storage: row.storage
+        };
+    }
+
+    /**
      * Return a list of aois
      *
      * @param {Number} instanceid - AOIS related to a specific instance
@@ -45,7 +85,7 @@ class Aoi {
 
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to list instances');
+            throw new Err(500, new Error(err), 'Failed to list aois');
         }
 
         return {
