@@ -117,7 +117,7 @@ class Aoi {
                     bounds
                 ) VALUES (
                     $1,
-                    ST_GeomFromGeoJSON($2),
+                    ST_GeomFromGeoJSON($2)
                 ) RETURNING *
             `, [
                 instanceid,

@@ -31,10 +31,10 @@ class API():
         self.model_id = self.instance['model_id']
         self.mosaic_id = self.instance['mosaic']
 
-        self.mosaic = self.get_tilejson()
-        self.project = self.project_meta()
         self.model = self.model_meta()
         self.model_fs = self.model_download()
+        self.mosaic = self.get_tilejson()
+        self.project = self.project_meta()
 
     def server_meta(self):
         url = self.url + '/api'
@@ -52,12 +52,15 @@ class API():
         url = self.url + '/api/instance/' + self.instance_id + '/aoi'
 
         LOGGER.info("ok - POST " + url)
-        r = requests.post(url, headers={
-            "authorization": "Bearer " + self.token
-        },
-        data = {
-            bounds: mapping(box(*bounds))
-        })
+        r = requests.post(url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
+            },
+            data = json.dumps({
+                'bounds': mapping(box(*bounds))
+            })
+        )
 
         r.raise_for_status()
 
