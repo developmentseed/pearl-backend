@@ -543,12 +543,12 @@ async function server(config, cb) {
         Param.int(req, res, 'instanceid');
 
         try {
-            const project = await project.get(req.param.projectid);
+            const proj = await project.get(req.param.projectid);
 
-            if (req.auth.uid !== project.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+            if (req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
-            delete project.uid;
-            res.json(project);
+            delete proj.uid;
+            res.json(proj);
         } catch (err) {
             return Err.respond(err, res);
         }
