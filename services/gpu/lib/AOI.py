@@ -70,18 +70,18 @@ class AOI():
 
     @staticmethod
     def gen_bounds(tiles):
-        bounds = mercantile.bounds(tiles[0])
+        bounds = [*mercantile.bounds(tiles[0])]
 
         for tile in tiles:
             tilebounds = mercantile.bounds(tile.x, tile.y, tile.z)
 
             if tilebounds.west < bounds[0]:
-                bounds[0] - tilebounds.west
+                bounds[0] = tilebounds.west
             if tilebounds.south < bounds[1]:
-                bounds[1] - tilebounds.south
+                bounds[1] = tilebounds.south
             if tilebounds.east > bounds[2]:
-                bounds[2] - tilebounds.east
+                bounds[2] = tilebounds.east
             if tilebounds.north < bounds[3]:
-                bounds[3] - tilebounds.north
+                bounds[3] = tilebounds.north
 
         return list(bounds)
