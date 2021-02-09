@@ -19,17 +19,26 @@ class ModelSrv():
         os.makedirs("/tmp/output/", exist_ok=True)
         os.makedirs("/tmp/session/", exist_ok=True)
 
+        self.aoi = None
         self.api = api
         self.model = model
 
     async def prediction(self, body, websocket):
-        poly = body.get('polygon')
+        if self.aoi is not None:
+            await websocket.send(json.dumps({
+                'message': 'error',
+                'data': {
+                    'error': 'Cannot create AOI while another is still processing'
+                    'detailed': 'The API is only capable of handling a single AOI at a time. Wait until the AOI is complete and resubmit'
+                }
+            }))
+            return
 
-        aoi = AOI(self.api, poly)
+        self.aoi = AOI(self.api, body.get('polygon'))
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
-        for in_memraster in memrasters:
+        for in_memraster in self.aoi.memrasters:
             output = self.model.run(in_memraster.data, False)
 
             assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
@@ -45,14 +54,29 @@ class ModelSrv():
             img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
             img_soft = base64.b64encode(img_soft).decode("utf-8")
 
-            LOGGER.info("ok - returning inference");
             await websocket.send(json.dumps({
-                'message': 'model#prediction',
+                'message': 'model#prediction#progress',
                 'data': {
-                    'bounds': in_memraster.bounds,
-                    'image': img_soft
+                    'total': self.aoi.total,
+                    'processed': len(self.aoi.tiles)
                 }
             }))
+
+            if self.aoi.live:
+                LOGGER.info("ok - returning inference");
+                await websocket.send(json.dumps({
+                    'message': 'model#prediction',
+                    'data': {
+                        'bounds': in_memraster.bounds,
+                        'image': img_soft
+                    }
+                }))
+
+        await websocket.send(json.dumps({
+            'message': 'model#prediction#complete'
+        }))
+
+        self.aoi = None
 
     def last_tile(self):
         return serialize(self.model.last_tile)

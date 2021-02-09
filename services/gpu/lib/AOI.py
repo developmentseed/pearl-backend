@@ -17,12 +17,15 @@ class AOI():
         self.poly = poly
 
         self.tiles = AOI.gen_tiles(self.poly)
+        self.total = len(tiles)
         self.bounds = API.gen_bounds(self.tiles)
+
+        # TODO Calculate Area in Metres
+        self.live = bounds > self.aoi['limits']['live_inference']
 
         self.api.create_aoi(bounds)
 
-        memrasters = self.api.get_tiles(self.tiles, iformat='npy')
-
+        self.memrasters = self.api.get_tiles(self.tiles, iformat='npy')
 
     @static
     def gen_tiles(poly):
