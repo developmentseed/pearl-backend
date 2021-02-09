@@ -130,7 +130,8 @@ async function server(config, cb) {
      *   {
      *       "version": "1.0.0"
      *       "limits": {
-     *           "live_inference": 1000
+     *           "live_inference": 1000 (m^2)
+     *           "max_inference": 100000 (m^2)
      *       }
      *   }
      */
@@ -138,7 +139,8 @@ async function server(config, cb) {
         return res.json({
             version: pkg.version,
             limits: {
-                live_inference: 1000
+                live_inference: 1000,
+                max_inference: 100000
             }
         });
     });
