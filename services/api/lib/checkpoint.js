@@ -20,7 +20,7 @@ class CheckPoint {
     async list(instanceid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
-        if (!query.page) query.page = 1;
+        if (!query.page) query.page = 0;
 
         let pgres;
         try {

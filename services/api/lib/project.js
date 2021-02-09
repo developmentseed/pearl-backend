@@ -19,7 +19,7 @@ class Project {
     async list(uid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
-        if (!query.page) query.page = 1;
+        if (!query.page) query.page = 0;
 
         let pgres;
         try {
@@ -95,32 +95,33 @@ class Project {
      * @param {Integer} projectid - Project Id to get
      */
     async get(projectid) {
+        let pgres;
         try {
-            const pgres = await this.pool.query(`
+            pgres = await this.pool.query(`
                 SELECT
                     id,
                     uid,
                     name,
                     created
                 FROM
-                    projets
+                    projects
                 WHERE
                     id = $1
             `, [
                 projectid
             ]);
-
-            if (!pgres.rows.length) throw new Err(404, null, 'No project found');
-
-            return {
-                id: parseInt(pgres.rows[0].id),
-                uid: parseInt(pgres.rows[0].uid),
-                name: pgres.rows[0].name,
-                created: pgres.rows[0].created
-            };
         } catch (err) {
             throw new Err(500, err, 'Failed to get project');
         }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'No project found');
+
+        return {
+            id: parseInt(pgres.rows[0].id),
+            uid: parseInt(pgres.rows[0].uid),
+            name: pgres.rows[0].name,
+            created: pgres.rows[0].created
+        };
     }
 }
 

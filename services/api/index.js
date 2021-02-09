@@ -540,15 +540,16 @@ async function server(config, cb) {
      *   }
      */
     router.get('/project/:projectid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'instanceid');
+        Param.int(req, res, 'projectid');
 
         try {
-            const proj = await project.get(req.param.projectid);
+            const proj = await project.get(req.params.projectid);
 
             if (req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
             delete proj.uid;
-            res.json(proj);
+
+            return res.json(proj);
         } catch (err) {
             return Err.respond(err, res);
         }
