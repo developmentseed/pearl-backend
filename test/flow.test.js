@@ -68,7 +68,8 @@ test('api running', (t) => {
         t.equals(res.statusCode, 200);
 
         t.deepEquals(body, {
-            version: '1.0.0'
+            version: '1.0.0',
+            limits: { live_inference: 1000, max_inference: 100000 }
         });
 
         t.end();

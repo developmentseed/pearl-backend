@@ -228,13 +228,11 @@ async function server(config, cb) {
                         token: token
                     };
                 }
-                next();
+
+                req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
             } else {
                 return Err.respond(new Err(401, null, 'Authentication Required'), res);
             }
-        },
-        (req, res, next) => {
-            req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
         },
         (err, req, res, next) => {
             // Catch Auth0 errors
