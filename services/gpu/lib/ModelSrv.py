@@ -38,7 +38,9 @@ class ModelSrv():
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
-        for in_memraster in self.aoi.memrasters:
+        for zxy in self.aoi.tiles:
+            in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+
             output = self.model.run(in_memraster.data, False)
 
             assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"

@@ -78,14 +78,6 @@ class API():
 
         return r.json()
 
-    def get_tiles(self, zxys, iformat='npy'):
-        rasters = []
-        for zxy in zxys:
-            rasters.append(self.get_tile(zxy.z, zxy.x, zxy.y))
-        LOGGER.info("ok - got all tiles")
-
-        return rasters
-
     def get_tile(self, z, x, y, iformat='npy'):
         url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
 
