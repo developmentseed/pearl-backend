@@ -4,6 +4,10 @@ import shapely
 import geojson
 import json
 import shapely.ops as ops
+import rasterio
+import supermercado
+from rasterio.io import MemoryFile
+from rasterio.crs import CRS
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import box
 from functools import partial
@@ -19,11 +23,11 @@ LOGGER = logging.getLogger("server")
 
 class AOI():
     def __init__(self, api, poly):
-
         self.api = api
         self.poly = poly
+        self.zoom = self.api.mosaic['maxzoom']
 
-        self.tiles = AOI.gen_tiles(self.poly, self.api.mosaic['maxzoom'])
+        self.tiles = AOI.gen_tiles(self.poly, self.zoom)
         self.total = len(self.tiles)
 
         LOGGER.info("ok - " + str(self.total) + " tiles queued")
@@ -36,7 +40,27 @@ class AOI():
 
         self.api.create_aoi(self.bounds)
 
-        self.memrasters = self.api.get_tiles(self.tiles, iformat='npy')
+        self.raster = AOI.gen_raster(self.bounds, self.zoom)
+
+    @staticmethod
+    def gen_raster(bounds, zoom):
+        extrema = supermercado.burntiles.tile_extrema(bounds, zoom)
+        transform = supermercado.burntiles.make_transform(extrema, zoom)
+
+        height = (extrema["y"]["max"] - extrema["y"]["min"] + 1) * 256
+        width = (extrema["x"]["max"] - extrema["x"]["min"] + 1) * 256
+
+        with MemoryFile() as memfile:
+            with memfile.open(
+                driver='GTiff',
+                count=1,
+                dtype="uint8",
+                crs="EPSG:3857",
+                transform=transform,
+                height=height,
+                width=height
+            ) as mem:
+                return mem
 
     @staticmethod
     def gen_tiles(poly, zoom):
