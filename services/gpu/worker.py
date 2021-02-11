@@ -9,6 +9,7 @@ import argparse
 import asyncio
 import websockets
 import logging
+import traceback
 from lib.api import API
 from lib.ModelSrv import ModelSrv
 from web_tool.ModelSessionKerasExample import KerasDenseFineTune
@@ -114,7 +115,7 @@ async def connection(uri, model):
                                 model.save_state_to()
                         except Exception as e:
                             LOGGER.error("not ok - failed to perform action")
-                            LOGGER.error(e)
+                            traceback.print_exc()
                             continue
         except Exception as e:
             LOGGER.error("not ok - failed to connect to router, reattempting")

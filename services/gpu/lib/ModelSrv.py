@@ -4,8 +4,8 @@ import json
 import numpy as np
 import cv2
 from .AOI import AOI
-from web_tool.Utils import serialize, deserialize, class_prediction_to_img
 from .MemRaster import MemRaster
+from web_tool.Utils import serialize, deserialize, class_prediction_to_img
 import logging
 
 LOGGER = logging.getLogger("server")
@@ -47,15 +47,6 @@ class ModelSrv():
 
             LOGGER.info("ok - generated inference");
 
-            if output.shape[2] > len(color_list):
-                LOGGER.warning("The number of output channels is larger than the given color list, cropping output to number of colors (you probably don't want this to happen")
-                output = output[:,:,:len(color_list)]
-
-            # Create color versions of predictions
-            img_soft = class_prediction_to_img(output, False, color_list)
-            img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
-            img_soft = base64.b64encode(img_soft).decode("utf-8")
-
             await websocket.send(json.dumps({
                 'message': 'model#prediction#progress',
                 'data': {
@@ -65,6 +56,15 @@ class ModelSrv():
             }))
 
             if self.aoi.live:
+                if output.shape[2] > len(color_list):
+                    LOGGER.warning("The colour list does not match class list")
+                    output = output[:,:,:len(color_list)]
+
+                # Create color versions of predictions
+                img_soft = class_prediction_to_img(output, False, color_list)
+                img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
+                img_soft = base64.b64encode(img_soft).decode("utf-8")
+
                 LOGGER.info("ok - returning inference");
                 await websocket.send(json.dumps({
                     'message': 'model#prediction',
@@ -73,6 +73,12 @@ class ModelSrv():
                         'image': img_soft
                     }
                 }))
+
+            # Push tile into geotiff fabric
+            output = MemRaster(output, in_memraster.crs, in_memraster.tile)
+            self.aoi.add_to_fabric(output)
+
+        self.aoi.upload_fabric()
 
         await websocket.send(json.dumps({
             'message': 'model#prediction#complete'

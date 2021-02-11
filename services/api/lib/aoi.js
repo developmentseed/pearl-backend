@@ -11,10 +11,9 @@ class Aoi {
     /**
      * Return a single aoi
      *
-     * @param {Number} instanceid - AOIS related to a specific instance
      * @param {Number} aoiid - Specific AOI id
      */
-    async get(instanceid, aoiid) {
+    async get(aoiid) {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -26,10 +25,8 @@ class Aoi {
                 FROM
                     aois
                 WHERE
-                    instance_id = $1
-                    AND aoi.id = $2
+                    aoi.id = $1
             `, [
-                instanceid,
                 aoiid
 
             ]);

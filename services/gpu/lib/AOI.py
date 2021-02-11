@@ -3,9 +3,11 @@ import pyproj
 import shapely
 import geojson
 import json
+import numpy as np
 import shapely.ops as ops
 import rasterio
 import supermercado
+from rasterio.windows import Window
 from rasterio.io import MemoryFile
 from rasterio.crs import CRS
 from shapely.geometry.polygon import Polygon
@@ -40,27 +42,40 @@ class AOI():
 
         self.api.create_aoi(self.bounds)
 
-        self.raster = AOI.gen_raster(self.bounds, self.zoom)
+        self.extrema, self.fabric = AOI.gen_fabric(self.bounds, self.zoom)
+
+    def add_to_fabric(self, fragment):
+        data = fragment.data.argmax(axis=-1).astype(np.uint8)
+        data = np.expand_dims(data, axis=0)
+
+        col_off = (self.extrema["x"]["min"] - fragment.x) * 256
+        row_off = (self.extrema["y"]["min"] - fragment.y) * 256
+
+        self.fabric.write(data, window=Window(col_off, row_off, 256, 256))
+
+    def upload_fabric(self):
+        self.api.upload_aoi(self.fabric)
 
     @staticmethod
-    def gen_raster(bounds, zoom):
+    def gen_fabric(bounds, zoom):
         extrema = supermercado.burntiles.tile_extrema(bounds, zoom)
         transform = supermercado.burntiles.make_transform(extrema, zoom)
 
         height = (extrema["y"]["max"] - extrema["y"]["min"] + 1) * 256
         width = (extrema["x"]["max"] - extrema["x"]["min"] + 1) * 256
 
-        with MemoryFile() as memfile:
-            with memfile.open(
-                driver='GTiff',
-                count=1,
-                dtype="uint8",
-                crs="EPSG:3857",
-                transform=transform,
-                height=height,
-                width=height
-            ) as mem:
-                return mem
+        memfile = MemoryFile()
+        memfile = memfile.open(
+            driver='GTiff',
+            count=1,
+            dtype="uint8",
+            crs="EPSG:3857",
+            transform=transform,
+            height=height,
+            width=height
+        )
+
+        return (extrema, memfile)
 
     @staticmethod
     def gen_tiles(poly, zoom):

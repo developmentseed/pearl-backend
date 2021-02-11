@@ -1,6 +1,8 @@
+import mercantile
+
 class MemRaster(object):
 
-    def __init__(self, data, crs, bounds):
+    def __init__(self, data, crs, tile):
         """A wrapper around the four pieces of information needed to define a raster datasource.
 
         Args:
@@ -11,7 +13,15 @@ class MemRaster(object):
         assert len(data.shape) == 3
         #assert data.shape[2] < data.shape[1] and data.shape[2] < data.shape[0], "We assume that rasters should have larger height/width then number of channels"
 
+        self.tile = tile
         self.data = data
         self.crs = crs
-        self.bounds = bounds
+
+        self.x = tile[0]
+        self.y = tile[1]
+        self.z = tile[2]
+
+        # Lat Lng bounds
+        self.xy_bounds = mercantile.xy_bounds(self.x, self.y, self.z)
+        self.bounds = mercantile.bounds(self.x, self.y, self.z)
         self.shape = data.shape

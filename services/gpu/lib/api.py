@@ -66,6 +66,22 @@ class API():
 
         return r.json()
 
+    def upload_aoi(self, geotiff):
+        url = self.url + '/api/instance/' + self.instance_id + '/aoi/upload'
+
+        LOGGER.info("ok - POST " + url)
+        r = requests.post(url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
+            },
+            data = geotiff
+        )
+
+        r.raise_for_status()
+
+        return r.json()
+
     def get_tilejson(self):
         url = self.url + '/api/mosaic/' + self.mosaic_id
 
@@ -89,9 +105,6 @@ class API():
         r.raise_for_status()
 
         if iformat == 'npy':
-            with open("f.npy", "wb") as f:
-                f.write(r.content)
-
             res = np.load(BytesIO(r.content))
 
             assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
@@ -101,7 +114,7 @@ class API():
             memraster = MemRaster(
                 res,
                 "epsg:3857",
-                mercantile.bounds(x, y, z)
+                (x, y, z)
             )
 
             return memraster

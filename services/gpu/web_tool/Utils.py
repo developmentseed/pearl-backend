@@ -2,6 +2,14 @@ import os
 import io
 import threading
 
+import rasterio
+import rasterio.warp
+import rasterio.crs
+import rasterio.io
+import rasterio.mask
+import rasterio.transform
+import rasterio.merge
+
 import numpy as np
 
 import logging

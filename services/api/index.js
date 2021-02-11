@@ -694,6 +694,39 @@ async function server(config, cb) {
     });
 
     /**
+     * @api {post} /api/instance/:instanceid/aoi/:aoiid/upload Upload AOI
+     * @apiVersion 1.0.0
+     * @apiName UploadAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Upload a new GeoTiff to the API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON "}
+     *   }
+     */
+    router.post('/instance/:instanceid/aoi/:aoiid/upload', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceid');
+        Param.int(req, res, 'aoiid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            return res.json(await aoi.upload(req.params.aoiid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/instance/:instanceid/aoi List AOIs
      * @apiVersion 1.0.0
      * @apiName ListAOIs
