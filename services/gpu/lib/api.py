@@ -1,17 +1,18 @@
 import json
 import requests
 import pyproj
-from io import BytesIO
 import numpy as np
-from os import path
 import logging
 import geojson
+import mercantile
+from os import path
+from io import BytesIO
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 from shapely.ops import transform
 from shapely.geometry import shape
 from tiletanic import tilecover, tileschemes
 from shapely.geometry import box, mapping
 from .MemRaster import MemRaster
-import mercantile
 
 LOGGER = logging.getLogger("server")
 
@@ -75,7 +76,7 @@ class API():
                 "authorization": "Bearer " + self.token,
                 "content-type": "application/json"
             },
-            data = geotiff
+            data = MultipartEncoder(fields={'file': ('filename', geotiff, 'image/tiff')})
         )
 
         r.raise_for_status()
