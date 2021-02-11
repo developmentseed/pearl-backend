@@ -1,12 +1,75 @@
 'use strict';
 
 const Err = require('./error');
+const { BlobServiceClient } = require('@azure/storage-blob');
 
-class Aoi {
+class AOI {
     constructor(pool, config) {
         this.pool = pool;
         this.config = config;
+
+        // don't access these services unless AzureStorage is truthy
+        if (this.config.AzureStorage) {
+            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
+            this.container_client = this.blob_client.getContainerClient('aois');
+        }
     }
+
+    /**
+     * Upload an AOI geotiff and mark the AOI storage property as true
+     *
+     * @param {Number} aoiid AOI ID to upload to
+     * @param {Object} file File Stream to upload
+     */
+    async upload(aoiid, file) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
+
+        const blockBlobClient = this.containerClient.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
+
+        await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
+            blobHTTPHeaders: { blobContentType: 'image/tiff' }
+        });
+
+        return await this.patch(aoiid, {
+            storage: true
+        });
+    }
+
+    /**
+     * Update AOI properties
+     *
+     * @param {Number} aoiid - Specific AOI id
+     * @param {Object} aoi AOI Object
+     * @param {Boolean} aoi.storage Has the storage been uploaded
+     */
+     async patch(aoiid, aoi) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                UPDATE aois
+                    SET
+                        storage = COALESCE($2, storage)
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [
+                aoiid,
+                aoi.storage
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to update AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+
+        const row = pgres.rows[0];
+        return {
+            id: parseInt(row.id),
+            bounds: row.bounds,
+            created: row.created,
+            storage: row.storage
+        };
+     }
 
     /**
      * Return a single aoi
@@ -135,5 +198,5 @@ class Aoi {
 }
 
 module.exports = {
-    Aoi
+    AOI
 };

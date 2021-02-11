@@ -49,7 +49,7 @@ class API():
         return r.json()
 
     def create_aoi(self, bounds):
-        url = self.url + '/api/instance/' + self.instance_id + '/aoi'
+        url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi'
 
         LOGGER.info("ok - POST " + url)
         r = requests.post(url,
@@ -66,8 +66,8 @@ class API():
 
         return r.json()
 
-    def upload_aoi(self, geotiff):
-        url = self.url + '/api/instance/' + self.instance_id + '/aoi/upload'
+    def upload_aoi(self, aoiid, geotiff):
+        url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi/' + str(aoiid) + '/upload'
 
         LOGGER.info("ok - POST " + url)
         r = requests.post(url,

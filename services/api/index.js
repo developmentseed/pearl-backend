@@ -8,6 +8,7 @@ const fs = require('fs');
 const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
+const Busboy = require('busboy');
 const { Param, fetchJSON } = require('./lib/util');
 const jwt = require('express-jwt');
 const jwks = require('jwks-rsa');
@@ -100,7 +101,7 @@ async function server(config, cb) {
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
     const checkpoint = new (require('./lib/checkpoint').CheckPoint)(pool, config);
-    const aoi = new (require('./lib/aoi').Aoi)(pool, config);
+    const aoi = new (require('./lib/aoi').AOI)(pool, config);
     const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
@@ -687,7 +688,7 @@ async function server(config, cb) {
             const inst = await instance.get(req.params.instanceid);
             if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
-            return res.json(await aoi.get(req.params.instanceid, req.params.aoiid));
+            return res.json(await aoi.get(req.params.aoiid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -720,7 +721,23 @@ async function server(config, cb) {
             const inst = await instance.get(req.params.instanceid);
             if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
 
-            return res.json(await aoi.upload(req.params.aoiid));
+            const busboy = new Busboy({ headers: req.headers });
+
+            const files = [];
+
+            busboy.on('file', (fieldname, file, filename) => {
+                files.push(aoi.upload(req.params.aoiid, file));
+            });
+
+            busboy.on('finish', async () => {
+                try {
+                    return res.json(await aoi.get(req.params.aoiid));
+                } catch (err) {
+                    Err.respond(res, err);
+                }
+            });
+
+            return req.pipe(busboy);
         } catch (err) {
             return Err.respond(err, res);
         }

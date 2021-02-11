@@ -40,9 +40,9 @@ class AOI():
         # TODO Check Max size too
         self.live = AOI.area(self.bounds) > self.api.server['limits']['live_inference']
 
-        self.api.create_aoi(self.bounds)
+        self.id = self.api.create_aoi(self.bounds)["id"]
 
-        self.extrema, self.fabric = AOI.gen_fabric(self.bounds, self.zoom)
+        self.extrema, self.raw_fabric, self.fabric = AOI.gen_fabric(self.bounds, self.zoom)
 
     def add_to_fabric(self, fragment):
         data = fragment.data.argmax(axis=-1).astype(np.uint8)
@@ -54,7 +54,7 @@ class AOI():
         self.fabric.write(data, window=Window(col_off, row_off, 256, 256))
 
     def upload_fabric(self):
-        self.api.upload_aoi(self.fabric)
+        self.api.upload_aoi(self.id, self.raw_fabric)
 
     @staticmethod
     def gen_fabric(bounds, zoom):
@@ -65,7 +65,7 @@ class AOI():
         width = (extrema["x"]["max"] - extrema["x"]["min"] + 1) * 256
 
         memfile = MemoryFile()
-        memfile = memfile.open(
+        writer = memfile.open(
             driver='GTiff',
             count=1,
             dtype="uint8",
@@ -75,7 +75,7 @@ class AOI():
             width=height
         )
 
-        return (extrema, memfile)
+        return (extrema, memfile, writer)
 
     @staticmethod
     def gen_tiles(poly, zoom):
