@@ -16,6 +16,7 @@ tiles:
   env:
     Backends: {{STAGING_MOSAIC_BACKEND}}
     Host: {{STAGING_MOSAIC_HOST}}
+    WebConcurrency: 2
 tilesScaler:
   env:
     tenantId: {{STAGING_TENANT_ID}}

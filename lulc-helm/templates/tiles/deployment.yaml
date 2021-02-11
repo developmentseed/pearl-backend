@@ -37,15 +37,14 @@ spec:
               path: /healthz
               port: {{ .Values.tiles.containerPort }}
           resources:
-            requests:
-              cpu: {{ .Values.tiles.resources.requests.cpu }}
-              memory: {{ .Values.tiles.resources.requests.memory }}
             limits:
               cpu: {{ .Values.tiles.resources.limits.cpu }}
               memory: {{ .Values.tiles.resources.limits.memory }}
           env:
             - name: PORT
               value: {{ .Values.tiles.containerPort | quote }}
+            - name: WEB_CONCURRENCY
+              value: {{ .Values.tiles.env.WebConcurrency | quote }}
             - name: MOSAIC_BACKEND
               value: {{ .Values.tiles.env.Backends }}
             - name: MOSAIC_HOST
