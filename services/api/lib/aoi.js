@@ -26,9 +26,13 @@ class AOI {
 
         const blockBlobClient = this.containerClient.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
 
-        await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
-            blobHTTPHeaders: { blobContentType: 'image/tiff' }
-        });
+        try {
+            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
+                blobHTTPHeaders: { blobContentType: 'image/tiff' }
+            });
+        } catch (err) {
+            throw new Err(500, err, 'Failed to uploda AOI');
+        }
 
         return await this.patch(aoiid, {
             storage: true
