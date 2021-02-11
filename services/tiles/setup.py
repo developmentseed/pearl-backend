@@ -6,7 +6,7 @@ inst_reqs = [
     "cogeo-mosaic @ git+https://github.com/developmentseed/cogeo-mosaic.git",
     "aiocache[redis]",
     "titiler==0.1.0a14",
-    "rasterio==1.2b3",
+    "rasterio~=1.2",
     "ujson",
     "tilebench",
 ]

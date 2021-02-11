@@ -16,3 +16,4 @@ tiles:
   env:
     Backends: {{PRODUCTION_MOSAIC_BACKEND}}
     Host: {{PRODUCTION_MOSAIC_HOST}}
+    WebConcurrency: 2
