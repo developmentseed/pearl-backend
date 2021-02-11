@@ -16,3 +16,18 @@ tiles:
   env:
     Backends: {{STAGING_MOSAIC_BACKEND}}
     Host: {{STAGING_MOSAIC_HOST}}
+tilesScaler:
+  env:
+    tenantId: {{STAGING_TENANT_ID}}
+    subscriptionId: {{STAGING_SUBSCRIPTION_ID}}
+    resourceGroupName: {{CLUSTER_RESOURCE_GROUP}}
+    activeDirectoryClientId: {{STAGING_CLIENT_ID}}
+    activeDirectoryClientPassword: {{STAGING_CLIENT_SECRET}}
+ingress-azure:
+  appgw:
+    subscriptionId: {{STAGING_APPGW_SUBSCRIPTION_ID}}
+    resourceGroup: {{STAGING_APPGW_RESOURCE_GROUP}}
+    name: {{STAGING_APPGW_NAME}}
+  armAuth:
+     type: servicePrincipal
+     secretJSON: {{STAGING_SERVICE_PRINCIPAL_BASE64}}
