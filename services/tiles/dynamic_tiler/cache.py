@@ -2,16 +2,17 @@
 
 import asyncio
 import urllib
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import aiocache
 from starlette.responses import Response
 
 from fastapi.dependencies.utils import is_coroutine_callable
 
-from .settings import cache_settings
+from .settings import CacheSettings
 
-CacheSettings = cache_settings()
+
+cache_settings = CacheSettings()
 
 
 class cached(aiocache.cached):
@@ -66,11 +67,11 @@ def setup_cache():
             'class': "aiocache.serializers.PickleSerializer"
         }
     }
-    if CacheSettings.ttl is not None:
-        config["ttl"] = CacheSettings.ttl
+    if cache_settings.ttl is not None:
+        config["ttl"] = cache_settings.ttl
 
-    if CacheSettings.endpoint:
-        url = urllib.parse.urlparse(CacheSettings.endpoint)
+    if cache_settings.endpoint:
+        url = urllib.parse.urlparse(cache_settings.endpoint)
         ulr_config = dict(urllib.parse.parse_qsl(url.query))
         config.update(ulr_config)
 

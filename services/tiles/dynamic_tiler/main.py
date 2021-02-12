@@ -6,28 +6,44 @@ from starlette.middleware.cors import CORSMiddleware
 
 from tilebench.middleware import VSIStatsMiddleware
 from titiler.errors import DEFAULT_STATUS_CODES, add_exception_handlers
-from titiler.middleware import CacheControlMiddleware
+from titiler.middleware import CacheControlMiddleware, TotalTimeMiddleware
+from titiler.endpoints.factory import TilerFactory, TMSFactory
 
-from .endpoints import mosaic, cog
+from .endpoints.factory import MosaicTilerFactory
 from .cache import setup_cache
+from .settings import ApiSettings
 
+
+api_settings = ApiSettings()
 
 app = FastAPI(title="LULC Dynamic Map Tile Services", version="0.1.0")
-app.include_router(mosaic.router, prefix="/mosaic", tags=["Mosaic"])
-app.include_router(cog.router, prefix="/cog", tags=["COG"])
 
-add_exception_handlers(app, DEFAULT_STATUS_CODES)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
-app.add_middleware(VSIStatsMiddleware)
+app.add_middleware(TotalTimeMiddleware)
 app.add_middleware(BrotliMiddleware, minimum_size=0, gzip_fallback=True)
-app.add_middleware(CacheControlMiddleware, cachecontrol="public, max-age=3600")
+app.add_middleware(CacheControlMiddleware, cachecontrol=api_settings.cachecontrol)
+if api_settings.cors_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=api_settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["GET"],
+        allow_headers=["*"],
+    )
+
+if api_settings.debug:
+    app.add_middleware(VSIStatsMiddleware)
+
 app.add_event_handler("startup", setup_cache)
+add_exception_handlers(app, DEFAULT_STATUS_CODES)
+
+mosaic_endpoint = MosaicTilerFactory(router_prefix="mosaic")
+app.include_router(mosaic_endpoint.router, prefix="/mosaic", tags=["Mosaic"])
+
+cog_endpoints = TilerFactory(router_prefix="cog")
+app.include_router(cog_endpoints.router, prefix="/cog", tags=["COG"])
+
+tms_endpoint = TMSFactory()
+app.include_router(tms_endpoint.router,  tags=["TileMatrixSets"])
 
 
 @app.get("/healthz", description="Health Check", tags=["Health Check"])
