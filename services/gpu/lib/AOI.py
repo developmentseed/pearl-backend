@@ -54,6 +54,7 @@ class AOI():
         self.fabric.write(data, window=Window(col_off, row_off, 256, 256))
 
     def upload_fabric(self):
+        self.fabric.close()
         self.api.upload_aoi(self.id, self.raw_fabric)
 
     @staticmethod

@@ -726,10 +726,12 @@ async function server(config, cb) {
             const files = [];
 
             busboy.on('file', (fieldname, file, filename) => {
+                console.error('OK: ', filename);
                 files.push(aoi.upload(req.params.aoiid, file));
             });
 
             busboy.on('finish', async () => {
+                console.error('FINISH');
                 try {
                     return res.json(await aoi.get(req.params.aoiid));
                 } catch (err) {

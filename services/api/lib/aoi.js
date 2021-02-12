@@ -24,7 +24,7 @@ class AOI {
     async upload(aoiid, file) {
         if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
 
-        const blockBlobClient = this.containerClient.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
+        const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
 
         try {
             await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {

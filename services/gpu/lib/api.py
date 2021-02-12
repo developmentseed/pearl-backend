@@ -47,6 +47,7 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def create_aoi(self, bounds):
@@ -65,22 +66,26 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def upload_aoi(self, aoiid, geotiff):
         url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi/' + str(aoiid) + '/upload'
 
         LOGGER.info("ok - POST " + url)
+        encoder = MultipartEncoder(fields={'file': ('filename', geotiff, 'image/tiff')})
+
         r = requests.post(url,
             headers={
-                "authorization": "Bearer " + self.token,
-                "content-type": "application/json"
+                "Authorization": "Bearer " + self.token,
+                'Content-Type': encoder.content_type
             },
-            data = MultipartEncoder(fields={'file': ('filename', geotiff, 'image/tiff')})
+            data = encoder
         )
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def get_tilejson(self):
@@ -93,6 +98,7 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def get_tile(self, z, x, y, iformat='npy'):
@@ -104,6 +110,7 @@ class API():
         })
 
         r.raise_for_status()
+        LOGGER.info("ok - Received " + url)
 
         if iformat == 'npy':
             res = np.load(BytesIO(r.content))
@@ -132,6 +139,7 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def project_meta(self):
@@ -144,6 +152,7 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def model_meta(self):
@@ -156,6 +165,7 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def model_download(self):
