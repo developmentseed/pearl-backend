@@ -11,6 +11,7 @@ services:
             - PORT=2000
             - TileUrl=http://tiler:8000
             - Postgres=postgres://docker:docker@postgis:5432/gis
+            - AZURE_STORAGE_CONNECTION_STRING
 
     postgis:
         image: kartoza/postgis:13.0

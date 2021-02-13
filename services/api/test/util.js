@@ -77,7 +77,11 @@ class Flight {
                     t.equals(res.statusCode, 200);
 
                     t.deepEquals(body, {
-                        version: pkg.version
+                        version: pkg.version,
+                        limits: {
+                            live_inference: 1000,
+                            max_inference: 100000
+                        }
                     });
 
                     t.end();

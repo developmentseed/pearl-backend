@@ -68,7 +68,8 @@ test('api running', (t) => {
         t.equals(res.statusCode, 200);
 
         t.deepEquals(body, {
-            version: '1.0.0'
+            version: '1.0.0',
+            limits: { live_inference: 1000, max_inference: 100000 }
         });
 
         t.end();
@@ -142,13 +143,12 @@ test('new project', (t) => {
             'created',
         ], 'expected props');
 
-        t.ok(parseInt(body.id), 'id: <integer>');
         t.ok(body.created, 'created: <date>');
 
-        delete body.id,
         delete body.created;
 
         t.deepEquals(body, {
+            id: 1,
             name: 'Test Project',
         }, 'expected body');
 
