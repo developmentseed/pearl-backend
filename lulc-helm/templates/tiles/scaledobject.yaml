@@ -1,0 +1,23 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-tiles-scaler
+spec:
+  scaleTargetRef:
+    name: {{ template "lulc-helm.fullname" . }}-tiles
+  minReplicaCount: 10
+  maxReplicaCount: 50
+  triggers:
+  - type: azure-monitor
+    metadata:
+      resourceURI: Microsoft.ContainerService/managedClusters/azureMonitorCluster
+      tenantId: {{ .Values.tilesScaler.env.tenantId }}
+      subscriptionId: {{ .Values.tilesScaler.env.subscriptionId }}
+      resourceGroupName: azureMonitor
+      metricName: AvgRequestCountPerHealthyHost
+      metricFilter: BackendSettingsPool eq pool-default-lulc-test-lulc-helm-tiles-80-bp-8000~bp-default-lulc-test-lulc-helm-tiles-80-8000-lulc-test-lulc-helm-ingress
+      metricAggregationInterval: "0:1:0"
+      metricAggregationType: 'Average'
+      targetValue: "10"
+      activeDirectoryClientId: {{ .Values.tilesScaler.env.activeDirectoryClientId }}
+      activeDirectoryClientPassword: {{ .Values.tilesScaler.env.activeDirectoryClientPassword }}

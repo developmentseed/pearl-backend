@@ -38,6 +38,12 @@ az ad sp create-for-rbac --name lulc-frontend --role contributor --scopes /subsc
 az aks get-credentials --resource-group lulcStaging --name lulcStagingAks
 ```
 
+## Install KEDA on to the cluster
+```
+kubectl create namespace keda
+helm install keda kedacore/keda --namespace keda
+```
+
 ## Create an Azure Database for PostgreSQL server
 
 ```
@@ -88,7 +94,7 @@ az storage blob service-properties update --account-name lulc --static-website -
 ```
 az aks nodepool add \
     --resource-group lulcStaging \
-    --cluster-name lulcStagingAks2 \
+    --cluster-name lulcStagingAks3 \
     --name gpunodepool \
     --node-count 1 \
     --node-vm-size Standard_NC6 \
@@ -98,11 +104,11 @@ az aks nodepool add \
 ```
 az aks nodepool update \
   --resource-group lulcStaging \
-  --cluster-name lulcStagingAks2 \
+  --cluster-name lulcStagingAks3 \
   --name nodepool1 \
   --enable-cluster-autoscaler \
   --min-count 3 \
-  --max-count 5
+  --max-count 8
 ```
 # Update cluster autoscale on an node pool (if needed to change min / max)
 ```
@@ -135,3 +141,50 @@ az provider register --namespace Microsoft.ContainerService
 ```
 az aks nodepool add --name gpu --cluster-name lulcStagingAks2 --resource-group lulcStaging --node-vm-size Standard_NC6 --node-count 1 --aks-custom-headers UseGPUDedicatedVHD=true
 ```
+
+## Create and Configure Application Gateway for Ingress
+
+Enable `IngressApplicationGatewayAddon` feature (needed to be done only once per subscription):
+
+    az feature register --name AKS-IngressApplicationGatewayAddon --namespace microsoft.containerservice
+
+To check if feature registration is complete:
+
+    az feature list -o table --query "[?contains(name, 'microsoft.containerservice/AKS-IngressApplicationGatewayAddon')].{Name:name,State:properties.state}"
+
+
+Once feature is registered, you need to run:
+
+    az provider register --namespace Microsoft.ContainerService
+
+Create public IP address, Virtual Network and Application Gateway:
+
+```
+az network public-ip create -n lulcStagingPublicIp3 -g lulcStaging --allocation-method Static --sku Standard
+az network vnet create -n lulcStagingVnet3 -g lulcStaging --address-prefix 11.0.0.0/8 --subnet-name lulcStagingSubnet --subnet-prefix 11.1.0.0/16 
+az network application-gateway create -n lulcStagingApplicationGateway3 -l westeurope -g lulcStaging --sku Standard_v2 --public-ip-address lulcStagingPublicIp3 --vnet-name lulcStagingVnet --subnet lulcStagingSubnet
+```
+
+Peer Application Gateway and cluster networks:
+
+```
+nodeResourceGroup=$(az aks show -n lulcStagingAks3 -g lulcStaging -o tsv --query "nodeResourceGroup")
+
+aksVnetName=$(az network vnet list -g $nodeResourceGroup -o tsv --query "[0].name")
+
+aksVnetId=$(az network vnet show -n $aksVnetName -g $nodeResourceGroup -o tsv --query "id")
+
+az network vnet peering create -n lulcStagingAppGWtoAKSVnetPeering3 -g lulcStaging --vnet-name lulcStagingVnet3 --remote-vnet $aksVnetId --allow-vnet-access
+
+appGWVnetId=$(az network vnet show -n lulcStagingVnet3 -g lulcStaging -o tsv --query "id")
+
+az network vnet peering create -n lulcStagingAKStoAppGWVnetPeering3 -g $nodeResourceGroup --vnet-name $aksVnetName --remote-vnet $appGWVnetId --allow-vnet-access
+
+```
+## Create custom HTTP metric
+### Create service principal
+```
+az ad sp create-for-rbac -n "azure-k8s-metric-adapter-sp" --role "Monitoring Reader"
+```
+
+Supply these as Github Secrets

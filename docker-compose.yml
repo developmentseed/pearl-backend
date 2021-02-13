@@ -38,6 +38,7 @@ services:
         ports:
             - "8000:8000"
         environment:
+            - TITILER_API_DEBUG=TRUE
             - PORT=8000
             - MOSAIC_BACKEND=sqlite:///
             - MOSAIC_HOST=/tmp/data/mosaics.db

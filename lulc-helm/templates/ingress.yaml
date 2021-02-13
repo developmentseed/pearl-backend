@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-ingress
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+spec:
+  rules:
+  - host: api.{{ .Values.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ template "lulc-helm.fullname" . }}-api
+          servicePort: 80
+  - host: tiles.{{ .Values.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ template "lulc-helm.fullname" . }}-tiles
+          servicePort: 80
+  - host: socket.{{ .Values.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ template "lulc-helm.fullname" . }}-socket
+          servicePort: 80
