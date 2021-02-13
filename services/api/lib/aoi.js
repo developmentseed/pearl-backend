@@ -92,7 +92,7 @@ class AOI {
                 FROM
                     aois
                 WHERE
-                    aoi.id = $1
+                    aois.id = $1
             `, [
                 aoiid
 

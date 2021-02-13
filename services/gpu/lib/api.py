@@ -73,7 +73,12 @@ class API():
         url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi/' + str(aoiid) + '/upload'
 
         LOGGER.info("ok - POST " + url)
-        encoder = MultipartEncoder(fields={'file': ('filename', geotiff, 'image/tiff')})
+
+        geo_path = '/tmp/aoi-{}.geotiff'.format(aoiid)
+        with open(geo_path, 'wb') as filehandle:
+            filehandle.write(geotiff.read())
+
+        encoder = MultipartEncoder([('file', ('filename', open(geo_path, 'rb'), 'image/tiff'))])
 
         r = requests.post(url,
             headers={
