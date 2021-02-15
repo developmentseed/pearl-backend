@@ -85,6 +85,24 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/instance/:instanceid/aoi/:aoiid/download",
+    "title": "Download AOI",
+    "version": "1.0.0",
+    "name": "DownloadAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return the aoi fabric geotiff</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
     "url": "/api/instance/:instanceid/aoi/:aoiid",
     "title": "Get AOI",
     "version": "1.0.0",
