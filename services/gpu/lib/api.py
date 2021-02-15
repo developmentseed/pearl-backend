@@ -50,6 +50,24 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
+    def create_checkpoint(self):
+        url = self.url + '/api/instance/' + str(self.instance_id) + '/checkpoint'
+
+        LOGGER.info("ok - POST " + url)
+        r = requests.post(url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
+            },
+            data = json.dumps({
+            })
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_aoi(self, bounds):
         url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi'
 
