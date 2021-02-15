@@ -1,9 +1,6 @@
 'use strict';
 
 const Err = require('./error');
-const crypto = require('crypto');
-const { promisify } = require('util');
-const randomBytes = promisify(crypto.randomBytes);
 const jwt = require('jsonwebtoken');
 
 class Auth {
