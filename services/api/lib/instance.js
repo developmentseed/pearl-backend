@@ -21,7 +21,7 @@ class Instance {
     async list(query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
-        if (!query.page) query.page = 1;
+        if (!query.page) query.page = 0;
         if (!query.status) query.status = 'active';
 
         let WHERE = [];

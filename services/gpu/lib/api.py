@@ -1,16 +1,18 @@
 import json
 import requests
 import pyproj
-from io import BytesIO
 import numpy as np
-from os import path
 import logging
 import geojson
+import mercantile
+from os import path
+from io import BytesIO
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 from shapely.ops import transform
 from shapely.geometry import shape
 from tiletanic import tilecover, tileschemes
+from shapely.geometry import box, mapping
 from .MemRaster import MemRaster
-import mercantile
 
 LOGGER = logging.getLogger("server")
 
@@ -22,15 +24,74 @@ class API():
         self.url = url
         self.token = token
 
+        self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
 
+        self.project_id = self.instance['project_id']
         self.instance_id = instance_id
         self.model_id = self.instance['model_id']
         self.mosaic_id = self.instance['mosaic']
 
-        self.mosaic = self.get_tilejson()
         self.model = self.model_meta()
         self.model_fs = self.model_download()
+        self.mosaic = self.get_tilejson()
+        self.project = self.project_meta()
+
+    def server_meta(self):
+        url = self.url + '/api'
+
+        LOGGER.info("ok - GET " + url)
+        r = requests.get(url, headers={
+            "authorization": "Bearer " + self.token
+        })
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def create_aoi(self, bounds):
+        url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi'
+
+        LOGGER.info("ok - POST " + url)
+        r = requests.post(url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
+            },
+            data = json.dumps({
+                'bounds': mapping(box(*bounds))
+            })
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def upload_aoi(self, aoiid, geotiff):
+        url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi/' + str(aoiid) + '/upload'
+
+        LOGGER.info("ok - POST " + url)
+
+        geo_path = '/tmp/aoi-{}.geotiff'.format(aoiid)
+        with open(geo_path, 'wb') as filehandle:
+            filehandle.write(geotiff.read())
+
+        encoder = MultipartEncoder([('file', ('filename', open(geo_path, 'rb'), 'image/tiff'))])
+
+        r = requests.post(url,
+            headers={
+                "Authorization": "Bearer " + self.token,
+                'Content-Type': encoder.content_type
+            },
+            data = encoder
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
 
     def get_tilejson(self):
         url = self.url + '/api/mosaic/' + self.mosaic_id
@@ -42,27 +103,8 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
-
-    def get_tile_by_geom(self, geom, iformat='npy'):
-        poly = shape(geojson.loads(json.dumps(geom)))
-
-        project = pyproj.Transformer.from_proj(
-            pyproj.Proj('epsg:4326'),
-            pyproj.Proj('epsg:3857'),
-            always_xy=True
-        )
-
-        poly = transform(project.transform, poly)
-
-        zxys = tilecover.cover_geometry(tiler, poly, self.mosaic['maxzoom'])
-
-        rasters = []
-        for zxy in zxys:
-            rasters.append(self.get_tile(zxy.z, zxy.x, zxy.y))
-        LOGGER.info("ok - got all tiles")
-
-        return rasters
 
     def get_tile(self, z, x, y, iformat='npy'):
         url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
@@ -73,11 +115,9 @@ class API():
         })
 
         r.raise_for_status()
+        LOGGER.info("ok - Received " + url)
 
         if iformat == 'npy':
-            with open("f.npy", "wb") as f:
-                f.write(r.content)
-
             res = np.load(BytesIO(r.content))
 
             assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
@@ -87,7 +127,7 @@ class API():
             memraster = MemRaster(
                 res,
                 "epsg:3857",
-                mercantile.bounds(x, y, z)
+                (x, y, z)
             )
 
             return memraster
@@ -104,6 +144,20 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def project_meta(self):
+        url = self.url + '/api/project/' + str(self.project_id)
+
+        LOGGER.info("ok - GET " + url)
+        r = requests.get(url, headers={
+            "authorization": "Bearer " + self.token
+        })
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def model_meta(self):
@@ -116,6 +170,7 @@ class API():
 
         r.raise_for_status()
 
+        LOGGER.info("ok - Received " + url)
         return r.json()
 
     def model_download(self):

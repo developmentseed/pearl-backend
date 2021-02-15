@@ -11,6 +11,7 @@ services:
             - PORT=2000
             - TileUrl=http://tiler:8000
             - Postgres=postgres://docker:docker@postgis:5432/gis
+            - AZURE_STORAGE_CONNECTION_STRING
 
     postgis:
         image: kartoza/postgis:13.0
@@ -37,6 +38,7 @@ services:
         ports:
             - "8000:8000"
         environment:
+            - TITILER_API_DEBUG=TRUE
             - PORT=8000
             - MOSAIC_BACKEND=sqlite:///
             - MOSAIC_HOST=/tmp/data/mosaics.db

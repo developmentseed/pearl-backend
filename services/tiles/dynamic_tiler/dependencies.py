@@ -5,10 +5,10 @@ from dataclasses import dataclass
 
 from fastapi import HTTPException, Query
 
-from .settings import mosaic_settings
+from .settings import MosaicSettings
 
 
-mosaic_config = mosaic_settings()
+mosaic_settings = MosaicSettings()
 
 
 @dataclass
@@ -32,4 +32,4 @@ class MosaicParams:
         self.username = meta["username"]
         self.layername = meta["layername"]
 
-        self.url = f"{mosaic_config.backend}{mosaic_config.host}:{self.layer}"
+        self.url = f"{mosaic_settings.backend}{mosaic_settings.host}:{self.layer}"

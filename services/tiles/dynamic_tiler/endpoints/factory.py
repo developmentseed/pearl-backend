@@ -1,4 +1,4 @@
-"""Mosaic routes."""
+"""Custom Mosaic Factory."""
 
 import os
 from dataclasses import dataclass, field
@@ -14,7 +14,7 @@ from rio_tiler.io import BaseReader, COGReader
 from titiler import utils
 from titiler.endpoints.factory import BaseTilerFactory, img_endpoint_params
 from titiler.models.mapbox import TileJSON
-from titiler.ressources.enums import ImageType, PixelSelectionMethod
+from titiler.resources.enums import ImageType, PixelSelectionMethod
 from titiler.dependencies import WebMercatorTMSParams
 
 from ..dependencies import MosaicParams
@@ -196,6 +196,3 @@ class MosaicTilerFactory(BaseTilerFactory):
                 }
 
             return tjson
-
-
-router = MosaicTilerFactory(router_prefix="mosaic").router  # type: ignore

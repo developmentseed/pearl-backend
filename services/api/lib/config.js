@@ -7,8 +7,10 @@ class Config {
         }
 
         this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
+        if (this.AzureStorage) console.log('ok - AzureStorage: Enabled');
 
         this.Environment = args.prod ? 'deploy' : 'local';
+        console.log(`ok - Environment: ${this.Environment}`);
 
         this.Postgres = process.env.Postgres || args.postgres || 'postgres://postgres@localhost:5432/lulc';
 

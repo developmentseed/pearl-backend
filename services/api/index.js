@@ -8,6 +8,7 @@ const fs = require('fs');
 const Err = require('./lib/error');
 const path = require('path');
 const express = require('express');
+const Busboy = require('busboy');
 const { Param, fetchJSON } = require('./lib/util');
 const jwt = require('express-jwt');
 const jwks = require('jwks-rsa');
@@ -100,7 +101,7 @@ async function server(config, cb) {
     const model = new (require('./lib/model').Model)(pool, config);
     const instance = new (require('./lib/instance').Instance)(pool, config);
     const checkpoint = new (require('./lib/checkpoint').CheckPoint)(pool, config);
-    const aoi = new (require('./lib/aoi').Aoi)(pool, config);
+    const aoi = new (require('./lib/aoi').AOI)(pool, config);
     const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
@@ -123,15 +124,25 @@ async function server(config, cb) {
      * @apiDescription
      *     Return basic metadata about server configuration
      *
+     *     limits.live_inference: The area in metres that can be live inferenced
+     *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
      *       "version": "1.0.0"
+     *       "limits": {
+     *           "live_inference": 1000 (m^2)
+     *           "max_inference": 100000 (m^2)
+     *       }
      *   }
      */
     app.get('/api', (req, res) => {
         return res.json({
-            version: pkg.version
+            version: pkg.version,
+            limits: {
+                live_inference: 1000,
+                max_inference: 100000
+            }
         });
     });
 
@@ -218,13 +229,11 @@ async function server(config, cb) {
                         token: token
                     };
                 }
-                next();
+
+                req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
             } else {
                 return Err.respond(new Err(401, null, 'Authentication Required'), res);
             }
-        },
-        (req, res, next) => {
-            req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
         },
         (err, req, res, next) => {
             // Catch Auth0 errors
@@ -483,7 +492,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {post} /api/instance List Projects
+     * @api {post} /api/project List Projects
      * @apiVersion 1.0.0
      * @apiName ListProjects
      * @apiGroup Projects
@@ -508,6 +517,40 @@ async function server(config, cb) {
     router.get('/project', requiresAuth, async (req, res) => {
         try {
             res.json(await project.list(req.auth.uid, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:projectid Get Project
+     * @apiVersion 1.0.0
+     * @apiName GetProject
+     * @apiGroup Projects
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all information about a given project
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "name": "Test Project",
+     *       "created": "<date>"
+     *   }
+     */
+    router.get('/project/:projectid', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'projectid');
+
+        try {
+            const proj = await project.get(req.params.projectid);
+
+            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+
+            delete proj.uid;
+
+            return res.json(proj);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -619,7 +662,91 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instance/aoi List AOIs
+     * @api {get} /api/instance/:instanceid/aoi/:aoiid Get AOI
+     * @apiVersion 1.0.0
+     * @apiName GetAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all information about a given AOI
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON "}
+     *   }
+     */
+    router.get('/instance/:instanceid/aoi/:aoiid', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceid');
+        Param.int(req, res, 'aoiid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            return res.json(await aoi.get(req.params.aoiid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/instance/:instanceid/aoi/:aoiid/upload Upload AOI
+     * @apiVersion 1.0.0
+     * @apiName UploadAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Upload a new GeoTiff to the API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON "}
+     *   }
+     */
+    router.post('/instance/:instanceid/aoi/:aoiid/upload', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceid');
+        Param.int(req, res, 'aoiid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            const busboy = new Busboy({ headers: req.headers });
+
+            const files = [];
+
+            busboy.on('file', (fieldname, file, filename) => {
+                console.error('OK: ', filename);
+                files.push(aoi.upload(req.params.aoiid, file));
+            });
+
+            busboy.on('finish', async () => {
+                console.error('FINISH');
+                try {
+                    return res.json(await aoi.get(req.params.aoiid));
+                } catch (err) {
+                    Err.respond(res, err);
+                }
+            });
+
+            return req.pipe(busboy);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/instance/:instanceid/aoi List AOIs
      * @apiVersion 1.0.0
      * @apiName ListAOIs
      * @apiGroup AOI
