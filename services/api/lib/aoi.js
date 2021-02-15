@@ -46,7 +46,7 @@ class AOI {
      * @param {Object} aoi AOI Object
      * @param {Boolean} aoi.storage Has the storage been uploaded
      */
-     async patch(aoiid, aoi) {
+    async patch(aoiid, aoi) {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -73,7 +73,7 @@ class AOI {
             created: row.created,
             storage: row.storage
         };
-     }
+    }
 
     /**
      * Return a single aoi

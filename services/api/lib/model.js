@@ -83,7 +83,7 @@ class Model {
     async upload(modelid, file) {
         if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`model-${aoiid}.h5`);
+        const blockBlobClient = this.container_client.getBlockBlobClient(`model-${modelid}.h5`);
 
         try {
             await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {

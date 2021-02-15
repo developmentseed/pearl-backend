@@ -725,7 +725,7 @@ async function server(config, cb) {
 
             const files = [];
 
-            busboy.on('file', (fieldname, file, filename) => {
+            busboy.on('file', (fieldname, file) => {
                 files.push(aoi.upload(req.params.aoiid, file));
             });
 
@@ -991,13 +991,13 @@ async function server(config, cb) {
         try {
             await auth.is_admin(req);
 
-            const mdl = await model.get(req.params.modelid);
+            await model.get(req.params.modelid);
 
             const busboy = new Busboy({ headers: req.headers });
 
             const files = [];
 
-            busboy.on('file', (fieldname, file, filename) => {
+            busboy.on('file', (fieldname, file) => {
                 files.push(model.upload(req.params.modelid, file));
             });
 
