@@ -85,7 +85,34 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/instance/:instance/aoi",
+    "url": "/api/instance/:instanceid/aoi/:aoiid",
+    "title": "Get AOI",
+    "version": "1.0.0",
+    "name": "GetAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all information about a given AOI</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
+    "url": "/api/instance/:instanceid/aoi",
     "title": "List AOIs",
     "version": "1.0.0",
     "name": "ListAOIs",
@@ -125,6 +152,60 @@ define({ "api": [
         {
           "title": "Success-Response:",
           "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "post",
+    "url": "/api/instance/:instanceid/aoi/:aoiid/upload",
+    "title": "Upload AOI",
+    "version": "1.0.0",
+    "name": "UploadAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upload a new GeoTiff to the API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "post",
+    "url": "/api/model/:modelid/upload",
+    "title": "UploadModel",
+    "version": "1.0.0",
+    "name": "UploadModel",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upload a new model asset to the API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_finetunelayer\": -2,\n    \"model_numparams\": 563498,\n    \"model_inputshape\": [100,100,4],\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
           "type": "json"
         }
       ]
@@ -370,9 +451,9 @@ define({ "api": [
     "group": "Model",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
     "parameter": {
@@ -462,7 +543,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_finetunelayer\": -2,\n    \"model_numparams\": 563498,\n    \"model_inputshape\": [100,100,4],\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
           "type": "json"
         }
       ]
@@ -1114,7 +1195,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 1000\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 1000 (m^2)\n        \"max_inference\": 100000 (m^2)\n    }\n}",
           "type": "json"
         }
       ]
