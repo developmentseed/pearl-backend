@@ -47,14 +47,6 @@ class ModelSrv():
 
             LOGGER.info("ok - generated inference");
 
-            await websocket.send(json.dumps({
-                'message': 'model#prediction#progress',
-                'data': {
-                    'total': self.aoi.total,
-                    'processed': len(self.aoi.tiles)
-                }
-            }))
-
             if self.aoi.live:
                 if output.shape[2] > len(color_list):
                     LOGGER.warning("The colour list does not match class list")
@@ -70,7 +62,17 @@ class ModelSrv():
                     'message': 'model#prediction',
                     'data': {
                         'bounds': in_memraster.bounds,
-                        'image': img_soft
+                        'image': img_soft,
+                        'total': self.aoi.total,
+                        'processed': len(self.aoi.tiles)
+                    }
+                }))
+            else:
+                await websocket.send(json.dumps({
+                    'message': 'model#prediction',
+                    'data': {
+                        'total': self.aoi.total,
+                        'processed': len(self.aoi.tiles)
                     }
                 }))
 
