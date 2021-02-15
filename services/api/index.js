@@ -260,6 +260,7 @@ async function server(config, cb) {
 
                     // Create user, add to request
                     req.auth = await auth.create({
+                        access: 'user',
                         auth0Id: auth0User.sub,
                         username: auth0User.name,
                         email: auth0User.email
