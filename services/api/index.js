@@ -872,6 +872,7 @@ async function server(config, cb) {
      *       "instance_id": 123,
      *       "checkpoints": [{
      *           "id": 1432,
+     *           "name": "Checkpoint Name",
      *           "storage": true,
      *           "created": "<date>"
      *       }]
@@ -914,6 +915,8 @@ async function server(config, cb) {
      *       "id": 1432,
      *       "instance_id": 124,
      *       "storage": true,
+     *       "classes": [ ... ],
+     *       "name": "Named Checkpoint",
      *       "created": "<date>"
      *   }
      */

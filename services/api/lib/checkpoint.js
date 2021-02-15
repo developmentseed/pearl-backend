@@ -28,6 +28,7 @@ class CheckPoint {
                SELECT
                     count(*) OVER() AS count,
                     id,
+                    name,
                     instance_id,
                     created,
                     storage
@@ -54,6 +55,7 @@ class CheckPoint {
             checkpoints: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    name: row.name,
                     created: row.created,
                     storage: row.storage
                 };
@@ -74,18 +76,24 @@ class CheckPoint {
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoint (
-                    instance_id
+                    instance_id,
+                    name,
+                    classes
                 ) VALUES (
                     $1
                 ) RETURNING *
             `, [
-                instanceid
+                instanceid,
+                checkpoint.name,
+                checkpont.classes
             ]);
 
             return {
                 id: parseInt(pgres.rows[0].id),
                 instance_id: instanceid,
                 created: pgres.rows[0].created,
+                name: pgres.rows[0].name,
+                classes: pgres.rows[0].classes,
                 storage: pgres.rows[0].storage
             };
         } catch (err) {
