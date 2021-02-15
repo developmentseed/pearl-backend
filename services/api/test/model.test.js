@@ -8,7 +8,9 @@ flight.takeoff(test);
 
 let token;
 test('user', async (t) => {
-    token = (await flight.user(t)).token;
+    token = (await flight.user(t, {
+        access: 'admin'
+    })).token;
     t.end();
 });
 
@@ -115,14 +117,40 @@ test('POST /api/model', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(Object.keys(res.body).sort(), ['created', 'id'], 'body');
+        t.deepEquals(Object.keys(res.body).sort(), [ 'active', 'classes', 'created', 'id', 'meta', 'model_finetunelayer', 'model_inputshape', 'model_numparams', 'model_type', 'name', 'storage', 'uid' ], 'body');
         t.ok(res.body.id, 1, '.id: 1');
 
         t.end();
     });
 });
 
-test('GET /api/model (model)', (t) => {
+test('GET /api/model (storage: false)', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/model',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(Object.keys(res.body).sort(), ['models'], 'body');
+        t.equals(res.body.models.length, 0, '0 model');
+        t.end();
+    });
+});
+
+test('Set Storage: true', async (t) => {
+    await flight.pool.query(`
+        UPDATE models SET storage = True
+    `);
+
+    t.end();
+});
+
+test('GET /api/model (storage: true)', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000/api/model',
@@ -175,10 +203,10 @@ test('GET /api/model/1', (t) => {
             uid: 1,
             name: 'NAIP Supervised',
             model_type: 'keras_example',
+            model_inputshape: [ 240, 240, 4 ],
             model_finetunelayer: -4,
             model_numparams: 7790949,
-            model_inputshape: [ 240, 240, 4 ],
-            storage: null,
+            storage: true,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -219,7 +247,7 @@ test('GET /api/model/1', (t) => {
             model_inputshape: [ 240, 240, 4 ],
             model_finetunelayer: -4,
             model_numparams: 7790949,
-            storage: null,
+            storage: true,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },

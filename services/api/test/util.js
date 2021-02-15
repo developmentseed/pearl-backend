@@ -63,8 +63,10 @@ class Flight {
      * Create a new user & return an access token
      *
      * @param {Tape} t active tape instance to run new user creation on
+     * @param {Object} opts Options object
+     * @param {String} [opts.access=user] Should the user be user or admin
      */
-    user(t) {
+    user(t, opts = {}) {
         return new Promise((resolve, reject) => {
             t.test('api online', (t) => {
                 request({
@@ -93,6 +95,7 @@ class Flight {
                 const authtoken = new (require('../lib/auth').AuthToken)(this.pool, config);
 
                 const testUser = {
+                    access: opts.access || 'user',
                     auth0Id: 1,
                     username: 'example',
                     email: 'example@example.com'
