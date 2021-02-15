@@ -114,6 +114,7 @@ course of a session as informational messages
 | --------------------- | ----- |
 | `instance#terminate`  |       |
 | `model#prediction`    | Inference a GeoJSON polygon |
+| `model#checkpoint`    | Save a checkpoint to the Db |
 | `model#reset`         |       |
 | `model#undo`          |       |
 
@@ -122,6 +123,14 @@ course of a session as informational messages
 ```JSON
 {
     "action": "instance#terminate"
+}
+```
+
+#### model#checkpoint
+
+```JSON
+{
+    "action": "model#checkpoint"
 }
 ```
 
