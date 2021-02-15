@@ -60,12 +60,12 @@ course of a session as informational messages
 
 ### Supported Messages
 
-| Message               | Notes |
-| --------------------- | ----- |
-| `info#connection`     |       |
-| `info#disconnection`  |       |
-| `model#prediction`    | PNG Inference |
-| `error`               |       |
+| Message                       | Notes |
+| ----------------------------- | ----- |
+| `info#connection`             |       |
+| `info#disconnection`          |       |
+| `model#prediction`            | PNG Inference |
+| `error`                       |       |
 
 #### error
 
@@ -81,13 +81,29 @@ course of a session as informational messages
 
 #### model#prediction
 
+If the AOI is in live mode, the `bounds` and `image` param will be returned,
+otherwise only the `total` & `processed` tags will be returned
 
 ```json
 {
     "message": "model#prediction",
     "data": {
         "bounds": [ 1, 1, 1, 1]
-        "image": "<base64 encoded png>"
+        "image": "<base64 encoded png>",
+        "total": 123,
+        "processed": 23
+    }
+}
+```
+
+#### model#prediction#progress
+
+```json
+{
+    "message": "model#prediction",
+    "data": {
+        "total": 123,
+        "processed": 5
     }
 }
 ```
@@ -117,6 +133,7 @@ course of a session as informational messages
 | `model#checkpoint`    | Save a checkpoint to the Db |
 | `model#reset`         |       |
 | `model#undo`          |       |
+
 
 #### instance#terminate
 
