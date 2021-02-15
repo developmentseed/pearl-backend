@@ -745,6 +745,30 @@ async function server(config, cb) {
     });
 
     /**
+     * @api {get} /api/instance/:instanceid/aoi/:aoiid/download Download AOI
+     * @apiVersion 1.0.0
+     * @apiName DownloadAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return the aoi fabric geotiff
+     */
+    router.get('/api/instance/:instanceid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceeid');
+        Param.int(req, res, 'aoiid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            await aoi.download(req.params.aoiid, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/instance/:instanceid/aoi List AOIs
      * @apiVersion 1.0.0
      * @apiName ListAOIs
@@ -1139,7 +1163,6 @@ async function server(config, cb) {
             return Err.respond(err, res);
         }
     });
-
 
     /**
      * @api {get} /api/mosaic List Mosaics

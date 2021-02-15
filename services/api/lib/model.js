@@ -144,19 +144,28 @@ class Model {
         };
     }
 
-    async download(id, res) {
+    /**
+     * Download a Model Asset
+     *
+     * @param {Number} modelid Model ID to download
+     * @param {Stream} res Stream to pipe model to (usually express response object)
+     */
+    async download(modelid, res) {
         if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
 
-        const model = await this.get(id);
+        const model = await this.get(modelid);
         if (!model.storage) throw new Err(404, null, 'Model has not been uploaded');
         if (!model.active) throw new Err(410, null, 'Model is set as inactive');
 
-        const blob_client = this.container_client.getBlockBlobClient(`model-${id}.h5`);
+        const blob_client = this.container_client.getBlockBlobClient(`model-${modelid}.h5`);
         const dwn = await blob_client.download(0);
 
         dwn.readableStreamBody.pipe(res);
     }
 
+    /**
+     * Return a list of active & uploaded models
+     */
     async list() {
         let pgres;
 
@@ -172,6 +181,7 @@ class Model {
                     models
                 WHERE
                     active = true
+                    AND storage = true
             `, []);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
@@ -193,9 +203,9 @@ class Model {
     /**
       * Retrieve information about a model
       *
-      * @param {String} id Model id
+      * @param {String} modelid Model id
       */
-    async get(id) {
+    async get(modelid) {
         let pgres;
 
         try {
@@ -217,7 +227,7 @@ class Model {
                     models
                 WHERE
                     id = $1
-            `, [id]);
+            `, [modelid]);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }
@@ -243,9 +253,9 @@ class Model {
     /**
      * Set a model as inactive and unusable
      *
-     * @param {String} id Model id
+     * @param {String} modelid Model id
      */
-    async delete(id) {
+    async delete(modelid) {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -256,7 +266,7 @@ class Model {
                 WHERE
                     id = $1
                 RETURNING *
-            `, [id]);
+            `, [modelid]);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }
