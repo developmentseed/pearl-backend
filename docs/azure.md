@@ -188,3 +188,60 @@ az ad sp create-for-rbac -n "azure-k8s-metric-adapter-sp" --role "Monitoring Rea
 ```
 
 Supply these as Github Secrets
+
+
+### Setup Cert Manager for Lets Encrypt SSL Certificates
+
+```
+# install cert-manager chart (from docs.cert-manager.io)
+
+# Create the namespace for cert-manager
+kubectl create namespace cert-manager
+
+# Label the cert-manager namespace to disable resource validation
+kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
+
+# Add the Jetstack Helm repository
+helm repo add jetstack https://charts.jetstack.io
+
+# Update your local Helm chart repository cache
+helm repo update
+
+# Install the cert-manager Helm chart
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v1.1.0 \
+  --set installCRDs=true
+
+
+kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+    name: letsencrypt-prod-issuer
+spec:
+    acme:
+        # You must replace this email address with your own.
+        # Let's Encrypt will use this to contact you about expiring
+        # certificates, and issues related to your account.
+        email: sanjay@developmentseed.org
+        # ACME server URL for Let’s Encrypt’s staging environment.
+        # The staging environment will not issue trusted certificates but is
+        # used to ensure that the verification process is working properly
+        # before moving to production
+        server: https://acme-v02.api.letsencrypt.org/directory
+        privateKeySecretRef:
+        # Secret resource used to store the account's private key.
+            name: letsencrypt-issuer-key
+        # Enable the HTTP-01 challenge provider
+        # you prove ownership of a domain by ensuring that a particular
+        # file is present at the domain
+        solvers:
+        - http01:
+            ingress:
+                class: azure/application-gateway
+EOF
+
+
+```

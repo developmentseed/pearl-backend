@@ -1,5 +1,6 @@
 environment: dev
 domain: lulc.ds.io
+adminEmail: sanjay@developmentseed.org
 api:
   enabled: true
   replicaCount: 1
