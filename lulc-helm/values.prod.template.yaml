@@ -1,19 +1,35 @@
 environment: prod
+domain: lulc-staging.ds.io
 api:
   enabled: true
   replicaCount: 1
   containerPort: 2000
   env:
-    SigningSecret: {{PRODUCTION_SIGNING_SECRET}}
+    SigningSecret: {{STAGING_SIGNING_SECRET}}
     Postgres: {{PRODUCTION_POSTGRES}}
 socket:
   enabled: true
   containerPort: 1999
 tiles:
   enabled: true
-  replicaCount: 1
+  replicaCount: 4
   containerPort: 8000
   env:
-    Backends: {{PRODUCTION_MOSAIC_BACKEND}}
-    Host: {{PRODUCTION_MOSAIC_HOST}}
+    Backends: {{STAGING_MOSAIC_BACKEND}}
+    Host: {{STAGING_MOSAIC_HOST}}
     WebConcurrency: 2
+tilesScaler:
+  env:
+    tenantId: {{STAGING_TENANT_ID}}
+    subscriptionId: {{STAGING_SUBSCRIPTION_ID}}
+    resourceGroupName: {{CLUSTER_RESOURCE_GROUP}}
+    activeDirectoryClientId: {{STAGING_CLIENT_ID}}
+    activeDirectoryClientPassword: {{STAGING_CLIENT_SECRET}}
+ingress-azure:
+  appgw:
+    subscriptionId: {{STAGING_APPGW_SUBSCRIPTION_ID}}
+    resourceGroup: {{STAGING_APPGW_RESOURCE_GROUP}}
+    name: {{STAGING_APPGW_NAME}}
+  armAuth:
+     type: servicePrincipal
+     secretJSON: {{STAGING_SERVICE_PRINCIPAL_BASE64}}

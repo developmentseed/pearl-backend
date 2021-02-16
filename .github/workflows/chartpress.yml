@@ -34,8 +34,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
 
-    - name: Staging / Test - substitute secrets
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
+    - name: Test - substitute secrets
+      if: startsWith(github.event.head_commit.message, '[deploy]')
       uses: bluwy/substitute-string-action@v1
       with:
         _input-file: './lulc-helm/values.dev.template.yaml'
@@ -55,8 +55,29 @@ jobs:
         STAGING_CLIENT_ID: ${{ secrets.STAGING_CLIENT_ID }}
         STAGING_CLIENT_SECRET: ${{ secrets.STAGING_CLIENT_SECRET }}
 
+    - name: Staging - substitute secrets
+      if: github.ref == 'refs/heads/main'
+      uses: bluwy/substitute-string-action@v1
+      with:
+        _input-file: './lulc-helm/values.prod.template.yaml'
+        _format-key: '{{key}}'
+        _output-file: './lulc-helm/values.prod.yaml'
+        STAGING_SIGNING_SECRET: ${{ secrets.STAGING_SIGNING_SECRET }}
+        STAGING_POSTGRES: ${{ secrets.PRODUCTION_POSTGRES }}
+        STAGING_MOSAIC_BACKEND: ${{ env.STAGING_MOSAIC_BACKEND }}
+        STAGING_MOSAIC_HOST: ${{ env.STAGING_MOSAIC_HOST }}
+        STAGING_APPGW_SUBSCRIPTION_ID: ${{ secrets.STAGING_APPGW_SUBSCRIPTION_ID }}
+        STAGING_APPGW_RESOURCE_GROUP: ${{ env.CLUSTER_RESOURCE_GROUP }}
+        STAGING_APPGW_NAME: ${{ env.STAGING_APPGW_NAME }}
+        STAGING_SERVICE_PRINCIPAL_BASE64: ${{ secrets.STAGING_SERVICE_PRINCIPAL_BASE64 }}
+        STAGING_TENANT_ID: $${{ secrets.STAGING_TENANT_ID }}
+        STAGING_SUBSCRIPTION_ID: ${{ secrets.STAGING_APPGW_SUBSCRIPTION_ID }}
+        CLUSTER_RESOURCE_GROUP: ${{ env.CLUSTER_RESOURCE_GROUP }}
+        STAGING_CLIENT_ID: ${{ secrets.STAGING_CLIENT_ID }}
+        STAGING_CLIENT_SECRET: ${{ secrets.STAGING_CLIENT_SECRET }}
+
     - name: Staging / Test — set AKS context
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
+      if: github.ref == 'refs/heads/main' || startsWith(github.event.head_commit.message, '[deploy]')
       uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
@@ -64,7 +85,7 @@ jobs:
         resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
 
     - name: Staging / Test - create image pull secret for ACR
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging' || startsWith(github.event.head_commit.message, '[deploy]')
+      if: github.ref == 'refs/heads/main' || startsWith(github.event.head_commit.message, '[deploy]')
       uses: azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
@@ -74,13 +95,13 @@ jobs:
         namespace: ${{ env.NAMESPACE }}
 
     - name: Staging — bake manifest
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
+      if: github.ref == 'refs/heads/main'
       uses: azure/k8s-bake@v1
       with:
         renderEngine: 'helm'
         helmChart: './lulc-helm/'
         releaseName: lulc-staging
-        overrideFiles: './lulc-helm/values.dev.yaml'
+        overrideFiles: './lulc-helm/values.prod.yaml'
         helm-version: 'latest'
       id: staging-bake
 
@@ -98,7 +119,7 @@ jobs:
     # Deploy app to staging AKS
     - name: Staging - deploy
       uses: azure/k8s-deploy@v1
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
+      if: github.ref == 'refs/heads/main'
       with:
         manifests: ${{ steps.staging-bake.outputs.manifestsBundle }}
         imagepullsecrets: |
