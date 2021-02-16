@@ -1,5 +1,6 @@
 environment: dev
 domain: lulc.ds.io
+adminEmail: sanjay@developmentseed.org
 api:
   enabled: true
   replicaCount: 1
@@ -15,7 +16,7 @@ socket:
     tag: 'chartpress_replace'
 tiles:
   enabled: true
-  replicaCount: 14
+  replicaCount: 4
   containerPort: 8000
   image:
     name: 'chartpress_replace'
@@ -26,8 +27,8 @@ tiles:
     label_value: nodepool1
   resources:
     limits:
-      cpu: 4
-      memory: 8Gi
+      cpu: 1
+      memory: 2Gi
     requests:
       cpu: 2
       memory: 4Gi

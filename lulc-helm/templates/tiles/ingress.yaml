@@ -1,0 +1,22 @@
+{{- if .Values.tiles.enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-ingress-tiles
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    cert-manager.io/cluster-issuer: letsencrypt-prod-issuer
+spec:
+  tls:
+    - hosts:
+      - tiles.{{ .Values.domain }}
+      secretName: {{ template "lulc-helm.fullname" . }}-secret-tiles
+
+  rules:
+  - host: tiles.{{ .Values.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ template "lulc-helm.fullname" . }}-tiles
+          servicePort: 80
+{{- end }}
