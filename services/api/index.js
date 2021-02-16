@@ -700,7 +700,7 @@ async function server(config, cb) {
      * @apiVersion 1.0.0
      * @apiName UploadAOI
      * @apiGroup AOI
-     * @apiPermission user
+     * @apiPermission admin
      *
      * @apiDescription
      *     Upload a new GeoTiff to the API
@@ -719,8 +719,7 @@ async function server(config, cb) {
         Param.int(req, res, 'aoiid');
 
         try {
-            const inst = await instance.get(req.params.instanceid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+            await auth.is_admin(req);
 
             const busboy = new Busboy({ headers: req.headers });
 
@@ -890,6 +889,79 @@ async function server(config, cb) {
             }
         }
     );
+
+    /**
+     * @api {post} /api/instance/:instanceid/checkpoint/:checkpointid/upload Upload Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName UploadCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Upload a new checkpoint asset to the API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "name": "Checkpoint Name",
+     *       "classes": [ ... ],
+     *       "storage": true,
+     *       "created": "<date>"
+     *   }
+     */
+    router.post('/api/instance/:instanceid/checkpoint/:checkpointid/upload', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceid');
+        Param.int(req, res, 'checkpointid');
+
+        try {
+            await auth.is_admin(req);
+
+            const busboy = new Busboy({ headers: req.headers });
+
+            const files = [];
+
+            busboy.on('file', (fieldname, file) => {
+                files.push(model.upload(req.params.checkpointid, file));
+            });
+
+            busboy.on('finish', async () => {
+                try {
+                    return res.json(await checkpoint.get(req.params.checkpointid));
+                } catch (err) {
+                    Err.respond(res, err);
+                }
+            });
+
+            return req.pipe(busboy);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/instance/:instanceid/checkpoint/:checkpointid/download Download Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName DownloadCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Download a checkpoint asset from the API
+     */
+    router.get('/api/instance/:instanceid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceid');
+        Param.int(req, res, 'checkpointid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            await checkpoint.download(req.params.checkpointid, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/instance/:instanceid/checkpoint List Checkpoints

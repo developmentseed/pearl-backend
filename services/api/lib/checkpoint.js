@@ -6,6 +6,12 @@ class CheckPoint {
     constructor(pool, config) {
         this.pool = pool;
         this.config = config;
+
+        // don't access these services unless AzureStorage is truthy
+        if (this.config.AzureStorage) {
+            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
+            this.container_client = this.blob_client.getContainerClient('checkpoints');
+        }
     }
 
     /**
@@ -61,6 +67,87 @@ class CheckPoint {
                 };
             })
         };
+    }
+
+    /**
+     * Upload a Checkpoint and mark the Checkpoint storage property as true
+     *
+     * @param {Number} checkpointid Checkpoint ID to upload to
+     * @param {Object} file File stream to upload
+     */
+    async upload(checkpointid, file) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'Checkpoint storage not configured');
+
+        const blockBlobClient = this.container_client.getBlockBlobClient(`checkpoint-${checkpointid}`);
+
+        try {
+            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
+                blobHTTPHeaders: { blobContentType: 'application/octet-stream' }
+            });
+        } catch (err) {
+            throw new Err(500, err, 'Failed to uploda Checkpoint');
+        }
+
+        return await this.patch(checkpointid, {
+            storage: true
+        });
+    }
+
+    /**
+     * Download a Checkpoint Asset
+     *
+     * @param {Number} checkpointid Checkpoint ID to download
+     * @param {Stream} res Stream to pipe model to (usually express response object)
+     */
+    async download(checkpointid, res) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
+
+        const checkpoint = await this.get(checkpointid);
+        if (!checkpoint.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+
+        const blob_client = this.container_client.getBlockBlobClient(`checkpoint-${checkpointid}`);
+        const dwn = await blob_client.download(0);
+
+        dwn.readableStreamBody.pipe(res);
+    }
+
+    /**
+     * Update Model Properties
+     *
+     * @param {Number} modelid - Specific Model id
+     * @param {Object} model - Model Object
+     * @param {Boolean} model.storage Has the storage been uploaded
+     */
+    async patch(modelid, model) {
+        let pgres;
+
+        try {
+            pgres = await this.pool.query(`
+                UPDATE checkpoints
+                    SET
+                        storage = COALESCE($2, storage)
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [
+                checkpoint,
+                checkpoint.storage
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to update Checkpoint');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
+
+        const row = pgres.rows[0];
+
+        return {
+            id: parseInt(row.id),
+            name: row.name,
+            classes: row.classes,
+            created: row.created,
+            storage: row.storage
+        }
     }
 
     /**
