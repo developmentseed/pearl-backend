@@ -20,7 +20,7 @@ class Config {
 
         this.Port = args.port || 2000;
 
-        this.Auth0IssuerBaseUrl = process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-h6v8jbhz.us.auth0.com';
+        this.Auth0IssuerBaseUrl = process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-y5qeoqlh.us.auth0.com';
 
         this.BaseUrl = `http://localhost:${this.Port}`;
 
