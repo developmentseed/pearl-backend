@@ -6,8 +6,8 @@ metadata:
 spec:
   scaleTargetRef:
     name: {{ template "lulc-helm.fullname" . }}-tiles
-  minReplicaCount: 6
-  maxReplicaCount: 6
+  minReplicaCount: 4
+  maxReplicaCount: 4
   triggers:
   - type: azure-monitor
     metadata:

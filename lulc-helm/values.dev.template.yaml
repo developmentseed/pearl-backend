@@ -11,7 +11,7 @@ socket:
   containerPort: 1999
 tiles:
   enabled: true
-  replicaCount: 8
+  replicaCount: 4
   containerPort: 8000
   env:
     Backends: {{STAGING_MOSAIC_BACKEND}}
