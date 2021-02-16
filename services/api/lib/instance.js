@@ -2,7 +2,8 @@
 
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
-
+const { Kube } = require('./kube');
+const kube = new Kube('default');
 class Instance {
     constructor(pool, config) {
         this.pool = pool;
@@ -109,10 +110,22 @@ class Instance {
                 i: parseInt(pgres.rows[0].id)
             }, this.config.SigningSecret, { expiresIn: '12h' });
 
+            const instanceId = parseInt(pgres.rows[0].id)
+            const podSpec = kube.makePodSpec(instanceId, {
+                'INSTANCE_ID': instanceId,
+                'API': 'https://api.lulc.ds.io',
+                'SOCKET': 'https://socket.lulc.ds.io'
+            });
+            console.log('podSpec', JSON.stringify(podSpec));
+            const pod = await kube.createPod(podSpec);
+
             return {
                 id: parseInt(pgres.rows[0].id),
                 created: pgres.rows[0].created,
-                token: token
+                model_id: parseInt(pgres.rows[0].model_id),
+                token: token,
+                mosaic: pgres.rows[0].mosaic,
+                pod: pod
             };
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');
