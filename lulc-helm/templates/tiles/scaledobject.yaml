@@ -1,3 +1,4 @@
+{{- if .Values.tiles.enabled }}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
@@ -21,3 +22,4 @@ spec:
       targetValue: "10"
       activeDirectoryClientId: {{ .Values.tilesScaler.env.activeDirectoryClientId }}
       activeDirectoryClientPassword: {{ .Values.tilesScaler.env.activeDirectoryClientPassword }}
+{{- end }}
