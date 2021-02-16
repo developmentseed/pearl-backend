@@ -1,6 +1,6 @@
 environment: dev
 api:
-  enabled: false
+  enabled: true
   replicaCount: 1
   containerPort: 2000
   env:
