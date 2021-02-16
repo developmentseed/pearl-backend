@@ -126,18 +126,28 @@ otherwise only the `total` & `processed` tags will be returned
 
 ### Supported Actions
 
-| Action                        | Notes |
-| ----------------------------- | ----- |
-| `instance#terminate`          |       |
-| `model#prediction`            | Inference a GeoJSON polygon |
-| `model#reset`                 |       |
-| `model#undo`                  |       |
+| Action                | Notes |
+| --------------------- | ----- |
+| `instance#terminate`  |       |
+| `model#prediction`    | Inference a GeoJSON polygon |
+| `model#checkpoint`    | Save a checkpoint to the Db |
+| `model#reset`         |       |
+| `model#undo`          |       |
+
 
 #### instance#terminate
 
 ```JSON
 {
     "action": "instance#terminate"
+}
+```
+
+#### model#checkpoint
+
+```JSON
+{
+    "action": "model#checkpoint"
 }
 ```
 

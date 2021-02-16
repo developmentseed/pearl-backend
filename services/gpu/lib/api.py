@@ -50,6 +50,50 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
+    def create_checkpoint(self, name, classes):
+        url = self.url + '/api/instance/' + str(self.instance_id) + '/checkpoint'
+
+        LOGGER.info("ok - POST " + url)
+        r = requests.post(url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
+            },
+            data = json.dumps({
+                'name': name,
+                'classes': classes
+            })
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def upload_checkpoint(self, checkpointid):
+        url = self.url + '/api/instance/' + str(self.instance_id) + '/checkpoint/' + str(checkpointid) + '/upload'
+
+        LOGGER.info("ok - POST " + url)
+
+        geo_path = '/tmp/aoi-{}.geotiff'.format(aoiid)
+        with open(geo_path, 'wb') as filehandle:
+            filehandle.write(geotiff.read())
+
+        encoder = MultipartEncoder([('file', ('filename', open(geo_path, 'rb'), 'image/tiff'))])
+
+        r = requests.post(url,
+            headers={
+                "Authorization": "Bearer " + self.token,
+                'Content-Type': encoder.content_type
+            },
+            data = encoder
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_aoi(self, bounds):
         url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi'
 

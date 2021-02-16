@@ -76,34 +76,6 @@ def record_correction():
     return json.dumps(result)
 
 
-def pred_patch():
-    input_raster = current_data_loader.get_data_from_extent(extent)
-    current_session.latest_input_raster = input_raster
-
-    output_raster = current_session.pred_patch(input_raster) # run inference
-    warped_output_raster = warp_data_to_3857(output_raster) # warp output to 3857
-    cropped_warped_output_raster = crop_data_by_extent(warped_output_raster, extent) # crop to the desired result
-
-    if cropped_warped_output_raster.shape[2] > len(color_list):
-       LOGGER.warning("The number of output channels is larger than the given color list, cropping output to number of colors (you probably don't want this to happen")
-       cropped_warped_output_raster.data = cropped_warped_output_raster.data[:,:,:len(color_list)]
-
-
-    # Create color versions of predictions
-    img_soft = class_prediction_to_img(cropped_warped_output_raster.data, False, color_list)
-    img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
-    img_soft = base64.b64encode(img_soft).decode("utf-8")
-    data["output_soft"] = img_soft
-
-    img_hard = class_prediction_to_img(cropped_warped_output_raster.data, True, color_list)
-    img_hard = cv2.imencode(".png", cv2.cvtColor(img_hard, cv2.COLOR_RGB2BGR))[1].tostring()
-    img_hard = base64.b64encode(img_hard).decode("utf-8")
-    data["output_hard"] = img_hard
-
-    bottle.response.status = 200
-    return json.dumps(data)
-
-
 def pred_tile():
     # Inputs
     geom = data["polygon"]

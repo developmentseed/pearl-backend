@@ -1,7 +1,15 @@
 {
     "type": "object",
-    "required": [],
+    "required": [
+        "name",
+        "classes"
+    ],
     "additionalProperties": false,
     "properties": {
+        "name": {
+            "type": "string"
+        },
+        "classes": {
+        }
     }
 }

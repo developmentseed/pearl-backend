@@ -124,7 +124,7 @@ class Model {
             throw new Err(500, new Error(err), 'Failed to update Model');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+        if (!pgres.rows.length) throw new Err(404, null, 'Model not found');
 
         const row = pgres.rows[0];
 

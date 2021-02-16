@@ -53,10 +53,11 @@ See the main README for how to view API documentation once generated
 
 A basic blob storage resource must be created with the following containers:
 
-| Container | Notes |
-| --------- | ----- |
-| `models`  | Storage of raw base model data |
-| `aois`  | Storage of aoi tiff fabrics |
+| Container     | Notes                             |
+| ------------- | --------------------------------- |
+| `models`      | Storage of raw base model data    |
+| `aois`        | Storage of aoi tiff fabrics       |
+| `checkpoints` | Storage of Model Checkpoints      |
 
 Notes:
 

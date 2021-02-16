@@ -62,6 +62,10 @@ CREATE TABLE IF NOT EXISTS aois (
 
 CREATE TABLE IF NOT EXISTS checkpoints (
     id          BIGSERIAL PRIMARY KEY,
+
+    name        TEXT NOT NULL,
+    classes     JSONB,
+
     instance_id BIGINT NOT NULL,
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
     storage     BOOLEAN NOT NULL DEFAULT False

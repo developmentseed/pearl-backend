@@ -121,48 +121,9 @@ class Session():
 
         return self.model.save_state_to(directory)
 
-    def add_entry(self, data):
-        # data = data.copy()
-        # data["time"] = datetime.datetime.now()
-        # data["current_snapshot_index"] = self.current_snapshot_idx
-        # current_request_counter = self.current_request_counter.increment()
-        # data["current_request_index"] = current_request_counter
-
-        # assert "experiment" in data
-
-        # if self.storage_type == "file":
-        #     self.request_list.append(data)
-        
-        # elif self.storage_type == "table":
-
-        #     data["PartitionKey"] = self.current_snapshot_string
-        #     data["RowKey"] = "%s_%d" % (data["experiment"], current_request_counter)
-
-        #     for k in data.keys():
-        #         if isinstance(data[k], dict) or isinstance(data[k], list):
-        #             data[k] = json.dumps(data[k])
-            
-        #     try:
-        #         self.table_service.insert_entity("webtoolinteractions", data)
-        #     except Exception as e:
-        #         LOGGER.error(e)
-        # else:
-        #     # The storage_type / --storage_path command line args were not set
-        #     pass
-        pass
-
-    def pred_patch(self, input_raster):
-        output = self.model.run(input_raster.data, False)
-        assert input_raster.shape[0] == output.shape[0] and input_raster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
-
-        return InMemoryRaster(output, input_raster.crs, input_raster.transform, input_raster.bounds)
-
     def pred_tile(self, input_raster):
         output = self.model.run(input_raster.data, True)
         assert input_raster.shape[0] == output.shape[0] and input_raster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
 
         return InMemoryRaster(output, input_raster.crs, input_raster.transform, input_raster.bounds)
-
-    def download_all(self):
-        pass
 

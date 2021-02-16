@@ -71,11 +71,31 @@
       }
     ],
     "description": "<p>Create a new Checkpoint during an instance Note: this is an internal API that is called by the websocket GPU</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Unknown",
+            "optional": false,
+            "field": "classes",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -233,7 +253,34 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instance/aoi",
+    "url": "/api/instance/:instanceid/checkpoint/:checkpointid",
+    "title": "Get Checkpoint",
+    "version": "1.0.0",
+    "name": "GetCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a given checkpoint for a given instance</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "get",
+    "url": "/api/instance/:instanceid/checkpoint",
     "title": "List Checkpoints",
     "version": "1.0.0",
     "name": "ListCheckpoints",
@@ -272,7 +319,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
           "type": "json"
         }
       ]
