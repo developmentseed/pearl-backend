@@ -32,6 +32,13 @@ spec:
             httpGet:
               path: /health/
               port: {{ .Values.socket.containerPort }}
+          resources:
+            requests:
+              cpu: {{ .Values.socket.requests.cpu }}
+              memory: {{ .Values.socket.requests.memory }}
+            limits:
+              cpu: {{ .Values.socket.limits.cpu }}
+              memory: {{ .Values.socket.limits.memory }}
           env:
             - name: SigningSecret
               value: {{ .Values.api.env.SigningSecret }}
