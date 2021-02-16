@@ -34,9 +34,12 @@ spec:
               path: /api/
               port: {{ .Values.api.containerPort }}
           resources:
+            requests:
+              cpu: {{ .Values.api.resources.requests.cpu }}
+              memory: {{ .Values.api.resources.requests.memory }}
             limits:
-              cpu: 2
-              memory: 4Gi
+              cpu: {{ .Values.api.resources.limits.cpu }}
+              memory: {{ .Values.api.resources.limits.memory }}
           env:
             - name: SigningSecret
               value: {{ .Values.api.env.SigningSecret }}
