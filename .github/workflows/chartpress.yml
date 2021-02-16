@@ -63,7 +63,7 @@ jobs:
         _format-key: '{{key}}'
         _output-file: './lulc-helm/values.prod.yaml'
         STAGING_SIGNING_SECRET: ${{ secrets.STAGING_SIGNING_SECRET }}
-        STAGING_POSTGRES: ${{ secrets.PRODUCTION_POSTGRES }}
+        PRODUCTION_POSTGRES: ${{ secrets.PRODUCTION_POSTGRES }}
         STAGING_MOSAIC_BACKEND: ${{ env.STAGING_MOSAIC_BACKEND }}
         STAGING_MOSAIC_HOST: ${{ env.STAGING_MOSAIC_HOST }}
         STAGING_APPGW_SUBSCRIPTION_ID: ${{ secrets.STAGING_APPGW_SUBSCRIPTION_ID }}
