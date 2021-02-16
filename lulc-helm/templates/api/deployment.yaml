@@ -35,7 +35,8 @@ spec:
               port: {{ .Values.api.containerPort }}
           resources:
             limits:
-              nvidia.com/gpu: 1
+              cpu: 2
+              memory: 4Gi
           env:
             - name: SigningSecret
               value: {{ .Values.api.env.SigningSecret }}
