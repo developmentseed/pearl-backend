@@ -34,11 +34,11 @@ spec:
               port: {{ .Values.socket.containerPort }}
           resources:
             requests:
-              cpu: {{ .Values.socket.requests.cpu }}
-              memory: {{ .Values.socket.requests.memory }}
+              cpu: {{ .Values.socket.resources.requests.cpu }}
+              memory: {{ .Values.socket.resources.requests.memory }}
             limits:
-              cpu: {{ .Values.socket.limits.cpu }}
-              memory: {{ .Values.socket.limits.memory }}
+              cpu: {{ .Values.socket.resources.limits.cpu }}
+              memory: {{ .Values.socket.resources.limits.memory }}
           env:
             - name: SigningSecret
               value: {{ .Values.api.env.SigningSecret }}

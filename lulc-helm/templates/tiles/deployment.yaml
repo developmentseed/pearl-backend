@@ -36,12 +36,13 @@ spec:
             httpGet:
               path: /healthz
               port: {{ .Values.tiles.containerPort }}
+          resources:
             requests:
-              cpu: {{ .Values.tiles.requests.cpu }}
-              memory: {{ .Values.tiles.requests.memory }}
+              cpu: {{ .Values.tiles.resources.requests.cpu }}
+              memory: {{ .Values.tiles.resources.requests.memory }}
             limits:
-              cpu: {{ .Values.tiles.limits.cpu }}
-              memory: {{ .Values.tiles.limits.memory }}
+              cpu: {{ .Values.tiles.resources.limits.cpu }}
+              memory: {{ .Values.tiles.resources.limits.memory }}
           env:
             - name: PORT
               value: {{ .Values.tiles.containerPort | quote }}
