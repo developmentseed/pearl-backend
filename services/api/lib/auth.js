@@ -127,7 +127,7 @@ class Auth {
         };
     }
 
-    async user(uid) {
+    async user(uid, idField = 'id') {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -140,7 +140,7 @@ class Auth {
                 FROM
                     users
                 WHERE
-                    id = $1
+                    ${idField} = $1
             `, [
                 uid
             ]);
