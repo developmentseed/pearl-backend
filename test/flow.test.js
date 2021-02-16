@@ -37,13 +37,14 @@ test('pre-run', async (t) => {
 
         const auth = new (require('../services/api/lib/auth').Auth)(pool);
         const authtoken = new (require('../services/api/lib/auth').AuthToken)(pool, config);
-        const testUser = {
+
+        const user = await auth.create({
+            access: 'admin',
             username: 'example',
             email: 'example@example.com',
             auth0Id: 0
-        };
+        });
 
-        const user = await auth.create(testUser);
         token = (await authtoken.generate({
             type: 'auth0',
             uid: 1
@@ -105,8 +106,7 @@ test('new model', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(Object.keys(body), [
-            'id',
-            'created'
+            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_finetunelayer', 'model_numparams', 'model_inputshape', 'storage', 'classes', 'meta'
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
@@ -115,6 +115,21 @@ test('new model', (t) => {
         delete body.id;
 
         t.deepEquals(body, {
+            active: true,
+            uid: 1,
+            name: 'NAIP Supervised',
+            model_type: 'keras_example',
+            model_finetunelayer: -4,
+            model_numparams: 7790949,
+            model_inputshape: [ 240, 240, 4 ],
+            storage: null,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            meta: {}
         }, 'expected body');
 
         t.end();

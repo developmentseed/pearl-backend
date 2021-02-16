@@ -22,7 +22,7 @@ class AOI {
      * @param {Object} file File Stream to upload
      */
     async upload(aoiid, file) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
+        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
 
         const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
 
@@ -40,13 +40,32 @@ class AOI {
     }
 
     /**
+     * Download an AOI geotiff fabric
+     *
+     * @param {Number} aoiid AOI ID to download
+     * @param {Stream} res Stream to pipe geotiff to (usually express response object)
+     */
+    async download(aoiid, res) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
+
+        const aoi = await this.get(aoiid);
+        if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
+        const dwn = await blob_client.download(0);
+
+        dwn.readableStreamBody.pipe(res);
+    }
+
+
+    /**
      * Update AOI properties
      *
      * @param {Number} aoiid - Specific AOI id
      * @param {Object} aoi AOI Object
      * @param {Boolean} aoi.storage Has the storage been uploaded
      */
-     async patch(aoiid, aoi) {
+    async patch(aoiid, aoi) {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -73,7 +92,7 @@ class AOI {
             created: row.created,
             storage: row.storage
         };
-     }
+    }
 
     /**
      * Return a single aoi

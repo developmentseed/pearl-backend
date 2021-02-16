@@ -260,6 +260,7 @@ async function server(config, cb) {
 
                     // Create user, add to request
                     req.auth = await auth.create({
+                        access: 'user',
                         auth0Id: auth0User.sub,
                         username: auth0User.name,
                         email: auth0User.email
@@ -725,8 +726,7 @@ async function server(config, cb) {
 
             const files = [];
 
-            busboy.on('file', (fieldname, file, filename) => {
-                console.error('OK: ', filename);
+            busboy.on('file', (fieldname, file) => {
                 files.push(aoi.upload(req.params.aoiid, file));
             });
 
@@ -740,6 +740,30 @@ async function server(config, cb) {
             });
 
             return req.pipe(busboy);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/instance/:instanceid/aoi/:aoiid/download Download AOI
+     * @apiVersion 1.0.0
+     * @apiName DownloadAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return the aoi fabric geotiff
+     */
+    router.get('/api/instance/:instanceid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'instanceeid');
+        Param.int(req, res, 'aoiid');
+
+        try {
+            const inst = await instance.get(req.params.instanceid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+            await aoi.download(req.params.aoiid, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -916,7 +940,7 @@ async function server(config, cb) {
      * @apiVersion 1.0.0
      * @apiName CreateModel
      * @apiGroup Model
-     * @apiPermission user
+     * @apiPermission admin
      *
      * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
      *
@@ -927,7 +951,19 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1,
-     *       "created": "<date>"
+     *       "created": "<date>",
+     *       "active": true,
+     *       "uid": 1,
+     *       "name": "HCMC Sentinel 2019 Unsupervised",
+     *       "model_type": "keras_example",
+     *       "model_finetunelayer": -2,
+     *       "model_numparams": 563498,
+     *       "model_inputshape": [100,100,4],
+     *       "storage": true,
+     *       "classes": [
+     *           {"name": "Water", "color": "#0000FF"},
+     *       ],
+     *       "meta": {}
      *   }
      */
     router.post(
@@ -936,12 +972,73 @@ async function server(config, cb) {
         validate({ body: require('./schema/model.json') }),
         async (req, res) => {
             try {
+                await auth.is_admin(req);
+
                 res.json(await model.create(req.body, req.auth));
             } catch (err) {
                 return Err.respond(err, res);
             }
         }
     );
+
+    /**
+     * @api {post} /api/model/:modelid/upload UploadModel
+     * @apiVersion 1.0.0
+     * @apiName UploadModel
+     * @apiGroup AOI
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Upload a new model asset to the API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "created": "<date>",
+     *       "active": true,
+     *       "uid": 1,
+     *       "name": "HCMC Sentinel 2019 Unsupervised",
+     *       "model_type": "keras_example",
+     *       "model_finetunelayer": -2,
+     *       "model_numparams": 563498,
+     *       "model_inputshape": [100,100,4],
+     *       "storage": true,
+     *       "classes": [
+     *           {"name": "Water", "color": "#0000FF"},
+     *       ],
+     *       "meta": {}
+     *   }
+     */
+    router.post('/api/model/:modelid/upload', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'modelid');
+
+        try {
+            await auth.is_admin(req);
+
+            await model.get(req.params.modelid);
+
+            const busboy = new Busboy({ headers: req.headers });
+
+            const files = [];
+
+            busboy.on('file', (fieldname, file) => {
+                files.push(model.upload(req.params.modelid, file));
+            });
+
+            busboy.on('finish', async () => {
+                try {
+                    return res.json(await model.get(req.params.modelid));
+                } catch (err) {
+                    Err.respond(res, err);
+                }
+            });
+
+            return req.pipe(busboy);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/model List Models
@@ -1067,7 +1164,6 @@ async function server(config, cb) {
             return Err.respond(err, res);
         }
     });
-
 
     /**
      * @api {get} /api/mosaic List Mosaics

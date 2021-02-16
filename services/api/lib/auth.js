@@ -1,9 +1,6 @@
 'use strict';
 
 const Err = require('./error');
-const crypto = require('crypto');
-const { promisify } = require('util');
-const randomBytes = promisify(crypto.randomBytes);
 const jwt = require('jsonwebtoken');
 
 class Auth {
@@ -66,7 +63,7 @@ class Auth {
         const row = pgres.rows[0];
 
         return {
-            id: parseInt(row.id),
+            uid: parseInt(row.id),
             username: row.username,
             email: row.email,
             access: row.access,
@@ -130,7 +127,7 @@ class Auth {
         };
     }
 
-    async user(uid, idField = 'id') {
+    async user(uid) {
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -143,7 +140,7 @@ class Auth {
                 FROM
                     users
                 WHERE
-                    ${idField} = $1
+                    id = $1
             `, [
                 uid
             ]);
@@ -167,11 +164,13 @@ class Auth {
     async create(user) {
         if (!user.username) throw new Err(400, null, 'username required');
         if (!user.email) throw new Err(400, null, 'email required');
+        if (!user.access) user.access = 'user';
 
         if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
+        let pgres;
         try {
-            await this.pool.query(`
+            pgres = await this.pool.query(`
                     INSERT INTO users (
                         username,
                         email,
@@ -182,13 +181,14 @@ class Auth {
                         $1,
                         $2,
                         $3,
-                        'user',
+                        $4,
                         '{}'::JSONB
-                    )
+                    ) RETURNING *
                 `, [
                 user.username,
                 user.email,
-                user.auth0Id
+                user.auth0Id,
+                user.access
             ]);
         } catch (err) {
             if (err && err.code === '23505') {
@@ -199,7 +199,13 @@ class Auth {
         }
 
         // return created user
-        return this.user(user.email, 'email');
+        return {
+            uid: parseInt(pgres.rows[0].id),
+            username: pgres.rows[0].username,
+            access: pgres.rows[0].access,
+            email: pgres.rows[0].email,
+            flags: pgres.rows[0].flags
+        }
     }
 }
 
