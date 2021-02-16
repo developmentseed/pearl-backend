@@ -244,7 +244,7 @@ test('gpu connection', (t) => {
                     }
                 }
             }));
-        } else if (msg.message === 'model#prediction') {
+        } else if (msg.message === 'model#prediction#complete') {
             ws.send(JSON.stringify({
                 action: 'model#checkpoint',
                 data: {
