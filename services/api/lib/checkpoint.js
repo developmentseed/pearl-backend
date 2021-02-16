@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const { BlobServiceClient } = require('@azure/storage-blob');
 
 class CheckPoint {
     constructor(pool, config) {
