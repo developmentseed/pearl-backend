@@ -10,7 +10,7 @@ socket:
   enabled: true
   containerPort: 1999
 tiles:
-  enabled: false
+  enabled: true
   replicaCount: 8
   containerPort: 8000
   env:
