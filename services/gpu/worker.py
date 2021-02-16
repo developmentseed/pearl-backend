@@ -112,7 +112,7 @@ async def connection(uri, model):
                                 model.add_sample_point()
 
                             elif action == "model#checkpoint":
-                                model.save_state_to()
+                                await model.checkpoint(msg.get('data'), websocket)
                         except Exception as e:
                             LOGGER.error("not ok - failed to perform action")
                             traceback.print_exc()

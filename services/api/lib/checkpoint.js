@@ -75,17 +75,19 @@ class CheckPoint {
 
         try {
             const pgres = await this.pool.query(`
-                INSERT INTO checkpoint (
+                INSERT INTO checkpoints (
                     instance_id,
                     name,
                     classes
                 ) VALUES (
-                    $1
+                    $1,
+                    $2,
+                    $3::JSONB
                 ) RETURNING *
             `, [
                 instanceid,
                 checkpoint.name,
-                checkpont.classes
+                JSON.stringify(checkpoint.classes)
             ]);
 
             return {

@@ -227,6 +227,7 @@ test('gpu connection', (t) => {
     ws.on('message', (msg) => {
         msg = JSON.parse(msg)
 
+        // Messages in this IF queue are in chrono order
         if (msg.message === 'info#connected') {
             ws.send(JSON.stringify({
                 action: 'model#prediction',
@@ -241,6 +242,13 @@ test('gpu connection', (t) => {
                             [ -79.37724530696869, 38.83428180092151 ]
                         ]]
                     }
+                }
+            }));
+        } else if (msg.message === 'model#prediction') {
+            ws.send(JSON.stringify({
+                action: 'model#checkpoint',
+                data: {
+                    name: 'Test Checkpoint'
                 }
             }));
         } else {

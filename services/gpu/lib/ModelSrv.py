@@ -14,10 +14,8 @@ LOGGER = logging.getLogger("server")
 class ModelSrv():
     def __init__(self, model, api):
 
-        os.makedirs("/tmp/checkpoints/", exist_ok=True)
-        os.makedirs("/tmp/downloads/", exist_ok=True)
-        os.makedirs("/tmp/output/", exist_ok=True)
-        os.makedirs("/tmp/session/", exist_ok=True)
+        self.checkpoint_dir = '/tmp/checkpoints/'
+        os.makedirs(self.checkpoint_dir, exist_ok=True)
 
         self.aoi = None
         self.api = api
@@ -103,8 +101,20 @@ class ModelSrv():
     def reset(self):
         return self.model.reset()
 
-    def save_state_to(self, directory):
-        return self.model.save_state_to(directory)
+    async def checkpoint(self, body, websocket):
+        checkpoint = self.api.create_checkpoint(
+            body['name'],
+            self.api.model['classes']
+        )
+
+        self.model.save_state_to(self.checkpoint_dir)
+
+        await websocket.send(json.dumps({
+            'message': 'model#checkpoint',
+            'data': {
+                'id': checkpoint['id']
+            }
+        }))
 
     def load_state_from(self, directory):
         return self.model.load_state_from(directory)
