@@ -1,0 +1,22 @@
+{{- if .Values.api.enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-ingress-api
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    cert-manager.io/cluster-issuer: letsencrypt-prod-issuer
+spec:
+  tls:
+    - hosts:
+      - api.{{ .Values.domain }}
+      secretName: {{ template "lulc-helm.fullname" . }}-secret-api
+
+  rules:
+  - host: api.{{ .Values.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ template "lulc-helm.fullname" . }}-api
+          servicePort: 80
+{{- end }}

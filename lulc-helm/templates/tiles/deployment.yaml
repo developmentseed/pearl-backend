@@ -37,6 +37,9 @@ spec:
               path: /healthz
               port: {{ .Values.tiles.containerPort }}
           resources:
+            requests:
+              cpu: {{ .Values.tiles.resources.requests.cpu }}
+              memory: {{ .Values.tiles.resources.requests.memory }}
             limits:
               cpu: {{ .Values.tiles.resources.limits.cpu }}
               memory: {{ .Values.tiles.resources.limits.memory }}
