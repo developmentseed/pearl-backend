@@ -63,6 +63,45 @@ class CheckPoint {
         };
     }
 
+    /**
+     * Return a single checkpoint
+     *
+     * @param {Number} checkpointid Checkpoint ID to get
+     */
+    async get(checkpointid) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+               SELECT
+                    id,
+                    name,
+                    instance_id,
+                    classes,
+                    created,
+                    storage
+                FROM
+                    checkpoints
+                WHERE
+                    id = $1
+            `, [
+                checkpointid
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to get checkpoint');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
+        const row = pgres.rows[0];
+
+        return {
+            id: parseInt(row.id),
+            name: row.name,
+            classes: row.classes,
+            created: row.created,
+            storage: row.storage
+        };
+    }
+
 
     /**
      * Create a new Checkpoint

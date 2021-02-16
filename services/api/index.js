@@ -854,7 +854,45 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/instance/:instance/aoi List Checkpoints
+     * @api {get} /api/instance/:instanceid/checkpoint/:checkpointid Get Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName GetCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a given checkpoint for a given instance
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "name": "Checkpoint Name",
+     *       "classes": [ ... ],
+     *       "storage": true,
+     *       "created": "<date>"
+     *   }
+     */
+    router.get(
+        '/instance/:instanceid/checkpoint/:checkpointid',
+        requiresAuth,
+        async (req, res) => {
+            Param.int(req, res, 'instanceid');
+            Param.int(req, res, 'checkpointid');
+
+            try {
+                const inst = await instance.get(req.params.instanceid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+
+                return res.json(await checkpoint.get(req.params.checkpointid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/instance/:instanceid/checkpoint List Checkpoints
      * @apiVersion 1.0.0
      * @apiName ListCheckpoints
      * @apiGroup Checkpoints
