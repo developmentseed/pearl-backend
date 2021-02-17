@@ -11,7 +11,7 @@ class Project {
     /**
      * Return a list of projects
      *
-     * @param {Number} instanceid - AOIS related to a specific instance
+     * @param {Number} uid - Projects related to a specific user
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
@@ -61,6 +61,7 @@ class Project {
     /**
      * Create a new project
      *
+     * @param {Number} uid - User ID that is creating project
      * @param {Object} project - Project Object
      * @param {Object} project.name - Project Name
      * @param {Object} project.model_id - Model ID

@@ -113,13 +113,13 @@ class CheckPoint {
     }
 
     /**
-     * Update Model Properties
+     * Update Checkpoint Properties
      *
-     * @param {Number} modelid - Specific Model id
-     * @param {Object} model - Model Object
-     * @param {Boolean} model.storage Has the storage been uploaded
+     * @param {Number} checkpointid - Specific Model id
+     * @param {Object} checkpoint - Checkpoint Object
+     * @param {Boolean} checkpoint.storage Has the storage been uploaded
      */
-    async patch(modelid, model) {
+    async patch(checkpointid, checkpoint) {
         let pgres;
 
         try {
@@ -131,7 +131,7 @@ class CheckPoint {
                         id = $1
                     RETURNING *
             `, [
-                checkpoint,
+                checkpointid,
                 checkpoint.storage
             ]);
         } catch (err) {
@@ -148,7 +148,7 @@ class CheckPoint {
             classes: row.classes,
             created: row.created,
             storage: row.storage
-        }
+        };
     }
 
     /**

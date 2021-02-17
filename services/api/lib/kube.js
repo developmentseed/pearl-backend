@@ -4,9 +4,10 @@ const k8s = require('@kubernetes/client-node');
 class Kube {
 
     /**
-   * Kubernetes Client
-   * Create a client using a namespace. Default is default.
-   */
+     * Kubernetes Client
+     *
+     * @param {String} [namespace="default"] - Client Namespace
+     */
     constructor(namespace) {
         this.kc = new k8s.KubeConfig();
         this.kc.loadFromDefault();

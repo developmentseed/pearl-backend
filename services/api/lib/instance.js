@@ -86,7 +86,7 @@ class Instance {
                     $1
                 ) RETURNING *
             `, [
-                instance.project_id,
+                instance.project_id
             ]);
 
             const token = jwt.sign({
@@ -119,10 +119,8 @@ class Instance {
                     id,
                     uid,
                     created,
-                    model_id,
                     project_id,
-                    active,
-                    mosaic
+                    active
                 FROM
                     instances
                 WHERE
@@ -138,10 +136,8 @@ class Instance {
             id: parseInt(pgres.rows[0].id),
             uid: parseInt(pgres.rows[0].uid),
             created: pgres.rows[0].created,
-            model_id: parseInt(pgres.rows[0].model_id),
             project_id: parseInt(pgres.rows[0].project_id),
-            active: pgres.rows[0].active,
-            mosaic: pgres.rows[0].mosaic
+            active: pgres.rows[0].active
         };
     }
 }

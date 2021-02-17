@@ -134,7 +134,7 @@ class AOI {
     /**
      * Return a list of aois
      *
-     * @param {Number} instanceid - AOIS related to a specific project
+     * @param {Number} projectid - AOIS related to a specific project
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
