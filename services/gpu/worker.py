@@ -12,10 +12,7 @@ import logging
 import traceback
 from lib.api import API
 from lib.ModelSrv import ModelSrv
-from web_tool.ModelSessionKerasExample import KerasDenseFineTune
-from web_tool.ModelSessionPytorchSolar import SolarFineTuning
 from web_tool.ModelSessionPyTorchExample import TorchFineTuning
-from web_tool.ModelSessionRandomForest import ModelSessionRandomForest
 from web_tool.Utils import setup_logging
 
 LOGGER = logging.getLogger("server")
@@ -127,10 +124,6 @@ def load(gpu_id, api):
 
     if model_type == "pytorch_example":
         model = TorchFineTuning(gpu_id, api.model, api.model_fs)
-    elif model_type == "pytorch_solar":
-        model = SolarFineTuning(gpu_id, api.model, api.model_fs)
-    elif model_type == "random_forest":
-        model = ModelSessionRandomForest(api.model, api.model_fs)
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
