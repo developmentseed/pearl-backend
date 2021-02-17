@@ -426,7 +426,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance Create Instance
+     * @api {get} /api/project/:project/instance Create Instance
      * @apiVersion 1.0.0
      * @apiName CreateInstance
      * @apiGroup Instance
@@ -450,10 +450,12 @@ async function server(config, cb) {
      *       "token": "websocket auth token"
      *   }
      */
-    router.post('/instance',
+    router.post('/project/:projectid/instance',
         requiresAuth,
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
+            Param.int(req, res, 'projectid');
+
             try {
                 if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
 
@@ -467,7 +469,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {patch} /api/instance/:instance Patch Instance
+     * @api {patch} /api/project/:projectid/instance/:instance Patch Instance
      * @apiVersion 1.0.0
      * @apiName PatchInstance
      * @apiGroup Instance
@@ -476,10 +478,11 @@ async function server(config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/instance-patch.json} apiParam
      */
     router.patch(
-        '/instance/:instanceid',
+        '/project/:projectid/instance/:instanceid',
         requiresAuth,
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
+            Param.int(req, res, 'projectid');
             Param.int(req, res, 'instanceid');
 
             try {
@@ -591,7 +594,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/instance List Instances
+     * @api {get} /api/project/:projectid/instance List Instances
      * @apiVersion 1.0.0
      * @apiName ListInstances
      * @apiGroup Instance
@@ -617,7 +620,9 @@ async function server(config, cb) {
      *       }]
      *   }
      */
-    router.get('/instance', requiresAuth, async (req, res) => {
+    router.get('/project/:projectid/instance', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'projectid');
+
         try {
             // Only admins can see all running instances
             if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
@@ -629,7 +634,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instance Get Instance
+     * @api {get} /api/project/:projectid/instance/:instanceid Get Instance
      * @apiVersion 1.0.0
      * @apiName GetInstance
      * @apiGroup Instance
@@ -649,7 +654,8 @@ async function server(config, cb) {
      *       "mosaic": "naip.latest"
      *   }
      */
-    router.get('/instance/:instanceid', requiresAuth, async (req, res) => {
+    router.get('/project/:projectid/instance/:instanceid', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'projectid');
         Param.int(req, res, 'instanceid');
 
         try {
@@ -663,7 +669,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instanceid/aoi/:aoiid Get AOI
+     * @api {get} /api/project/:project/aoi/:aoiid Get AOI
      * @apiVersion 1.0.0
      * @apiName GetAOI
      * @apiGroup AOI
@@ -681,8 +687,8 @@ async function server(config, cb) {
      *       "bounds": { "GeoJSON "}
      *   }
      */
-    router.get('/instance/:instanceid/aoi/:aoiid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'instanceid');
+    router.get('/project/:projectid/aoi/:aoiid', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'projectid');
         Param.int(req, res, 'aoiid');
 
         try {
@@ -696,7 +702,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {post} /api/instance/:instanceid/aoi/:aoiid/upload Upload AOI
+     * @api {post} /api/project/:projectid/aoi/:aoiid/upload Upload AOI
      * @apiVersion 1.0.0
      * @apiName UploadAOI
      * @apiGroup AOI
@@ -714,7 +720,7 @@ async function server(config, cb) {
      *       "bounds": { "GeoJSON "}
      *   }
      */
-    router.post('/instance/:instanceid/aoi/:aoiid/upload', requiresAuth, async (req, res) => {
+    router.post('/project/:projectid/aoi/:aoiid/upload', requiresAuth, async (req, res) => {
         Param.int(req, res, 'instanceid');
         Param.int(req, res, 'aoiid');
 
@@ -730,7 +736,6 @@ async function server(config, cb) {
             });
 
             busboy.on('finish', async () => {
-                console.error('FINISH');
                 try {
                     return res.json(await aoi.get(req.params.aoiid));
                 } catch (err) {
@@ -745,7 +750,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instanceid/aoi/:aoiid/download Download AOI
+     * @api {get} /api/project/:projectid/aoi/:aoiid/download Download AOI
      * @apiVersion 1.0.0
      * @apiName DownloadAOI
      * @apiGroup AOI
@@ -754,8 +759,8 @@ async function server(config, cb) {
      * @apiDescription
      *     Return the aoi fabric geotiff
      */
-    router.get('/api/instance/:instanceid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'instanceeid');
+    router.get('/api/project/:projectid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'projectid');
         Param.int(req, res, 'aoiid');
 
         try {
@@ -769,7 +774,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instanceid/aoi List AOIs
+     * @api {get} /api/project/:projectid/aoi List AOIs
      * @apiVersion 1.0.0
      * @apiName ListAOIs
      * @apiGroup AOI
@@ -794,11 +799,11 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        '/instance/:instanceid/aoi',
+        '/project/:projectid/aoi',
         requiresAuth,
         validate({ query: require('./schema/aoi.query.json') }),
         async (req, res) => {
-            Param.int(req, res, 'instanceid');
+            Param.int(req, res, 'projectid');
 
             try {
                 const inst = await instance.get(req.params.instanceid);
@@ -812,7 +817,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {post} /api/instance/:instance/aoi Create AOI
+     * @api {post} /api/project/:projectid/aoi Create AOI
      * @apiVersion 1.0.0
      * @apiName CreateAOI
      * @apiGroup AOI
@@ -835,11 +840,11 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        '/instance/:instanceid/aoi',
+        '/project/:projectid/aoi',
         requiresAuth,
         validate({ body: require('./schema/aoi.json') }),
         async (req, res) => {
-            Param.int(req, res, 'instanceid');
+            Param.int(req, res, 'projectid');
 
             try {
                 const inst = await instance.get(req.params.instanceid);
@@ -853,7 +858,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/instance/:instanceid/checkpoint/:checkpointid Get Checkpoint
+     * @api {get} /api/project/:projectid/checkpoint/:checkpointid Get Checkpoint
      * @apiVersion 1.0.0
      * @apiName GetCheckpoint
      * @apiGroup Checkpoints
@@ -873,10 +878,10 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        '/instance/:instanceid/checkpoint/:checkpointid',
+        '/project/:projectid/checkpoint/:checkpointid',
         requiresAuth,
         async (req, res) => {
-            Param.int(req, res, 'instanceid');
+            Param.int(req, res, 'projectid');
             Param.int(req, res, 'checkpointid');
 
             try {
@@ -891,7 +896,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {post} /api/instance/:instanceid/checkpoint/:checkpointid/upload Upload Checkpoint
+     * @api {post} /api/project/:projectid/checkpoint/:checkpointid/upload Upload Checkpoint
      * @apiVersion 1.0.0
      * @apiName UploadCheckpoint
      * @apiGroup Checkpoints
@@ -910,8 +915,8 @@ async function server(config, cb) {
      *       "created": "<date>"
      *   }
      */
-    router.post('/api/instance/:instanceid/checkpoint/:checkpointid/upload', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'instanceid');
+    router.post('/api/project/:projectid/checkpoint/:checkpointid/upload', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'projectid');
         Param.int(req, res, 'checkpointid');
 
         try {
@@ -940,7 +945,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instanceid/checkpoint/:checkpointid/download Download Checkpoint
+     * @api {get} /api/project/:projectid/checkpoint/:checkpointid/download Download Checkpoint
      * @apiVersion 1.0.0
      * @apiName DownloadCheckpoint
      * @apiGroup Checkpoints
@@ -949,8 +954,8 @@ async function server(config, cb) {
      * @apiDescription
      *     Download a checkpoint asset from the API
      */
-    router.get('/api/instance/:instanceid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'instanceid');
+    router.get('/api/project/:projectid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
+        Param.int(req, res, 'projectid');
         Param.int(req, res, 'checkpointid');
 
         try {
@@ -964,7 +969,7 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/instance/:instanceid/checkpoint List Checkpoints
+     * @api {get} /api/project/:projectid/checkpoint List Checkpoints
      * @apiVersion 1.0.0
      * @apiName ListCheckpoints
      * @apiGroup Checkpoints
@@ -989,11 +994,11 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        '/instance/:instanceid/checkpoint',
+        '/project/:projectid/checkpoint',
         requiresAuth,
         validate({ query: require('./schema/checkpoint.query.json') }),
         async (req, res) => {
-            Param.int(req, res, 'instanceid');
+            Param.int(req, res, 'projectid');
 
             try {
                 const inst = await instance.get(req.params.instanceid);
@@ -1007,7 +1012,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/instance/:instance/checkpoint Create Checkpoint
+     * @api {get} /api/project/:projectid/checkpoint Create Checkpoint
      * @apiVersion 1.0.0
      * @apiName CreateCheckpoint
      * @apiGroup AOI
@@ -1031,11 +1036,11 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        '/instance/:instanceid/checkpoint',
+        '/project/:projectid/checkpoint',
         requiresAuth,
         validate({ body: require('./schema/checkpoint.json') }),
         async (req, res) => {
-            Param.int(req, res, 'instanceid');
+            Param.int(req, res, 'projectid');
 
             try {
                 const inst = await instance.get(req.params.instanceid);
