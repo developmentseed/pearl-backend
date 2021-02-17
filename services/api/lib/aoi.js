@@ -134,12 +134,12 @@ class AOI {
     /**
      * Return a list of aois
      *
-     * @param {Number} instanceid - AOIS related to a specific instance
+     * @param {Number} instanceid - AOIS related to a specific project
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    async list(instanceid, query) {
+    async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -156,7 +156,7 @@ class AOI {
                 FROM
                     aois
                 WHERE
-                    instance_id = $3
+                    project_id = $3
                 LIMIT
                     $1
                 OFFSET
@@ -164,7 +164,7 @@ class AOI {
             `, [
                 query.limit,
                 query.page,
-                instanceid
+                projectid
 
             ]);
         } catch (err) {
@@ -173,7 +173,7 @@ class AOI {
 
         return {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            instance_id: instanceid,
+            project_id: projectid,
             aois: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
@@ -188,28 +188,28 @@ class AOI {
     /**
      * Create a new AOI
      *
-     * @param {Number} instanceid - AOIS related to a specific instance
+     * @param {Number} projectid - AOIS related to a specific project
      * @param {Object} aoi - AOI Object
      * @param {Object} aoi.bounds - AOI Bounds GeoJSON
      */
-    async create(instanceid, aoi) {
+    async create(projectid, aoi) {
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO aois (
-                    instance_id,
+                    project_id,
                     bounds
                 ) VALUES (
                     $1,
                     ST_GeomFromGeoJSON($2)
                 ) RETURNING *
             `, [
-                instanceid,
+                projectid,
                 aoi.bounds
             ]);
 
             return {
                 id: parseInt(pgres.rows[0].id),
-                instance_id: instanceid,
+                project_id: projectid,
                 created: pgres.rows[0].created,
                 bounds: aoi.bounds,
                 storage: pgres.rows[0].storage
