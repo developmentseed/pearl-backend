@@ -125,9 +125,7 @@ async def connection(uri, model):
 def load(gpu_id, api):
     model_type = api.model["model_type"]
 
-    if model_type == "keras_example":
-        model = KerasDenseFineTune(gpu_id, api.model, api.model_fs)
-    elif model_type == "pytorch_example":
+    if model_type == "pytorch_example":
         model = TorchFineTuning(gpu_id, api.model, api.model_fs)
     elif model_type == "pytorch_solar":
         model = SolarFineTuning(gpu_id, api.model, api.model_fs)

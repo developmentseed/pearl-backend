@@ -7,9 +7,6 @@ import numpy as np
 import sklearn.base
 from sklearn.ensemble import RandomForestClassifier
 
-import tensorflow as tf
-import tensorflow.keras as keras
-
 import logging
 LOGGER = logging.getLogger("server")
 

@@ -83,7 +83,7 @@ class Model {
     async upload(modelid, file) {
         if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`model-${modelid}.h5`);
+        const blockBlobClient = this.container_client.getBlockBlobClient(`model-${modelid}.pt`);
 
         try {
             await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
@@ -157,7 +157,7 @@ class Model {
         if (!model.storage) throw new Err(404, null, 'Model has not been uploaded');
         if (!model.active) throw new Err(410, null, 'Model is set as inactive');
 
-        const blob_client = this.container_client.getBlockBlobClient(`model-${modelid}.h5`);
+        const blob_client = this.container_client.getBlockBlobClient(`model-${modelid}.pt`);
         const dwn = await blob_client.download(0);
 
         dwn.readableStreamBody.pipe(res);

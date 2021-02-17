@@ -24,7 +24,6 @@
             "type": "string",
             "description": "Underlying model type",
             "enum": [
-                "keras_example",
                 "random_forest",
                 "pytorch_example",
                 "pytorch_solar"
