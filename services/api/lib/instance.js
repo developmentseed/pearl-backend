@@ -16,7 +16,6 @@ class Instance {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {Number} [query.status=active] - Should the session be active? `active`, `inactive`, or `all`
-     * @param {Number} query.uid - Query by uid.
      */
     async list(query) {
         if (!query) query = {};
@@ -32,10 +31,6 @@ class Instance {
             WHERE.push('active IS false');
         }
 
-        if (query.uid) {
-            WHERE.push('uid = ', parseInt(query.uid));
-        }
-
         if (WHERE.length) WHERE = 'WHERE ' + WHERE.join(' AND ');
 
         let pgres;
@@ -44,11 +39,8 @@ class Instance {
                SELECT
                     count(*) OVER() AS count,
                     id,
-                    uid,
                     active,
-                    created,
-                    model_id,
-                    mosaic
+                    created
                 FROM
                     instances
                 ${WHERE}
@@ -70,11 +62,8 @@ class Instance {
             instances: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
-                    uid: parseInt(row.uid),
                     active: row.active,
-                    created: row.created,
-                    model_id: parseInt(row.model_id),
-                    mosaic: row.mosaic
+                    created: row.created
                 };
             })
         };
@@ -92,21 +81,12 @@ class Instance {
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO instances (
-                    uid,
-                    model_id,
-                    project_id,
-                    mosaic
+                    project_id
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    $4
+                    $1
                 ) RETURNING *
             `, [
-                auth.uid,
-                instance.model_id,
                 instance.project_id,
-                instance.mosaic
             ]);
 
             const token = jwt.sign({
@@ -118,9 +98,7 @@ class Instance {
             return {
                 id: parseInt(pgres.rows[0].id),
                 created: pgres.rows[0].created,
-                model_id: parseInt(pgres.rows[0].model_id),
-                token: token,
-                mosaic: pgres.rows[0].mosaic
+                token: token
             };
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');

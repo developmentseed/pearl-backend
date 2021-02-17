@@ -21,10 +21,6 @@
                 "inactive",
                 "all"
             ]
-        },
-        "uid": {
-            "type": "integer",
-            "description": "Query by user id"
         }
     }
 }
