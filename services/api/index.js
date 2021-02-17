@@ -457,6 +457,9 @@ async function server(config, cb) {
             Param.int(req, res, 'projectid');
 
             try {
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+
                 if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
 
                 const inst = await instance.create(req.auth, req.body);
@@ -549,7 +552,6 @@ async function server(config, cb) {
 
         try {
             const proj = await project.get(req.params.projectid);
-
             if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
             delete proj.uid;
@@ -624,8 +626,8 @@ async function server(config, cb) {
         Param.int(req, res, 'projectid');
 
         try {
-            // Only admins can see all running instances
-            if (req.auth.access !== 'admin') req.query.uid = req.auth.uid;
+            const proj = await project.get(req.params.projectid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
             res.json(await instance.list(req.query));
         } catch (err) {
@@ -659,10 +661,10 @@ async function server(config, cb) {
         Param.int(req, res, 'instanceid');
 
         try {
-            const inst = await instance.get(req.params.instanceid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+            const proj = await project.get(req.params.projectid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
-            return res.json(inst);
+            return res.json(await instance.get(req.params.instanceid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -692,8 +694,8 @@ async function server(config, cb) {
         Param.int(req, res, 'aoiid');
 
         try {
-            const inst = await instance.get(req.params.instanceid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+            const proj = await project.get(req.params.projectid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
             return res.json(await aoi.get(req.params.aoiid));
         } catch (err) {
@@ -764,8 +766,8 @@ async function server(config, cb) {
         Param.int(req, res, 'aoiid');
 
         try {
-            const inst = await instance.get(req.params.instanceid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+            const proj = await project.get(req.params.projectid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
             await aoi.download(req.params.aoiid, res);
         } catch (err) {
@@ -806,8 +808,8 @@ async function server(config, cb) {
             Param.int(req, res, 'projectid');
 
             try {
-                const inst = await instance.get(req.params.instanceid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
                 return res.json(await aoi.list(req.params.instanceid, req.query));
             } catch (err) {
@@ -847,8 +849,8 @@ async function server(config, cb) {
             Param.int(req, res, 'projectid');
 
             try {
-                const inst = await instance.get(req.params.instanceid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
                 return res.json(await aoi.create(req.params.instanceid, req.body));
             } catch (err) {
@@ -885,8 +887,8 @@ async function server(config, cb) {
             Param.int(req, res, 'checkpointid');
 
             try {
-                const inst = await instance.get(req.params.instanceid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
                 return res.json(await checkpoint.get(req.params.checkpointid));
             } catch (err) {
@@ -959,8 +961,8 @@ async function server(config, cb) {
         Param.int(req, res, 'checkpointid');
 
         try {
-            const inst = await instance.get(req.params.instanceid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+            const proj = await project.get(req.params.projectid);
+            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
             await checkpoint.download(req.params.checkpointid, res);
         } catch (err) {
@@ -1001,8 +1003,8 @@ async function server(config, cb) {
             Param.int(req, res, 'projectid');
 
             try {
-                const inst = await instance.get(req.params.instanceid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
                 return res.json(await checkpoint.list(req.params.instanceid, req.query));
             } catch (err) {
@@ -1043,8 +1045,8 @@ async function server(config, cb) {
             Param.int(req, res, 'projectid');
 
             try {
-                const inst = await instance.get(req.params.instanceid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== inst.uid) throw new Error(403, null, 'Cannot access resources you don\'t own');
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
                 return res.json(await checkpoint.create(req.params.instanceid, req.body));
             } catch (err) {
