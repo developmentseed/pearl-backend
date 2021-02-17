@@ -721,7 +721,7 @@ async function server(config, cb) {
      */
     router.post('/project/:projectid/aoi/:aoiid/upload', requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'instanceid');
+            await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
             await auth.is_admin(req);
 
@@ -1001,7 +1001,7 @@ async function server(config, cb) {
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
-                return res.json(await checkpoint.list(req.params.instanceid, req.query));
+                return res.json(await checkpoint.list(req.params.projectid, req.query));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1043,7 +1043,7 @@ async function server(config, cb) {
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
-                return res.json(await checkpoint.create(req.params.instanceid, req.body));
+                return res.json(await checkpoint.create(req.params.projectid, req.body));
             } catch (err) {
                 return Err.respond(err, res);
             }
