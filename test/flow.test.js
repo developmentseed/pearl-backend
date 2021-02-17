@@ -25,6 +25,8 @@ const drop = require('../services/api/test/drop');
 
 let token, instance;
 
+process.env.Postgres = process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis';
+
 test('pre-run', async (t) => {
     try {
         const config = await drop();
@@ -143,6 +145,8 @@ test('new project', (t) => {
         url: API + '/api/project',
         body: {
             name: 'Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
         },
         headers: {
             Authorization: `Bearer ${token}`
@@ -152,10 +156,8 @@ test('new project', (t) => {
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body), [
-            'id',
-            'name',
-            'created',
+        t.deepEquals(Object.keys(body).sort(), [
+            'created', 'id', 'model_id', 'mosaic', 'name'
         ], 'expected props');
 
         t.ok(body.created, 'created: <date>');
@@ -165,6 +167,8 @@ test('new project', (t) => {
         t.deepEquals(body, {
             id: 1,
             name: 'Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
         }, 'expected body');
 
         t.end();
@@ -175,12 +179,8 @@ test('new instance', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: API + '/api/instance',
-        body: {
-            model_id: 1,
-            project_id: 1,
-            mosaic: 'naip.latest'
-        },
+        url: API + '/api/project/1/instance',
+        body: { },
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -189,12 +189,8 @@ test('new instance', (t) => {
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body), [
-            'id',
-            'created',
-            'model_id',
-            'token',
-            'mosaic'
+        t.deepEquals(Object.keys(body).sort(), [
+            'created', 'id', 'token'
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
@@ -203,10 +199,7 @@ test('new instance', (t) => {
         instance = body.token;
         delete body.token;
 
-        t.deepEquals(body, {
-            model_id: 1,
-            mosaic: 'naip.latest'
-        }, 'expected body');
+        t.deepEquals(body, {}, 'expected body');
 
         t.end();
     });

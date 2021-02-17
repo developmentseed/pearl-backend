@@ -1,23 +1,6 @@
 {
     "type": "object",
-    "required": [
-        "model_id",
-        "mosaic",
-        "project_id"
-    ],
+    "required": [ ],
     "additionalProperties": false,
-    "properties": {
-        "project_id": {
-            "type": "integer",
-            "description": "The project to start this instance under"
-        },
-        "model_id": {
-            "type": "integer",
-            "description": "The model id to start an instance with"
-        },
-        "mosaic": {
-            "type": "string",
-            "description": "The mosaic ID to run the model with"
-        }
-    }
+    "properties": { }
 }

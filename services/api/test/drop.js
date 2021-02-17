@@ -1,9 +1,10 @@
 'use strict';
 
 const { Client } = require('pg');
-const config = require('../lib/config').env();
 
 async function drop() {
+    const config = require('../lib/config').env();
+
     const client = new Client({
         connectionString: config.Postgres
     });

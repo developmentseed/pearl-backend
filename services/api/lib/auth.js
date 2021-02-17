@@ -205,7 +205,7 @@ class Auth {
             access: pgres.rows[0].access,
             email: pgres.rows[0].email,
             flags: pgres.rows[0].flags
-        }
+        };
     }
 }
 

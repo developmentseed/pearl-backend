@@ -11,7 +11,7 @@ class Project {
     /**
      * Return a list of projects
      *
-     * @param {Number} instanceid - AOIS related to a specific instance
+     * @param {Number} uid - Projects related to a specific user
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
@@ -61,27 +61,38 @@ class Project {
     /**
      * Create a new project
      *
+     * @param {Number} uid - User ID that is creating project
      * @param {Object} project - Project Object
      * @param {Object} project.name - Project Name
+     * @param {Object} project.model_id - Model ID
+     * @param {Object} project.mosaic - Mosaic String
      */
     async create(uid, project) {
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO projects (
                     uid,
-                    name
+                    name,
+                    model_id,
+                    mosaic
                 ) VALUES (
                     $1,
-                    $2
+                    $2,
+                    $3,
+                    $4
                 ) RETURNING *
             `, [
                 uid,
-                project.name
+                project.name,
+                project.model_id,
+                project.mosaic
             ]);
 
             return {
                 id: parseInt(pgres.rows[0].id),
                 name: pgres.rows[0].name,
+                model_id: parseInt(pgres.rows[0].model_id),
+                mosaic: pgres.rows[0].mosaic,
                 created: pgres.rows[0].created
             };
         } catch (err) {
@@ -102,6 +113,8 @@ class Project {
                     id,
                     uid,
                     name,
+                    model_id,
+                    mosaic,
                     created
                 FROM
                     projects
@@ -120,6 +133,8 @@ class Project {
             id: parseInt(pgres.rows[0].id),
             uid: parseInt(pgres.rows[0].uid),
             name: pgres.rows[0].name,
+            model_id: parseInt(pgres.rows[0].model_id),
+            mosaic: pgres.rows[0].mosaic,
             created: pgres.rows[0].created
         };
     }

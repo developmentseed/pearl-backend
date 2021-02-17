@@ -14,42 +14,6 @@ test('user', async (t) => {
     t.end();
 });
 
-test('GET /api/project (empty)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        t.deepEquals(res.body, {
-            total: 0,
-            projects: []
-        });
-
-        t.end();
-    });
-});
-
-test('GET /api/project/1 (empty)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 404, 'status: 404');
-        t.end();
-    });
-});
-
 test('POST /api/model', (t) => {
     request({
         method: 'POST',
@@ -76,33 +40,6 @@ test('POST /api/model', (t) => {
     } , (err, res, body) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
-        t.end();
-    });
-});
-
-test('POST /api/project (Invalid Mosaic)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`
-        },
-        body: {
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.fake'
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 400, 'status: 400');
-
-        t.deepEquals(res.body, {
-            status: 400,
-            message: 'Invalid Mosaic',
-            messages: []
-        });
-
         t.end();
     });
 });
@@ -138,10 +75,10 @@ test('POST /api/project', (t) => {
     });
 });
 
-test('GET /api/project', (t) => {
+test('GET /api/project/1/aoi (empty)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: 'http://localhost:2000/api/project/1/aoi',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -150,40 +87,50 @@ test('GET /api/project', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.ok(res.body.projects[0].created, '.created: <date>');
-        delete res.body.projects[0].created;
-
-        t.deepEquals(res.body, {
-            total: 1,
-            projects: [{
-                id: 1,
-                name: 'Test Project'
-            }]
-        });
-
         t.end();
     });
 });
 
-test('GET /api/project/1', (t) => {
+test('POST /api/project/1/aoi', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
-        method: 'GET',
+        url: 'http://localhost:2000/api/project/1/aoi',
+        method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`
+        },
+        body: {
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
+            }
         }
     }, (err, res) => {
+        t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
-
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
         t.deepEquals(res.body, {
             id: 1,
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
+            project_id: 1,
+            storage: false,
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
+            }
         });
 
         t.end();

@@ -17,13 +17,6 @@ CREATE TABLE IF NOT EXISTS users_tokens (
     uid         BIGINT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS projects (
-    id                      BIGSERIAL PRIMARY KEY,
-    uid                     BIGINT NOT NULL,
-    name                    TEXT NOT NULL,
-    created                 TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
 CREATE TABLE IF NOT EXISTS models (
     id                      BIGSERIAL PRIMARY KEY,
     created                 TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -42,22 +35,44 @@ CREATE TABLE IF NOT EXISTS models (
     meta                    JSONB
 );
 
+CREATE TABLE IF NOT EXISTS projects (
+    id                      BIGSERIAL PRIMARY KEY,
+    uid                     BIGINT NOT NULL,
+    name                    TEXT NOT NULL,
+    created                 TIMESTAMP NOT NULL DEFAULT NOW(),
+    model_id                BIGINT NOT NULL,
+    mosaic                  TEXT NOT NULL,
+
+    CONSTRAINT fk_model
+        FOREIGN KEY (model_id)
+        REFERENCES models(id),
+
+    CONSTRAINT fk_user
+        FOREIGN KEY (uid)
+        REFERENCES users(id)
+);
+
 CREATE TABLE IF NOT EXISTS instances (
     id          BIGSERIAL PRIMARY KEY,
     project_id  BIGINT NOT NULL,
-    uid         BIGINT NOT NULL,
     active      BOOLEAN NOT NULL DEFAULT False,
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
-    model_id    BIGINT NOT NULL,
-    mosaic      TEXT NOT NULL
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id)
 );
 
 CREATE TABLE IF NOT EXISTS aois (
     id          BIGSERIAL PRIMARY KEY,
-    instance_id  BIGINT NOT NULL,
+    project_id  BIGINT NOT NULL,
     bounds      GEOMETRY(POLYGON, 4326),
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
-    storage     BOOLEAN NOT NULL DEFAULT False
+    storage     BOOLEAN NOT NULL DEFAULT False,
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id)
 );
 
 CREATE TABLE IF NOT EXISTS checkpoints (
@@ -66,7 +81,11 @@ CREATE TABLE IF NOT EXISTS checkpoints (
     name        TEXT NOT NULL,
     classes     JSONB,
 
-    instance_id BIGINT NOT NULL,
+    project_id  BIGINT NOT NULL,
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
-    storage     BOOLEAN NOT NULL DEFAULT False
+    storage     BOOLEAN NOT NULL DEFAULT False,
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id)
 );

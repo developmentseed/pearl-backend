@@ -1,7 +1,7 @@
 [
   {
     "type": "post",
-    "url": "/api/instance/:instance/aoi",
+    "url": "/api/project/:projectid/aoi",
     "title": "Create AOI",
     "version": "1.0.0",
     "name": "CreateAOI",
@@ -58,7 +58,7 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instance/checkpoint",
+    "url": "/api/project/:projectid/checkpoint",
     "title": "Create Checkpoint",
     "version": "1.0.0",
     "name": "CreateCheckpoint",
@@ -105,7 +105,7 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instanceid/aoi/:aoiid/download",
+    "url": "/api/project/:projectid/aoi/:aoiid/download",
     "title": "Download AOI",
     "version": "1.0.0",
     "name": "DownloadAOI",
@@ -123,7 +123,7 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instanceid/aoi/:aoiid",
+    "url": "/api/project/:project/aoi/:aoiid",
     "title": "Get AOI",
     "version": "1.0.0",
     "name": "GetAOI",
@@ -150,7 +150,7 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instanceid/aoi",
+    "url": "/api/project/:projectid/aoi",
     "title": "List AOIs",
     "version": "1.0.0",
     "name": "ListAOIs",
@@ -199,16 +199,16 @@
   },
   {
     "type": "post",
-    "url": "/api/instance/:instanceid/aoi/:aoiid/upload",
+    "url": "/api/project/:projectid/aoi/:aoiid/upload",
     "title": "Upload AOI",
     "version": "1.0.0",
     "name": "UploadAOI",
     "group": "AOI",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
     "description": "<p>Upload a new GeoTiff to the API</p>",
@@ -253,7 +253,25 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instanceid/checkpoint/:checkpointid",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid/download",
+    "title": "Download Checkpoint",
+    "version": "1.0.0",
+    "name": "DownloadCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Download a checkpoint asset from the API</p>",
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid",
     "title": "Get Checkpoint",
     "version": "1.0.0",
     "name": "GetCheckpoint",
@@ -280,7 +298,7 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instanceid/checkpoint",
+    "url": "/api/project/:projectid/checkpoint",
     "title": "List Checkpoints",
     "version": "1.0.0",
     "name": "ListCheckpoints",
@@ -328,8 +346,35 @@
     "groupTitle": "Checkpoints"
   },
   {
+    "type": "post",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid/upload",
+    "title": "Upload Checkpoint",
+    "version": "1.0.0",
+    "name": "UploadCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upload a new checkpoint asset to the API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
     "type": "get",
-    "url": "/api/instance",
+    "url": "/api/project/:project/instance",
     "title": "Create Instance",
     "version": "1.0.0",
     "name": "CreateInstance",
@@ -342,33 +387,6 @@
       }
     ],
     "description": "<p>Instruct the GPU pool to start a new model instance and return a time limited session token for accessing the websockets GPU API</p>",
-    "parameter": {
-      "fields": {
-        "Body": [
-          {
-            "group": "Body",
-            "type": "Integer",
-            "optional": false,
-            "field": "project_id",
-            "description": "<p>The project to start this instance under</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Integer",
-            "optional": false,
-            "field": "model_id",
-            "description": "<p>The model id to start an instance with</p>"
-          },
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "mosaic",
-            "description": "<p>The mosaic ID to run the model with</p>"
-          }
-        ]
-      }
-    },
     "success": {
       "examples": [
         {
@@ -383,7 +401,7 @@
   },
   {
     "type": "get",
-    "url": "/api/instance/:instance",
+    "url": "/api/project/:projectid/instance/:instanceid",
     "title": "Get Instance",
     "version": "1.0.0",
     "name": "GetInstance",
@@ -410,7 +428,34 @@
   },
   {
     "type": "get",
-    "url": "/api/instance",
+    "url": "/api/instance/:instanceid",
+    "title": "Self Instance",
+    "version": "1.0.0",
+    "name": "GetInstance",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>A newly instantiated GPU Instance does not know what it's project id is. This API allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/instance",
     "title": "List Instances",
     "version": "1.0.0",
     "name": "ListInstances",
@@ -453,13 +498,6 @@
             "field": "status",
             "defaultValue": "active",
             "description": "<p>Filter instances by active status</p>"
-          },
-          {
-            "group": "Query",
-            "type": "Integer",
-            "optional": true,
-            "field": "uid",
-            "description": "<p>Query by user id</p>"
           }
         ]
       }
@@ -479,7 +517,7 @@
   },
   {
     "type": "patch",
-    "url": "/api/instance/:instance",
+    "url": "/api/project/:projectid/instance/:instance",
     "title": "Patch Instance",
     "version": "1.0.0",
     "name": "PatchInstance",
@@ -1122,6 +1160,20 @@
             "optional": false,
             "field": "name",
             "description": "<p>Name of the Project</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_id",
+            "description": "<p>Starter Model to use for project</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "mosaic",
+            "description": "<p>Imagery to use with model</p>"
           }
         ]
       }

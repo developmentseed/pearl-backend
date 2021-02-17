@@ -1,16 +1,12 @@
 'use strict';
 
 const fetch = require('node-fetch');
+const Err = require('./error');
 
 class Param {
-    static int(req, res, name) {
+    static async int(req, name) {
         req.params[name] = Number(req.params[name]);
-        if (isNaN(req.params[name])) {
-            return res.status(400).send({
-                status: 400,
-                error: `${name} param must be an integer`
-            });
-        }
+        if (isNaN(req.params[name])) throw new Err(400, null, `${name} param must be an integer`);
     }
 }
 
