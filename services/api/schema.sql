@@ -41,14 +41,26 @@ CREATE TABLE IF NOT EXISTS projects (
     name                    TEXT NOT NULL,
     created                 TIMESTAMP NOT NULL DEFAULT NOW(),
     model_id                BIGINT NOT NULL,
-    mosaic                  TEXT NOT NULL
+    mosaic                  TEXT NOT NULL,
+
+    CONSTRAINT fk_model
+        FOREIGN KEY (model_id)
+        REFERENCES models(id),
+
+    CONSTRAINT fk_user
+        FOREIGN KEY (uid)
+        REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS instances (
     id          BIGSERIAL PRIMARY KEY,
     project_id  BIGINT NOT NULL,
     active      BOOLEAN NOT NULL DEFAULT False,
-    created     TIMESTAMP NOT NULL DEFAULT NOW()
+    created     TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id)
 );
 
 CREATE TABLE IF NOT EXISTS aois (
@@ -56,7 +68,11 @@ CREATE TABLE IF NOT EXISTS aois (
     project_id  BIGINT NOT NULL,
     bounds      GEOMETRY(POLYGON, 4326),
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
-    storage     BOOLEAN NOT NULL DEFAULT False
+    storage     BOOLEAN NOT NULL DEFAULT False,
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id)
 );
 
 CREATE TABLE IF NOT EXISTS checkpoints (
@@ -67,5 +83,9 @@ CREATE TABLE IF NOT EXISTS checkpoints (
 
     project_id  BIGINT NOT NULL,
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
-    storage     BOOLEAN NOT NULL DEFAULT False
+    storage     BOOLEAN NOT NULL DEFAULT False,
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id)
 );

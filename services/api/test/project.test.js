@@ -8,7 +8,9 @@ flight.takeoff(test);
 
 let token;
 test('user', async (t) => {
-    token = (await flight.user(t)).token;
+    token = (await flight.user(t, {
+        access: 'admin'
+    })).token;
     t.end();
 });
 
@@ -48,6 +50,36 @@ test('GET /api/project/1 (empty)', (t) => {
     });
 });
 
+test('POST /api/model', (t) => {
+    request({
+        method: 'POST',
+        json: true,
+        url: 'http://localhost:2000/api/model',
+        body: {
+            name: 'NAIP Supervised',
+            active: true,
+            model_type: 'keras_example',
+            model_finetunelayer: -4,
+            model_numparams: 7790949,
+            model_inputshape: [240,240,4],
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            meta: {}
+        },
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    } , (err, res, body) => {
+        t.error(err, 'no error');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.end();
+    });
+});
+
 test('POST /api/project', (t) => {
     request({
         json: true,
@@ -57,7 +89,9 @@ test('POST /api/project', (t) => {
             Authorization: `Bearer ${token}`
         },
         body: {
-            name: 'Test Project'
+            name: 'Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -68,7 +102,9 @@ test('POST /api/project', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            name: 'Test Project'
+            name: 'Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
         });
 
         t.end();
@@ -118,7 +154,9 @@ test('GET /api/project/1', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            name: 'Test Project'
+            name: 'Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
         });
 
         t.end();
