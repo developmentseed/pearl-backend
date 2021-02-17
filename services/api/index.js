@@ -348,9 +348,9 @@ async function server(config, cb) {
      *   }
      */
     router.delete('/token/:tokenid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'tokenid');
-
         try {
+            await await Param.int(req, 'tokenid');
+
             return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);
@@ -454,9 +454,9 @@ async function server(config, cb) {
         requiresAuth,
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
-            Param.int(req, res, 'projectid');
-
             try {
+                await Param.int(req, 'projectid');
+
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -485,10 +485,10 @@ async function server(config, cb) {
         requiresAuth,
         validate({ body: require('./schema/instance.json') }),
         async (req, res) => {
-            Param.int(req, res, 'projectid');
-            Param.int(req, res, 'instanceid');
-
             try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'instanceid');
+
                 await auth.is_admin(req);
 
                 // TODO Allow patching
@@ -548,9 +548,9 @@ async function server(config, cb) {
      *   }
      */
     router.get('/project/:projectid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'projectid');
-
         try {
+            await Param.int(req, 'projectid');
+
             const proj = await project.get(req.params.projectid);
             if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -623,9 +623,9 @@ async function server(config, cb) {
      *   }
      */
     router.get('/project/:projectid/instance', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'projectid');
-
         try {
+            await Param.int(req, 'projectid');
+
             const proj = await project.get(req.params.projectid);
             if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -657,10 +657,10 @@ async function server(config, cb) {
      *   }
      */
     router.get('/project/:projectid/instance/:instanceid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'projectid');
-        Param.int(req, res, 'instanceid');
-
         try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'instanceid');
+
             const proj = await project.get(req.params.projectid);
             if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -690,10 +690,10 @@ async function server(config, cb) {
      *   }
      */
     router.get('/project/:projectid/aoi/:aoiid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'projectid');
-        Param.int(req, res, 'aoiid');
-
         try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'aoiid');
+
             const proj = await project.get(req.params.projectid);
             if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -723,10 +723,9 @@ async function server(config, cb) {
      *   }
      */
     router.post('/project/:projectid/aoi/:aoiid/upload', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'instanceid');
-        Param.int(req, res, 'aoiid');
-
         try {
+            await Param.int(req, 'instanceid');
+            await Param.int(req, 'aoiid');
             await auth.is_admin(req);
 
             const busboy = new Busboy({ headers: req.headers });
@@ -762,10 +761,10 @@ async function server(config, cb) {
      *     Return the aoi fabric geotiff
      */
     router.get('/api/project/:projectid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'projectid');
-        Param.int(req, res, 'aoiid');
-
         try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'aoiid');
+
             const proj = await project.get(req.params.projectid);
             if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -805,9 +804,9 @@ async function server(config, cb) {
         requiresAuth,
         validate({ query: require('./schema/aoi.query.json') }),
         async (req, res) => {
-            Param.int(req, res, 'projectid');
-
             try {
+                await Param.int(req, 'projectid');
+
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -846,9 +845,9 @@ async function server(config, cb) {
         requiresAuth,
         validate({ body: require('./schema/aoi.json') }),
         async (req, res) => {
-            Param.int(req, res, 'projectid');
-
             try {
+                await Param.int(req, 'projectid');
+
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -883,10 +882,10 @@ async function server(config, cb) {
         '/project/:projectid/checkpoint/:checkpointid',
         requiresAuth,
         async (req, res) => {
-            Param.int(req, res, 'projectid');
-            Param.int(req, res, 'checkpointid');
-
             try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
+
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -918,10 +917,9 @@ async function server(config, cb) {
      *   }
      */
     router.post('/api/project/:projectid/checkpoint/:checkpointid/upload', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'projectid');
-        Param.int(req, res, 'checkpointid');
-
         try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
             await auth.is_admin(req);
 
             const busboy = new Busboy({ headers: req.headers });
@@ -957,10 +955,10 @@ async function server(config, cb) {
      *     Download a checkpoint asset from the API
      */
     router.get('/api/project/:projectid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'projectid');
-        Param.int(req, res, 'checkpointid');
-
         try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
+
             const proj = await project.get(req.params.projectid);
             if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -1000,9 +998,9 @@ async function server(config, cb) {
         requiresAuth,
         validate({ query: require('./schema/checkpoint.query.json') }),
         async (req, res) => {
-            Param.int(req, res, 'projectid');
-
             try {
+                await Param.int(req, 'projectid');
+
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -1042,9 +1040,9 @@ async function server(config, cb) {
         requiresAuth,
         validate({ body: require('./schema/checkpoint.json') }),
         async (req, res) => {
-            Param.int(req, res, 'projectid');
-
             try {
+                await Param.int(req, 'projectid');
+
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
@@ -1131,9 +1129,8 @@ async function server(config, cb) {
      *   }
      */
     router.post('/api/model/:modelid/upload', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'modelid');
-
         try {
+            await Param.int(req, 'modelid');
             await auth.is_admin(req);
 
             await model.get(req.params.modelid);
@@ -1212,9 +1209,9 @@ async function server(config, cb) {
      *   }
      */
     router.delete('/model/:modelid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'modelid');
-
         try {
+            await Param.int(req, 'modelid');
+
             await model.delete(req.params.modelid);
 
             return res.status(200).json({
@@ -1256,9 +1253,9 @@ async function server(config, cb) {
      *   }
      */
     router.get('/model/:modelid', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'modelid');
-
         try {
+            await Param.int(req, 'modelid');
+
             res.json(await model.get(req.params.modelid));
         } catch (err) {
             return Err.respond(err, res);
@@ -1276,9 +1273,9 @@ async function server(config, cb) {
      *     Return the model itself
      */
     router.get('/model/:modelid/download', requiresAuth, async (req, res) => {
-        Param.int(req, res, 'modelid');
-
         try {
+            await Param.int(req, 'modelid');
+
             await model.download(req.params.modelid, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -1373,12 +1370,45 @@ async function server(config, cb) {
     router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        Param.int(req, res, 'z');
-        Param.int(req, res, 'x');
-        Param.int(req, res, 'y');
-
         try {
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
+
             await proxy.request(req, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/instance/:instanceid Self Instance
+     * @apiVersion 1.0.0
+     * @apiName GetInstance
+     * @apiGroup Instance
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     A newly instantiated GPU Instance does not know what it's project id is. This API
+     *     allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1,
+     *       "uid": 123,
+     *       "active": true,
+     *       "created": "<date>",
+     *       "model_id": 1,
+     *       "mosaic": "naip.latest"
+     *   }
+     */
+    router.get('/instance/:instanceid', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'instanceid');
+            await auth.is_admin(req);
+
+            return res.json(await instance.get(req.params.instanceid));
         } catch (err) {
             return Err.respond(err, res);
         }
