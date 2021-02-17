@@ -117,7 +117,6 @@ class Instance {
             pgres = await this.pool.query(`
                 SELECT
                     id,
-                    uid,
                     created,
                     project_id,
                     active
@@ -134,7 +133,6 @@ class Instance {
 
         return {
             id: parseInt(pgres.rows[0].id),
-            uid: parseInt(pgres.rows[0].uid),
             created: pgres.rows[0].created,
             project_id: parseInt(pgres.rows[0].project_id),
             active: pgres.rows[0].active

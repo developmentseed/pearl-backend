@@ -29,13 +29,14 @@ class API():
 
         self.project_id = self.instance['project_id']
         self.instance_id = instance_id
-        self.model_id = self.instance['model_id']
-        self.mosaic_id = self.instance['mosaic']
+        self.project = self.project_meta()
+
+        self.model_id = self.project['model_id']
+        self.mosaic_id = self.project['mosaic']
 
         self.model = self.model_meta()
         self.model_fs = self.model_download()
         self.mosaic = self.get_tilejson()
-        self.project = self.project_meta()
 
     def server_meta(self):
         url = self.url + '/api'
@@ -51,7 +52,7 @@ class API():
         return r.json()
 
     def create_checkpoint(self, name, classes):
-        url = self.url + '/api/instance/' + str(self.instance_id) + '/checkpoint'
+        url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint'
 
         LOGGER.info("ok - POST " + url)
         r = requests.post(url,
@@ -71,7 +72,7 @@ class API():
         return r.json()
 
     def upload_checkpoint(self, checkpointid):
-        url = self.url + '/api/instance/' + str(self.instance_id) + '/checkpoint/' + str(checkpointid) + '/upload'
+        url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid) + '/upload'
 
         LOGGER.info("ok - POST " + url)
 
@@ -95,7 +96,7 @@ class API():
         return r.json()
 
     def create_aoi(self, bounds):
-        url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi'
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi'
 
         LOGGER.info("ok - POST " + url)
         r = requests.post(url,
@@ -114,7 +115,7 @@ class API():
         return r.json()
 
     def upload_aoi(self, aoiid, geotiff):
-        url = self.url + '/api/instance/' + str(self.instance_id) + '/aoi/' + str(aoiid) + '/upload'
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoiid) + '/upload'
 
         LOGGER.info("ok - POST " + url)
 
