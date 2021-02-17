@@ -458,6 +458,7 @@ async function server(config, cb) {
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
+                req.body.project_id = req.params.projectid;
                 const inst = await instance.create(req.auth, req.body);
 
                 res.json(inst);

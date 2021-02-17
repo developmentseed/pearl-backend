@@ -25,6 +25,7 @@ const drop = require('../services/api/test/drop');
 
 let token, instance;
 
+process.env.Postgres = 'postgres://docker:docker@localhost:5433/gis';
 test('pre-run', async (t) => {
     try {
         const config = await drop();
@@ -188,9 +189,7 @@ test('new instance', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(Object.keys(body).sort(), [
-            'id',
-            'created',
-            'token'
+            'created', 'id', 'token'
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
