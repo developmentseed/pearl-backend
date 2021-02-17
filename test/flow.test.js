@@ -25,7 +25,8 @@ const drop = require('../services/api/test/drop');
 
 let token, instance;
 
-process.env.Postgres = 'postgres://docker:docker@localhost:5433/gis';
+process.env.Postgres = process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis';
+
 test('pre-run', async (t) => {
     try {
         const config = await drop();
