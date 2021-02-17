@@ -80,6 +80,33 @@ test('POST /api/model', (t) => {
     });
 });
 
+test('POST /api/project (Invalid Mosaic)', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'Test Project',
+            model_id: 1,
+            mosaic: 'naip.fake'
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 400, 'status: 400');
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'Invalid Mosaic',
+            messages: []
+        });
+
+        t.end();
+    });
+});
+
 test('POST /api/project', (t) => {
     request({
         json: true,

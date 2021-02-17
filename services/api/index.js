@@ -443,9 +443,7 @@ async function server(config, cb) {
      *   {
      *       "id": 1,
      *       "created": "<date",
-     *       "model_id": 1,
      *       "project_id": 2,
-     *       "mosaic": "naip.latest",
      *       "url": "ws://<websocket-connection-url>",
      *       "token": "websocket auth token"
      *   }
@@ -459,8 +457,6 @@ async function server(config, cb) {
 
                 const proj = await project.get(req.params.projectid);
                 if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
-
-                if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Error(400, null, 'Invalid Mosaic');
 
                 const inst = await instance.create(req.auth, req.body);
 
@@ -545,6 +541,8 @@ async function server(config, cb) {
      *       "id": 1,
      *       "name": "Test Project",
      *       "created": "<date>"
+     *       "model_id": 1,
+     *       "mosaic": "naip.latest"
      *   }
      */
     router.get('/project/:projectid', requiresAuth, async (req, res) => {
@@ -588,6 +586,8 @@ async function server(config, cb) {
         validate({ body: require('./schema/project.json') }),
         async (req, res) => {
             try {
+                if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
+
                 return res.json(await project.create(req.auth.uid, req.body));
             } catch (err) {
                 return Err.respond(err, res);
@@ -616,9 +616,7 @@ async function server(config, cb) {
      *           "id": 1,
      *           "uid": 123,
      *           "active": true,
-     *           "created": "<date>",
-     *           "model_id": 1,
-     *           "mosaic": "naip.latest"
+     *           "created": "<date>"
      *       }]
      *   }
      */
@@ -651,9 +649,7 @@ async function server(config, cb) {
      *       "id": 1,
      *       "uid": 123,
      *       "active": true,
-     *       "created": "<date>",
-     *       "model_id": 1,
-     *       "mosaic": "naip.latest"
+     *       "created": "<date>"
      *   }
      */
     router.get('/project/:projectid/instance/:instanceid', requiresAuth, async (req, res) => {
