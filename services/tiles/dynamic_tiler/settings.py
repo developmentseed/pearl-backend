@@ -40,6 +40,7 @@ class _CacheSettings(pydantic.BaseSettings):
     class Config:
         """model config"""
 
+        env_file = ".env"
         env_prefix = "CACHE_"
 
 
@@ -71,6 +72,7 @@ class _ApiSettings(pydantic.BaseSettings):
     class Config:
         """model config"""
 
+        env_file = ".env"
         env_prefix = "TITILER_API_"
 
 

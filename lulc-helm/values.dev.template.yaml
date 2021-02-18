@@ -14,6 +14,7 @@ tiles:
   replicaCount: 4
   containerPort: 8000
   env:
+    Debug: "TRUE"
     Backends: {{STAGING_MOSAIC_BACKEND}}
     Host: {{STAGING_MOSAIC_HOST}}
     WebConcurrency: 2

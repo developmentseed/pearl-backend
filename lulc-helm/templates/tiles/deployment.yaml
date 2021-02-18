@@ -48,6 +48,8 @@ spec:
               value: {{ .Values.tiles.containerPort | quote }}
             - name: WEB_CONCURRENCY
               value: {{ .Values.tiles.env.WebConcurrency | quote }}
+            - name: DEBUG
+              value: {{ .Values.tiles.env.Debug }}
             - name: MOSAIC_BACKEND
               value: {{ .Values.tiles.env.Backends }}
             - name: MOSAIC_HOST

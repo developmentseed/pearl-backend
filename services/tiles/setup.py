@@ -3,10 +3,8 @@
 from setuptools import find_packages, setup
 
 inst_reqs = [
-    "cogeo-mosaic @ git+https://github.com/developmentseed/cogeo-mosaic.git",
-    "titiler @ git+https://github.com/developmentseed/titiler.git",
+    "titiler==0.1.0",
     "aiocache[redis]",
-    "rasterio==1.1.8",
     "tilebench",
     "ujson",
 ]
