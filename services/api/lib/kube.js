@@ -31,8 +31,8 @@ class Kube {
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      */
     makePodSpec(name, env) {
-        const nodeSelectorKey = process.env.nodeSelectorKey;
-        const nodeSelectorValue = process.env.nodeSelectorValue;
+        const nodeSelectorKey = process.env.nodeSelectorKey || 'agentpool';
+        const nodeSelectorValue = process.env.nodeSelectorValue || 'gpunodepool';
         const gpuImageName = process.env.GpuImageName;
         const gpuImageTag = process.env.GpuImageTag;
 
