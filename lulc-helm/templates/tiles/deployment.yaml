@@ -49,7 +49,7 @@ spec:
             - name: WEB_CONCURRENCY
               value: {{ .Values.tiles.env.WebConcurrency | quote }}
             - name: DEBUG
-              value: {{ .Values.tiles.env.Debug }}
+              value: {{ .Values.tiles.env.Debug | quote }}
             - name: MOSAIC_BACKEND
               value: {{ .Values.tiles.env.Backends }}
             - name: MOSAIC_HOST
