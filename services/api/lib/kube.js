@@ -36,6 +36,9 @@ class Kube {
         const gpuImageName = process.env.GpuImageName;
         const gpuImageTag = process.env.GpuImageTag;
 
+        const nodeSelector = {};
+        nodeSelector[nodeSelectorKey] = nodeSelectorValue;
+
         return {
             apiVersion: 'v1',
             kind: 'Pod',
@@ -55,7 +58,7 @@ class Kube {
                         env: env
                     }
                 ],
-                nodeSelector: `${nodeSelectorKey}:${nodeSelectorValue}`
+                nodeSelector: nodeSelector
             }
         };
     }
