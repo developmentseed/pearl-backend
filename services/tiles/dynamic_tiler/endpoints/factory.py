@@ -14,7 +14,7 @@ from rio_tiler.io import BaseReader, COGReader
 from titiler import utils
 from titiler.endpoints.factory import BaseTilerFactory, img_endpoint_params
 from titiler.models.mapbox import TileJSON
-from titiler.resources.enums import ImageType, PixelSelectionMethod
+from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHeaders
 from titiler.dependencies import WebMercatorTMSParams
 
 from ..dependencies import MosaicParams
@@ -28,12 +28,15 @@ from starlette.responses import Response
 
 @dataclass
 class MosaicTilerFactory(BaseTilerFactory):
-    """MosaicTiler"""
+    """Custom MosaicTilerFactory.
 
-    reader: Type[BaseBackend] = field(default=MosaicBackend)
-    dataset_reader: Type[BaseReader] = field(default=COGReader)
+    Note this is a really simple MosaicTiler Factory with only few endpoints.
+    """
 
-    path_dependency: Type[MosaicParams] = field(default=MosaicParams)
+    reader: Type[BaseBackend] = MosaicBackend
+    dataset_reader: Type[BaseReader] = COGReader
+
+    path_dependency: Type[MosaicParams] = MosaicParams
 
     # BaseBackend does not support other TMS than WebMercator
     tms_dependency: Callable[..., TileMatrixSet] = WebMercatorTMSParams
@@ -124,11 +127,13 @@ class MosaicTilerFactory(BaseTilerFactory):
                 )
             timings.append(("format", round(t.elapsed * 1000, 2)))
 
-            headers["Server-Timing"] = ", ".join(
-                [f"{name};dur={time}" for (name, time) in timings]
-            )
+            if OptionalHeaders.server_timing in self.optional_headers:
+                headers["Server-Timing"] = ", ".join(
+                    [f"{name};dur={time}" for (name, time) in timings]
+                )
 
-            headers["X-Assets"] = ",".join(data.assets)
+            if OptionalHeaders.x_assets in self.optional_headers:
+                headers["X-Assets"] = ",".join(data.assets)
 
             return Response(content, media_type=format.mimetype, headers=headers)
 
@@ -186,7 +191,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                 center = list(src_dst.center)
                 if minzoom:
                     center[-1] = minzoom
-                tjson = {
+                return {
                     "bounds": src_dst.bounds,
                     "center": tuple(center),
                     "minzoom": minzoom if minzoom is not None else src_dst.minzoom,
@@ -194,5 +199,3 @@ class MosaicTilerFactory(BaseTilerFactory):
                     "name": os.path.basename(src_path.layer),
                     "tiles": [tiles_url],
                 }
-
-            return tjson
