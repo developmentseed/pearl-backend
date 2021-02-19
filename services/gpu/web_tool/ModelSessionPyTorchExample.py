@@ -202,7 +202,7 @@ class TorchFineTuning(ModelSession):
         data = tile_img.to(self.device)
         with torch.no_grad():
             t_output = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy, to-do fix for actual batches
-            t_output = F.softmax(t_output, dim=1).cpu().numpy()
+            t_output = F.softmax(t_output, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
 
         print(t_output.shape)
         output_hard = t_output[0].argmax(axis=0).astype(np.uint8) #using [0] because using a "fake batch" of 1 tile

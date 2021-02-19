@@ -46,12 +46,12 @@ class ModelSrv():
             LOGGER.info("ok - generated inference");
 
             if self.aoi.live:
-                if output.shape[2] > len(color_list):
-                    LOGGER.warning("The colour list does not match class list")
-                    output = output[:,:,:len(color_list)]
+                # if output.shape[2] > len(color_list): # TO-DO fix this check to be in the unique pred values are > color list, or max value predicted > len(color_lst + 1)
+                #     LOGGER.warning("The colour list does not match class list")
+                #     output = output[:,:,:len(color_list)]
 
                 # Create color versions of predictions
-                img_soft = class_prediction_to_img(output, False, color_list)
+                img_soft = class_prediction_to_img(output, False, color_list) # investigate this
                 img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
                 img_soft = base64.b64encode(img_soft).decode("utf-8")
 

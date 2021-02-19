@@ -148,12 +148,13 @@ def to_one_hot_batch(batch, class_num):
         one_hot[:, class_id, :, :] = (batch == class_id).astype(np.float32)
     return one_hot
 
-def class_prediction_to_img(y_pred, hard=True, color_list=None):
-    assert len(y_pred.shape) == 3, "Input must have shape (height, width, num_classes)"
-    height, width, num_classes = y_pred.shape
+def class_prediction_to_img(y_pred, hard=False, color_list=None):
+    #assert len(y_pred.shape) == 3, "Input must have shape (height, width, num_classes)" # I don't think input needs to have num_classes?
+    height, width = y_pred.shape
+    num_classes = 10 #fix this should not be hard-coded, should be num classes
 
     if color_list is None:
-        colour_map = COLOR_MAP_LC4
+        colour_map = COLOR_MAP_LC4 # I think we need a COLOR_MAP variable for 10 classes?
     else:
         new_color_list = []
         for color in color_list:
@@ -162,7 +163,8 @@ def class_prediction_to_img(y_pred, hard=True, color_list=None):
             new_color_list.append(color)
         colour_map = np.array(new_color_list)
 
-    if hard:
+    if hard:  #maybe change how this is named, this is a bit confusing if the output were "soft" it would be (10,256,245) (num_classes, width, height);
+        # hard output implies that the argmax has already been taken and it's just one value per pixel (256,256).
         img = np.zeros((height, width, 3), dtype=np.uint8)
         y_pred_temp = y_pred.argmax(axis=2)
         for c in range(num_classes):
