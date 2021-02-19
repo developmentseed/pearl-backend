@@ -21,7 +21,7 @@ tiles:
     WebConcurrency: 2
 tilesScaler:
   env:
-    backendPool: pool-default-lulc-test-lulc-helm-tiles-80-bp-8000
+    backendPool: pool-default-lulc-test-lulc-helm-tiles-80-bp-8000~bp-default-lulc-test-lulc-helm-tiles-80-8000-lulc-test-lulc-helm-ingress-tiles
     tenantId: {{STAGING_TENANT_ID}}
     subscriptionId: {{STAGING_SUBSCRIPTION_ID}}
     resourceGroupName: {{CLUSTER_RESOURCE_GROUP}}
