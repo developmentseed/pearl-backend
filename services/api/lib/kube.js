@@ -33,6 +33,7 @@ class Kube {
     makePodSpec(name, env) {
         const nodeSelectorKey = process.env.nodeSelectorKey || 'agentpool';
         const nodeSelectorValue = process.env.nodeSelectorValue || 'gpunodepool';
+        const deploymentName = process.env.Deployment || '';
         const gpuImageName = process.env.GpuImageName;
         const gpuImageTag = process.env.GpuImageTag;
 
@@ -43,7 +44,7 @@ class Kube {
             apiVersion: 'v1',
             kind: 'Pod',
             metadata: {
-                name: `gpu-${name}`
+                name: `${deploymentName}-gpu-${name}`
             },
             spec: {
                 containers: [

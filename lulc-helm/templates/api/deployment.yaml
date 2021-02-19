@@ -51,4 +51,6 @@ spec:
               value: {{ .Values.gpu.image.tag }}
             - name: AZURE_STORAGE_CONNECTION_STRING
               value: {{ .Values.api.env.AZURE_STORAGE_CONNECTION_STRING}}
+            - name: Deployment
+              value: {{ template "lulc-helm.fullname" . }}
 {{- end }}
