@@ -9,7 +9,6 @@ import argparse
 import asyncio
 import websockets
 import logging
-import traceback
 from lib.api import API
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router

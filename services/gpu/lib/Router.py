@@ -1,4 +1,5 @@
 import websockets
+import traceback
 import logging
 import json
 
@@ -46,7 +47,12 @@ class Router():
                     LOGGER.info('ok - message: ' + str(message))
 
                     if self.msg.get(message):
-                        await self.msg[message](msg.get('data', {}), self.websocket)
+                        try:
+                            await self.msg[message](msg.get('data', {}), self.websocket)
+                        except Exception as e:
+                            LOGGER.error("not ok - failed to process: " + message)
+                            traceback.print_exc()
+
                     else:
                         LOGGER.info('ok - Unknown Message')
 
@@ -55,7 +61,11 @@ class Router():
                     LOGGER.info('ok - action: ' + str(action))
 
                     if self.act.get(action):
-                        await self.act[action](msg.get('data', {}), self.websocket)
+                        try:
+                            await self.act[action](msg.get('data', {}), self.websocket)
+                        except Exception as e:
+                            LOGGER.error("not ok - failed to process: " + action)
+                            traceback.print_exc()
                     else:
                         LOGGER.info('ok - Unknown Action')
 
