@@ -19,6 +19,7 @@ from sklearn.preprocessing import LabelBinarizer
 
 from .ModelSessionAbstract import ModelSession
 from training.models.unet_solar import UnetModel
+import segmentation_models_pytorch as smp
 
 import torch
 import torch.nn as nn
@@ -27,14 +28,6 @@ import torch.nn.functional as F
 
 class TorchFineTuning(ModelSession):
 
-    # AUGMENT_MODEL = SGDClassifier(
-    #     loss="log",
-    #     shuffle=True,
-    #     n_jobs=-1,
-    #     learning_rate="constant",
-    #     eta0=0.001,
-    #     warm_start=True
-    # )
     AUGMENT_MODEL = MLPClassifier(
         hidden_layer_sizes=(),
         alpha=0.0001,
@@ -50,7 +43,8 @@ class TorchFineTuning(ModelSession):
         self.model_fs = model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        self.model = model
+        #self.model = model
+
 
         ### THESE ARE FAKE - TALK TO MARTHA
         self.input_size = 1
@@ -63,7 +57,7 @@ class TorchFineTuning(ModelSession):
         )
         ###
 
-        self.output_channels = 3
+        self.output_channels = 10
         self.output_features = 64
 
         self.down_weight_padding = 10
@@ -73,15 +67,19 @@ class TorchFineTuning(ModelSession):
 
         ### TODO
         #self.model = UnetModel(model_opts)
-        #self._init_model()
+        self.model = smp.Unet(
+            encoder_name='resnet18', encoder_depth=3, encoder_weights=None,
+            decoder_channels=(128, 64, 64), in_channels=4, classes=10 #this is hard-ocded need to fix
+            )
+        self._init_model()
 
-        #for param in self.model.parameters():
-        #    param.requires_grad = False
+        for param in self.model.parameters():
+           param.requires_grad = False
 
-        #self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
-        #self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
+        self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
+        self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
 
-        #self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
         ### TODO
 
         #self.augment_model.coef_ = self.initial_weights.astype(np.float64)
@@ -103,14 +101,12 @@ class TorchFineTuning(ModelSession):
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
         self.model.eval()
-        self.model.seg_layer = nn.Conv2d(64, 3, kernel_size=1)
+        self.model.seg_layer = nn.Conv2d(64, 10, kernel_size=1)
         self.model = self.model.to(self.device)
 
 
     def run(self, tile, inference_mode=False):
-        means = np.array([660.5929,812.9481,1080.6552,1398.3968,1662.5913,1899.4804,2061.932,2100.2792,2214.9325,2230.5973,2443.3014,1968.1885])
-        stdevs = np.array([137.4943,195.3494,241.2698,378.7495,383.0338,449.3187,511.3159,547.6335,563.8937,501.023,624.041,478.9655])
-        tile = (tile - means) / stdevs
+        tile = tile / 255.0
         tile = tile.astype(np.float32)
 
         output, output_features = self.run_model_on_tile(tile)
@@ -241,7 +237,7 @@ class TorchFineTuning(ModelSession):
             t_batch = torch.from_numpy(t_batch).to(self.device)
 
             with torch.no_grad():
-                predictions, features = self.model.forward_features(t_batch)
+                predictions, features = self.model.forward(t_batch)
                 predictions = F.softmax(predictions)
 
                 predictions = predictions.cpu().numpy()
