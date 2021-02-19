@@ -114,7 +114,7 @@ class Instance {
             const podSpec = kube.makePodSpec(instanceId, [
                 {
                     name: 'INSTANCE_ID',
-                    value: instanceId
+                    value: instanceId.toString()
                 },
                 {
                     name: 'API',
