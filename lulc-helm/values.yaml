@@ -47,6 +47,15 @@ tiles:
       cpu: 1500m
       memory: 4Gi
 
+tilesScaler:
+  env:
+    backendPool: replace-with-service-backend-pool-identifier
+    tenantId: replace-with-tenant-id
+    subscriptionId: replace-with-subscription-id
+    resourceGroupName: replace-with-cluster-resource-group
+    activeDirectoryClientId: replace-with-client-id
+    activeDirectoryClientPassword: replace-with-client-secret
+
 redis:
   enabled: true
 gpu:

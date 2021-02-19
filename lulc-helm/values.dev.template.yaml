@@ -11,8 +11,9 @@ socket:
   containerPort: 1999
 tiles:
   enabled: true
-  replicaCount: 4
+  replicaCount: 2
   containerPort: 8000
+
   env:
     Debug: TRUE
     Backends: {{STAGING_MOSAIC_BACKEND}}
@@ -20,6 +21,7 @@ tiles:
     WebConcurrency: 2
 tilesScaler:
   env:
+    backendPool: pool-default-lulc-test-lulc-helm-tiles-80-bp-8000
     tenantId: {{STAGING_TENANT_ID}}
     subscriptionId: {{STAGING_SUBSCRIPTION_ID}}
     resourceGroupName: {{CLUSTER_RESOURCE_GROUP}}

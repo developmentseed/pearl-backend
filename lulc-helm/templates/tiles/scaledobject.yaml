@@ -6,8 +6,8 @@ metadata:
 spec:
   scaleTargetRef:
     name: {{ template "lulc-helm.fullname" . }}-tiles
-  minReplicaCount: 4
-  maxReplicaCount: 4
+  minReplicaCount: 2
+  maxReplicaCount: 12
   triggers:
   - type: azure-monitor
     metadata:
@@ -16,7 +16,7 @@ spec:
       subscriptionId: {{ .Values.tilesScaler.env.subscriptionId }}
       resourceGroupName: azureMonitor
       metricName: AvgRequestCountPerHealthyHost
-      metricFilter: BackendSettingsPool eq pool-default-lulc-test-lulc-helm-tiles-80-bp-8000~bp-default-lulc-test-lulc-helm-tiles-80-8000-lulc-test-lulc-helm-ingress
+      metricFilter: BackendSettingsPool eq {{ .Values.tilesScaler.env.backendPool }}
       metricAggregationInterval: "0:1:0"
       metricAggregationType: 'Average'
       targetValue: "10"
