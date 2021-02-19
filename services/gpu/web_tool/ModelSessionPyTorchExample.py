@@ -43,6 +43,7 @@ class TorchFineTuning(ModelSession):
         self.model_fs = model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+        # will need to figure out for re-training ?
         # self.output_channels = 10
         # self.output_features = 64
 
@@ -61,6 +62,7 @@ class TorchFineTuning(ModelSession):
         for param in self.model.parameters():
            param.requires_grad = False
 
+        # will need to figure out for re-training
         #self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
         #self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
 
@@ -199,10 +201,11 @@ class TorchFineTuning(ModelSession):
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
         with torch.no_grad():
-            t_output = self.model(data[None, ...]) # insert singleton "batch" dimension to your input data, to-do fix for actual batches
+            t_output = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy, to-do fix for actual batches
             t_output = F.softmax(t_output, dim=1).cpu().numpy()
 
-        output_hard = t_output.argmax(axis=0).astype(np.uint8)
+        print(t_output.shape)
+        output_hard = t_output[0].argmax(axis=0).astype(np.uint8) #using [0] because using a "fake batch" of 1 tile
 
         print ('output_hard shape')
         print (output_hard.shape)
@@ -293,46 +296,3 @@ class TorchFineTuning(ModelSession):
             "message": "Loaded model state",
             "success": True
         }
-
-    # def retrain(self, train_steps=100, learning_rate=1e-3):
-
-    #     print_every_k_steps = 10
-
-    #     print("Fine tuning with %d new labels." % self.num_corrected_pixels)
-    #     batch_x = torch.from_numpy(np.array(self.augment_x_train)).float().to(self.device)
-    #     batch_y = torch.from_numpy(np.array(self.augment_y_train)).to(self.device)
-
-    #     self._init_model()
-
-    #     optimizer = torch.optim.Adam(self.model.last.parameters(), lr=learning_rate, eps=1e-5)
-
-    #     criterion = nn.CrossEntropyLoss().to(self.device)
-
-    #     for i in range(train_steps):
-    #         #print('step %d' % i)
-    #         acc = 0
-
-    #         with torch.enable_grad():
-
-    #             optimizer.zero_grad()
-
-    #             pred = self.model.last.forward(batch_x.unsqueeze(2).unsqueeze(3)).squeeze(3).squeeze(2)
-    #             #print(pred)
-    #             #print('retr', y_pred1.shape, out.shape)
-
-    #             loss = criterion(pred,batch_y)
-
-    #             print(loss.mean().item())
-
-    #             acc = (pred.argmax(1)==batch_y).float().mean().item()
-
-    #             loss.backward()
-    #             optimizer.step()
-
-    #         if i % print_every_k_steps == 0:
-    #             print("Step pixel acc: ", acc)
-
-    #     success = True
-    #     message = "Fine-tuned model with %d samples." % len(self.augment_x_train)
-    #     print(message)
-    #     return success, message
