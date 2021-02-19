@@ -76,6 +76,19 @@ class Kube {
     }
 
     /**
+     *
+     * Delete a pod based on the name
+     */
+
+    async deletePod(name) {
+        const res = await this.k8sApi.deleteNamespacedPod(name, this.namespace);
+        if (res.statusCode >= 400) {
+            return `REquest failed: ${res.statusMessage}`;
+        }
+        return res.body;
+    }
+
+    /**
      * Get pod details
      */
     async getPod(name) {
