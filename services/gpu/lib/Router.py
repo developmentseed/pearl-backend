@@ -23,29 +23,39 @@ class Router():
         self.act[path] = fn
 
     async def open(self):
-        self.websocket = await websockets.connect(self.uri)
-        LOGGER.info("ok - WebSocket Connection Initialized")
-
         while True:
-            try:
-                if not self.websocket.open:
-                    LOGGER.warning("ok - websocket disconnected, attempting reconnection")
-                    break
+            self.websocket = await websockets.connect(self.uri)
+            LOGGER.info("ok - WebSocket Connection Initialized")
 
-                msg = await self.websocket.recv()
-                msg = json.loads(msg)
+            while True:
+                try:
+                    if not self.websocket.open:
+                        LOGGER.warning("ok - websocket disconnected, attempting reconnection")
+                        break
 
-            except Exception as e:
-                LOGGER.error("not ok - failed to decode websocket message")
-                LOGGER.error(e)
-                continue
+                    msg = await self.websocket.recv()
+                    msg = json.loads(msg)
 
-            if msg.get('message') is not None:
-                message = msg.get('message')
-                LOGGER.info('ok - message: ' + str(message))
+                except Exception as e:
+                    LOGGER.error("not ok - failed to decode websocket message")
+                    LOGGER.error(e)
+                    continue
 
-            elif msg.get('action') is not None:
-                action = msg.get('action')
-                LOGGER.info('ok - action: ' + str(action))
+                if msg.get('message') is not None:
+                    message = msg.get('message')
+                    LOGGER.info('ok - message: ' + str(message))
 
+                    if self.msg.get(message):
+                        await self.msg[message](msg.get('data', {}), self.websocket)
+                    else:
+                        LOGGER.info('ok - Unknown Message')
+
+                elif msg.get('action') is not None:
+                    action = msg.get('action')
+                    LOGGER.info('ok - action: ' + str(action))
+
+                    if self.act.get(action):
+                        await self.act[action](msg.get('data', {}), self.websocket)
+                    else:
+                        LOGGER.info('ok - Unknown Action')
 
