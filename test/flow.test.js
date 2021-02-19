@@ -87,7 +87,7 @@ test('new model', (t) => {
         body: {
             name: 'NAIP Supervised',
             active: true,
-            model_type: 'keras_example',
+            model_type: 'pytorch_example',
             model_finetunelayer: -4,
             model_numparams: 7790949,
             model_inputshape: [240,240,4],
@@ -120,7 +120,7 @@ test('new model', (t) => {
             active: true,
             uid: 1,
             name: 'NAIP Supervised',
-            model_type: 'keras_example',
+            model_type: 'pytorch_example',
             model_finetunelayer: -4,
             model_numparams: 7790949,
             model_inputshape: [ 240, 240, 4 ],

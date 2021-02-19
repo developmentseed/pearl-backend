@@ -24,7 +24,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-    
+
 class TorchFineTuning(ModelSession):
 
     # AUGMENT_MODEL = SGDClassifier(
@@ -46,44 +46,52 @@ class TorchFineTuning(ModelSession):
     )
 
 
-    def __init__(self, gpu_id, **kwargs):
-        self.model_fn = kwargs["fn"]
+    def __init__(self, gpu_id, model, model_fs):
+        self.model_fs = model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        self.output_channels = 3 #kwargs["num_classes"]
+        self.model = model
+
+        ### THESE ARE FAKE - TALK TO MARTHA
+        self.input_size = 1
+
+        model_opts = types.SimpleNamespace(
+            input_channels=self.input_size,
+            first_layer_filters=1,
+            net_depth=1,
+            num_classes=1
+        )
+        ###
+
+        self.output_channels = 3
         self.output_features = 64
-        self.input_size = kwargs["input_size"]
 
         self.down_weight_padding = 10
 
         self.stride_x = self.input_size - self.down_weight_padding*2
         self.stride_y = self.input_size - self.down_weight_padding*2
 
-        model_opts = types.SimpleNamespace(
-            **kwargs
-        )
-        self.model = UnetModel(model_opts)
-        self._init_model()
+        ### TODO
+        #self.model = UnetModel(model_opts)
+        #self._init_model()
 
-        for param in self.model.parameters():
-            param.requires_grad = False
+        #for param in self.model.parameters():
+        #    param.requires_grad = False
 
-        self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
-        self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
+        #self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
+        #self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
 
-        print(self.initial_weights.shape)
-        print(self.initial_biases.shape)
-
-        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+        #self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+        ### TODO
 
         #self.augment_model.coef_ = self.initial_weights.astype(np.float64)
         #self.augment_model.intercept_ = self.initial_biases.astype(np.float64)
         #self.augment_model.classes_ = np.array(list(range(self.output_channels)))
         #self.augment_model.n_features_in_ = self.output_features
         #self.augment_model.n_features = self.output_features
-      
+
         self._last_tile = None
-        
+
         self.augment_x_train = []
         self.augment_y_train = []
 
@@ -92,13 +100,13 @@ class TorchFineTuning(ModelSession):
         return self._last_tile
 
     def _init_model(self):
-        checkpoint = torch.load(self.model_fn, map_location=self.device)
+        checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
         self.model.eval()
         self.model.seg_layer = nn.Conv2d(64, 3, kernel_size=1)
         self.model = self.model.to(self.device)
 
-    
+
     def run(self, tile, inference_mode=False):
         means = np.array([660.5929,812.9481,1080.6552,1398.3968,1662.5913,1899.4804,2061.932,2100.2792,2214.9325,2230.5973,2443.3014,1968.1885])
         stdevs = np.array([137.4943,195.3494,241.2698,378.7495,383.0338,449.3187,511.3159,547.6335,563.8937,501.023,624.041,478.9655])
@@ -113,14 +121,14 @@ class TorchFineTuning(ModelSession):
     def retrain(self, **kwargs):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
-        
+
         if x_train.shape[0] == 0:
             return {
                 "message": "Need to add training samples in order to train",
                 "success": False
             }
 
-        
+
         try:
             self.augment_model.fit(x_train, y_train)
             score = self.augment_model.score(x_train, y_train)
@@ -133,7 +141,7 @@ class TorchFineTuning(ModelSession):
 
             self.model.seg_layer.weight.data = new_weights
             self.model.seg_layer.bias.data = new_biases
-            
+
             return {
                 "message": "Fine-tuning accuracy on data: %0.2f" % (score),
                 "success": True
@@ -143,7 +151,7 @@ class TorchFineTuning(ModelSession):
                 "message": "Error in 'retrain()': %s" % (e),
                 "success": False
             }
-    
+
     def undo(self):
         if len(self.augment_y_train) > 0:
             self.augment_x_train.pop()
@@ -171,7 +179,7 @@ class TorchFineTuning(ModelSession):
                 "message": "Must run model before adding a training sample",
                 "success": False
             }
-        
+
     def reset(self):
         self._init_model()
         self.augment_x_train = []
@@ -201,7 +209,7 @@ class TorchFineTuning(ModelSession):
     def run_model_on_tile(self, tile, batch_size=32):
         height = tile.shape[0]
         width = tile.shape[1]
-        
+
         output = np.zeros((height, width, self.output_channels), dtype=np.float32)
         output_features = np.zeros((height, width, self.output_features), dtype=np.float32)
 
@@ -231,7 +239,7 @@ class TorchFineTuning(ModelSession):
             t_batch = batch[i:i+batch_size]
             t_batch = np.rollaxis(t_batch, 3, 1)
             t_batch = torch.from_numpy(t_batch).to(self.device)
-            
+
             with torch.no_grad():
                 predictions, features = self.model.forward_features(t_batch)
                 predictions = F.softmax(predictions)
@@ -247,7 +255,7 @@ class TorchFineTuning(ModelSession):
 
         model_output = np.concatenate(model_output, axis=0)
         model_feature_output = np.concatenate(model_feature_output, axis=0)
-        
+
         for i, (y, x) in enumerate(batch_indices):
             output[y:y+self.input_size, x:x+self.input_size] += model_output[i] * kernel[..., np.newaxis]
             output_features[y:y+self.input_size, x:x+self.input_size] += model_feature_output[i] * kernel[..., np.newaxis]
@@ -270,7 +278,7 @@ class TorchFineTuning(ModelSession):
         #         f.write("")
 
         return {
-            "message": "Saved model state", 
+            "message": "Saved model state",
             "success": True
         }
 
@@ -288,45 +296,45 @@ class TorchFineTuning(ModelSession):
         # self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         return {
-            "message": "Loaded model state", 
+            "message": "Loaded model state",
             "success": True
         }
 
     # def retrain(self, train_steps=100, learning_rate=1e-3):
-      
+
     #     print_every_k_steps = 10
 
     #     print("Fine tuning with %d new labels." % self.num_corrected_pixels)
     #     batch_x = torch.from_numpy(np.array(self.augment_x_train)).float().to(self.device)
     #     batch_y = torch.from_numpy(np.array(self.augment_y_train)).to(self.device)
-        
+
     #     self._init_model()
-        
+
     #     optimizer = torch.optim.Adam(self.model.last.parameters(), lr=learning_rate, eps=1e-5)
-        
+
     #     criterion = nn.CrossEntropyLoss().to(self.device)
 
     #     for i in range(train_steps):
     #         #print('step %d' % i)
     #         acc = 0
-            
+
     #         with torch.enable_grad():
 
     #             optimizer.zero_grad()
-                
+
     #             pred = self.model.last.forward(batch_x.unsqueeze(2).unsqueeze(3)).squeeze(3).squeeze(2)
     #             #print(pred)
     #             #print('retr', y_pred1.shape, out.shape)
 
     #             loss = criterion(pred,batch_y)
-                
+
     #             print(loss.mean().item())
-                
+
     #             acc = (pred.argmax(1)==batch_y).float().mean().item()
 
     #             loss.backward()
     #             optimizer.step()
-            
+
     #         if i % print_every_k_steps == 0:
     #             print("Step pixel acc: ", acc)
 

@@ -12,6 +12,7 @@ import logging
 import traceback
 from lib.api import API
 from lib.ModelSrv import ModelSrv
+from lib.Router import Router
 from web_tool.ModelSessionPyTorchExample import TorchFineTuning
 from web_tool.Utils import setup_logging
 
@@ -57,66 +58,15 @@ def main():
     )
 
 async def connection(uri, model):
-    while True:
-        try:
-            async with websockets.connect(uri) as websocket:
-                LOGGER.info("ok - WebSocket Connection Initialized")
+    router = Router(uri)
 
-                while True:
-                    try:
-                        if not websocket.open:
-                            LOGGER.warning("ok - websocket disconnected, attempting reconnection")
-                            break
+    router.on_act("instance#terminate", router.terminate)
+    router.on_act("model#reset", model.reset)
+    router.on_act("model#undo", model.undo)
+    router.on_act("model#prediction", model.prediction)
+    router.on_act("model#checkpoint", model.checkpoint)
 
-                        msg = await websocket.recv()
-                        msg = json.loads(msg)
-
-                    except Exception as e:
-                        LOGGER.error("not ok - failed to decode websocket message")
-                        LOGGER.error(e)
-                        continue
-
-                    if msg.get('message') is not None:
-                        message = msg.get('message')
-
-                        LOGGER.info('ok - message: ' + str(message))
-                    elif msg.get('action') is not None:
-                        action = msg.get('action')
-
-                        LOGGER.info('ok - action: ' + str(action))
-
-                        try:
-                            if action == "instance#terminate":
-                                # Save Checkpoint
-                                # Mark instance as terminated in API
-                                # Shut down
-                                break
-
-                            elif action == "model#reset":
-                                model.reset()
-
-                            elif action == "model#undo":
-                                model.undo()
-
-                            # Return a prediction for a given extent
-                            elif action == "model#prediction":
-                                await model.prediction(msg.get('data'), websocket)
-
-                            elif action == "model#last_tile":
-                                model.last_tile()
-
-                            elif action == "model#add_sample":
-                                model.add_sample_point()
-
-                            elif action == "model#checkpoint":
-                                await model.checkpoint(msg.get('data'), websocket)
-                        except Exception as e:
-                            LOGGER.error("not ok - failed to perform action")
-                            traceback.print_exc()
-                            continue
-        except Exception as e:
-            LOGGER.error("not ok - failed to connect to router, reattempting")
-            time.sleep(1)
+    await router.open()
 
 
 def load(gpu_id, api):
