@@ -43,30 +43,15 @@ class TorchFineTuning(ModelSession):
         self.model_fs = model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        #self.model = model
+        # self.output_channels = 10
+        # self.output_features = 64
 
+        # self.down_weight_padding = 10
 
-        ### THESE ARE FAKE - TALK TO MARTHA
-        self.input_size = 1
-
-        model_opts = types.SimpleNamespace(
-            input_channels=self.input_size,
-            first_layer_filters=1,
-            net_depth=1,
-            num_classes=1
-        )
-        ###
-
-        self.output_channels = 10
-        self.output_features = 64
-
-        self.down_weight_padding = 10
-
-        self.stride_x = self.input_size - self.down_weight_padding*2
-        self.stride_y = self.input_size - self.down_weight_padding*2
+        # self.stride_x = self.input_size - self.down_weight_padding*2
+        # self.stride_y = self.input_size - self.down_weight_padding*2
 
         ### TODO
-        #self.model = UnetModel(model_opts)
         self.model = smp.Unet(
             encoder_name='resnet18', encoder_depth=3, encoder_weights=None,
             decoder_channels=(128, 64, 64), in_channels=4, classes=10 #this is hard-ocded need to fix
@@ -76,17 +61,10 @@ class TorchFineTuning(ModelSession):
         for param in self.model.parameters():
            param.requires_grad = False
 
-        self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
-        self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
+        #self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
+        #self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
 
-        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
-        ### TODO
-
-        #self.augment_model.coef_ = self.initial_weights.astype(np.float64)
-        #self.augment_model.intercept_ = self.initial_biases.astype(np.float64)
-        #self.augment_model.classes_ = np.array(list(range(self.output_channels)))
-        #self.augment_model.n_features_in_ = self.output_features
-        #self.augment_model.n_features = self.output_features
+        # self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
 
         self._last_tile = None
 
@@ -100,17 +78,21 @@ class TorchFineTuning(ModelSession):
     def _init_model(self):
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
-        self.model.eval()
-        self.model.seg_layer = nn.Conv2d(64, 10, kernel_size=1)
+        #self.model.eval()
+        #self.model.seg_layer = nn.Conv2d(64, 10, kernel_size=1)
         self.model = self.model.to(self.device)
 
 
     def run(self, tile, inference_mode=False):
+        print ('in run tile')
+
+        tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
         tile = tile.astype(np.float32)
+        print(tile.shape)
 
-        output, output_features = self.run_model_on_tile(tile)
-        self._last_tile = output_features
+        output  = self.run_model_on_tile(tile)
+        #self._last_tile = output_features
 
         return output
 
@@ -202,65 +184,81 @@ class TorchFineTuning(ModelSession):
         }
 
 
-    def run_model_on_tile(self, tile, batch_size=32):
+    def run_model_on_tile(self, tile):
+        print('in run model on tile')
         height = tile.shape[0]
         width = tile.shape[1]
 
-        output = np.zeros((height, width, self.output_channels), dtype=np.float32)
-        output_features = np.zeros((height, width, self.output_features), dtype=np.float32)
+        #print (self.model)
 
-        counts = np.zeros((height, width), dtype=np.float32) + 0.000000001
-        kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
-        kernel[10:-10, 10:-10] = 1
-        kernel[self.down_weight_padding:self.down_weight_padding+self.stride_y,
-               self.down_weight_padding:self.down_weight_padding+self.stride_x] = 5
+        self.model.eval() #moved this out of the _init_model() should probably move back?
 
-        batch = []
-        batch_indices = []
-        batch_count = 0
+        output = np.zeros((10, height, width), dtype=np.float32) # num_classes hard-coded fix
+        counts = np.zeros((height, width), dtype=np.float32)
 
-        for y_index in (list(range(0, height - self.input_size, self.stride_y)) + [height - self.input_size,]):
-            for x_index in (list(range(0, width - self.input_size, self.stride_x)) + [width - self.input_size,]):
-                naip_im = tile[y_index:y_index+self.input_size, x_index:x_index+self.input_size, :]
+        tile_img = torch.from_numpy(tile)
+        data = tile_img.to(self.device)
+        with torch.no_grad():
+            t_output = self.model(data[None, ...]) # insert singleton "batch" dimension to your input data, to-do fix for actual batches
+            t_output = F.softmax(t_output, dim=1).cpu().numpy()
 
-                batch.append(naip_im)
-                batch_indices.append((y_index, x_index))
-                batch_count+=1
-        batch = np.array(batch)
+        output_hard = t_output.argmax(axis=0).astype(np.uint8)
 
-        model_output = []
-        model_feature_output = []
-        for i in range(0, len(batch), batch_size):
+        print ('output_hard shape')
+        print (output_hard.shape)
+        print(np.unique(output_hard))
 
-            t_batch = batch[i:i+batch_size]
-            t_batch = np.rollaxis(t_batch, 3, 1)
-            t_batch = torch.from_numpy(t_batch).to(self.device)
+        # just one tile at a time? or can we get batches of tiles?
+        # batch = []
+        # batch_indices = []
+        # batch_count = 0
 
-            with torch.no_grad():
-                predictions, features = self.model.forward(t_batch)
-                predictions = F.softmax(predictions)
+        # we don't need this part because this is helping to make 256, 256 tiles from a large naip image, but the new naip tiler returns 256 by 256 already
+        # for y_index in (list(range(0, height - self.input_size, self.stride_y)) + [height - self.input_size,]):
+        #     for x_index in (list(range(0, width - self.input_size, self.stride_x)) + [width - self.input_size,]):
+        #         naip_im = tile[y_index: y_index + self.input_size, x_index: x_index + self.input_size, :]
+        #         print(naip_im)
 
-                predictions = predictions.cpu().numpy()
-                features = features.cpu().numpy()
+        #         batch.append(naip_im)
+        #         batch_indices.append((y_index, x_index))
+        #         batch_count+=1
+        #batch = np.array(batch)
+        #rint(batch.shape)
 
-            predictions = np.rollaxis(predictions, 1, 4)
-            features = np.rollaxis(features, 1, 4)
+        # model_output = []
+        # model_feature_output = []
+        # for i in range(0, len(batch), batch_size):
 
-            model_output.append(predictions)
-            model_feature_output.append(features)
+        #     t_batch = batch[i:i+batch_size]
+        #     t_batch = np.rollaxis(t_batch, 3, 1)
+        #     print(t_batch.shape)
+        #     t_batch = torch.from_numpy(t_batch).to(self.device)
 
-        model_output = np.concatenate(model_output, axis=0)
-        model_feature_output = np.concatenate(model_feature_output, axis=0)
+        #     with torch.no_grad():
+        #         predictions, features = self.model.forward(t_batch)
+        #         predictions = F.softmax(predictions)
 
-        for i, (y, x) in enumerate(batch_indices):
-            output[y:y+self.input_size, x:x+self.input_size] += model_output[i] * kernel[..., np.newaxis]
-            output_features[y:y+self.input_size, x:x+self.input_size] += model_feature_output[i] * kernel[..., np.newaxis]
-            counts[y:y+self.input_size, x:x+self.input_size] += kernel
+        #         predictions = predictions.cpu().numpy()
+        #         features = features.cpu().numpy()
 
-        output = output / counts[..., np.newaxis]
-        output_features = output_features / counts[..., np.newaxis]
+        #     predictions = np.rollaxis(predictions, 1, 4)
+        #     features = np.rollaxis(features, 1, 4)
 
-        return output, output_features
+        #     model_output.append(predictions)
+        #     model_feature_output.append(features)
+
+        # model_output = np.concatenate(model_output, axis=0)
+        # model_feature_output = np.concatenate(model_feature_output, axis=0)
+
+        # for i, (y, x) in enumerate(batch_indices):
+        #     output[y:y+self.input_size, x:x+self.input_size] += model_output[i] * kernel[..., np.newaxis]
+        #     output_features[y:y+self.input_size, x:x+self.input_size] += model_feature_output[i] * kernel[..., np.newaxis]
+        #     counts[y:y+self.input_size, x:x+self.input_size] += kernel
+
+        #output = output / counts[..., np.newaxis]
+        #output_features = output_features / counts[..., np.newaxis]
+
+        return  output_hard
 
     def save_state_to(self, directory):
         raise NotImplementedError()
