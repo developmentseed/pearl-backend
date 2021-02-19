@@ -65,7 +65,7 @@ test('api running', (t) => {
         method: 'GET',
         json: true,
         url: API + '/api'
-    } , (err, res, body) => {
+    }, (err, res, body) => {
         t.error(err, 'no error');
 
         t.equals(res.statusCode, 200);
@@ -89,20 +89,25 @@ test('new model', (t) => {
             active: true,
             model_type: 'pytorch_example',
             model_finetunelayer: -4,
-            model_numparams: 7790949,
-            model_inputshape: [240,240,4],
+            model_numparams: 11776266,
+            model_inputshape: [256, 256, 4],
             classes: [
                 { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
+                { name: 'Emergent Wetlands', color: '#008000' },
+                { name: 'Tree Canopy', color: '#80FF80' },
+                { name: 'Shrubland', color: '#806060' },
+                { name: 'Low Vegetation', color: '#07c4c5' },
+                { name: 'Barren', color: '#027fdc' },
+                { name: 'Structure', color: '#f76f73' },
+                { name: 'Imprervious Surface', color: '#ffb703' },
+                { name: 'Imprevious Road', color: '#0218a2' }
             ],
             meta: {}
         },
         headers: {
             Authorization: `Bearer ${token}`
         }
-    } , (err, res, body) => {
+    }, (err, res, body) => {
         t.error(err, 'no error');
 
         t.equals(res.statusCode, 200, '200 status code');
@@ -123,7 +128,7 @@ test('new model', (t) => {
             model_type: 'pytorch_example',
             model_finetunelayer: -4,
             model_numparams: 7790949,
-            model_inputshape: [ 240, 240, 4 ],
+            model_inputshape: [240, 240, 4],
             storage: null,
             classes: [
                 { name: 'Water', color: '#0000FF' },
@@ -151,7 +156,7 @@ test('new project', (t) => {
         headers: {
             Authorization: `Bearer ${token}`
         }
-    } , (err, res, body) => {
+    }, (err, res, body) => {
         t.error(err, 'no error');
 
         t.equals(res.statusCode, 200, '200 status code');
@@ -180,11 +185,11 @@ test('new instance', (t) => {
         method: 'POST',
         json: true,
         url: API + '/api/project/1/instance',
-        body: { },
+        body: {},
         headers: {
             Authorization: `Bearer ${token}`
         }
-    } , (err, res, body) => {
+    }, (err, res, body) => {
         t.error(err, 'no error');
 
         t.equals(res.statusCode, 200, '200 status code');
@@ -195,7 +200,7 @@ test('new instance', (t) => {
 
         t.ok(parseInt(body.id), 'id: <integer>');
         delete body.id,
-        delete body.created;
+            delete body.created;
         instance = body.token;
         delete body.token;
 
@@ -228,11 +233,11 @@ test('gpu connection', (t) => {
                     polygon: {
                         type: 'Polygon',
                         coordinates: [[
-                            [ -79.37724530696869, 38.83428180092151 ],
-                            [ -79.37677592039108, 38.83428180092151 ],
-                            [ -79.37677592039108, 38.83455550411051 ],
-                            [ -79.37724530696869, 38.83455550411051 ],
-                            [ -79.37724530696869, 38.83428180092151 ]
+                            [-79.37724530696869, 38.83428180092151],
+                            [-79.37677592039108, 38.83428180092151],
+                            [-79.37677592039108, 38.83455550411051],
+                            [-79.37724530696869, 38.83455550411051],
+                            [-79.37724530696869, 38.83428180092151]
                         ]]
                     }
                 }
