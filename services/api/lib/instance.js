@@ -111,11 +111,20 @@ class Instance {
             }, this.config.SigningSecret, { expiresIn: '12h' });
 
             const instanceId = parseInt(pgres.rows[0].id)
-            const podSpec = kube.makePodSpec(instanceId, {
-                'INSTANCE_ID': instanceId,
-                'API': 'https://api.lulc.ds.io',
-                'SOCKET': 'https://socket.lulc.ds.io'
-            });
+            const podSpec = kube.makePodSpec(instanceId, [
+                {
+                    name: 'INSTANCE_ID',
+                    value: instanceId
+                },
+                {
+                    name: 'API',
+                    value: 'https://api.lulc.ds.io'
+                },
+                {
+                    name: 'SOCKET',
+                    value: 'https://socket.lulc.ds.io'
+                }
+            ]);
             console.log('podSpec', JSON.stringify(podSpec));
             const pod = await kube.createPod(podSpec);
 
