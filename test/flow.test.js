@@ -115,7 +115,7 @@ test('new model', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(Object.keys(body), [
-            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_finetunelayer', 'model_numparams', 'model_inputshape', 'storage', 'classes', 'meta'
+            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_finetunelayer', 'model_numparams', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
@@ -129,15 +129,21 @@ test('new model', (t) => {
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',
             model_finetunelayer: -4,
-            model_numparams: 7790949,
-            model_inputshape: [240, 240, 4],
+            model_numparams: 11776266,
+            model_inputshape: [256, 256, 4],
             model_zoom: 17,
             storage: null,
             classes: [
+                { name: 'No Data', color: '#62a092' },
                 { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
+                { name: 'Emergent Wetlands', color: '#008000' },
+                { name: 'Tree Canopy', color: '#80FF80' },
+                { name: 'Shrubland', color: '#806060' },
+                { name: 'Low Vegetation', color: '#07c4c5' },
+                { name: 'Barren', color: '#027fdc' },
+                { name: 'Structure', color: '#f76f73' },
+                { name: 'Imprervious Surface', color: '#ffb703' },
+                { name: 'Imprevious Road', color: '#0218a2' }
             ],
             meta: {}
         }, 'expected body');
@@ -202,9 +208,12 @@ test('new instance', (t) => {
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
+
         delete body.id,
-            delete body.created;
+        delete body.created;
+
         instance = body.token;
+
         delete body.token;
 
         t.deepEquals(body, {}, 'expected body');
