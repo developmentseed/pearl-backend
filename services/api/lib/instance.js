@@ -9,15 +9,16 @@ class Instance {
         this.config = config;
     }
 
-    /** 
+    /**
      * Return a Row as a JSON Object
      * @param {Object} row Postgres Database Row
      */
     static json(row) {
         return {
-            id: parseInt(pgres.rows[0].id),
-            created: pgres.rows[0].created,
-            active: pgres.rows[0].active
+            id: parseInt(row.id),
+            project_id: parseInt(row.project_id),
+            created: row.created,
+            active: row.active
         };
     }
 
@@ -131,6 +132,7 @@ class Instance {
                 SELECT
                     id,
                     created,
+                    project_id,
                     active
                 FROM
                     instances

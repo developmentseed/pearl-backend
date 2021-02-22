@@ -27,7 +27,7 @@ class AOI():
     def __init__(self, api, poly):
         self.api = api
         self.poly = poly
-        self.zoom = self.api.mosaic['maxzoom']
+        self.zoom = self.api.model['model_zoom']
 
         self.tiles = AOI.gen_tiles(self.poly, self.zoom)
         self.total = len(self.tiles)

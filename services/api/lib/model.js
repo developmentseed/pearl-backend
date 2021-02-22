@@ -214,6 +214,7 @@ class Model {
                     model_finetunelayer,
                     model_numparams,
                     model_inputshape,
+                    model_zoom,
                     storage,
                     classes,
                     meta
