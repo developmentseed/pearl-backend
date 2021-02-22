@@ -20,4 +20,7 @@ spec:
       metricAggregationInterval: "0:1:0"
       metricAggregationType: 'Average'
       targetValue: "10"
+    authenticationRef:
+      name: {{ template "lulc-helm.fullname" . }}-azure-monitor-trigger-auth
+
 {{- end }}
