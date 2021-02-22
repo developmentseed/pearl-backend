@@ -8,6 +8,8 @@ spec:
     name: {{ template "lulc-helm.fullname" . }}-tiles
   minReplicaCount: 2
   maxReplicaCount: 12
+  cooldownPeriod: 300
+  pollingInterval: 50
   triggers:
   - type: azure-monitor
     metadata:
