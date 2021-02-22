@@ -20,6 +20,4 @@ spec:
       metricAggregationInterval: "0:1:0"
       metricAggregationType: 'Average'
       targetValue: "10"
-      activeDirectoryClientId: {{ .Values.tilesScaler.env.activeDirectoryClientId }}
-      activeDirectoryClientPassword: {{ .Values.tilesScaler.env.activeDirectoryClientPassword }}
 {{- end }}
