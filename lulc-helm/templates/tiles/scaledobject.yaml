@@ -11,7 +11,7 @@ spec:
   triggers:
   - type: azure-monitor
     metadata:
-      resourceURI: Microsoft.ContainerService/managedClusters/lulcStagingAks3
+      resourceURI: Microsoft.Network/applicationGateways/lulcStagingApplicationGateway3
       tenantId: {{ .Values.tilesScaler.env.tenantId }}
       subscriptionId: {{ .Values.tilesScaler.env.subscriptionId }}
       resourceGroupName: lulcStaging
