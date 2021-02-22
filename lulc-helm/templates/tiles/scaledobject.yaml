@@ -16,7 +16,7 @@ spec:
       subscriptionId: {{ .Values.tilesScaler.env.subscriptionId }}
       resourceGroupName: lulcStaging
       metricName: AvgRequestCountPerHealthyHost
-      metricFilter: BackendSettingsPool eq {{ .Values.tilesScaler.env.backendPool }}
+      metricFilter: BackendSettingsPool eq {{ .Values.tilesScaler.env.backendPool | quote }}
       metricAggregationInterval: "0:1:0"
       metricAggregationType: 'Average'
       targetValue: "10"
