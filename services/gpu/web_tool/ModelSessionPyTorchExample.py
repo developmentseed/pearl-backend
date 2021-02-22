@@ -6,6 +6,7 @@ import time
 import copy
 import json
 import types
+import joblib
 
 import logging
 LOGGER = logging.getLogger("server")
@@ -66,7 +67,7 @@ class TorchFineTuning(ModelSession):
         #self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
         #self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
 
-        # self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
 
         self._last_tile = None
 
@@ -253,15 +254,15 @@ class TorchFineTuning(ModelSession):
         return  output_hard
 
     def save_state_to(self, directory):
-        raise NotImplementedError()
-        # np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
-        # np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
-        # joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p"))
+        np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
+        np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
-        # if self.augment_model_trained:
-        #     with open(os.path.join(directory, "trained.txt"), "w") as f:
-        #         f.write("")
+        joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
+
+        if self.augment_model_trained:
+            with open(os.path.join(directory, "trained.txt"), "w") as f:
+                f.write("")
 
         return {
             "message": "Saved model state",
@@ -269,17 +270,17 @@ class TorchFineTuning(ModelSession):
         }
 
     def load_state_from(self, directory):
-        raise NotImplementedError()
-        # self.augment_x_train = []
-        # self.augment_y_train = []
 
-        # for sample in np.load(os.path.join(directory, "augment_x_train.npy")):
-        #     self.augment_x_train.append(sample)
-        # for sample in np.load(os.path.join(directory, "augment_y_train.npy")):
-        #     self.augment_y_train.append(sample)
+        self.augment_x_train = []
+        self.augment_y_train = []
 
-        # self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
-        # self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
+        for sample in np.load(os.path.join(directory, "augment_x_train.npy")):
+            self.augment_x_train.append(sample)
+        for sample in np.load(os.path.join(directory, "augment_y_train.npy")):
+            self.augment_y_train.append(sample)
+
+        self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
+        self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         return {
             "message": "Loaded model state",
