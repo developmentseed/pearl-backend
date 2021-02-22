@@ -86,15 +86,14 @@ class TorchFineTuning(ModelSession):
 
 
     def run(self, tile, inference_mode=False):
-        print ('in run tile')
-
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
         tile = tile.astype(np.float32)
-        print(tile.shape)
 
-        output  = self.run_model_on_tile(tile)
+        print('RUN', tile.shape)
+        output = self.run_model_on_tile(tile)
         #self._last_tile = output_features
+        print('OUTPUT', output.shape)
 
         return output
 
@@ -187,11 +186,8 @@ class TorchFineTuning(ModelSession):
 
 
     def run_model_on_tile(self, tile):
-        print('in run model on tile')
-        height = tile.shape[0]
-        width = tile.shape[1]
-
-        #print (self.model)
+        height = tile.shape[1]
+        width = tile.shape[2]
 
         self.model.eval() #moved this out of the _init_model() should probably move back?
 
@@ -204,12 +200,7 @@ class TorchFineTuning(ModelSession):
             t_output = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy, to-do fix for actual batches
             t_output = F.softmax(t_output, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
 
-        print(t_output.shape)
         output_hard = t_output[0].argmax(axis=0).astype(np.uint8) #using [0] because using a "fake batch" of 1 tile
-
-        print ('output_hard shape')
-        print (output_hard.shape)
-        print(np.unique(output_hard))
 
         # just one tile at a time? or can we get batches of tiles?
         # batch = []

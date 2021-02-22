@@ -1,3 +1,4 @@
+Pillow==8.1.0
 supermercado==0.2.0
 pyproj==2.6.0
 pyjwt==2.0.0
@@ -8,7 +9,6 @@ requests-toolbelt==0.9.1
 websockets==8.1
 rasterio==1.2.0
 shapely==1.7.1
-opencv-python==4.5.1.48
 mercantile==1.1.6
 rtree==0.9.7
 fiona==1.8.18

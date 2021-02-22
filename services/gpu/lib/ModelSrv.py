@@ -2,10 +2,10 @@ import os
 import base64
 import json
 import numpy as np
-import cv2
+from .utils import pred2png
 from .AOI import AOI
 from .MemRaster import MemRaster
-from web_tool.Utils import serialize, deserialize, class_prediction_to_img
+from web_tool.Utils import serialize, deserialize
 import logging
 
 LOGGER = logging.getLogger("server")
@@ -51,16 +51,14 @@ class ModelSrv():
                 #     output = output[:,:,:len(color_list)]
 
                 # Create color versions of predictions
-                img_soft = class_prediction_to_img(output, False, color_list) # investigate this
-                img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
-                img_soft = base64.b64encode(img_soft).decode("utf-8")
+                png = pred2png(output, color_list) # investigate this
 
                 LOGGER.info("ok - returning inference");
                 await websocket.send(json.dumps({
                     'message': 'model#prediction',
                     'data': {
                         'bounds': in_memraster.bounds,
-                        'image': img_soft,
+                        'image': png,
                         'total': self.aoi.total,
                         'processed': len(self.aoi.tiles)
                     }
