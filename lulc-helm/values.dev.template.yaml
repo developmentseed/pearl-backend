@@ -11,7 +11,6 @@ socket:
   containerPort: 1999
 tiles:
   enabled: true
-  replicaCount: 2
   containerPort: 8000
 
   env:

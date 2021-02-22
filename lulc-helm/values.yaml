@@ -30,7 +30,6 @@ socket:
       memory: 8Gi
 tiles:
   enabled: true
-  replicaCount: 4
   containerPort: 8000
   image:
     name: 'chartpress_replace'
