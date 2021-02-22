@@ -92,6 +92,7 @@ test('new model', (t) => {
             model_numparams: 11776266,
             model_inputshape: [256, 256, 4],
             classes: [
+                { name: 'No Data', color: '#62a092' },
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Emergent Wetlands', color: '#008000' },
                 { name: 'Tree Canopy', color: '#80FF80' },
