@@ -90,10 +90,8 @@ class TorchFineTuning(ModelSession):
         tile = tile / 255.0
         tile = tile.astype(np.float32)
 
-        print('RUN', tile.shape)
         output = self.run_model_on_tile(tile)
         #self._last_tile = output_features
-        print('OUTPUT', output.shape)
 
         return output
 

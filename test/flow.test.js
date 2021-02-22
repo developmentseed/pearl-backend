@@ -91,6 +91,7 @@ test('new model', (t) => {
             model_finetunelayer: -4,
             model_numparams: 11776266,
             model_inputshape: [256, 256, 4],
+            model_zoom: 17,
             classes: [
                 { name: 'No Data', color: '#62a092' },
                 { name: 'Water', color: '#0000FF' },

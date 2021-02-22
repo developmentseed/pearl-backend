@@ -16,6 +16,28 @@ class Model {
     }
 
     /**
+     * Return a Row as a JSON Object
+     * @param {Object} row Postgres Database Row
+     */
+    static json(row) {
+        return {
+            id: parseInt(row.id),
+            created: row.created,
+            active: row.active,
+            uid: parseInt(row.uid),
+            name: row.name,
+            model_type: row.model_type,
+            model_finetunelayer: row.model_finetunelayer,
+            model_numparams: parseInt(row.model_numparams),
+            model_inputshape: row.model_inputshape,
+            model_zoom: row.model_zoom,
+            storage: row.storage,
+            classes: row.classes,
+            meta: row.meta
+        };
+    }
+
+    /**
      * Create a new model
      *
      * @param {Object} model Model object
@@ -34,11 +56,12 @@ class Model {
                     model_finetunelayer,
                     model_numparams,
                     model_inputshape,
+                    model_zoom,
                     storage,
                     classes,
                     meta
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
                 ) RETURNING *
             `, [
                 model.active,
@@ -48,6 +71,7 @@ class Model {
                 model.model_finetunelayer,
                 model.model_numparams,
                 model.model_inputshape,
+                model.model_zoom,
                 model.storage,
                 JSON.stringify(model.classes),
                 model.meta
@@ -56,22 +80,7 @@ class Model {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        const row = pgres.rows[0];
-
-        return {
-            id: parseInt(row.id),
-            created: row.created,
-            active: row.active,
-            uid: parseInt(row.uid),
-            name: row.name,
-            model_type: row.model_type,
-            model_finetunelayer: row.model_finetunelayer,
-            model_numparams: parseInt(row.model_numparams),
-            model_inputshape: row.model_inputshape,
-            storage: row.storage,
-            classes: row.classes,
-            meta: row.meta
-        };
+        return Model.json(pgres.rows[0]);
     }
 
     /**
@@ -126,22 +135,7 @@ class Model {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Model not found');
 
-        const row = pgres.rows[0];
-
-        return {
-            id: parseInt(row.id),
-            created: row.created,
-            active: row.active,
-            uid: parseInt(row.uid),
-            name: row.name,
-            model_type: row.model_type,
-            model_finetunelayer: row.model_finetunelayer,
-            model_numparams: parseInt(row.model_numparams),
-            model_inputshape: row.model_inputshape,
-            storage: row.storage,
-            classes: row.classes,
-            meta: row.meta
-        };
+        return Model.json(pgres.rows[0]);
     }
 
     /**
@@ -234,20 +228,7 @@ class Model {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No model found');
 
-        return {
-            id: parseInt(pgres.rows[0].id),
-            created: pgres.rows[0].created,
-            active: pgres.rows[0].active,
-            uid: parseInt(pgres.rows[0].uid),
-            name: pgres.rows[0].name,
-            model_type: pgres.rows[0].model_type,
-            model_finetunelayer: pgres.rows[0].model_finetunelayer,
-            model_numparams: parseInt(pgres.rows[0].model_numparams),
-            model_inputshape: pgres.rows[0].model_inputshape,
-            storage: pgres.rows[0].storage,
-            classes: pgres.rows[0].classes,
-            meta: pgres.rows[0].meta
-        };
+        return Model.json(pgres.rows[0]);
     }
 
     /**

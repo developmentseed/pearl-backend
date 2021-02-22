@@ -9,6 +9,19 @@ class Instance {
         this.config = config;
     }
 
+    /** 
+     * Return a Row as a JSON Object
+     * @param {Object} row Postgres Database Row
+     */
+    static json(row) {
+        return {
+            id: parseInt(pgres.rows[0].id),
+            created: pgres.rows[0].created,
+            active: pgres.rows[0].active
+        };
+    }
+
+
     /**
      * Return a list of instances
      *
@@ -118,7 +131,6 @@ class Instance {
                 SELECT
                     id,
                     created,
-                    project_id,
                     active
                 FROM
                     instances
@@ -131,12 +143,7 @@ class Instance {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
-        return {
-            id: parseInt(pgres.rows[0].id),
-            created: pgres.rows[0].created,
-            project_id: parseInt(pgres.rows[0].project_id),
-            active: pgres.rows[0].active
-        };
+        return Instance.json(pgres.rows[0]);
     }
 }
 

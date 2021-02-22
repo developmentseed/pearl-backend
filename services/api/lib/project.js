@@ -9,6 +9,20 @@ class Project {
     }
 
     /**
+     * Return a Row as a JSON Object
+     * @param {Object} row Postgres Database Row
+     */
+    static json(row) {
+        return {
+            id: parseInt(row.id),
+            name: row.name,
+            model_id: parseInt(row.model_id),
+            mosaic: row.mosaic,
+            created: row.created
+        };
+    }
+
+    /**
      * Return a list of projects
      *
      * @param {Number} uid - Projects related to a specific user
@@ -88,13 +102,7 @@ class Project {
                 project.mosaic
             ]);
 
-            return {
-                id: parseInt(pgres.rows[0].id),
-                name: pgres.rows[0].name,
-                model_id: parseInt(pgres.rows[0].model_id),
-                mosaic: pgres.rows[0].mosaic,
-                created: pgres.rows[0].created
-            };
+            return Project.json(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to create project');
         }
@@ -129,14 +137,7 @@ class Project {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No project found');
 
-        return {
-            id: parseInt(pgres.rows[0].id),
-            uid: parseInt(pgres.rows[0].uid),
-            name: pgres.rows[0].name,
-            model_id: parseInt(pgres.rows[0].model_id),
-            mosaic: pgres.rows[0].mosaic,
-            created: pgres.rows[0].created
-        };
+        return Project.json(pgres.rows[0]);
     }
 }
 
