@@ -24,7 +24,7 @@ if (require.main === module) {
 
 const pool = new Pool();
 
-function configure(argv = {}, cb) {
+async function configure(argv = {}, cb) {
     Config.env(argv).then((config) => {
         return server(argv, config, cb);
     }).catch((err) => {

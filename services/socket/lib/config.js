@@ -1,6 +1,8 @@
 'use strict';
 
 const pkg = require('../package.json');
+const { promisify } = require('util');
+const request = promisify(require('request'));
 
 /**
  * @class Config
@@ -26,13 +28,38 @@ class Config {
         this.API = args.api || process.env.API || 'http://localhost:2000';
 
         this.Port = args.port || 1999;
-        this.Timeout = args.timeout || 15 * 60 * 1000; // default 15m
+
+        let maxretry = 20;
+        let retry = maxretry;
+        this.Timeout = false;
+        do {
+            try {
+                const meta = await request({
+                    json: true,
+                    method: 'GET',
+                    url: this.API + '/api'
+                });
+
+                this.Timeout = meta.instance_window;
+            } catch (err) {
+                if (retry === 0) {
+                    console.error('not ok - terminating due to lack of api metadata');
+                    return process.exit(1);
+                }
+
+                retry--;
+                console.error('not ok - unable to get api metadata');
+                console.error(`ok - retrying... (${maxretry - retry}/${maxretry})`);
+                await sleep(5000);
+            }
+        } while (!this.Timeout);
+
         this.Alive = args.alive || 30 * 1000; // default 30s
 
         return this;
     }
 
-    static async help() {
+    static help() {
         console.error(`lulc/socket@${pkg.version}`);
         console.error();
         console.error('./index.js [--help] [--prod] [--api <api>] [--port <port>] [--timeout <timeout>] [--alive <timeout>]');
@@ -53,6 +80,12 @@ class Config {
         console.error('  API                                        The API URL to connect to');
         console.error();
     }
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 module.exports = Config;
