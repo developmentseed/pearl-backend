@@ -37,7 +37,7 @@ tiles:
   nodeSelector:
     enabled: true
     label_key: agentpool
-    label_value: nodepool1
+    label_value: tiler
   resources:
     requests:
       cpu: 800m
