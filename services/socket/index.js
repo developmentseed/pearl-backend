@@ -65,7 +65,7 @@ function server(argv, config, cb) {
         }
     });
 
-    const timeout = new Timeout(config, wss);
+    const timeout = new Timeout(config, pool);
 
     wss.on('connection', (ws, req) => {
         ws.auth = req.auth;
