@@ -6,10 +6,10 @@ metadata:
 spec:
   scaleTargetRef:
     name: {{ template "lulc-helm.fullname" . }}-tiles
-  minReplicaCount: 2
-  maxReplicaCount: 12
+  minReplicaCount: 8
+  maxReplicaCount: 30
   cooldownPeriod: 300
-  pollingInterval: 50
+  pollingInterval: 20
   triggers:
   - type: azure-monitor
     metadata:
@@ -21,7 +21,7 @@ spec:
       metricFilter: BackendSettingsPool eq '{{ .Values.tilesScaler.env.backendPool }}'
       metricAggregationInterval: "0:1:0"
       metricAggregationType: 'Average'
-      targetValue: "10"
+      targetValue: "40"
     authenticationRef:
       name: {{ template "lulc-helm.fullname" . }}-azure-monitor-trigger-auth
 
