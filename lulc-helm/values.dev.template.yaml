@@ -17,7 +17,7 @@ tiles:
     Debug: TRUE
     Backends: {{STAGING_MOSAIC_BACKEND}}
     Host: {{STAGING_MOSAIC_HOST}}
-    WebConcurrency: 2
+    WebConcurrency: 1
 tilesScaler:
   env:
     backendPool: pool-default-lulc-test-lulc-helm-tiles-80-bp-8000~bp-default-lulc-test-lulc-helm-tiles-80-8000-lulc-test-lulc-helm-ingress-tiles
