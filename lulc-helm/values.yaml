@@ -40,11 +40,11 @@ tiles:
     label_value: tiler
   resources:
     requests:
-      cpu: 800m
-      memory: 2Gi
+      cpu: 2
+      memory: 4Gi
     limits:
-      cpu: 1200m
-      memory: 3Gi
+      cpu: 2
+      memory: 4Gi
 
 tilesScaler:
   env:
