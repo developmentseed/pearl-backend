@@ -40,11 +40,11 @@ tiles:
     label_value: nodepool1
   resources:
     requests:
-      cpu: 600m
-      memory: 1Gi
+      cpu: 800m
+      memory: 2Gi
     limits:
-      cpu: 1500m
-      memory: 4Gi
+      cpu: 1200m
+      memory: 3Gi
 
 tilesScaler:
   env:
