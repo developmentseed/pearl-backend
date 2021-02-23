@@ -9,7 +9,7 @@ const request = promisify(require('request'));
  *
  * @prop {Number} [API='http://localhost:2000'] URL to the main lulc API
  * @prop {Number} [Port=1999] The port on which the WebSocketServer will listen for connections
- * @prop {Number} [Timeout=900000] How long a connection can be silent before it's resources are terminated
+ * @prop {Number} Timeout How long a connection can be silent before it's resources are terminated
  * @prop {Number} [Alive=30000] How often the client must ping/pong to retain an active connection
  */
 class Config {

@@ -67,20 +67,13 @@ function server(argv, config, cb) {
 
     const timeout = new Timeout(config, wss);
 
-    /*
-     * ws.isAlive {boolean} Store whether the connection is still alive
-     * ws.activity {Date} Store the timestamp of th last user defined action
-     */
     wss.on('connection', (ws, req) => {
-        ws.isAlive = true;
-        ws.activity = +new Date();
         ws.auth = req.auth;
 
+        pool.connected(ws);
         console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} connected`);
 
         Timeout.client(ws);
-
-        pool.connected(ws);
 
         ws.on('close', () => {
             console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} disconnected`);
