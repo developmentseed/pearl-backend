@@ -22,10 +22,9 @@ test('POST /api/model', (t) => {
         body: {
             name: 'NAIP Supervised',
             active: true,
-            model_type: 'keras_example',
-            model_finetunelayer: -4,
-            model_numparams: 7790949,
+            model_type: 'pytorch_example',
             model_inputshape: [240,240,4],
+            model_zoom: 17,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -119,7 +118,6 @@ test('POST /api/project/1/aoi', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            project_id: 1,
             storage: false,
             bounds: {
                 type: 'Polygon',

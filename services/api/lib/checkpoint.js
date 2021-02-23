@@ -16,6 +16,20 @@ class CheckPoint {
     }
 
     /**
+     * Return a Row as a JSON Object
+     * @param {Object} row Postgres Database Row
+     */
+     static json(row) {
+        return {
+            id: parseInt(row.id),
+            name: row.name,
+            classes: row.classes,
+            created: row.created,
+            storage: row.storage
+        };
+     }
+
+    /**
      * Return a list of checkpoints for a given instance
      *
      * @param {Number} instanceid Instance ID to list checkpoints for
@@ -140,15 +154,7 @@ class CheckPoint {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
 
-        const row = pgres.rows[0];
-
-        return {
-            id: parseInt(row.id),
-            name: row.name,
-            classes: row.classes,
-            created: row.created,
-            storage: row.storage
-        };
+        return CheckPoint.json(pgres.rows[0]);
     }
 
     /**
@@ -179,31 +185,24 @@ class CheckPoint {
         }
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
-        const row = pgres.rows[0];
 
-        return {
-            id: parseInt(row.id),
-            name: row.name,
-            classes: row.classes,
-            created: row.created,
-            storage: row.storage
-        };
+        return CheckPoint(pgres.rows[0]);
     }
 
 
     /**
      * Create a new Checkpoint
      *
-     * @param {Number} instanceid - Checkpoint related to a specific instance
+     * @param {Number} projectid - Checkpoint related to a specific instance
      * @param {Object} checkpoint - Checkpoint Object
      */
-    async create(instanceid, checkpoint) {
+    async create(projectid, checkpoint) {
         if (!checkpoint) checkpoint = {};
 
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoints (
-                    instance_id,
+                    project_id,
                     name,
                     classes
                 ) VALUES (
@@ -217,14 +216,7 @@ class CheckPoint {
                 JSON.stringify(checkpoint.classes)
             ]);
 
-            return {
-                id: parseInt(pgres.rows[0].id),
-                instance_id: instanceid,
-                created: pgres.rows[0].created,
-                name: pgres.rows[0].name,
-                classes: pgres.rows[0].classes,
-                storage: pgres.rows[0].storage
-            };
+            return CheckPoint.json(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to create checkpoint');
         }

@@ -10,6 +10,20 @@ class Instance {
     }
 
     /**
+     * Return a Row as a JSON Object
+     * @param {Object} row Postgres Database Row
+     */
+    static json(row) {
+        return {
+            id: parseInt(row.id),
+            project_id: parseInt(row.project_id),
+            created: row.created,
+            active: row.active
+        };
+    }
+
+
+    /**
      * Return a list of instances
      *
      * @param {Object} query - Query Object
@@ -131,12 +145,7 @@ class Instance {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
-        return {
-            id: parseInt(pgres.rows[0].id),
-            created: pgres.rows[0].created,
-            project_id: parseInt(pgres.rows[0].project_id),
-            active: pgres.rows[0].active
-        };
+        return Instance.json(pgres.rows[0]);
     }
 }
 

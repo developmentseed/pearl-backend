@@ -2,10 +2,10 @@ import os
 import base64
 import json
 import numpy as np
-import cv2
+from .utils import pred2png
 from .AOI import AOI
 from .MemRaster import MemRaster
-from web_tool.Utils import serialize, deserialize, class_prediction_to_img
+from web_tool.Utils import serialize, deserialize
 import logging
 
 LOGGER = logging.getLogger("server")
@@ -46,21 +46,19 @@ class ModelSrv():
             LOGGER.info("ok - generated inference");
 
             if self.aoi.live:
-                if output.shape[2] > len(color_list):
-                    LOGGER.warning("The colour list does not match class list")
-                    output = output[:,:,:len(color_list)]
+                # if output.shape[2] > len(color_list): # TO-DO fix this check to be in the unique pred values are > color list, or max value predicted > len(color_lst + 1)
+                #     LOGGER.warning("The colour list does not match class list")
+                #     output = output[:,:,:len(color_list)]
 
                 # Create color versions of predictions
-                img_soft = class_prediction_to_img(output, False, color_list)
-                img_soft = cv2.imencode(".png", cv2.cvtColor(img_soft, cv2.COLOR_RGB2BGR))[1].tostring()
-                img_soft = base64.b64encode(img_soft).decode("utf-8")
+                png = pred2png(output, color_list) # investigate this
 
                 LOGGER.info("ok - returning inference");
                 await websocket.send(json.dumps({
                     'message': 'model#prediction',
                     'data': {
                         'bounds': in_memraster.bounds,
-                        'image': img_soft,
+                        'image': png,
                         'total': self.aoi.total,
                         'processed': len(self.aoi.tiles)
                     }
@@ -75,6 +73,7 @@ class ModelSrv():
                 }))
 
             # Push tile into geotiff fabric
+            output = np.expand_dims(output, axis=-1)
             output = MemRaster(output, in_memraster.crs, in_memraster.tile)
             self.aoi.add_to_fabric(output)
 

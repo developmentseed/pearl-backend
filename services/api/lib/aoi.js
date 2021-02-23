@@ -16,6 +16,30 @@ class AOI {
     }
 
     /**
+     * Return a Row as a JSON Object
+     * @param {Object} row Postgres Database Row
+     */
+    static json(row) {
+        const def = {
+            id: parseInt(row.id),
+            created: row.created,
+            storage: row.storage
+        };
+
+        if (typeof row.bounds === 'object') {
+            def.bounds = row.bounds;
+        } else {
+            try {
+                def.bounds = JSON.parse(row.bounds);
+            } catch (err) {
+                // Ignore Errors
+            }
+        }
+
+        return def;
+    }
+
+    /**
      * Upload an AOI geotiff and mark the AOI storage property as true
      *
      * @param {Number} aoiid AOI ID to upload to
@@ -85,13 +109,7 @@ class AOI {
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
 
-        const row = pgres.rows[0];
-        return {
-            id: parseInt(row.id),
-            bounds: row.bounds,
-            created: row.created,
-            storage: row.storage
-        };
+        AOI.json(pgres.rows[0]);
     }
 
     /**
@@ -122,13 +140,7 @@ class AOI {
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
 
-        const row = pgres.rows[0];
-        return {
-            id: parseInt(row.id),
-            bounds: row.bounds,
-            created: row.created,
-            storage: row.storage
-        };
+        return AOI.json(pgres.rows[0]);
     }
 
     /**
@@ -193,8 +205,9 @@ class AOI {
      * @param {Object} aoi.bounds - AOI Bounds GeoJSON
      */
     async create(projectid, aoi) {
+        let pgres;
         try {
-            const pgres = await this.pool.query(`
+            pgres = await this.pool.query(`
                 INSERT INTO aois (
                     project_id,
                     bounds
@@ -207,16 +220,12 @@ class AOI {
                 aoi.bounds
             ]);
 
-            return {
-                id: parseInt(pgres.rows[0].id),
-                project_id: projectid,
-                created: pgres.rows[0].created,
-                bounds: aoi.bounds,
-                storage: pgres.rows[0].storage
-            };
         } catch (err) {
             throw new Err(500, err, 'Failed to create aoi');
         }
+
+        pgres.rows[0].bounds = aoi.bounds;
+        return AOI.json(pgres.rows[0]);
     }
 }
 

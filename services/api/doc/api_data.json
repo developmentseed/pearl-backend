@@ -391,7 +391,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"model_id\": 1,\n    \"project_id\": 2,\n    \"mosaic\": \"naip.latest\",\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date\",\n    \"project_id\": 2,\n    \"url\": \"ws://<websocket-connection-url>\",\n    \"token\": \"websocket auth token\"\n}",
           "type": "json"
         }
       ]
@@ -418,7 +418,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -507,7 +507,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instances\": [{\n        \"id\": 1,\n        \"uid\": 123,\n        \"active\": true,\n        \"created\": \"<date>\",\n        \"model_id\": 1,\n        \"mosaic\": \"naip.latest\"\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instances\": [{\n        \"id\": 1,\n        \"uid\": 123,\n        \"active\": true,\n        \"created\": \"<date>\"\n    }]\n}",
           "type": "json"
         }
       ]
@@ -580,7 +580,6 @@
             "group": "Body",
             "type": "String",
             "allowedValues": [
-              "\"keras_example\"",
               "\"random_forest\"",
               "\"pytorch_example\"",
               "\"pytorch_solar\""
@@ -595,6 +594,13 @@
             "optional": false,
             "field": "model_finetunelayer",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_zoom",
+            "description": "<p>The tile zoom level to run inferences on</p>"
           },
           {
             "group": "Body",
@@ -1209,7 +1215,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\"\n}",
           "type": "json"
         }
       ]
