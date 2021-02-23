@@ -35,6 +35,7 @@ spec:
             httpGet:
               path: /healthz
               port: {{ .Values.tiles.containerPort }}
+            periodSeconds: 20
           resources:
             requests:
               cpu: {{ .Values.tiles.resources.requests.cpu }}
