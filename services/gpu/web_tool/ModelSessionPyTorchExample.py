@@ -64,8 +64,8 @@ class TorchFineTuning(ModelSession):
            param.requires_grad = False
 
         # will need to figure out for re-training
-        #self.initial_weights = self.model.seg_layer.weight.cpu().detach().numpy().squeeze()
-        #self.initial_biases = self.model.seg_layer.bias.cpu().detach().numpy()
+        self.initial_weights = self.model.segmentation_head[0].weight
+        self.initial_biases = self.model.segmentation_head[0].bias
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
 
