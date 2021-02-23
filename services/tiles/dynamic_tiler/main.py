@@ -4,7 +4,7 @@ from brotli_asgi import BrotliMiddleware
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from tilebench.middleware import VSIStatsMiddleware
+# from tilebench.middleware import VSIStatsMiddleware
 from titiler.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 from titiler.middleware import CacheControlMiddleware, TotalTimeMiddleware
 from titiler.endpoints.factory import TilerFactory, TMSFactory
@@ -32,7 +32,7 @@ if api_settings.cors_origins:
 optional_headers = []
 if api_settings.debug:
     app.add_middleware(TotalTimeMiddleware)
-    app.add_middleware(VSIStatsMiddleware)
+    # app.add_middleware(VSIStatsMiddleware)
     optional_headers = [OptionalHeaders.x_assets, OptionalHeaders.server_timing]
 
 app.add_event_handler("startup", setup_cache)
