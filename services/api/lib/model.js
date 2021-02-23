@@ -27,8 +27,6 @@ class Model {
             uid: parseInt(row.uid),
             name: row.name,
             model_type: row.model_type,
-            model_finetunelayer: row.model_finetunelayer,
-            model_numparams: parseInt(row.model_numparams),
             model_inputshape: row.model_inputshape,
             model_zoom: row.model_zoom,
             storage: row.storage,
@@ -53,23 +51,19 @@ class Model {
                     uid,
                     name,
                     model_type,
-                    model_finetunelayer,
-                    model_numparams,
                     model_inputshape,
                     model_zoom,
                     storage,
                     classes,
                     meta
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9
                 ) RETURNING *
             `, [
                 model.active,
                 user.uid,
                 model.name,
                 model.model_type,
-                model.model_finetunelayer,
-                model.model_numparams,
                 model.model_inputshape,
                 model.model_zoom,
                 model.storage,
@@ -211,8 +205,6 @@ class Model {
                     uid,
                     name,
                     model_type,
-                    model_finetunelayer,
-                    model_numparams,
                     model_inputshape,
                     model_zoom,
                     storage,

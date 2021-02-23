@@ -23,8 +23,6 @@ test('POST /api/model', (t) => {
             name: 'NAIP Supervised',
             active: true,
             model_type: 'pytorch_example',
-            model_finetunelayer: -4,
-            model_numparams: 7790949,
             model_inputshape: [240,240,4],
             model_zoom: 17,
             classes: [

@@ -27,8 +27,6 @@ CREATE TABLE IF NOT EXISTS models (
 
     model_type              TEXT,
     model_zoom              INT,
-    model_finetunelayer     INT,
-    model_numparams         BIGINT,
     model_inputshape        INT[],
 
     storage                 BOOLEAN,

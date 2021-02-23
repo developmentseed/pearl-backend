@@ -4,8 +4,6 @@
         "name",
         "active",
         "model_type",
-        "model_finetunelayer",
-        "model_numparams",
         "model_inputshape",
         "model_zoom",
         "classes",
@@ -30,15 +28,9 @@
                 "pytorch_solar"
             ]
         },
-        "model_finetunelayer": {
-            "type": "integer"
-        },
         "model_zoom": {
             "type": "integer",
             "description": "The tile zoom level to run inferences on"
-        },
-        "model_numparams": {
-            "type": "integer"
         },
         "model_inputshape": {
             "type": "array",
