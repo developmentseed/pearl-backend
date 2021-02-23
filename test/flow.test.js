@@ -113,7 +113,7 @@ test('new model', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(Object.keys(body), [
-            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_finetunelayer', 'model_numparams', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
+            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
@@ -126,8 +126,6 @@ test('new model', (t) => {
             uid: 1,
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',
-            model_finetunelayer: -4,
-            model_numparams: 11776266,
             model_inputshape: [256, 256, 4],
             model_zoom: 17,
             storage: null,
