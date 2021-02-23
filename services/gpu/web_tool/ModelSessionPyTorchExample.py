@@ -201,56 +201,6 @@ class TorchFineTuning(ModelSession):
 
         output_hard = t_output[0].argmax(axis=0).astype(np.uint8) #using [0] because using a "fake batch" of 1 tile
 
-        # just one tile at a time? or can we get batches of tiles?
-        # batch = []
-        # batch_indices = []
-        # batch_count = 0
-
-        # we don't need this part because this is helping to make 256, 256 tiles from a large naip image, but the new naip tiler returns 256 by 256 already
-        # for y_index in (list(range(0, height - self.input_size, self.stride_y)) + [height - self.input_size,]):
-        #     for x_index in (list(range(0, width - self.input_size, self.stride_x)) + [width - self.input_size,]):
-        #         naip_im = tile[y_index: y_index + self.input_size, x_index: x_index + self.input_size, :]
-        #         print(naip_im)
-
-        #         batch.append(naip_im)
-        #         batch_indices.append((y_index, x_index))
-        #         batch_count+=1
-        #batch = np.array(batch)
-        #rint(batch.shape)
-
-        # model_output = []
-        # model_feature_output = []
-        # for i in range(0, len(batch), batch_size):
-
-        #     t_batch = batch[i:i+batch_size]
-        #     t_batch = np.rollaxis(t_batch, 3, 1)
-        #     print(t_batch.shape)
-        #     t_batch = torch.from_numpy(t_batch).to(self.device)
-
-        #     with torch.no_grad():
-        #         predictions, features = self.model.forward(t_batch)
-        #         predictions = F.softmax(predictions)
-
-        #         predictions = predictions.cpu().numpy()
-        #         features = features.cpu().numpy()
-
-        #     predictions = np.rollaxis(predictions, 1, 4)
-        #     features = np.rollaxis(features, 1, 4)
-
-        #     model_output.append(predictions)
-        #     model_feature_output.append(features)
-
-        # model_output = np.concatenate(model_output, axis=0)
-        # model_feature_output = np.concatenate(model_feature_output, axis=0)
-
-        # for i, (y, x) in enumerate(batch_indices):
-        #     output[y:y+self.input_size, x:x+self.input_size] += model_output[i] * kernel[..., np.newaxis]
-        #     output_features[y:y+self.input_size, x:x+self.input_size] += model_feature_output[i] * kernel[..., np.newaxis]
-        #     counts[y:y+self.input_size, x:x+self.input_size] += kernel
-
-        #output = output / counts[..., np.newaxis]
-        #output_features = output_features / counts[..., np.newaxis]
-
         return  output_hard
 
     def save_state_to(self, directory):
