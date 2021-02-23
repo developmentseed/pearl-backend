@@ -82,7 +82,8 @@ class Flight {
                         version: pkg.version,
                         limits: {
                             live_inference: 1000,
-                            max_inference: 100000
+                            max_inference: 100000,
+                            instance_window: 1800
                         }
                     });
 
