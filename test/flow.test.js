@@ -88,8 +88,6 @@ test('new model', (t) => {
             name: 'NAIP Supervised',
             active: true,
             model_type: 'pytorch_example',
-            model_finetunelayer: -4,
-            model_numparams: 11776266,
             model_inputshape: [256, 256, 4],
             model_zoom: 17,
             classes: [
