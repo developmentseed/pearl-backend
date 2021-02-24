@@ -53,4 +53,6 @@ spec:
               value: {{ .Values.api.env.AZURE_STORAGE_CONNECTION_STRING}}
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
+            - name: TileUrl
+              value: tiles.{{ .Values.domain }}
 {{- end }}
