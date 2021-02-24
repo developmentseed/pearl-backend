@@ -123,6 +123,10 @@ class Instance {
                 {
                     name: 'SOCKET',
                     value: 'https://socket.lulc.ds.io'
+                },
+                {
+                    name: 'SigningSecret',
+                    value: this.config.SigningSecret
                 }
             ]);
             console.log('podSpec', JSON.stringify(podSpec));

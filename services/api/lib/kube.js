@@ -1,6 +1,8 @@
 'use strict';
 
 const k8s = require('@kubernetes/client-node');
+const Config = require('./config');
+const config = Config.env({});
 class Kube {
 
     /**
@@ -31,11 +33,11 @@ class Kube {
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      */
     makePodSpec(name, env) {
-        const nodeSelectorKey = process.env.nodeSelectorKey || 'agentpool';
-        const nodeSelectorValue = process.env.nodeSelectorValue || 'gpunodepool';
-        const deploymentName = process.env.Deployment || '';
-        const gpuImageName = process.env.GpuImageName;
-        const gpuImageTag = process.env.GpuImageTag;
+        const nodeSelectorKey = config.nodeSelectorKey;
+        const nodeSelectorValue = config.nodeSelectorValue;
+        const deploymentName = config.Deployment;
+        const gpuImageName = config.GpuImageName;
+        const gpuImageTag = config.GpuImageTag;
 
         const nodeSelector = {};
         nodeSelector[nodeSelectorKey] = nodeSelectorValue;
