@@ -1,4 +1,0 @@
-dependencies: 
-  - name: ingress-azure 
-    version: 1.3.0 
-    repository: https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/

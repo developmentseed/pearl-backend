@@ -5,7 +5,6 @@ from setuptools import find_packages, setup
 inst_reqs = [
     "titiler==0.1.0",
     "aiocache[redis]",
-    "tilebench",
     "ujson",
 ]
 

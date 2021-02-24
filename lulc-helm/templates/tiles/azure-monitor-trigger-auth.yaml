@@ -1,0 +1,14 @@
+{{- if .Values.tiles.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-azure-monitor-trigger-auth
+spec:
+  secretTargetRef:
+    - parameter: activeDirectoryClientId
+      name: {{ template "lulc-helm.fullname" . }}-azure-monitor-secrets
+      key: activeDirectoryClientId
+    - parameter: activeDirectoryClientPassword
+      name: {{ template "lulc-helm.fullname" . }}-azure-monitor-secrets
+      key: activeDirectoryClientPassword
+{{- end }}
