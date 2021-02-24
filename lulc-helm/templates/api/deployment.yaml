@@ -54,5 +54,5 @@ spec:
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
-              value: tiles.{{ .Values.domain }}
+              value: https://tiles.{{ .Values.domain }}
 {{- end }}
