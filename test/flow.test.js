@@ -252,6 +252,21 @@ test('gpu connection', (t) => {
             }));
         } else if (msg.message === 'model#prediction#complete') {
             ws.send(JSON.stringify({
+                action: 'model#retrain',
+                data: {
+                    geom: {
+                        type: 'MultiPoint',
+                        coordinates: [
+                            [ -79.37697172164916, 38.83450118142389 ],
+                            [ -79.37693685293198, 38.83441133996658 ],
+                            [ -79.37684834003448, 38.834442680022704 ]
+                        ]
+                    },
+                    class: 'Structure'
+                }
+            }));
+        } else if (msg.message === 'model#retrain#complete') {
+            ws.send(JSON.stringify({
                 action: 'model#checkpoint',
                 data: {
                     name: 'Test Checkpoint'
