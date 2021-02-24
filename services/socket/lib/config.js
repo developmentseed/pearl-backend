@@ -32,16 +32,25 @@ class Config {
         let maxretry = 20;
         let retry = maxretry;
         this.Timeout = false;
+
+        const api = new URL(this.API + '/api');
         do {
             try {
+                await sleep(5000);
+
+                console.error(`ok - GET ${api}`);
                 const meta = await request({
                     json: true,
                     method: 'GET',
-                    url: this.API + '/api'
+                    url: api
                 });
 
-                this.Timeout = meta.instance_window;
+                if (meta.statusCode !== 200) throw new Error(meta.body);
+
+                this.Timeout = meta.body.limits.instance_window;
+                console.error(`ok - Timeout: ${this.Timeout}`);
             } catch (err) {
+                console.error(err);
                 if (retry === 0) {
                     console.error('not ok - terminating due to lack of api metadata');
                     return process.exit(1);
@@ -50,7 +59,6 @@ class Config {
                 retry--;
                 console.error(`not ok - unable to GET ${this.API + '/api'}`);
                 console.error(`ok - retrying... (${maxretry - retry}/${maxretry})`);
-                await sleep(5000);
             }
         } while (!this.Timeout);
 

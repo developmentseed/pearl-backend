@@ -25,12 +25,13 @@ if (require.main === module) {
 const pool = new Pool();
 
 async function configure(argv = {}, cb) {
-    Config.env(argv).then((config) => {
+    try {
+        const config = await Config.env(argv);
         return server(argv, config, cb);
-    }).catch((err) => {
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
 }
 
 /**
