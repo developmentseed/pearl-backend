@@ -1,13 +1,15 @@
 'use strict';
 
 const pkg = require('../package.json');
+const { promisify } = require('util');
+const request = promisify(require('request'));
 
 /**
  * @class Config
  *
  * @prop {Number} [API='http://localhost:2000'] URL to the main lulc API
  * @prop {Number} [Port=1999] The port on which the WebSocketServer will listen for connections
- * @prop {Number} [Timeout=900000] How long a connection can be silent before it's resources are terminated
+ * @prop {Number} Timeout How long a connection can be silent before it's resources are terminated
  * @prop {Number} [Alive=30000] How often the client must ping/pong to retain an active connection
  */
 class Config {
@@ -26,13 +28,46 @@ class Config {
         this.API = args.api || process.env.API || 'http://localhost:2000';
 
         this.Port = args.port || 1999;
-        this.Timeout = args.timeout || 15 * 60 * 1000; // default 15m
+
+        let maxretry = 20;
+        let retry = maxretry;
+        this.Timeout = false;
+
+        const api = new URL(this.API + '/api');
+        do {
+            try {
+                await sleep(5000);
+
+                console.error(`ok - GET ${api}`);
+                const meta = await request({
+                    json: true,
+                    method: 'GET',
+                    url: api
+                });
+
+                if (meta.statusCode !== 200) throw new Error(meta.body);
+
+                this.Timeout = meta.body.limits.instance_window;
+                console.error(`ok - Timeout: ${this.Timeout}`);
+            } catch (err) {
+                console.error(err);
+                if (retry === 0) {
+                    console.error('not ok - terminating due to lack of api metadata');
+                    return process.exit(1);
+                }
+
+                retry--;
+                console.error(`not ok - unable to GET ${this.API + '/api'}`);
+                console.error(`ok - retrying... (${maxretry - retry}/${maxretry})`);
+            }
+        } while (!this.Timeout);
+
         this.Alive = args.alive || 30 * 1000; // default 30s
 
         return this;
     }
 
-    static async help() {
+    static help() {
         console.error(`lulc/socket@${pkg.version}`);
         console.error();
         console.error('./index.js [--help] [--prod] [--api <api>] [--port <port>] [--timeout <timeout>] [--alive <timeout>]');
@@ -53,6 +88,12 @@ class Config {
         console.error('  API                                        The API URL to connect to');
         console.error();
     }
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 module.exports = Config;

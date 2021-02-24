@@ -24,13 +24,14 @@ if (require.main === module) {
 
 const pool = new Pool();
 
-function configure(argv = {}, cb) {
-    Config.env(argv).then((config) => {
+async function configure(argv = {}, cb) {
+    try {
+        const config = await Config.env(argv);
         return server(argv, config, cb);
-    }).catch((err) => {
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
 }
 
 /**
@@ -65,22 +66,15 @@ function server(argv, config, cb) {
         }
     });
 
-    const timeout = new Timeout(config, wss);
+    const timeout = new Timeout(config, pool);
 
-    /*
-     * ws.isAlive {boolean} Store whether the connection is still alive
-     * ws.activity {Date} Store the timestamp of th last user defined action
-     */
     wss.on('connection', (ws, req) => {
-        ws.isAlive = true;
-        ws.activity = +new Date();
         ws.auth = req.auth;
 
+        pool.connected(ws);
         console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} connected`);
 
         Timeout.client(ws);
-
-        pool.connected(ws);
 
         ws.on('close', () => {
             console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} disconnected`);

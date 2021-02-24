@@ -129,6 +129,7 @@ otherwise only the `total` & `processed` tags will be returned
 | Action                | Notes |
 | --------------------- | ----- |
 | `instance#terminate`  |       |
+| `connection#extend`   | Reset instance termination counter |
 | `model#prediction`    | Inference a GeoJSON polygon |
 | `model#checkpoint`    | Save a checkpoint to the Db |
 | `model#reset`         |       |

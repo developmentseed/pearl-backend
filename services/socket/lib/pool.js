@@ -14,8 +14,17 @@ class Pool {
 
     /**
      * Add a new connection to the pool
+     *
+     * @param {Object} ws Websocket Client
+     *
+     * Set by the connected Function
+     * @param {boolean} ws.isAlive Store whether the connection is still alive
+     * @param {Date} ws.activity Store the timestamp of the last user defined action
      */
     connected(ws) {
+        ws.isAlive = true;
+        ws.activity = +new Date();
+
         if (ws.auth.t === 'admin') {
             this.add_gpu(ws);
 
@@ -75,6 +84,8 @@ class Pool {
     }
 
     route(ws, payload) {
+        ws.activity = +new Date();
+
         if (ws.auth.t === 'inst') {
             if (!this.has_gpu(ws.auth.i)) {
                 ws.send(JSON.stringify({
@@ -86,6 +97,7 @@ class Pool {
                 }));
             }
 
+            this.gpu(ws.auth.i).activity = +new Date();
             this.gpu(ws.auth.i).send(payload);
         } else if (ws.auth.t === 'admin') {
             if (!this.has_client(ws.auth.i)) {
@@ -98,6 +110,7 @@ class Pool {
                 }));
             }
 
+            this.client(ws.auth.i).activity = +new Date();
             this.client(ws.auth.i).send(payload);
         }
     }
