@@ -258,31 +258,103 @@ test('gpu connection', (t) => {
             ws.send(JSON.stringify({
                 action: 'model#retrain',
                 data: {
-                    "type": "FeatureCollection",
-                    "features": [
-                        { "type": "Feature", "properties": { "class": 'Structure' }, "geometry": { "type": "Point", "coordinates": [-79.376936712501418, 38.834394753436762] } },
-                        { "type": "Feature", "properties": { "class": 'Structure' }, "geometry": { "type": "Point", "coordinates": [-79.377090146278206, 38.834530999727654] } },
-                        { "type": "Feature", "properties": { "class": 'Water' }, "geometry": { "type": "Point", "coordinates": [-79.37696804261671, 38.834380908318451] } },
-                        { "type": "Feature", "properties": { "class": 'Water' }, "geometry": { "type": "Point", "coordinates": [-79.377184066049367, 38.834321175495617] } },
-                        { "type": "Feature", "properties": { "class": 'No Data' }, "geometry": { "type": "Point", "coordinates": [-79.377054334995179, 38.834430418523333] } },
-                        { "type": "Feature", "properties": { "class": 'Imprevious Road' }, "geometry": { "type": "Point", "coordinates": [-79.377173465020022, 38.834299523357863] } },
-                        { "type": "Feature", "properties": { "class": 'Imprevious Road' }, "geometry": { "type": "Point", "coordinates": [-79.376966596942438, 38.834323695161871] } },
-                        { "type": "Feature", "properties": { "class": 'Emergent Wetlands' }, "geometry": { "type": "Point", "coordinates": [-79.37693751489175, 38.834455284388312] } },
-                        { "type": "Feature", "properties": { "class": 'Imprervious Surface' }, "geometry": { "type": "Point", "coordinates": [-79.376836609778778, 38.834442041615475] } },
-                        { "type": "Feature", "properties": { "class": 'Imprervious Surface' }, "geometry": { "type": "Point", "coordinates": [-79.376948437562518, 38.834433152757917] } },
-                        { "type": "Feature", "properties": { "class": 'Imprervious Surface' }, "geometry": { "type": "Point", "coordinates": [-79.376910948390474, 38.834417625757332] } },
-                        { "type": "Feature", "properties": { "class": 'Tree Canopy' }, "geometry": { "type": "Point", "coordinates": [-79.377115299643052, 38.834525768732178] } },
-                        { "type": "Feature", "properties": { "class": 'Tree Canopy' }, "geometry": { "type": "Point", "coordinates": [-79.377060944876419, 38.834393055366228] } },
-                        { "type": "Feature", "properties": { "class": 'Shrubland' }, "geometry": { "type": "Point", "coordinates": [-79.376997929836634, 38.834476753022301] } },
-                        { "type": "Feature", "properties": { "class": 'Shrubland' }, "geometry": { "type": "Point", "coordinates": [-79.376993520578864, 38.834320148825498] } },
-                        { "type": "Feature", "properties": { "class": 'Barren' }, "geometry": { "type": "Point", "coordinates": [-79.376950679117911, 38.834398686286974] } },
-                        { "type": "Feature", "properties": { "class": 'Barren' }, "geometry": { "type": "Point", "coordinates": [-79.377184762372309, 38.834317436038809] } },
-                        { "type": "Feature", "properties": { "class": 'Low Vegetation' }, "geometry": { "type": "Point", "coordinates": [-79.376824957802995, 38.834323027184489] } },
-                        { "type": "Feature", "properties": { "class": 'Tundra' }, "geometry": { "type": "Point", "coordinates": [-79.377064851017821, 38.834368202090261] } },
-                        { "type": "Feature", "properties": { "class": 'Tundra' }, "geometry": { "type": "Point", "coordinates": [-79.37707642397551, 38.834321754940582] } }
-                    ]
-                }
-            }));
+                    classes: [{
+                        class: 'Structure',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.376936712501418, 38.834394753436762],
+                                [-79.377090146278206, 38.834530999727654]
+                            ]
+                        }
+                    },{
+                        class: 'Water',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.37696804261671, 38.834380908318451],
+                                [-79.377184066049367, 38.834321175495617]
+                            ]
+                        }
+                    },{
+                        class: 'No Data',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [-79.377054334995179, 38.834430418523333]
+                        }
+                    },{
+                        class: 'Imprevious Road',
+                        geometry: {
+                            'type': 'MultiPoint',
+                            'coordinates': [
+                                [-79.377173465020022, 38.834299523357863],
+                                [-79.376966596942438, 38.834323695161871]
+                            ]
+                        },
+                    },{
+                        class: 'Emergent Wetlands',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.37693751489175, 38.834455284388312]
+                            ]
+                        }
+                    },{
+                        class: 'Imprervious Surface',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.376836609778778, 38.834442041615475],
+                                [-79.376948437562518, 38.834433152757917],
+                                [-79.376910948390474, 38.834417625757332]
+                            ]
+                        }
+                    },{
+                        class: 'Tree Canopy',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.377115299643052, 38.834525768732178],
+                                [-79.377060944876419, 38.834393055366228]
+                            ]
+                        }
+                    },{
+                        class: 'Shrubland',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.376997929836634, 38.834476753022301],
+                                [-79.376993520578864, 38.834320148825498]
+                            ],
+                        },
+                    },{
+                        class: 'Barren',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.376950679117911, 38.834398686286974],
+                                [-79.377184762372309, 38.834317436038809]
+                            ]
+                        },
+                    },{
+                        class: 'Low Vegetation',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.376824957802995, 38.834323027184489]
+                            ]
+                        },
+                    },{
+                        class: 'Tundra',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.377064851017821, 38.834368202090261],
+                                [-79.37707642397551, 38.834321754940582]
+                            ]
+                        }
+                    }]
+                }}));
         } else if (msg.message === 'model#retrain#complete') {
             ws.send(JSON.stringify({
                 action: 'model#checkpoint',
