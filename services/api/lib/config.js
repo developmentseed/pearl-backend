@@ -24,6 +24,12 @@ class Config {
 
         this.BaseUrl = `http://localhost:${this.Port}`;
 
+        this.GpuImageName = process.env.GpuImageName || '';
+        this.GpuImageTag = process.env.GpuImageTag || '';
+        this.Deployment = process.env.Deployment || '';
+        this.nodeSelectorKey = process.env.nodeSelectorKey || 'agentpool';
+        this.nodeSelectorValue = process.env.nodeSelectorValue || 'gpunodepool';
+
         return this;
     }
 }
