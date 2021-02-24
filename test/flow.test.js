@@ -103,8 +103,8 @@ test('new model', (t) => {
                 { name: 'Low Vegetation', color: '#07c4c5' },
                 { name: 'Barren', color: '#027fdc' },
                 { name: 'Structure', color: '#f76f73' },
-                { name: 'Imprervious Surface', color: '#ffb703' },
-                { name: 'Imprevious Road', color: '#0218a2' }
+                { name: 'Impervious Surface', color: '#ffb703' },
+                { name: 'Impevious Road', color: '#0218a2' }
             ],
             meta: {}
         },
@@ -259,7 +259,8 @@ test('gpu connection', (t) => {
                 action: 'model#retrain',
                 data: {
                     classes: [{
-                        class: 'Structure',
+                        name: 'Structure',
+                        color: '#f76f73',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -268,7 +269,8 @@ test('gpu connection', (t) => {
                             ]
                         }
                     },{
-                        class: 'Water',
+                        name: 'Water',
+                        color: '#0000FF',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -277,22 +279,27 @@ test('gpu connection', (t) => {
                             ]
                         }
                     },{
-                        class: 'No Data',
+                        name: 'No Data',
+                        color: '#62a092',
                         geometry: {
                             type: 'MultiPoint',
-                            coordinates: [-79.377054334995179, 38.834430418523333]
+                            coordinates: [
+                                [-79.377054334995179, 38.834430418523333]
+                            ]
                         }
                     },{
-                        class: 'Imprevious Road',
+                        name: 'Impervious Road',
+                        color: '#ffb703',
                         geometry: {
-                            'type': 'MultiPoint',
-                            'coordinates': [
+                            type: 'MultiPoint',
+                            coordinates: [
                                 [-79.377173465020022, 38.834299523357863],
                                 [-79.376966596942438, 38.834323695161871]
                             ]
                         },
                     },{
-                        class: 'Emergent Wetlands',
+                        name: 'Emergent Wetlands',
+                        color: '#008000',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -300,7 +307,8 @@ test('gpu connection', (t) => {
                             ]
                         }
                     },{
-                        class: 'Imprervious Surface',
+                        name: 'Impervious Surface',
+                        color: '#ffb703',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -310,7 +318,8 @@ test('gpu connection', (t) => {
                             ]
                         }
                     },{
-                        class: 'Tree Canopy',
+                        name: 'Tree Canopy',
+                        color: '#80FF80',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -319,7 +328,8 @@ test('gpu connection', (t) => {
                             ]
                         }
                     },{
-                        class: 'Shrubland',
+                        name: 'Shrubland',
+                        color: '#806060',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -328,7 +338,8 @@ test('gpu connection', (t) => {
                             ],
                         },
                     },{
-                        class: 'Barren',
+                        name: 'Barren',
+                        color: '#027fdc',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -337,7 +348,8 @@ test('gpu connection', (t) => {
                             ]
                         },
                     },{
-                        class: 'Low Vegetation',
+                        name: 'Low Vegetation',
+                        color: '#07c4c5',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
@@ -345,7 +357,8 @@ test('gpu connection', (t) => {
                             ]
                         },
                     },{
-                        class: 'Tundra',
+                        name: 'Tundra',
+                        color: '#ffffff',
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
