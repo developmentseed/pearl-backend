@@ -8,7 +8,6 @@ metadata:
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
-  replicas: {{ .Values.tiles.replicaCount }}
   selector:
     matchLabels:
       app: {{ template "lulc-helm.name" . }}
@@ -36,6 +35,7 @@ spec:
             httpGet:
               path: /healthz
               port: {{ .Values.tiles.containerPort }}
+            periodSeconds: 20
           resources:
             requests:
               cpu: {{ .Values.tiles.resources.requests.cpu }}
