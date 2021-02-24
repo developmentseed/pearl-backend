@@ -48,7 +48,7 @@ class Config {
                 }
 
                 retry--;
-                console.error('not ok - unable to get api metadata');
+                console.error(`not ok - unable to GET ${this.API + '/api'}`);
                 console.error(`ok - retrying... (${maxretry - retry}/${maxretry})`);
                 await sleep(5000);
             }

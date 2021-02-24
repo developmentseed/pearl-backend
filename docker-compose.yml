@@ -30,6 +30,7 @@ services:
             - "1999:1999"
         environment:
             - PORT=1999
+            - API=http://api:2000/
 
     tiler:
         build: ./services/tiles/
