@@ -125,6 +125,8 @@ async function server(config, cb) {
      *     Return basic metadata about server configuration
      *
      *     limits.live_inference: The area in metres that can be live inferenced
+     *     limits.max_inference: The max area in metres that can be inferenced
+     *     limits.instance_window: The number of seconds a GPU Instance can be idle before termination
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -133,6 +135,7 @@ async function server(config, cb) {
      *       "limits": {
      *           "live_inference": 1000 (m^2)
      *           "max_inference": 100000 (m^2)
+     *           "instance_window": 1800 (secs)
      *       }
      *   }
      */
@@ -141,7 +144,8 @@ async function server(config, cb) {
             version: pkg.version,
             limits: {
                 live_inference: 1000,
-                max_inference: 100000
+                max_inference: 100000,
+                instance_window: 1800
             }
         });
     });
