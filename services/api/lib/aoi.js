@@ -213,7 +213,7 @@ class AOI {
                     bounds
                 ) VALUES (
                     $1,
-                    ST_GeomFromGeoJSON($2)
+                    ST_SetSRID(ST_GeomFromGeoJSON($2), 4326)
                 ) RETURNING *
             `, [
                 projectid,
