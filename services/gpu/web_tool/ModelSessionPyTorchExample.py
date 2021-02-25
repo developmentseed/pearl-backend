@@ -19,8 +19,6 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer
 
 from .ModelSessionAbstract import ModelSession
-from training.models.unet_solar import UnetModel
-import segmentation_models_pytorch as smp
 
 import torch
 import torch.nn as nn
@@ -80,8 +78,8 @@ class TorchFineTuning(ModelSession):
            param.requires_grad = False
 
         # will need to figure out for re-training
-        self.initial_weights = self.model.segmentation_head[0].weight.cpu().detach().numpy().squeeze()
-        self.initial_biases = self.model.segmentation_head[0].bias.cpu().detach().numpy()
+        self.initial_weights = self.model.last[0].weight.cpu().detach().numpy().squeeze()
+        self.initial_biases = self.model.last[0].bias.cpu().detach().numpy()
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
 
