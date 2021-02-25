@@ -87,8 +87,11 @@ class ModelSrv():
 
     async def retrain(self, body, websocket):
         print(body)
+        self.model.retrain()
 
-        return self.model.retrain()
+        await websocket.send(json.dumps({
+            'message': 'model#retrain'
+        }))
 
     def add_sample_point(self, row, col, class_idx):
         return self.model.add_sample_point(row, col, class_idx)
