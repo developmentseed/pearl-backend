@@ -122,7 +122,7 @@ class Instance {
                 },
                 {
                     name: 'SOCKET',
-                    value: 'ws://socket.lulc.ds.io'
+                    value: 'wss://socket.lulc.ds.io'
                 },
                 {
                     name: 'SigningSecret',
