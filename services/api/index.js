@@ -1101,6 +1101,35 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {patch} /api/model/:modelid Update Model
+     * @apiVersion 1.0.0
+     * @apiName PatchModel
+     * @apiGroup Model
+     * @apiPermission admin
+     *
+     * @apiSchema (Body) {jsonschema=./schema/model-patch.json} apiParam
+     *
+     * @apiDescription
+     *     Update a model
+     */
+    router.patch(
+        '/model/:modelid',
+        requiresAuth,
+        validate({ body: require('./schema/model-patch.json') }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'modelid');
+
+                await auth.is_admin(req);
+
+                res.json(await model.patch(req.params.modelid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {post} /api/model/:modelid/upload UploadModel
      * @apiVersion 1.0.0
      * @apiName UploadModel
