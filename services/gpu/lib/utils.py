@@ -1,7 +1,34 @@
 import base64
 import io
+import mercantile
 import numpy as np
 from PIL import Image
+
+
+class PX:
+    def __init__(xyz, px):
+        self.x, self.y, self.z = xyz
+        self.px
+
+
+def geom2px(geom, zoom):
+    coords = []
+
+    if geom['type'] == 'Point':
+        coords.append(geom['coordinates'])
+    elif geom['type'] == 'MultiPoint':
+        for coord in geom['coordinates']:
+            coords.append(coord)
+    else:
+        return False
+
+    pxs = []
+    for coord in coords:
+        xyz = mercantile.tile(coord[0], coord[1], zoom)
+
+
+    return pxs
+
 
 def pred2png(output, color_list):
     rgb_list = []

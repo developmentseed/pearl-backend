@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 import pyproj
@@ -23,6 +24,11 @@ class API():
     def __init__(self, url, token, instance_id):
         self.url = url
         self.token = token
+
+        self.tmp_dir = '/tmp/gpu-api/'
+
+        os.makedirs(self.tmp_dir, exist_ok=True)
+        os.makedirs(self.tmp_dir + '/tiles', exist_ok=True)
 
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
@@ -76,7 +82,7 @@ class API():
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = '/tmp/aoi-{}.geotiff'.format(aoiid)
+        geo_path = self.tmp_dir + '/aoi-{}.geotiff'.format(aoiid)
         with open(geo_path, 'wb') as filehandle:
             filehandle.write(geotiff.read())
 
@@ -119,7 +125,7 @@ class API():
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = '/tmp/aoi-{}.geotiff'.format(aoiid)
+        geo_path = self.tmp_dir + '/aoi-{}.geotiff'.format(aoiid)
         with open(geo_path, 'wb') as filehandle:
             filehandle.write(geotiff.read())
 
@@ -154,20 +160,28 @@ class API():
     def get_tile(self, z, x, y, iformat='npy'):
         url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
 
-        LOGGER.info("ok - GET " + url)
-        r = requests.get(url, headers={
-            "authorization": "Bearer " + self.token
-        })
-
-        r.raise_for_status()
-        LOGGER.info("ok - Received " + url)
-
         if iformat == 'npy':
-            res = np.load(BytesIO(r.content))
+            tmpfs = '{}/tiles/{}-{}-{}.{}'.format(self.tmp_dir, x, y, z, iformat)
+            res = False
 
-            assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
-            res = np.moveaxis(res, 0, -1)
-            assert res.shape == (256, 256, 4), "Failed to reshape numpy array"
+            if not os.path.isfile(tmpfs):
+                LOGGER.info("ok - GET " + url)
+                r = requests.get(url, headers={
+                    "authorization": "Bearer " + self.token
+                })
+
+                r.raise_for_status()
+                LOGGER.info("ok - Received " + url)
+
+                res = np.load(BytesIO(r.content))
+
+                assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
+                res = np.moveaxis(res, 0, -1)
+                assert res.shape == (256, 256, 4), "Failed to reshape numpy array"
+
+                np.save('{}/tiles/{}-{}-{}.npy'.format(self.tmp_dir, x, y, z), res)
+            else:
+                res = np.load(tmpfs)
 
             memraster = MemRaster(
                 res,
@@ -177,6 +191,14 @@ class API():
 
             return memraster
         else:
+            LOGGER.info("ok - GET " + url)
+            r = requests.get(url, headers={
+                "authorization": "Bearer " + self.token
+            })
+
+            r.raise_for_status()
+            LOGGER.info("ok - Received " + url)
+
             return r.content
 
     def instance_meta(self, instance_id):
@@ -219,7 +241,7 @@ class API():
         return r.json()
 
     def model_download(self):
-        model_fs = '/tmp/model-{}.pt'.format(self.model_id)
+        model_fs = self.tmp_dir + '/model-{}.pt'.format(self.model_id)
 
         if not path.exists(model_fs):
             url = self.url + '/api/model/' + str(self.model_id) + '/download'

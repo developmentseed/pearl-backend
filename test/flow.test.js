@@ -104,7 +104,7 @@ test('new model', (t) => {
                 { name: 'Barren', color: '#027fdc' },
                 { name: 'Structure', color: '#f76f73' },
                 { name: 'Impervious Surface', color: '#ffb703' },
-                { name: 'Impevious Road', color: '#0218a2' }
+                { name: 'Impervious Road', color: '#0218a2' }
             ],
             meta: {}
         },
@@ -142,8 +142,60 @@ test('new model', (t) => {
                 { name: 'Low Vegetation', color: '#07c4c5' },
                 { name: 'Barren', color: '#027fdc' },
                 { name: 'Structure', color: '#f76f73' },
-                { name: 'Imprervious Surface', color: '#ffb703' },
-                { name: 'Imprevious Road', color: '#0218a2' }
+                { name: 'Impervious Surface', color: '#ffb703' },
+                { name: 'Impervious Road', color: '#0218a2' }
+            ],
+            meta: {}
+        }, 'expected body');
+
+        t.end();
+    });
+});
+
+test('new model - storage: true', (t) => {
+    request({
+        method: 'PATCH',
+        json: true,
+        url: API + '/api/model/1',
+        body: {
+            storage: true
+        },
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res, body) => {
+        t.error(err, 'no error');
+
+        t.equals(res.statusCode, 200, '200 status code');
+
+        t.deepEquals(Object.keys(body), [
+            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
+        ], 'expected props');
+
+        t.ok(parseInt(body.id), 'id: <integer>');
+
+        delete body.created;
+        delete body.id;
+
+        t.deepEquals(body, {
+            active: true,
+            uid: 1,
+            name: 'NAIP Supervised',
+            model_type: 'pytorch_example',
+            model_inputshape: [256, 256, 4],
+            model_zoom: 17,
+            storage: true,
+            classes: [
+                { name: 'No Data', color: '#62a092' },
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Emergent Wetlands', color: '#008000' },
+                { name: 'Tree Canopy', color: '#80FF80' },
+                { name: 'Shrubland', color: '#806060' },
+                { name: 'Low Vegetation', color: '#07c4c5' },
+                { name: 'Barren', color: '#027fdc' },
+                { name: 'Structure', color: '#f76f73' },
+                { name: 'Impervious Surface', color: '#ffb703' },
+                { name: 'Impervious Road', color: '#0218a2' }
             ],
             meta: {}
         }, 'expected body');
