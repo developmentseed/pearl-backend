@@ -85,11 +85,13 @@ class ModelSrv():
 
         self.aoi = None
 
-    def last_tile(self):
-        return serialize(self.model.last_tile)
-
     async def retrain(self, body, websocket):
-        return self.model.retrain()
+        print(body)
+        self.model.retrain()
+
+        await websocket.send(json.dumps({
+            'message': 'model#retrain'
+        }))
 
     def add_sample_point(self, row, col, class_idx):
         return self.model.add_sample_point(row, col, class_idx)

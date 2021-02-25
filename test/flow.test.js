@@ -104,7 +104,7 @@ test('new model', (t) => {
                 { name: 'Barren', color: '#027fdc' },
                 { name: 'Structure', color: '#f76f73' },
                 { name: 'Impervious Surface', color: '#ffb703' },
-                { name: 'Impevious Road', color: '#0218a2' }
+                { name: 'Impervious Road', color: '#0218a2' }
             ],
             meta: {}
         },
@@ -142,8 +142,8 @@ test('new model', (t) => {
                 { name: 'Low Vegetation', color: '#07c4c5' },
                 { name: 'Barren', color: '#027fdc' },
                 { name: 'Structure', color: '#f76f73' },
-                { name: 'Imprervious Surface', color: '#ffb703' },
-                { name: 'Imprevious Road', color: '#0218a2' }
+                { name: 'Impervious Surface', color: '#ffb703' },
+                { name: 'Impervious Road', color: '#0218a2' }
             ],
             meta: {}
         }, 'expected body');
