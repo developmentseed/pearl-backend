@@ -88,7 +88,7 @@ class ModelSrv():
     def last_tile(self):
         return serialize(self.model.last_tile)
 
-    def retrain(self):
+    async def retrain(self, body, websocket):
         return self.model.retrain()
 
     def add_sample_point(self, row, col, class_idx):
