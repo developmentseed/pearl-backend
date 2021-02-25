@@ -47,7 +47,7 @@ class Config {
 
                 if (meta.statusCode !== 200) throw new Error(meta.body);
 
-                this.Timeout = meta.body.limits.instance_window;
+                this.Timeout = meta.body.limits.instance_window * 1000;
                 console.error(`ok - Timeout: ${this.Timeout}`);
             } catch (err) {
                 console.error(err);

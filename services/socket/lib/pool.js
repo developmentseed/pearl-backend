@@ -88,7 +88,7 @@ class Pool {
 
         if (ws.auth.t === 'inst') {
             if (!this.has_gpu(ws.auth.i)) {
-                ws.send(JSON.stringify({
+                return ws.send(JSON.stringify({
                     message: 'error',
                     data: {
                         error: 'Failed to communicate with GPU Instance',
@@ -101,7 +101,7 @@ class Pool {
             this.gpu(ws.auth.i).send(payload);
         } else if (ws.auth.t === 'admin') {
             if (!this.has_client(ws.auth.i)) {
-                ws.send(JSON.stringify({
+                return ws.send(JSON.stringify({
                     message: 'error',
                     data: {
                         error: 'Failed to communicate with Client Instance',
