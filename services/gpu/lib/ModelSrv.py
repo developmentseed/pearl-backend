@@ -90,7 +90,7 @@ class ModelSrv():
             cls['geometry'] = geom2px(cls['geometry'], self.api.model['model_zoom'])
 
 
-        self.model.retrain()
+        self.model.retrain(classes)
 
         await websocket.send(json.dumps({
             'message': 'model#retrain'

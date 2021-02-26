@@ -115,7 +115,7 @@ class TorchFineTuning(ModelSession):
 
         return output
 
-    def retrain(self, **kwargs):
+    def retrain(self, classes, **kwargs):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
