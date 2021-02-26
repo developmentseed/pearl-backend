@@ -16,13 +16,16 @@ LL_EPSILON = 1e-11
 
 
 class PX:
-    def __init__(self, coords, xy, xyz, px):
+    def __init__(self, coords, xy, xyz, px, value):
         self.xyz = xyz # Tile Coordinates
         self.xy = xy # Mercator Coordinates
         self.coords = coords #WGS84 Coordinates
         self.px = px # Per Tile Pixel Coordinates
+        self.value = value # Actual Pixel Value (typically R,G,B,NIR) from Imagery Source
 
-def geom2px(geom, zoom):
+def geom2px(geom, api):
+    zoom = api.model['model_zoom']
+
     coords = []
 
     if geom['type'] == 'Point':
@@ -37,11 +40,16 @@ def geom2px(geom, zoom):
     for coord in coords:
         xy = ll2xy(coord[0], coord[1])
         xyz = mercantile.tile(coord[0], coord[1], zoom)
+
         transform = from_bounds(*mercantile.xy_bounds(xyz), 256, 256)
 
         pixels = rowcol(transform, *xy)
 
-        pxs.append(PX(coords, xy, xyz, pixels))
+        npy = api.get_tile(xyz.z, xyz.x, xyz.y, iformat='npy')
+
+        value = npy.data[pixels[0], pixels[1]]
+
+        pxs.append(PX(coords, xy, xyz, pixels, value))
 
     return pxs
 

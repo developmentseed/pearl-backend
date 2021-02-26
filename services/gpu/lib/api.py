@@ -157,14 +157,14 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tile(self, z, x, y, iformat='npy'):
+    def get_tile(self, z, x, y, iformat='npy', cache=True):
         url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
 
         if iformat == 'npy':
             tmpfs = '{}/tiles/{}-{}-{}.{}'.format(self.tmp_dir, x, y, z, iformat)
             res = False
 
-            if not os.path.isfile(tmpfs):
+            if cache or not os.path.isfile(tmpfs):
                 LOGGER.info("ok - GET " + url)
                 r = requests.get(url, headers={
                     "authorization": "Bearer " + self.token

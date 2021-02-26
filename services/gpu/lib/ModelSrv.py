@@ -87,10 +87,10 @@ class ModelSrv():
 
     async def retrain(self, body, websocket):
         for cls in body['classes']:
-            cls['geometry'] = geom2px(cls['geometry'], self.api.model['model_zoom'])
+            cls['geometry'] = geom2px(cls['geometry'], self.api)
 
 
-        self.model.retrain(classes)
+        self.model.retrain(body['classes'])
 
         await websocket.send(json.dumps({
             'message': 'model#retrain'
