@@ -458,9 +458,7 @@ async function server(config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
-
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+                await project.has_auth(req.auth, req.params.projectid);
 
                 req.body.project_id = req.params.projectid;
                 const inst = await instance.create(req.auth, req.body);
@@ -558,9 +556,7 @@ async function server(config, cb) {
         try {
             await Param.int(req, 'projectid');
 
-            const proj = await project.get(req.params.projectid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
-
+            const proj = await project.has_auth(req.auth, req.params.projectid);
             delete proj.uid;
 
             return res.json(proj);
@@ -635,11 +631,9 @@ async function server(config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
+                await project.has_auth(req.auth, req.params.projectid);
 
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
-
-                res.json(await instance.list(req.query));
+                res.json(await instance.list(req.params.projectid, req.query));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -670,10 +664,7 @@ async function server(config, cb) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'instanceid');
 
-            const proj = await project.get(req.params.projectid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
-
-            return res.json(await instance.get(req.params.instanceid));
+            res.json(await instance.has_auth(project, req.auth, req.params.projectid, req.params.instanceid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -702,11 +693,7 @@ async function server(config, cb) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
-
-            const proj = await project.get(req.params.projectid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
-
-            return res.json(await aoi.get(req.params.aoiid));
+            return res.json(await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -773,9 +760,7 @@ async function server(config, cb) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
-
-            const proj = await project.get(req.params.projectid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+            await project.has_auth(req.auth, req.params.projectid);
 
             await aoi.download(req.params.aoiid, res);
         } catch (err) {
@@ -815,9 +800,7 @@ async function server(config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
-
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+                await project.has_auth(req.auth, req.params.projectid);
 
                 return res.json(await aoi.list(req.params.projectid, req.query));
             } catch (err) {
@@ -856,9 +839,7 @@ async function server(config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
-
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+                await project.has_auth(req.auth, req.params.projectid);
 
                 return res.json(await aoi.create(req.params.projectid, req.body));
             } catch (err) {
@@ -895,10 +876,7 @@ async function server(config, cb) {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'checkpointid');
 
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
-
-                return res.json(await checkpoint.get(req.params.checkpointid));
+                return res.json(await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -967,9 +945,7 @@ async function server(config, cb) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
-
-            const proj = await project.get(req.params.projectid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+            await project.get(req.auth, req.params.projectid);
 
             await checkpoint.download(req.params.checkpointid, res);
         } catch (err) {
@@ -1009,9 +985,7 @@ async function server(config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
-
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+                await project.has_auth(req.auth, req.params.projectid);
 
                 return res.json(await checkpoint.list(req.params.projectid, req.query));
             } catch (err) {
@@ -1051,9 +1025,7 @@ async function server(config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
-
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+                await project.has_auth(req.auth, req.params.projectid);
 
                 return res.json(await checkpoint.create(req.params.projectid, req.body));
             } catch (err) {
@@ -1082,16 +1054,7 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'checkpointid');
-
-                await auth.is_admin(req);
-
-                // Ensure the user owns the project
-                const proj = await project.get(req.params.projectid);
-                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
-
-                // Ensure Checkpoint is actually part of the project
-                const checkpt = await checkpoint.get(req.params.checkpointid);
-                if (checkpt.project_id !== req.params.projectid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
 
                 return res.json(await checkpoint.patch(req.params.checkpointid, req.body));
             } catch (err) {
@@ -1286,6 +1249,7 @@ async function server(config, cb) {
     router.delete('/model/:modelid', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
+            await auth.is_admin(req);
 
             await model.delete(req.params.modelid);
 

@@ -90,25 +90,22 @@ test('GET /api/project/1/aoi (empty)', (t) => {
     });
 });
 
-test('POST /api/project/1/aoi', (t) => {
+test('POST /api/project/1/checkpoint', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
+        url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`
         },
         body: {
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
-                ]]
-            }
+            name: 'TEST',
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -118,31 +115,31 @@ test('POST /api/project/1/aoi', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            storage: false,
+            name: 'TEST',
             project_id: 1,
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
-                ]]
-            }
+            storage: false,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
         });
 
         t.end();
     });
 });
 
-test('GET /api/project/1/aoi/1', (t) => {
+test('PATCH /api/project/1/checkpoint/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1',
-        method: 'GET',
+        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        method: 'PATCH',
         headers: {
             Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'NEW NAME',
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -152,12 +149,15 @@ test('GET /api/project/1/aoi/1', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            storage: false,
+            name: 'NEW NAME',
             project_id: 1,
-            bounds: {
-                type: 'Polygon',
-                coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
-            }
+            storage: false,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
         });
 
         t.end();
