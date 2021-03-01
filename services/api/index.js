@@ -1013,7 +1013,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/project/:projectid/checkpoint Create Checkpoint
+     * @api {post} /api/project/:projectid/checkpoint Create Checkpoint
      * @apiVersion 1.0.0
      * @apiName CreateCheckpoint
      * @apiGroup AOI
