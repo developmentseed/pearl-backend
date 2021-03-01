@@ -189,6 +189,13 @@ class CheckPoint {
         return CheckPoint(pgres.rows[0]);
     }
 
+    /**
+     * Update a given checkpoint
+     *
+     * @param {Object} checkpoint Checkpoint Object
+     * @param {String} checkpoint.name
+     */
+
 
     /**
      * Create a new Checkpoint

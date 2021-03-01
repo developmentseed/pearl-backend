@@ -57,7 +57,7 @@ define({ "api": [
     "groupTitle": "AOI"
   },
   {
-    "type": "get",
+    "type": "post",
     "url": "/api/project/:projectid/checkpoint",
     "title": "Create Checkpoint",
     "version": "1.0.0",
@@ -592,22 +592,8 @@ define({ "api": [
             "group": "Body",
             "type": "Integer",
             "optional": false,
-            "field": "model_finetunelayer",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Integer",
-            "optional": false,
             "field": "model_zoom",
             "description": "<p>The tile zoom level to run inferences on</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Integer",
-            "optional": false,
-            "field": "model_numparams",
-            "description": "<p>undefined</p>"
           },
           {
             "group": "Body",
@@ -1313,12 +1299,12 @@ define({ "api": [
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
-    "description": "<p>Return basic metadata about server configuration</p> <pre><code>limits.live_inference: The area in metres that can be live inferenced</code></pre>",
+    "description": "<p>Return basic metadata about server configuration</p> <pre><code>limits.live_inference: The area in metres that can be live inferenced limits.max_inference: The max area in metres that can be inferenced limits.instance_window: The number of seconds a GPU Instance can be idle before termination</code></pre>",
     "success": {
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 1000 (m^2)\n        \"max_inference\": 100000 (m^2)\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 1000 (m^2)\n        \"max_inference\": 100000 (m^2)\n        \"instance_window\": 1800 (secs)\n    }\n}",
           "type": "json"
         }
       ]
