@@ -84,10 +84,6 @@ class Instance {
         };
     }
 
-    async patch() {
-
-    }
-
     async create(auth, instance) {
         if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
@@ -114,24 +110,19 @@ class Instance {
 
             let pod = {};
             if (this.config.Environment !== 'local') {
-                const podSpec = kube.makePodSpec(instanceId, [
-                    {
-                        name: 'INSTANCE_ID',
-                        value: instanceId.toString()
-                    },
-                    {
-                        name: 'API',
-                        value: 'https://api.lulc.ds.io'
-                    },
-                    {
-                        name: 'SOCKET',
-                        value: 'wss://socket.lulc.ds.io'
-                    },
-                    {
-                        name: 'SigningSecret',
-                        value: this.config.SigningSecret
-                    }
-                ]);
+                const podSpec = kube.makePodSpec(instanceId, [{
+                    name: 'INSTANCE_ID',
+                    value: instanceId.toString()
+                },{
+                    name: 'API',
+                    value: 'https://api.lulc.ds.io'
+                },{
+                    name: 'SOCKET',
+                    value: 'wss://socket.lulc.ds.io'
+                },{
+                    name: 'SigningSecret',
+                    value: this.config.SigningSecret
+                }]);
 
                 pod = await kube.createPod(podSpec);
             }
@@ -139,9 +130,7 @@ class Instance {
             return {
                 id: parseInt(pgres.rows[0].id),
                 created: pgres.rows[0].created,
-                model_id: parseInt(pgres.rows[0].model_id),
                 token: token,
-                mosaic: pgres.rows[0].mosaic,
                 pod: pod
             };
         } catch (err) {

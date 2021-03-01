@@ -1399,9 +1399,8 @@ async function server(config, cb) {
      *       "id": 1,
      *       "uid": 123,
      *       "active": true,
-     *       "created": "<date>",
-     *       "model_id": 1,
-     *       "mosaic": "naip.latest"
+     *       "created": "<date>"
+     *       "pod": { ... }
      *   }
      */
     router.get('/instance/:instanceid', requiresAuth, async (req, res) => {
