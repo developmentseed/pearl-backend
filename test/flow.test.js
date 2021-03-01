@@ -204,7 +204,7 @@ test('new instance', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(Object.keys(body).sort(), [
-            'created', 'id', 'token'
+            'created', 'id', 'pod', 'token'
         ], 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
@@ -216,7 +216,9 @@ test('new instance', (t) => {
 
         delete body.token;
 
-        t.deepEquals(body, {}, 'expected body');
+        t.deepEquals(body, {
+            pod: {}
+        }, 'expected body');
 
         t.end();
     });
