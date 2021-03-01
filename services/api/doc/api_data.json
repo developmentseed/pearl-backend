@@ -746,6 +746,37 @@
     "groupTitle": "Model"
   },
   {
+    "type": "patch",
+    "url": "/api/model/:modelid",
+    "title": "Update Model",
+    "version": "1.0.0",
+    "name": "PatchModel",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "description": "<p>Update a model</p>",
+    "filename": "./index.js",
+    "groupTitle": "Model"
+  },
+  {
     "type": "get",
     "url": "/api/mosaic/:layer",
     "title": "Get TileJson",
