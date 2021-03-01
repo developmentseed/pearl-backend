@@ -59,7 +59,6 @@ def main():
 async def connection(uri, model):
     router = Router(uri)
 
-    router.on_act("instance#terminate", router.terminate)
     router.on_act("model#reset", model.reset)
     router.on_act("model#undo", model.undo)
     router.on_act("model#prediction", model.prediction)

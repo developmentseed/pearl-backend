@@ -13,10 +13,6 @@ class Router():
         self.uri = uri
         self.websocket = None
 
-    def terminate(self):
-        ### Terminate the instance
-        print("Terminate Instance")
-
     def on_msg(self, path, fn):
         self.msg[path] = fn
 
@@ -24,11 +20,13 @@ class Router():
         self.act[path] = fn
 
     async def open(self):
-        while True:
+        terminate = False
+
+        while not terminate:
             self.websocket = await websockets.connect(self.uri)
             LOGGER.info("ok - WebSocket Connection Initialized")
 
-            while True:
+            while not terminate:
                 try:
                     if not self.websocket.open:
                         LOGGER.warning("ok - websocket disconnected, attempting reconnection")
@@ -66,6 +64,8 @@ class Router():
                         except Exception as e:
                             LOGGER.error("not ok - failed to process: " + action)
                             traceback.print_exc()
+                    elif action == "instance#terminate":
+                        terminate = True
                     else:
                         LOGGER.info('ok - Unknown Action')
 
