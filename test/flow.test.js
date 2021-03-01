@@ -17,8 +17,8 @@ const test = require('tape');
 const request = require('request');
 const { Pool } = require('pg');
 
-const API = process.env.API || 'https://api.lulc.ds.io';
-const SOCKET = process.env.SOCKET || 'wss://socket.lulc.ds.io';
+const API = process.env.API || 'http://localhost:2000';
+const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 
 const { Client } = require('pg');
 const drop = require('../services/api/test/drop');
@@ -72,7 +72,11 @@ test('api running', (t) => {
 
         t.deepEquals(body, {
             version: '1.0.0',
-            limits: { live_inference: 1000, max_inference: 100000 }
+            limits: {
+                live_inference: 1000,
+                max_inference: 100000,
+                instance_window: 1800
+            }
         });
 
         t.end();
@@ -99,8 +103,8 @@ test('new model', (t) => {
                 { name: 'Low Vegetation', color: '#07c4c5' },
                 { name: 'Barren', color: '#027fdc' },
                 { name: 'Structure', color: '#f76f73' },
-                { name: 'Imprervious Surface', color: '#ffb703' },
-                { name: 'Imprevious Road', color: '#0218a2' }
+                { name: 'Impervious Surface', color: '#ffb703' },
+                { name: 'Impervious Road', color: '#0218a2' }
             ],
             meta: {}
         },
@@ -138,8 +142,8 @@ test('new model', (t) => {
                 { name: 'Low Vegetation', color: '#07c4c5' },
                 { name: 'Barren', color: '#027fdc' },
                 { name: 'Structure', color: '#f76f73' },
-                { name: 'Imprervious Surface', color: '#ffb703' },
-                { name: 'Imprevious Road', color: '#0218a2' }
+                { name: 'Impervious Surface', color: '#ffb703' },
+                { name: 'Impervious Road', color: '#0218a2' }
             ],
             meta: {}
         }, 'expected body');
@@ -206,7 +210,7 @@ test('new instance', (t) => {
         t.ok(parseInt(body.id), 'id: <integer>');
 
         delete body.id,
-        delete body.created;
+            delete body.created;
 
         instance = body.token;
 
