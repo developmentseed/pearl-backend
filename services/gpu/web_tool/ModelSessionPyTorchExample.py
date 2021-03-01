@@ -117,11 +117,18 @@ class TorchFineTuning(ModelSession):
         return output
 
     def retrain(self, classes, **kwargs):
-        print('in retrain')
+        print ('in retrain')
+
+        self.augment_x_train = [x['geometry'] for x in classes]
+        print(self.augment_x_train)
+        self.augment_y_train = [x['name'] for x in classes] #to-do map these to integers
+        print(self.augment_y_train)
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
-        print(x_train.shape)
+        print (x_train.shape)
+        print (x_train.shape[0])
+        print(y_train.shape)
 
         if x_train.shape[0] == 0:
             return {
