@@ -132,6 +132,7 @@ class CheckPoint {
      * @param {Number} checkpointid - Specific Model id
      * @param {Object} checkpoint - Checkpoint Object
      * @param {Boolean} checkpoint.storage Has the storage been uploaded
+     * @param {String} checkpoint.name The name of the checkpoint
      */
     async patch(checkpointid, checkpoint) {
         let pgres;
@@ -140,13 +141,15 @@ class CheckPoint {
             pgres = await this.pool.query(`
                 UPDATE checkpoints
                     SET
-                        storage = COALESCE($2, storage)
+                        storage = COALESCE($2, storage),
+                        name = COALESCE($3, name)
                     WHERE
                         id = $1
                     RETURNING *
             `, [
                 checkpointid,
-                checkpoint.storage
+                checkpoint.storage,
+                checkpoint.name
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Checkpoint');
@@ -188,7 +191,6 @@ class CheckPoint {
 
         return CheckPoint(pgres.rows[0]);
     }
-
 
     /**
      * Create a new Checkpoint
