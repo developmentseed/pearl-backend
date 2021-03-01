@@ -8,7 +8,6 @@ const drop = require('./drop');
 
 const config = Config.env();
 
-const { Pool } = require('pg');
 class Flight {
 
     constructor() {
