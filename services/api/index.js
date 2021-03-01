@@ -1121,9 +1121,8 @@ async function server(config, cb) {
      *       "uid": 1,
      *       "name": "HCMC Sentinel 2019 Unsupervised",
      *       "model_type": "keras_example",
-     *       "model_finetunelayer": -2,
-     *       "model_numparams": 563498,
      *       "model_inputshape": [100,100,4],
+     *       "model_zoom" 17,
      *       "storage": true,
      *       "classes": [
      *           {"name": "Water", "color": "#0000FF"},
@@ -1194,9 +1193,9 @@ async function server(config, cb) {
      *       "uid": 1,
      *       "name": "HCMC Sentinel 2019 Unsupervised",
      *       "model_type": "keras_example",
-     *       "model_finetunelayer": -2,
-     *       "model_numparams": 563498,
      *       "model_inputshape": [100,100,4],
+     *       "model_zoom": 17,
+     *       "model_numparams": 563498,
      *       "storage": true,
      *       "classes": [
      *           {"name": "Water", "color": "#0000FF"},
@@ -1318,9 +1317,8 @@ async function server(config, cb) {
      *       "uid": 1,
      *       "name": "HCMC Sentinel 2019 Unsupervised",
      *       "model_type": "keras_example",
-     *       "model_finetunelayer": -2,
-     *       "model_numparams": 563498,
      *       "model_inputshape": [100,100,4],
+     *       "model_zoom": 17,
      *       "storage": true,
      *       "classes": [
      *           {"name": "Water", "color": "#0000FF"},
