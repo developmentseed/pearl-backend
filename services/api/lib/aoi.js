@@ -16,6 +16,25 @@ class AOI {
     }
 
     /**
+     * Ensure a user can only access their own project assets (or is an admin and can access anything)
+     *
+     * @param {Project} project Instantiated Project class
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     * @param {Number} aoiid AOI the user is attemping to access
+     */
+    async has_auth(project, auth, projectid, aoiid) {
+        const proj = await project.has_auth(auth, projectid);
+        const aoi = await this.get(aoiid);
+
+        if (aoi.project_id !== proj.id) {
+            throw new Err(400, null, `AOI #${aoiid} is not associated with project #${projectid}`);
+        }
+
+        return aoi;
+    }
+
+    /**
      * Return a Row as a JSON Object
      * @param {Object} row Postgres Database Row
      */
@@ -23,7 +42,8 @@ class AOI {
         const def = {
             id: parseInt(row.id),
             created: row.created,
-            storage: row.storage
+            storage: row.storage,
+            project_id: parseInt(row.project_id)
         };
 
         if (typeof row.bounds === 'object') {
@@ -123,7 +143,8 @@ class AOI {
             pgres = await this.pool.query(`
                SELECT
                     id,
-                    ST_AsGeoJSON(bounds)::JSON,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds,
+                    project_id,
                     created,
                     storage
                 FROM

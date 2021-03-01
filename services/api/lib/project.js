@@ -23,6 +23,22 @@ class Project {
     }
 
     /**
+     * Ensure a user can only access their own projects (or is an admin and can access anything)
+     *
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     */
+    async has_auth(auth, projectid) {
+        const proj = await this.get(projectid);
+
+        if (auth.access !== 'admin' && auth.uid !== proj.uid) {
+            throw new Err(401, null, 'Cannot access a project you are not the owner of');
+        }
+
+        return proj;
+    }
+
+    /**
      * Return a list of projects
      *
      * @param {Number} uid - Projects related to a specific user

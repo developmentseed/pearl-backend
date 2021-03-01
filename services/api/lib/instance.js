@@ -11,6 +11,25 @@ class Instance {
     }
 
     /**
+     * Ensure a user can only access their own project assets (or is an admin and can access anything)
+     *
+     * @param {Project} project Instantiated Project class
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     * @param {Number} instanceid Instance the user is attemping to access
+     */
+    async has_auth(project, auth, projectid, instanceid) {
+        const proj = await project.has_auth(auth, projectid);
+        const instance = await this.get(instanceid);
+
+        if (instance.project_id !== proj.id) {
+            throw new Err(400, null, `Instance #${instanceid} is not associated with project #${projectid}`);
+        }
+
+        return instance;
+    }
+
+    /**
      * Return a Row as a JSON Object
      * @param {Object} row Postgres Database Row
      */
@@ -23,16 +42,17 @@ class Instance {
         };
     }
 
-
     /**
      * Return a list of instances
+     *
+     * @param {Number} projectid - Project ID
      *
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {Number} [query.status=active] - Should the session be active? `active`, `inactive`, or `all`
      */
-    async list(query) {
+    async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -46,7 +66,9 @@ class Instance {
             WHERE.push('active IS false');
         }
 
-        if (WHERE.length) WHERE = 'WHERE ' + WHERE.join(' AND ');
+        WHERE.push(`project_id = ${projectid}`);
+
+        if (WHERE.length) WHERE.join(' AND ');
 
         let pgres;
         try {
@@ -58,14 +80,16 @@ class Instance {
                     created
                 FROM
                     instances
-                ${WHERE}
+                WHERE
+                    project_id = $3
                 LIMIT
                     $1
                 OFFSET
                     $2
             `, [
                 query.limit,
-                query.page
+                query.page,
+                projectid
 
             ]);
         } catch (err) {
@@ -106,7 +130,7 @@ class Instance {
                 i: parseInt(pgres.rows[0].id)
             }, this.config.SigningSecret, { expiresIn: '12h' });
 
-            const instanceId = parseInt(pgres.rows[0].id)
+            const instanceId = parseInt(pgres.rows[0].id);
 
             let pod = {};
             if (this.config.Environment !== 'local') {

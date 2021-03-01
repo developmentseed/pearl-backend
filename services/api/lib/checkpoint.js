@@ -16,29 +16,49 @@ class CheckPoint {
     }
 
     /**
+     * Ensure a user can only access their own project assets (or is an admin and can access anything)
+     *
+     * @param {Project} project Instantiated Project class
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     * @param {Number} checkpointid Checkpoint the user is attemping to access
+     */
+    async has_auth(project, auth, projectid, checkpointid) {
+        const proj = await project.has_auth(auth, projectid);
+        const checkpoint = await this.get(checkpointid);
+
+        if (checkpoint.project_id !== proj.id) {
+            throw new Err(400, null, `Checkpoint #${checkpointid} is not associated with project #${projectid}`);
+        }
+
+        return checkpoint;
+    }
+
+    /**
      * Return a Row as a JSON Object
      * @param {Object} row Postgres Database Row
      */
-     static json(row) {
+    static json(row) {
         return {
             id: parseInt(row.id),
+            project_id: parseInt(row.project_id),
             name: row.name,
             classes: row.classes,
             created: row.created,
             storage: row.storage
         };
-     }
+    }
 
     /**
      * Return a list of checkpoints for a given instance
      *
-     * @param {Number} instanceid Instance ID to list checkpoints for
+     * @param {Number} projectid Project ID to list checkpoints for
      *
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of checkpoints to return
      * @param {Number} [query.page=0] - Page to return
      */
-    async list(instanceid, query) {
+    async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -50,13 +70,12 @@ class CheckPoint {
                     count(*) OVER() AS count,
                     id,
                     name,
-                    instance_id,
                     created,
                     storage
                 FROM
                     checkpoints
                 WHERE
-                    instance_id = $3
+                    project_id = $3
                 LIMIT
                     $1
                 OFFSET
@@ -64,7 +83,7 @@ class CheckPoint {
             `, [
                 query.limit,
                 query.page,
-                instanceid
+                projectid
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list checkpoints');
@@ -72,7 +91,7 @@ class CheckPoint {
 
         return {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            instance_id: instanceid,
+            project_id: projectid,
             checkpoints: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
@@ -172,10 +191,10 @@ class CheckPoint {
                SELECT
                     id,
                     name,
-                    instance_id,
                     classes,
                     created,
-                    storage
+                    storage,
+                    project_id
                 FROM
                     checkpoints
                 WHERE
@@ -189,7 +208,7 @@ class CheckPoint {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
 
-        return CheckPoint(pgres.rows[0]);
+        return CheckPoint.json(pgres.rows[0]);
     }
 
     /**
@@ -213,7 +232,7 @@ class CheckPoint {
                     $3::JSONB
                 ) RETURNING *
             `, [
-                instanceid,
+                projectid,
                 checkpoint.name,
                 JSON.stringify(checkpoint.classes)
             ]);
