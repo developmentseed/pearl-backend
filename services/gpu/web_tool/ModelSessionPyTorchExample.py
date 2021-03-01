@@ -117,11 +117,9 @@ class TorchFineTuning(ModelSession):
         return output
 
     def retrain(self, classes, **kwargs):
-        print ('in retrain')
-
-        self.augment_x_train = [x['geometry'] for x in classes]
-        print(self.augment_x_train)
-        self.augment_y_train = [x['name'] for x in classes] #to-do map these to integers
+        pixels = [x['geometry'] for x in classes]
+        self.augment_x_train = [item.value/255. for sublist in pixels for item in sublist] # get pixel values and scale
+        self.augment_y_train = [x['name'] for x in classes] #to-do map these to integers, fix the number of labels to correspond with the number of points
         print(self.augment_y_train)
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
