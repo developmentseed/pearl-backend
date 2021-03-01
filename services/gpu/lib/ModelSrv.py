@@ -2,7 +2,7 @@ import os
 import base64
 import json
 import numpy as np
-from .utils import pred2png
+from .utils import pred2png, geom2px
 from .AOI import AOI
 from .MemRaster import MemRaster
 from web_tool.Utils import serialize, deserialize
@@ -86,8 +86,11 @@ class ModelSrv():
         self.aoi = None
 
     async def retrain(self, body, websocket):
-        print(body)
-        self.model.retrain()
+        for cls in body['classes']:
+            cls['geometry'] = geom2px(cls['geometry'], self.api)
+
+
+        self.model.retrain(body['classes'])
 
         await websocket.send(json.dumps({
             'message': 'model#retrain'

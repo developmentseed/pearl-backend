@@ -311,7 +311,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Create a new API token to perform API requests with
      *
-     * @apiSchema (Body) {jsonschema=./schema/token.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/req.body.token.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -324,7 +324,7 @@ async function server(config, cb) {
      */
     router.post('/token',
         requiresAuth,
-        validate({ body: require('./schema/token.json') }),
+        validate({ body: require('./schema/req.body.token.json') }),
         async (req, res) => {
             try {
                 return res.json(await authtoken.generate(req.auth, req.body.name));
@@ -368,7 +368,7 @@ async function server(config, cb) {
      * @apiGroup User
      * @apiPermission admin
      *
-     * @apiSchema (Query) {jsonschema=./schema/user-list.query.json} apiParam
+     * @apiSchema (Query) {jsonschema=./schema/req.query.user-list.json} apiParam
      *
      * @apiDescription
      *     Return a list of users that have registered with the service
@@ -389,7 +389,7 @@ async function server(config, cb) {
     router.get(
         '/user',
         requiresAuth,
-        validate({ query: require('./schema/user-list.query.json') }),
+        validate({ query: require('./schema/req.query.user-list.json') }),
         async (req, res) => {
             try {
                 const users = await auth.list(req.query);
@@ -440,7 +440,7 @@ async function server(config, cb) {
      *     Instruct the GPU pool to start a new model instance and return a time limited session
      *     token for accessing the websockets GPU API
      *
-     * @apiSchema (Body) {jsonschema=./schema/instance.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/req.body.instance.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -454,7 +454,7 @@ async function server(config, cb) {
      */
     router.post('/project/:projectid/instance',
         requiresAuth,
-        validate({ body: require('./schema/instance.json') }),
+        validate({ body: require('./schema/req.body.instance.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -479,12 +479,12 @@ async function server(config, cb) {
      * @apiGroup Instance
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=./schema/instance-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/req.body.instance-patch.json} apiParam
      */
     router.patch(
         '/project/:projectid/instance/:instanceid',
         requiresAuth,
-        validate({ body: require('./schema/instance.json') }),
+        validate({ body: require('./schema/req.body.instance-patch.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -506,7 +506,7 @@ async function server(config, cb) {
      * @apiGroup Projects
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=./schema/project-list.query.json} apiParam
+     * @apiSchema (Query) {jsonschema=./schema/req.query.project-list.json} apiParam
      *
      * @apiDescription
      *     Return a list of projects
@@ -522,13 +522,17 @@ async function server(config, cb) {
      *       }]
      *   }
      */
-    router.get('/project', requiresAuth, async (req, res) => {
-        try {
-            res.json(await project.list(req.auth.uid, req.query));
-        } catch (err) {
-            return Err.respond(err, res);
+    router.get('/project',
+        requiresAuth,
+        validate({ query: require('./schema/req.query.project-list.json') }),
+        async (req, res) => {
+            try {
+                res.json(await project.list(req.auth.uid, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:projectid Get Project
@@ -569,13 +573,13 @@ async function server(config, cb) {
      * @api {post} /api/project Create Project
      * @apiVersion 1.0.0
      * @apiName CreateProject
-     * @apiGroup Project
+     * @apiGroup Projects
      * @apiPermission user
      *
      * @apiDescription
      *     Create a new project
      *
-     * @apiSchema (Body) {jsonschema=./schema/project.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/req.body.project.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -588,7 +592,7 @@ async function server(config, cb) {
     router.post(
         '/project',
         requiresAuth,
-        validate({ body: require('./schema/project.json') }),
+        validate({ body: require('./schema/req.body.project.json') }),
         async (req, res) => {
             try {
                 if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
@@ -607,7 +611,7 @@ async function server(config, cb) {
      * @apiGroup Instance
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=./schema/instance-list.query.json} apiParam
+     * @apiSchema (Query) {jsonschema=./schema/req.query.instance-list.json} apiParam
      *
      * @apiDescription
      *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
@@ -625,18 +629,22 @@ async function server(config, cb) {
      *       }]
      *   }
      */
-    router.get('/project/:projectid/instance', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
+    router.get('/project/:projectid/instance',
+        requiresAuth,
+        validate({ query: require('./schema/req.query.instance-list.json') }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
 
-            const proj = await project.get(req.params.projectid);
-            if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
 
-            res.json(await instance.list(req.query));
-        } catch (err) {
-            return Err.respond(err, res);
+                res.json(await instance.list(req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:projectid/instance/:instanceid Get Instance
@@ -785,7 +793,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Return all aois for a given instance
      *
-     * @apiSchema (Query) {jsonschema=./schema/aoi.query.json} apiParam
+     * @apiSchema (Query) {jsonschema=./schema/req.query.aoi.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -803,7 +811,7 @@ async function server(config, cb) {
     router.get(
         '/project/:projectid/aoi',
         requiresAuth,
-        validate({ query: require('./schema/aoi.query.json') }),
+        validate({ query: require('./schema/req.query.aoi.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -829,7 +837,7 @@ async function server(config, cb) {
      *     Create a new AOI during an instance
      *     Note: this is an internal API that is called by the websocket GPU
      *
-     * @apiSchema (Body) {jsonschema=./schema/aoi.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/req.body.aoi.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -844,7 +852,7 @@ async function server(config, cb) {
     router.post(
         '/project/:projectid/aoi',
         requiresAuth,
-        validate({ body: require('./schema/aoi.json') }),
+        validate({ body: require('./schema/req.body.aoi.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -979,7 +987,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Return all checkpoints for a given instance
      *
-     * @apiSchema (Query) {jsonschema=./schema/checkpoint.query.json} apiParam
+     * @apiSchema (Query) {jsonschema=./schema/req.query.checkpoint.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -997,7 +1005,7 @@ async function server(config, cb) {
     router.get(
         '/project/:projectid/checkpoint',
         requiresAuth,
-        validate({ query: require('./schema/checkpoint.query.json') }),
+        validate({ query: require('./schema/req.query.checkpoint.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -1013,17 +1021,17 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/project/:projectid/checkpoint Create Checkpoint
+     * @api {post} /api/project/:projectid/checkpoint Create Checkpoint
      * @apiVersion 1.0.0
      * @apiName CreateCheckpoint
-     * @apiGroup AOI
+     * @apiGroup Checkpoints
      * @apiPermission admin
      *
      * @apiDescription
      *     Create a new Checkpoint during an instance
      *     Note: this is an internal API that is called by the websocket GPU
      *
-     * @apiSchema (Body) {jsonschema=./schema/checkpoint.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/req.body.checkpoint.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -1039,7 +1047,7 @@ async function server(config, cb) {
     router.post(
         '/project/:projectid/checkpoint',
         requiresAuth,
-        validate({ body: require('./schema/checkpoint.json') }),
+        validate({ body: require('./schema/req.body.checkpoint.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -1055,13 +1063,51 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {patch} /api/model/:modelid Patch Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName PatchCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission admin
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.checkpoint-patch.json} apiParam
+     *
+     * @apiDescription
+     *     Update a checkpoint
+     */
+    router.patch(
+        '/project/:projectid/checkpoint/:checkpointid',
+        requiresAuth,
+        validate({ body: require('./schema/req.body.checkpoint-patch.json') }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
+
+                await auth.is_admin(req);
+
+                // Ensure the user owns the project
+                const proj = await project.get(req.params.projectid);
+                if (req.auth.access !== 'admin' && req.auth.uid !== proj.uid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+
+                // Ensure Checkpoint is actually part of the project
+                const checkpt = await checkpoint.get(req.params.checkpointid);
+                if (checkpt.project_id !== req.params.projectid) throw new Err(401, null, 'Cannot access a project you are not the owner of');
+
+                return res.json(await checkpoint.patch(req.params.checkpointid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {post} /api/model Create Model
      * @apiVersion 1.0.0
      * @apiName CreateModel
      * @apiGroup Model
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=./schema/model.json} apiParam
+     * @apiSchema (Body) {jsonschema=./schema/req.body.model.json} apiParam
      *
      * @apiDescription
      *     Create a new model in the system
@@ -1075,9 +1121,8 @@ async function server(config, cb) {
      *       "uid": 1,
      *       "name": "HCMC Sentinel 2019 Unsupervised",
      *       "model_type": "keras_example",
-     *       "model_finetunelayer": -2,
-     *       "model_numparams": 563498,
      *       "model_inputshape": [100,100,4],
+     *       "model_zoom" 17,
      *       "storage": true,
      *       "classes": [
      *           {"name": "Water", "color": "#0000FF"},
@@ -1088,12 +1133,41 @@ async function server(config, cb) {
     router.post(
         '/model',
         requiresAuth,
-        validate({ body: require('./schema/model.json') }),
+        validate({ body: require('./schema/req.body.model.json') }),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
 
                 res.json(await model.create(req.body, req.auth));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {patch} /api/model/:modelid Update Model
+     * @apiVersion 1.0.0
+     * @apiName PatchModel
+     * @apiGroup Model
+     * @apiPermission admin
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.model-patch.json} apiParam
+     *
+     * @apiDescription
+     *     Update a model
+     */
+    router.patch(
+        '/model/:modelid',
+        requiresAuth,
+        validate({ body: require('./schema/req.body.model-patch.json') }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'modelid');
+
+                await auth.is_admin(req);
+
+                res.json(await model.patch(req.params.modelid, req.body));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1119,9 +1193,9 @@ async function server(config, cb) {
      *       "uid": 1,
      *       "name": "HCMC Sentinel 2019 Unsupervised",
      *       "model_type": "keras_example",
-     *       "model_finetunelayer": -2,
-     *       "model_numparams": 563498,
      *       "model_inputshape": [100,100,4],
+     *       "model_zoom": 17,
+     *       "model_numparams": 563498,
      *       "storage": true,
      *       "classes": [
      *           {"name": "Water", "color": "#0000FF"},
@@ -1243,9 +1317,8 @@ async function server(config, cb) {
      *       "uid": 1,
      *       "name": "HCMC Sentinel 2019 Unsupervised",
      *       "model_type": "keras_example",
-     *       "model_finetunelayer": -2,
-     *       "model_numparams": 563498,
      *       "model_inputshape": [100,100,4],
+     *       "model_zoom": 17,
      *       "storage": true,
      *       "classes": [
      *           {"name": "Water", "color": "#0000FF"},
@@ -1357,7 +1430,7 @@ async function server(config, cb) {
      * @apiGroup Mosaic
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=./schema/tile.query.json} apiParam
+     * @apiSchema (Query) {jsonschema=./schema/req.query.tile.json} apiParam
      *
      * @apiParam {Integer} z Mercator Z coordinate
      * @apiParam {Integer} x Mercator X coordinate

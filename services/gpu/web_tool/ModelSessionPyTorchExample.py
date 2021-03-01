@@ -19,24 +19,41 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer
 
 from .ModelSessionAbstract import ModelSession
-from training.models.unet_solar import UnetModel
-import segmentation_models_pytorch as smp
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class FCN(nn.Module):
+
+    def __init__(self, num_input_channels, num_output_classes, num_filters=64):
+        super(FCN,self).__init__()
+
+        self.conv1 = nn.Conv2d(num_input_channels, num_filters, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(num_filters, num_filters,        kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(num_filters, num_filters,        kernel_size=3, stride=1, padding=1)
+        self.conv4 = nn.Conv2d(num_filters, num_filters,        kernel_size=3, stride=1, padding=1)
+        self.conv5 = nn.Conv2d(num_filters, num_filters,        kernel_size=3, stride=1, padding=1)
+        self.last =  nn.Conv2d(num_filters, num_output_classes, kernel_size=1, stride=1, padding=0)
+
+    def forward(self,inputs):
+        x = F.relu(self.conv1(inputs))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        x = F.relu(self.conv5(x))
+        x = self.last(x)
+        return x
 
 class TorchFineTuning(ModelSession):
 
-    AUGMENT_MODEL = MLPClassifier(
-        hidden_layer_sizes=(),
-        alpha=0.0001,
-        solver='lbfgs',
-        tol=0.0001,
-        verbose=False,
-        validation_fraction=0.0,
-        n_iter_no_change=50
+    AUGMENT_MODEL = SGDClassifier(
+        loss="log",
+        shuffle=True,
+        n_jobs=-1,
+        learning_rate="constant",
+        eta0=0.001,
+        warm_start=True
     )
 
 
@@ -45,8 +62,8 @@ class TorchFineTuning(ModelSession):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # will need to figure out for re-training ?
-        # self.output_channels = 10
-        # self.output_features = 64
+        self.output_channels = 10 # don't hard code pull from model input
+        self.output_features = 64
 
         # self.down_weight_padding = 10
 
@@ -54,20 +71,23 @@ class TorchFineTuning(ModelSession):
         # self.stride_y = self.input_size - self.down_weight_padding*2
 
         ### TODO
-        self.model = smp.Unet(
-            encoder_name='resnet18', encoder_depth=3, encoder_weights=None,
-            decoder_channels=(128, 64, 64), in_channels=4, classes=10 #this is hard-ocded need to fix
-            )
+        self.model = FCN(num_input_channels=4, num_output_classes=10, num_filters=64) #to-do fix that 10 is hardcoded
         self._init_model()
 
         for param in self.model.parameters():
            param.requires_grad = False
 
         # will need to figure out for re-training
-        self.initial_weights = self.model.segmentation_head[0].weight
-        self.initial_biases = self.model.segmentation_head[0].bias
+        self.initial_weights = self.model.last.weight[0].cpu().detach().numpy().squeeze()
+        self.initial_biases = self.model.last.bias.cpu().detach().numpy()
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+
+        self.augment_model.coef_ = self.initial_weights.astype(np.float64)
+        self.augment_model.intercept_ = self.initial_biases.astype(np.float64)
+        self.augment_model.classes_ = np.array(list(range(self.output_channels)))
+        self.augment_model.n_features_in_ = self.output_features
+        self.augment_model.n_features = self.output_features
 
         self._last_tile = None
 
@@ -81,8 +101,7 @@ class TorchFineTuning(ModelSession):
     def _init_model(self):
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
-        #self.model.eval()
-        #self.model.seg_layer = nn.Conv2d(64, 10, kernel_size=1)
+        self.model.eval()
         self.model = self.model.to(self.device)
 
 
@@ -96,7 +115,7 @@ class TorchFineTuning(ModelSession):
 
         return output
 
-    def retrain(self, **kwargs):
+    def retrain(self, classes, **kwargs):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
@@ -117,8 +136,8 @@ class TorchFineTuning(ModelSession):
             new_weights = new_weights.to(self.device)
             new_biases = new_biases.to(self.device)
 
-            self.model.seg_layer.weight.data = new_weights
-            self.model.seg_layer.bias.data = new_biases
+            self.model.segmentation_head[0].weight = new_weights
+            self.model.segmentation_head[0].bias = new_biases
 
             return {
                 "message": "Fine-tuning accuracy on data: %0.2f" % (score),
@@ -176,7 +195,7 @@ class TorchFineTuning(ModelSession):
         self.augment_model.n_layers_ = 2
         self.augment_model.out_activation_ = 'softmax'
 
-        self.augment_model._label_binarizer = label_binarizer
+        self.augment_model._label_binarizer = label_binarizer # investigate
 
         return {
             "message": "Model reset successfully",
@@ -187,8 +206,6 @@ class TorchFineTuning(ModelSession):
     def run_model_on_tile(self, tile):
         height = tile.shape[1]
         width = tile.shape[2]
-
-        self.model.eval() #moved this out of the _init_model() should probably move back?
 
         output = np.zeros((10, height, width), dtype=np.float32) # num_classes hard-coded fix
         counts = np.zeros((height, width), dtype=np.float32)
