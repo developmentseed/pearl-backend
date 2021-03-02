@@ -42,5 +42,7 @@ spec:
           env:
             - name: SigningSecret
               value: {{ .Values.api.env.SigningSecret }}
+            - name: API
+              value: https://api.{{ .Values.domain }}
 
 {{- end }}

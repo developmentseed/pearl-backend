@@ -49,4 +49,14 @@ spec:
               value: {{ .Values.gpu.image.name }}
             - name: GpuImageTag
               value: {{ .Values.gpu.image.tag }}
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              value: {{ .Values.api.env.AZURE_STORAGE_CONNECTION_STRING}}
+            - name: Deployment
+              value: {{ template "lulc-helm.fullname" . }}
+            - name: TileUrl
+              value: https://tiles.{{ .Values.domain }}
+            - name: ApiUrl
+              value: https://api.{{ .Values.domain }}
+            - name: SocketUrl
+              value: wss://socket.{{ .Values.domain }}
 {{- end }}

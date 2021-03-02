@@ -2,7 +2,8 @@
 
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
-
+const { Kube } = require('./kube');
+const kube = new Kube('default');
 class Instance {
     constructor(pool, config) {
         this.pool = pool;
@@ -83,10 +84,6 @@ class Instance {
         };
     }
 
-    async patch() {
-
-    }
-
     async create(auth, instance) {
         if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
@@ -109,10 +106,32 @@ class Instance {
                 i: parseInt(pgres.rows[0].id)
             }, this.config.SigningSecret, { expiresIn: '12h' });
 
+            const instanceId = parseInt(pgres.rows[0].id)
+
+            let pod = {};
+            if (this.config.Environment !== 'local') {
+                const podSpec = kube.makePodSpec(instanceId, [{
+                    name: 'INSTANCE_ID',
+                    value: instanceId.toString()
+                },{
+                    name: 'API',
+                    value: this.config.ApiUrl
+                },{
+                    name: 'SOCKET',
+                    value: this.config.SocketUrl
+                },{
+                    name: 'SigningSecret',
+                    value: this.config.SigningSecret
+                }]);
+
+                pod = await kube.createPod(podSpec);
+            }
+
             return {
                 id: parseInt(pgres.rows[0].id),
                 created: pgres.rows[0].created,
-                token: token
+                token: token,
+                pod: pod
             };
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');

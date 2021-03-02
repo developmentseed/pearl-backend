@@ -54,6 +54,7 @@ jobs:
         CLUSTER_RESOURCE_GROUP: ${{ env.CLUSTER_RESOURCE_GROUP }}
         STAGING_CLIENT_ID: ${{ secrets.STAGING_CLIENT_ID }}
         STAGING_CLIENT_SECRET: ${{ secrets.STAGING_CLIENT_SECRET }}
+        STAGING_AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.STAGING_AZURE_STORAGE_CONNECTION_STRING }}
 
     - name: Staging - substitute secrets
       if: github.ref == 'refs/heads/main'
@@ -75,6 +76,7 @@ jobs:
         CLUSTER_RESOURCE_GROUP: ${{ env.CLUSTER_RESOURCE_GROUP }}
         STAGING_CLIENT_ID: ${{ secrets.STAGING_CLIENT_ID }}
         STAGING_CLIENT_SECRET: ${{ secrets.STAGING_CLIENT_SECRET }}
+        STAGING_AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.STAGING_AZURE_STORAGE_CONNECTION_STRING }}
 
     - name: Staging / Test — set AKS context
       if: github.ref == 'refs/heads/main' || startsWith(github.event.head_commit.message, '[deploy]')

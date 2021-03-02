@@ -1,6 +1,8 @@
 'use strict';
 
 const k8s = require('@kubernetes/client-node');
+const Config = require('./config');
+const config = Config.env({});
 class Kube {
 
     /**
@@ -31,16 +33,20 @@ class Kube {
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      */
     makePodSpec(name, env) {
-        const nodeSelectorKey = process.env.nodeSelectorKey;
-        const nodeSelectorValue = process.env.nodeSelectorValue;
-        const gpuImageName = process.env.GpuImageName;
-        const gpuImageTag = process.env.GpuImageTag;
+        const nodeSelectorKey = config.nodeSelectorKey;
+        const nodeSelectorValue = config.nodeSelectorValue;
+        const deploymentName = config.Deployment;
+        const gpuImageName = config.GpuImageName;
+        const gpuImageTag = config.GpuImageTag;
+
+        const nodeSelector = {};
+        nodeSelector[nodeSelectorKey] = nodeSelectorValue;
 
         return {
             apiVersion: 'v1',
             kind: 'Pod',
             metadata: {
-                name: `gpu-${name}`
+                name: `${deploymentName}-gpu-${name}`
             },
             spec: {
                 containers: [
@@ -55,7 +61,7 @@ class Kube {
                         env: env
                     }
                 ],
-                nodeSelector: `${nodeSelectorKey}:${nodeSelectorValue}`
+                nodeSelector: nodeSelector
             }
         };
     }
@@ -67,6 +73,19 @@ class Kube {
         const res = await this.k8sApi.createNamespacedPod(this.namespace, podSpec);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
+        }
+        return res.body;
+    }
+
+    /**
+     *
+     * Delete a pod based on the name
+     */
+
+    async deletePod(name) {
+        const res = await this.k8sApi.deleteNamespacedPod(name, this.namespace);
+        if (res.statusCode >= 400) {
+            return `REquest failed: ${res.statusMessage}`;
         }
         return res.body;
     }
