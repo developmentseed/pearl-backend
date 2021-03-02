@@ -63,6 +63,7 @@ class TorchFineTuning(ModelSession):
         print(len(api.model['classes'])) # Num Classes
         print(api.model['classes']) # Classses themselves
 
+        self.classes = api.model['classes']
 
         self.model_fs = api.model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -126,6 +127,11 @@ class TorchFineTuning(ModelSession):
         return output
 
     def retrain(self, classes, **kwargs):
+        self.classes = [{
+            'name': x['name'],
+            'color': x['color']
+        } for x in classes ]
+
         pixels = [x['geometry'] for x in classes]
         counts = [len(x) for x in pixels]
         self.augment_x_train = [item.value / 255. for sublist in pixels for item in sublist]  # get pixel values and scale
