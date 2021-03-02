@@ -111,7 +111,8 @@ class ModelSrv():
             self.model.classes
         )
 
-        chdir = self.checkpoint_dir + '/' + str(checkpoint['id']) + '/'
+        chdir = self.checkpoint_dir + str(checkpoint['id']) + '/'
+        os.makedirs(chdir, exist_ok=True)
         self.model.save_state_to(chdir)
 
         self.api.upload_checkpoint(checkpoint['id'], chdir)
