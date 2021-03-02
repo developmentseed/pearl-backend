@@ -6,6 +6,7 @@ import numpy as np
 import logging
 import geojson
 import mercantile
+import zipfile
 from os import path
 from io import BytesIO
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -29,6 +30,7 @@ class API():
 
         os.makedirs(self.tmp_dir, exist_ok=True)
         os.makedirs(self.tmp_dir + '/tiles', exist_ok=True)
+        os.makedirs(self.tmp_dir + '/checkpoints', exist_ok=True)
 
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
@@ -77,16 +79,20 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_checkpoint(self, checkpointid, directory):
+    def upload_checkpoint(self, checkpointid, ch_dir):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid) + '/upload'
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = self.tmp_dir + '/aoi-{}.geotiff'.format(aoiid)
-        with open(geo_path, 'wb') as filehandle:
-            filehandle.write(geotiff.read())
+        zip_fs = self.tmp_dir + 'checkpoints/checkpoint-{}.zip'.format(checkpointid)
 
-        encoder = MultipartEncoder([('file', ('filename', open(geo_path, 'rb'), 'image/tiff'))])
+        zipf = zipfile.ZipFile(zip_fs, 'w', zipfile.ZIP_DEFLATED)
+        for root, dirs, files in os.walk(ch_dir):
+            for file in files:
+                zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), os.path.join(ch_dir, '..')))
+        zipf.close()
+
+        encoder = MultipartEncoder([('file', ('filename', open(zip_fs, 'rb'), 'application/zip'))])
 
         r = requests.post(url,
             headers={
@@ -261,3 +267,4 @@ class API():
         LOGGER.info("ok - model: " + model_fs)
 
         return model_fs
+
