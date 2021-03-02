@@ -84,7 +84,7 @@ class TorchFineTuning(ModelSession):
            param.requires_grad = False
 
         # will need to figure out for re-training
-        self.initial_weights = self.model.last.weight[0].cpu().detach().numpy().squeeze()
+        self.initial_weights = self.model.last.weight.cpu().detach().numpy().squeeze()
         self.initial_biases = self.model.last.bias.cpu().detach().numpy()
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
@@ -94,6 +94,7 @@ class TorchFineTuning(ModelSession):
         self.augment_model.classes_ = np.array(list(range(self.output_channels)))
         self.augment_model.n_features_in_ = self.output_features
         self.augment_model.n_features = self.output_features
+        self.augment_model.n_classes = 10
 
         self._last_tile = None
 
