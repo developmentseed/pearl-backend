@@ -148,7 +148,7 @@ class CheckPoint {
     /**
      * Update Checkpoint Properties
      *
-     * @param {Number} checkpointid - Specific Model id
+     * @param {Number} checkpointid - Checkpoint ID
      * @param {Object} checkpoint - Checkpoint Object
      * @param {Boolean} checkpoint.storage Has the storage been uploaded
      * @param {String} checkpoint.name The name of the checkpoint
