@@ -189,4 +189,57 @@ test('GET /api/project/1', (t) => {
     });
 });
 
+test('PATCH /api/project/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'Renamed Test Project'
+        }
+    }, (err, res) => {
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            name: 'Renamed Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            name: 'Renamed Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
+        });
+
+        t.end();
+    });
+});
+
 flight.landing(test);

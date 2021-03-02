@@ -57,53 +57,6 @@
     "groupTitle": "AOI"
   },
   {
-    "type": "post",
-    "url": "/api/project/:projectid/checkpoint",
-    "title": "Create Checkpoint",
-    "version": "1.0.0",
-    "name": "CreateCheckpoint",
-    "group": "AOI",
-    "permission": [
-      {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be an admin to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Create a new Checkpoint during an instance Note: this is an internal API that is called by the websocket GPU</p>",
-    "parameter": {
-      "fields": {
-        "Body": [
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Unknown",
-            "optional": false,
-            "field": "classes",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "AOI"
-  },
-  {
     "type": "get",
     "url": "/api/project/:projectid/aoi/:aoiid/download",
     "title": "Download AOI",
@@ -243,13 +196,60 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_finetunelayer\": -2,\n    \"model_numparams\": 563498,\n    \"model_inputshape\": [100,100,4],\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_inputshape\": [100,100,4],\n    \"model_zoom\": 17,\n    \"model_numparams\": 563498,\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
           "type": "json"
         }
       ]
     },
     "filename": "./index.js",
     "groupTitle": "AOI"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:projectid/checkpoint",
+    "title": "Create Checkpoint",
+    "version": "1.0.0",
+    "name": "CreateCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new Checkpoint during an instance Note: this is an internal API that is called by the websocket GPU</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Unknown",
+            "optional": false,
+            "field": "classes",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
   },
   {
     "type": "get",
@@ -342,6 +342,37 @@
         }
       ]
     },
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "patch",
+    "url": "/api/model/:modelid",
+    "title": "Patch Checkpoint",
+    "version": "1.0.0",
+    "name": "PatchCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "description": "<p>Update a checkpoint</p>",
     "filename": "./index.js",
     "groupTitle": "Checkpoints"
   },
@@ -445,7 +476,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\",\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\"\n    \"pod\": { ... }\n}",
           "type": "json"
         }
       ]
@@ -638,7 +669,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_finetunelayer\": -2,\n    \"model_numparams\": 563498,\n    \"model_inputshape\": [100,100,4],\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_inputshape\": [100,100,4],\n    \"model_zoom\" 17,\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
           "type": "json"
         }
       ]
@@ -710,7 +741,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_finetunelayer\": -2,\n    \"model_numparams\": 563498,\n    \"model_inputshape\": [100,100,4],\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"created\": \"<date>\",\n    \"active\": true,\n    \"uid\": 1,\n    \"name\": \"HCMC Sentinel 2019 Unsupervised\",\n    \"model_type\": \"keras_example\",\n    \"model_inputshape\": [100,100,4],\n    \"model_zoom\": 17,\n    \"storage\": true,\n    \"classes\": [\n        {\"name\": \"Water\", \"color\": \"#0000FF\"},\n    ],\n    \"meta\": {}\n}",
           "type": "json"
         }
       ]
@@ -1165,7 +1196,7 @@
     "title": "Create Project",
     "version": "1.0.0",
     "name": "CreateProject",
-    "group": "Project",
+    "group": "Projects",
     "permission": [
       {
         "name": "user",
@@ -1211,7 +1242,7 @@
       ]
     },
     "filename": "./index.js",
-    "groupTitle": "Project"
+    "groupTitle": "Projects"
   },
   {
     "type": "get",
@@ -1282,6 +1313,46 @@
         {
           "title": "Success-Response:",
           "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Projects"
+  },
+  {
+    "type": "patch",
+    "url": "/api/project",
+    "title": "Patch Project",
+    "version": "1.0.0",
+    "name": "PatchProject",
+    "group": "Projects",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Update an existing Project</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "name",
+            "description": "<p>Name of the Project</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]

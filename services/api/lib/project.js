@@ -155,6 +155,37 @@ class Project {
 
         return Project.json(pgres.rows[0]);
     }
+
+    /**
+     * Update Project Properties
+     *
+     * @param {Number} projectid - Specific Project id
+     * @param {Object} project - Project Object
+     * @param {String} project.name The name of the project
+     */
+    async patch(projectid, project) {
+        let pgres;
+
+        try {
+            pgres = await this.pool.query(`
+                UPDATE projects
+                    SET
+                        name = COALESCE($2, name)
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [
+                projectid,
+                project.name
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to update Project');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Project not found');
+
+        return Project.json(pgres.rows[0]);
+    }
 }
 
 module.exports = {

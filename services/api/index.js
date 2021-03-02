@@ -601,6 +601,42 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {patch} /api/project Patch Project
+     * @apiVersion 1.0.0
+     * @apiName PatchProject
+     * @apiGroup Projects
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Update an existing Project
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.project-patch.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "name": "Test Project",
+     *       "created": "<date>"
+     *   }
+     */
+    router.patch(
+        '/project/:projectid',
+        requiresAuth,
+        validate({ body: require('./schema/req.body.project-patch.json') }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await project.has_auth(req.auth, req.params.projectid);
+
+                return res.json(await project.patch(req.params.projectid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {get} /api/project/:projectid/instance List Instances
      * @apiVersion 1.0.0
      * @apiName ListInstances
