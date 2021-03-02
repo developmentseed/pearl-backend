@@ -148,7 +148,7 @@ class TorchFineTuning(ModelSession):
                 self.class_names_mapping.update({name: max(self.class_names_mapping.values()) + 1}) #to-do? this new classs name + value need to stay in the dictionary for future re-training iterations
             ints_retrain.append(self.class_names_mapping.get(name))
 
-        self.augment_y_train =  ints_retrain #to-do map these to integers, fix the number of labels to correspond with the number of points
+        self.augment_y_train =  ints_retrain
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
