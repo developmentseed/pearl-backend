@@ -54,7 +54,8 @@ class TorchFineTuning(ModelSession):
         n_jobs=-1,
         learning_rate="constant",
         eta0=0.001,
-        warm_start=True
+        warm_start=True,
+        verbose=True
     )
 
 
@@ -99,6 +100,9 @@ class TorchFineTuning(ModelSession):
         self.augment_x_train = []
         self.augment_y_train = []
 
+        self.class_names_mapping = {'No Data': 0, 'Water': 1, 'Emergent Wetlands': 2, 'Tree Canopy': 3, 'Shrubland': 4, 'Low Vegetation': 5, 'Barren': 6, 'Structure': 7, 'Impervious Surface': 8,
+                                    'Impervious Road': 9} #TO-DO this should not be hard-coded
+
     @property
     def last_tile(self):
         return self._last_tile
@@ -122,15 +126,31 @@ class TorchFineTuning(ModelSession):
 
     def retrain(self, classes, **kwargs):
         pixels = [x['geometry'] for x in classes]
-        self.augment_x_train = [item.value/255. for sublist in pixels for item in sublist] # get pixel values and scale
-        self.augment_y_train = [x['name'] for x in classes] #to-do map these to integers, fix the number of labels to correspond with the number of points
-        print(self.augment_y_train)
+        counts = [len(x) for x in pixels]
+        self.augment_x_train = [item.value / 255. for sublist in pixels for item in sublist]  # get pixel values and scale
+        names =  [x['name'] for x in classes]
+
+        names_retrain = []
+        for i, c in enumerate(counts):
+             names_retrain.append(list(np.repeat(names[i], c)))
+
+        names_retrain = [x for sublist in names_retrain for x in sublist]
+
+        ints_retrain = []
+        for name in names_retrain:
+            if name not in list(self.class_names_mapping.keys()):
+                self.class_names_mapping.update({name: max(self.class_names_mapping.values()) + 1}) #to-do? this new classs name + value need to stay in the dictionary for future re-training iterations
+            ints_retrain.append(self.class_names_mapping.get(name))
+
+        self.augment_y_train =  ints_retrain #to-do map these to integers, fix the number of labels to correspond with the number of points
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
-        print (x_train.shape)
-        print (x_train.shape[0])
+        print(x_train.shape)
         print(y_train.shape)
+
+        print (x_train)
+        print(y_train)
 
         if x_train.shape[0] == 0:
             return {
@@ -141,6 +161,11 @@ class TorchFineTuning(ModelSession):
         # split re-training data into test 20% and train 80%
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.2, random_state=0)
+
+        print (x_train.shape)
+        print (x_test.shape)
+        print (y_train.shape)
+        print(y_test.shape)
 
 
         try:
@@ -244,9 +269,9 @@ class TorchFineTuning(ModelSession):
 
         joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
 
-        if self.augment_model_trained:
-            with open(os.path.join(directory, "trained.txt"), "w") as f:
-                f.write("")
+        # if self.augment_model_trained:
+        #     with open(os.path.join(directory, "trained.txt"), "w") as f:
+        #         f.write("")
 
         return {
             "message": "Saved model state",
@@ -264,7 +289,7 @@ class TorchFineTuning(ModelSession):
             self.augment_y_train.append(sample)
 
         self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
-        self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
+        #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         return {
             "message": "Loaded model state",
