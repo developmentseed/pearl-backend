@@ -77,7 +77,7 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_checkpoint(self, checkpointid):
+    def upload_checkpoint(self, checkpointid, directory):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid) + '/upload'
 
         LOGGER.info("ok - POST " + url)

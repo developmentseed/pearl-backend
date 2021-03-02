@@ -93,7 +93,7 @@ class ModelSrv():
         self.model.retrain(body['classes'])
 
         await websocket.send(json.dumps({
-            'message': 'model#retrain'
+            'message': 'model#retrain#complete'
         }))
 
     def add_sample_point(self, row, col, class_idx):
@@ -108,10 +108,13 @@ class ModelSrv():
     async def checkpoint(self, body, websocket):
         checkpoint = self.api.create_checkpoint(
             body['name'],
-            self.api.model['classes']
+            self.model.classes
         )
 
-        self.model.save_state_to(self.checkpoint_dir)
+        chdir = self.checkpoint_dir + '/' + str(checkpoint['id']) + '/'
+        self.model.save_state_to(chdir)
+
+        self.api.upload_checkpoint(checkpoint['id'], chdir)
 
         await websocket.send(json.dumps({
             'message': 'model#checkpoint',
