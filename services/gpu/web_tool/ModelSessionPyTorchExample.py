@@ -54,7 +54,8 @@ class TorchFineTuning(ModelSession):
         n_jobs=-1,
         learning_rate="constant",
         eta0=0.001,
-        warm_start=True
+        warm_start=True,
+        verbose=True
     )
 
 
@@ -144,6 +145,9 @@ class TorchFineTuning(ModelSession):
         print(x_train.shape)
         print(y_train.shape)
 
+        print (x_train)
+        print(y_train)
+
         if x_train.shape[0] == 0:
             return {
                 "message": "Need to add training samples in order to train",
@@ -153,6 +157,11 @@ class TorchFineTuning(ModelSession):
         # split re-training data into test 20% and train 80%
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.2, random_state=0)
+
+        print (x_train.shape)
+        print (x_test.shape)
+        print (y_train.shape)
+        print(y_test.shape)
 
 
         try:
@@ -256,9 +265,9 @@ class TorchFineTuning(ModelSession):
 
         joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
 
-        if self.augment_model_trained:
-            with open(os.path.join(directory, "trained.txt"), "w") as f:
-                f.write("")
+        # if self.augment_model_trained:
+        #     with open(os.path.join(directory, "trained.txt"), "w") as f:
+        #         f.write("")
 
         return {
             "message": "Saved model state",
@@ -276,7 +285,7 @@ class TorchFineTuning(ModelSession):
             self.augment_y_train.append(sample)
 
         self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
-        self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
+        #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         return {
             "message": "Loaded model state",
