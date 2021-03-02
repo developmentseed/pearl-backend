@@ -15,7 +15,7 @@ class ModelSession(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def __init__(self, gpu_id, **kwargs):
+    def __init__(self, gpu_id, api, **kwargs):
         """Responsible for initializing the model and other necessary components from the parameters in the
         models.json files.
 

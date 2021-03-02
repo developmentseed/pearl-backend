@@ -72,7 +72,7 @@ def load(gpu_id, api):
     model_type = api.model["model_type"]
 
     if model_type == "pytorch_example":
-        model = TorchFineTuning(gpu_id, api.model, api.model_fs)
+        model = TorchFineTuning(gpu_id, api)
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
