@@ -17,6 +17,7 @@ import sklearn.base
 from sklearn.linear_model import SGDClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer
+from sklearn.model_selection import train_test_split
 
 from .ModelSessionAbstract import ModelSession
 
@@ -116,8 +117,16 @@ class TorchFineTuning(ModelSession):
         return output
 
     def retrain(self, classes, **kwargs):
+        pixels = [x['geometry'] for x in classes]
+        self.augment_x_train = [item.value/255. for sublist in pixels for item in sublist] # get pixel values and scale
+        self.augment_y_train = [x['name'] for x in classes] #to-do map these to integers, fix the number of labels to correspond with the number of points
+        print(self.augment_y_train)
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
+
+        print (x_train.shape)
+        print (x_train.shape[0])
+        print(y_train.shape)
 
         if x_train.shape[0] == 0:
             return {
@@ -125,10 +134,14 @@ class TorchFineTuning(ModelSession):
                 "success": False
             }
 
+        # split re-training data into test 20% and train 80%
+        x_train, x_test, y_train, y_test = train_test_split(
+                                            x_train, y_train, test_size=0.2, random_state=0)
+
 
         try:
-            self.augment_model.fit(x_train, y_train)
-            score = self.augment_model.score(x_train, y_train)
+            self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
+            score = self.augment_model.score(x_test, y_test)
             LOGGER.debug("Fine-tuning accuracy: %0.4f" % (score))
 
             new_weights = torch.from_numpy(self.augment_model.coefs_[0].T.copy().astype(np.float32)[:,:,np.newaxis,np.newaxis])
