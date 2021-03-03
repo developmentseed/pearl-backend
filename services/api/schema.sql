@@ -62,18 +62,6 @@ CREATE TABLE IF NOT EXISTS instances (
         REFERENCES projects(id)
 );
 
-CREATE TABLE IF NOT EXISTS aois (
-    id          BIGSERIAL PRIMARY KEY,
-    project_id  BIGINT NOT NULL,
-    bounds      GEOMETRY(POLYGON, 4326),
-    created     TIMESTAMP NOT NULL DEFAULT NOW(),
-    storage     BOOLEAN NOT NULL DEFAULT False,
-
-    CONSTRAINT fk_project
-        FOREIGN KEY (project_id)
-        REFERENCES projects(id)
-);
-
 CREATE TABLE IF NOT EXISTS checkpoints (
     id          BIGSERIAL PRIMARY KEY,
 
@@ -88,3 +76,22 @@ CREATE TABLE IF NOT EXISTS checkpoints (
         FOREIGN KEY (project_id)
         REFERENCES projects(id)
 );
+
+CREATE TABLE IF NOT EXISTS aois (
+    id              BIGSERIAL PRIMARY KEY,
+    name            TEXT NOT NULL,
+    checkpoint_id   BIGINT NOT NULL,
+    project_id      BIGINT NOT NULL,
+    bounds          GEOMETRY(POLYGON, 4326),
+    created         TIMESTAMP NOT NULL DEFAULT NOW(),
+    storage         BOOLEAN NOT NULL DEFAULT False,
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id),
+
+    CONSTRAINT fk_checkpoint
+        FOREIGN KEY (checkpoint_id)
+        REFERENCES checkpoints(id)
+);
+
