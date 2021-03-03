@@ -75,11 +75,11 @@ class TorchFineTuning(ModelSession):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # will need to figure out for re-training ?
-        self.output_channels = 10 # don't hard code pull from model input
+        self.output_channels = len(self.classes)
         self.output_features = 64
 
         ### TODO
-        self.model = FCN(num_input_channels=4, num_output_classes=10, num_filters=64) #to-do fix that 10 is hardcoded
+        self.model = FCN(num_input_channels=4, num_output_classes=len(self.classes), num_filters=64) #to-do fix that 10 is hardcoded
         self._init_model()
 
         for param in self.model.parameters():
@@ -96,7 +96,7 @@ class TorchFineTuning(ModelSession):
         self.augment_model.classes_ = np.array(list(range(self.output_channels)))
         self.augment_model.n_features_in_ = self.output_features
         self.augment_model.n_features = self.output_features
-        self.augment_model.n_classes = 10
+        self.augment_model.n_classes = len(self.classes)
 
         self._last_tile = None
 
@@ -260,8 +260,7 @@ class TorchFineTuning(ModelSession):
         height = tile.shape[1]
         width = tile.shape[2]
 
-        output = np.zeros((10, height, width), dtype=np.float32) # num_classes hard-coded fix
-
+        output = np.zeros((len(self.classes), height, width), dtype=np.float32)
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
         with torch.no_grad():
