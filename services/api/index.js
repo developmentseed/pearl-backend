@@ -977,7 +977,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Download a checkpoint asset from the API
      */
-    router.get(/project/:projectid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
+    router.get('/project/:projectid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
