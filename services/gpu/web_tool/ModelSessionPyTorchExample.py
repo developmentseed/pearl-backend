@@ -127,11 +127,14 @@ class TorchFineTuning(ModelSession):
         tile = tile / 255.0
         tile = tile.astype(np.float32)
 
-        output = self.run_model_on_tile(tile)
+        output, output_features = self.run_model_on_tile(tile)
         #TO-DO also return output_features
         #self._last_tile = output_features
 
-        return output
+        print (output.shape)
+        print(output_features.shape)
+
+        return output, output_features
 
     def retrain(self, classes, **kwargs):
         self.classes = [{
@@ -266,7 +269,6 @@ class TorchFineTuning(ModelSession):
         width = tile.shape[2]
 
         output = np.zeros((10, height, width), dtype=np.float32) # num_classes hard-coded fix
-        counts = np.zeros((height, width), dtype=np.float32)
 
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
@@ -277,7 +279,7 @@ class TorchFineTuning(ModelSession):
 
 
         predictions = predictions[0].argmax(axis=0).astype(np.uint8)  #using [0] because using a "fake batch" of 1 tile
-        features = np.moveaxis(features, 0, -1)  #using [0] because using a "fake batch" of 1 tile (shape should be 256, 256, 64)
+        features = np.moveaxis(features[0], 0, -1)  #using [0] because using a "fake batch" of 1 tile (shape should be 256, 256, 64)
 
         return  predictions, features
 
