@@ -103,8 +103,7 @@ class TorchFineTuning(ModelSession):
         self.augment_x_train = []
         self.augment_y_train = []
 
-        self.class_names_mapping = {'No Data': 0, 'Water': 1, 'Emergent Wetlands': 2, 'Tree Canopy': 3, 'Shrubland': 4, 'Low Vegetation': 5, 'Barren': 6, 'Structure': 7, 'Impervious Surface': 8,
-                                    'Impervious Road': 9} #TO-DO this should not be hard-coded
+        self.class_names_mapping = {k: v for v, k in enumerate(x['name'] for x in self.classes)} #map class name to integer value
 
     @property
     def last_tile(self):
