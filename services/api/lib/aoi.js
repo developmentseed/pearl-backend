@@ -41,9 +41,11 @@ class AOI {
     static json(row) {
         const def = {
             id: parseInt(row.id),
+            name: row.name,
             created: row.created,
             storage: row.storage,
-            project_id: parseInt(row.project_id)
+            project_id: parseInt(row.project_id),
+            checkpoint_id: parseInt(row.checkpoint_id)
         };
 
         if (typeof row.bounds === 'object') {
@@ -108,6 +110,7 @@ class AOI {
      * @param {Number} aoiid - Specific AOI id
      * @param {Object} aoi AOI Object
      * @param {Boolean} aoi.storage Has the storage been uploaded
+     * @param {String} aoi.name - Human Readable Name
      */
     async patch(aoiid, aoi) {
         let pgres;
@@ -115,13 +118,15 @@ class AOI {
             pgres = await this.pool.query(`
                 UPDATE aois
                     SET
-                        storage = COALESCE($2, storage)
+                        storage = COALESCE($2, storage),
+                        name = COALESCE($3, name)
                     WHERE
                         id = $1
                     RETURNING *
             `, [
                 aoiid,
-                aoi.storage
+                aoi.storage,
+                aoi.name
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI');
@@ -143,8 +148,10 @@ class AOI {
             pgres = await this.pool.query(`
                SELECT
                     id,
+                    name,
                     ST_AsGeoJSON(bounds)::JSON AS bounds,
                     project_id,
+                    checkpoint_id,
                     created,
                     storage
                 FROM
@@ -183,6 +190,7 @@ class AOI {
                SELECT
                     count(*) OVER() AS count,
                     id,
+                    name,
                     ST_AsGeoJSON(bounds)::JSON,
                     created,
                     storage
@@ -210,6 +218,7 @@ class AOI {
             aois: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    name: row.name,
                     bounds: row.bounds,
                     created: row.created,
                     storage: row.storage
@@ -223,7 +232,9 @@ class AOI {
      *
      * @param {Number} projectid - AOIS related to a specific project
      * @param {Object} aoi - AOI Object
-     * @param {Object} aoi.bounds - AOI Bounds GeoJSON
+     * @param {Object} aoi.bounds - Bounds GeoJSON
+     * @param {Number} aoi.checkpoint_id - Checkpoint ID
+     * @param {String} aoi.name - Human Readable Name
      */
     async create(projectid, aoi) {
         let pgres;
@@ -231,13 +242,19 @@ class AOI {
             pgres = await this.pool.query(`
                 INSERT INTO aois (
                     project_id,
+                    name,
+                    checkpoint_id,
                     bounds
                 ) VALUES (
                     $1,
-                    ST_SetSRID(ST_GeomFromGeoJSON($2), 4326)
+                    $2,
+                    $3,
+                    ST_SetSRID(ST_GeomFromGeoJSON($4), 4326)
                 ) RETURNING *
             `, [
                 projectid,
+                aoi.name,
+                aoi.checkpoint_id,
                 aoi.bounds
             ]);
 

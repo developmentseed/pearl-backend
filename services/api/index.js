@@ -720,6 +720,8 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1432,
+     *       "name": "I'm an AOI",
+     *       "checkpoint_id": 1,
      *       "storage": true,
      *       "created": "<date>",
      *       "bounds": { "GeoJSON "}
@@ -862,7 +864,9 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1432,
-     *       "instance_id": 124,
+     *       "project_id": 1,
+     *       "name": "I'm an AOI",
+     *       "checkpoint_id": 1,
      *       "storage": true,
      *       "created": "<date>",
      *       "bounds": { "GeoJSON" }
@@ -878,6 +882,47 @@ async function server(config, cb) {
                 await project.has_auth(req.auth, req.params.projectid);
 
                 return res.json(await aoi.create(req.params.projectid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {patch} /api/project/:projectid/aoi/:aoiid Patch AOI
+     * @apiVersion 1.0.0
+     * @apiName PatchAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Update an AOI
+     *
+     * @apiSchema (Body) {jsonschema=./schema/req.body.aoi-patch.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "project_id": 1,
+     *       "name": "I'm an AOI",
+     *       "checkpoint_id": 1,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON" }
+     *   }
+     */
+    router.patch(
+        '/project/:projectid/aoi/:aoiid',
+        requiresAuth,
+        validate({ body: require('./schema/req.body.aoi-patch.json') }),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await aoi.has_auth(req.auth, req.params.projectid);
+
+                return res.json(await aoi.patch(req.params.aoiid, req.body));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1499,11 +1544,7 @@ async function server(config, cb) {
             Err.respond(
                 new Err(400, null, 'validation error'),
                 res,
-                err.validationErrors.body.map((e) => {
-                    return {
-                        message: e.message
-                    };
-                })
+                err.validationErrors.body
             );
 
             next();

@@ -1,10 +1,20 @@
 {
     "type": "object",
     "required": [
+        "name",
+        "checkpoint_id",
         "bounds"
     ],
     "additionalProperties": false,
     "properties": {
+        "name": {
+            "type": "string",
+            "description": "The human readable name of the AOI"
+        },
+        "checkpoint_id": {
+            "type": "integer",
+            "description": "The checkpoint ID that created this AOI"
+        },
         "bounds": {
             "type": "object",
             "description": "GeoJSON Polygon",
