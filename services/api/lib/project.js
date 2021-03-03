@@ -15,6 +15,7 @@ class Project {
     static json(row) {
         return {
             id: parseInt(row.id),
+            uid: parseInt(row.uid),
             name: row.name,
             model_id: parseInt(row.model_id),
             mosaic: row.mosaic,
@@ -31,7 +32,7 @@ class Project {
     async has_auth(auth, projectid) {
         const proj = await this.get(projectid);
 
-        if (auth.access !== 'admin' || auth.uid !== proj.uid) {
+        if (auth.access !== 'admin' && auth.uid !== proj.uid) {
             throw new Err(401, null, 'Cannot access a project you are not the owner of');
         }
 
