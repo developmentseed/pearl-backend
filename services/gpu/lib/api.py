@@ -102,6 +102,8 @@ class API():
             data = encoder
         )
 
+        print(r.content)
+
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)

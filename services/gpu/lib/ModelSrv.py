@@ -89,7 +89,6 @@ class ModelSrv():
         for cls in body['classes']:
             cls['geometry'] = geom2px(cls['geometry'], self.api)
 
-
         self.model.retrain(body['classes'])
 
         await websocket.send(json.dumps({

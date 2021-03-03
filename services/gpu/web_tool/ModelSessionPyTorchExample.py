@@ -60,9 +60,6 @@ class TorchFineTuning(ModelSession):
 
 
     def __init__(self, gpu_id, api):
-        print(len(api.model['classes'])) # Num Classes
-        print(api.model['classes']) # Classses themselves
-
         self.classes = api.model['classes']
 
         self.model_fs = api.model_fs

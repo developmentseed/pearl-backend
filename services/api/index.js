@@ -792,7 +792,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Return the aoi fabric geotiff
      */
-    router.get('/api/project/:projectid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
+    router.get('/project/:projectid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -939,7 +939,7 @@ async function server(config, cb) {
      *       "created": "<date>"
      *   }
      */
-    router.post('/api/project/:projectid/checkpoint/:checkpointid/upload', requiresAuth, async (req, res) => {
+    router.post('/project/:projectid/checkpoint/:checkpointid/upload', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -977,7 +977,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Download a checkpoint asset from the API
      */
-    router.get('/api/project/:projectid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
+    router.get(/project/:projectid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -1202,7 +1202,7 @@ async function server(config, cb) {
      *       "meta": {}
      *   }
      */
-    router.post('/api/model/:modelid/upload', requiresAuth, async (req, res) => {
+    router.post('/model/:modelid/upload', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
             await auth.is_admin(req);
