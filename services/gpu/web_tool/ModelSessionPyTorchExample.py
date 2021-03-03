@@ -46,6 +46,15 @@ class FCN(nn.Module):
         x = self.last(x)
         return x
 
+    def forward_features(self,inputs):
+        x = F.relu(self.conv1(inputs))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        z = F.relu(self.conv5(x))
+        y = self.last(z)
+        return y, z
+
 class TorchFineTuning(ModelSession):
 
     AUGMENT_MODEL = SGDClassifier(
@@ -262,14 +271,15 @@ class TorchFineTuning(ModelSession):
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
         with torch.no_grad():
-            t_output = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy, to-do fix for actual batches
-            t_output = F.softmax(t_output, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            predictions, features = self.model.forward_features(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            features = features.cpu().numpy() #embeddings per pixel for the image
 
-        output_hard = t_output[0].argmax(axis=0).astype(np.uint8) #using [0] because using a "fake batch" of 1 tile
 
+        predictions = predictions[0].argmax(axis=0).astype(np.uint8)  #using [0] because using a "fake batch" of 1 tile
+        features = np.moveaxis(features, 0, -1)  #using [0] because using a "fake batch" of 1 tile (shape should be 256, 256, 64)
 
-        #to-do also retrun output features
-        return  output_hard
+        return  predictions, features
 
     def save_state_to(self, directory):
 
