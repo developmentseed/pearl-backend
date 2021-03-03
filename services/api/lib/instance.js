@@ -139,10 +139,10 @@ class Instance {
                     value: instanceId.toString()
                 },{
                     name: 'API',
-                    value: 'https://api.lulc.ds.io'
+                    value: this.config.ApiUrl
                 },{
                     name: 'SOCKET',
-                    value: 'wss://socket.lulc.ds.io'
+                    value: this.config.SocketUrl
                 },{
                     name: 'SigningSecret',
                     value: this.config.SigningSecret

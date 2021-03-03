@@ -55,4 +55,8 @@ spec:
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
               value: https://tiles.{{ .Values.domain }}
+            - name: ApiUrl
+              value: https://api.{{ .Values.domain }}
+            - name: SocketUrl
+              value: wss://socket.{{ .Values.domain }}
 {{- end }}
