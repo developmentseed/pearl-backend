@@ -25,6 +25,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}-api
           image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
+          command: npm run prod
           ports:
             - name: http
               containerPort: {{ .Values.api.containerPort }}
