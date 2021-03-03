@@ -98,6 +98,8 @@ class ModelSrv():
             'message': 'model#retrain#complete'
         }))
 
+        # TODO Call .prediction to rerun inferences
+
     def add_sample_point(self, row, col, class_idx):
         return self.model.add_sample_point(row, col, class_idx)
 
