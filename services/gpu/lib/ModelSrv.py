@@ -32,7 +32,8 @@ class ModelSrv():
             }))
             return
 
-        self.aoi = AOI(self.api, body.get('polygon'))
+        chk = await self.checkpoint(body, websocket)
+        self.aoi = AOI(self.api, body, chk['id'])
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
@@ -121,9 +122,12 @@ class ModelSrv():
         await websocket.send(json.dumps({
             'message': 'model#checkpoint',
             'data': {
+                'name': checkpoint['name'],
                 'id': checkpoint['id']
             }
         }))
+
+        return checkpoint
 
     def load_state_from(self, directory):
         return self.model.load_state_from(directory)

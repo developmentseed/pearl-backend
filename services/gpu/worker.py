@@ -30,7 +30,7 @@ def main():
     args = parser.parse_args(sys.argv[1:])
 
     # Setup logging
-    log_path = os.path.join(os.getcwd(), "tmp/logs/")
+    log_path = os.path.join(os.getcwd(), "/tmp/gpu-logs/")
     setup_logging(log_path, "worker")
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -63,7 +63,6 @@ async def connection(uri, model):
     router.on_act("model#undo", model.undo)
     router.on_act("model#prediction", model.prediction)
     router.on_act("model#retrain", model.retrain)
-    router.on_act("model#checkpoint", model.checkpoint)
 
     await router.open()
 

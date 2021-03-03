@@ -102,14 +102,12 @@ class API():
             data = encoder
         )
 
-        print(r.content)
-
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def create_aoi(self, bounds):
+    def create_aoi(self, aoi):
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'
 
         LOGGER.info("ok - POST " + url)
@@ -119,7 +117,9 @@ class API():
                 "content-type": "application/json"
             },
             data = json.dumps({
-                'bounds': mapping(box(*bounds))
+                'name': aoi.name,
+                'checkpoint_id': aoi.checkpointid,
+                'bounds': mapping(box(*aoi.bounds))
             })
         )
 

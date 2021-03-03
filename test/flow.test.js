@@ -297,6 +297,7 @@ test('gpu connection', (t) => {
             ws.send(JSON.stringify({
                 action: 'model#prediction',
                 data: {
+                    name: 'Seneca Rocks, WV',
                     polygon: {
                         type: 'Polygon',
                         coordinates: [[
@@ -313,7 +314,7 @@ test('gpu connection', (t) => {
             ws.send(JSON.stringify({
                 action: 'model#retrain',
                 data: {
-                    name: 'Checkpoint & AOI name'
+                    name: 'Seneca Rocks, WV Corrected',
                     classes: [{
                         name: 'Structure',
                         color: '#f76f73',
@@ -425,12 +426,7 @@ test('gpu connection', (t) => {
                     }]
                 }}));
         } else if (msg.message === 'model#retrain#complete') {
-            ws.send(JSON.stringify({
-                action: 'model#checkpoint',
-                data: {
-                    name: 'Test Checkpoint'
-                }
-            }));
+            console.error('DONE RETRAINING');
         } else {
             console.error(JSON.stringify(msg, null, 4))
         }

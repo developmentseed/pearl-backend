@@ -24,9 +24,12 @@ LOGGER = logging.getLogger("server")
 
 
 class AOI():
-    def __init__(self, api, poly):
+    def __init__(self, api, body, checkpointid):
         self.api = api
-        self.poly = poly
+        self.poly = body['polygon']
+        self.name = body['name']
+        self.checkpointid = checkpointid
+
         self.zoom = self.api.model['model_zoom']
 
         self.tiles = AOI.gen_tiles(self.poly, self.zoom)
@@ -40,7 +43,7 @@ class AOI():
         # TODO Check Max size too
         self.live = AOI.area(self.bounds) > self.api.server['limits']['live_inference']
 
-        self.id = self.api.create_aoi(self.bounds)["id"]
+        self.id = self.api.create_aoi(self)["id"]
 
         self.extrema, self.raw_fabric, self.fabric = AOI.gen_fabric(self.bounds, self.zoom)
 
