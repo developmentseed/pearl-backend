@@ -223,7 +223,7 @@ test('new project', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(Object.keys(body).sort(), [
-            'created', 'id', 'model_id', 'mosaic', 'name'
+            'created', 'id', 'model_id', 'mosaic', 'name', 'uid'
         ], 'expected props');
 
         t.ok(body.created, 'created: <date>');
@@ -232,6 +232,7 @@ test('new project', (t) => {
 
         t.deepEquals(body, {
             id: 1,
+            uid: 1,
             name: 'Test Project',
             model_id: 1,
             mosaic: 'naip.latest'
