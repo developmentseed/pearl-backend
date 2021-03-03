@@ -137,7 +137,7 @@ class TorchFineTuning(ModelSession):
         counts = [len(x) for x in pixels]
 
         # this is wrong fix, maybe by calling .px then if px gives row, column then use that to access out_features
-        self.augment_x_train = [item.value / 255. for sublist in pixels for item in sublist]  # get pixel values and scale
+        self.augment_x_train = [item.px  for sublist in pixels for item in sublist]  # get pixel values and scale
         names =  [x['name'] for x in classes]
 
         names_retrain = []
@@ -274,38 +274,38 @@ class TorchFineTuning(ModelSession):
         #to-do also retrun output features
         return  output_hard
 
-    #def save_state_to(self, directory):
+    def save_state_to(self, directory):
 
         #TO-DO save updated pytorch model
 
-        # np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
-        # np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
+        np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
+        np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
-        # joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
+        joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
 
-        # # if self.augment_model_trained:
-        # #     with open(os.path.join(directory, "trained.txt"), "w") as f:
-        # #         f.write("")
+        # if self.augment_model_trained:
+        #     with open(os.path.join(directory, "trained.txt"), "w") as f:
+        #         f.write("")
 
-        # return {
-        #     "message": "Saved model state",
-        #     "success": True
-        # }
+        return {
+            "message": "Saved model state",
+            "success": True
+        }
 
-    #def load_state_from(self, directory):
+    def load_state_from(self, directory):
 
-        # self.augment_x_train = []
-        # self.augment_y_train = []
+        self.augment_x_train = []
+        self.augment_y_train = []
 
-        # for sample in np.load(os.path.join(directory, "augment_x_train.npy")):
-        #     self.augment_x_train.append(sample)
-        # for sample in np.load(os.path.join(directory, "augment_y_train.npy")):
-        #     self.augment_y_train.append(sample)
+        for sample in np.load(os.path.join(directory, "augment_x_train.npy")):
+            self.augment_x_train.append(sample)
+        for sample in np.load(os.path.join(directory, "augment_y_train.npy")):
+            self.augment_y_train.append(sample)
 
-        # self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
-        # #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
+        self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
+        #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
-        # return {
-        #     "message": "Loaded model state",
-        #     "success": True
-        # }
+        return {
+            "message": "Loaded model state",
+            "success": True
+        }
