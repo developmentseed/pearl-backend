@@ -75,6 +75,46 @@ test('POST /api/project', (t) => {
     });
 });
 
+test('POST /api/project/1/checkpoint', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'Test Checkpoint',
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            storage: false,
+            project_id: 1,
+            name: 'Test Checkpoint',
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+        });
+
+        t.end();
+    });
+});
+
 test('GET /api/project/1/aoi (empty)', (t) => {
     request({
         json: true,
@@ -100,6 +140,8 @@ test('POST /api/project/1/aoi', (t) => {
             Authorization: `Bearer ${token}`
         },
         body: {
+            name: 'Test AOI',
+            checkpoint_id: 1,
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
@@ -121,6 +163,8 @@ test('POST /api/project/1/aoi', (t) => {
             id: 1,
             storage: false,
             project_id: 1,
+            checkpoint_id: 1,
+            name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
@@ -155,10 +199,40 @@ test('GET /api/project/1/aoi/1', (t) => {
             id: 1,
             storage: false,
             project_id: 1,
+            checkpoint_id: 1,
+            name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
                 coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
             }
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/aoi', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.aois[0].created, '.aois[0].created: <date>');
+        delete res.body.aois[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            project_id: 1,
+            aois: [{
+                id: 1,
+                name: 'Test AOI',
+                storage: false
+            }]
         });
 
         t.end();
