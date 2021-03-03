@@ -179,42 +179,35 @@ class TorchFineTuning(ModelSession):
         print(y_test.shape)
 
 
-        try:
-            self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
+        self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
 
-            lr_preds = self.augment_model.predict(x_test)
+        lr_preds = self.augment_model.predict(x_test)
 
-            per_class_f1 = f1_score(lr_preds, y_test, average=None)
-            print ("Per Class f1-score: ")
-            print(per_class_f1)
-            global_f1 = f1_score(lr_preds, y_test, average='weighted')
-            print("Global f1-score: %0.4f" % (global_f1))
+        per_class_f1 = f1_score(lr_preds, y_test, average=None)
+        print ("Per Class f1-score: ")
+        print(per_class_f1)
+        global_f1 = f1_score(lr_preds, y_test, average='weighted')
+        print("Global f1-score: %0.4f" % (global_f1))
 
 
-            score = self.augment_model.score(x_test, y_test)
-            print("Fine-tuning accuracy: %0.4f" % (score))
+        score = self.augment_model.score(x_test, y_test)
+        print("Fine-tuning accuracy: %0.4f" % (score))
 
-            new_weights = torch.from_numpy(self.augment_model.coef_.T.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
-            new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
-            new_weights = new_weights.to(self.device)
-            new_biases = new_biases.to(self.device)
+        new_weights = torch.from_numpy(self.augment_model.coef_.T.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
+        new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
+        new_weights = new_weights.to(self.device)
+        new_biases = new_biases.to(self.device)
 
-            # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
-            self.model.last.weight = nn.Parameter(new_weights)
-            self.model.last.bias = nn.Parameter(new_biases)
+        # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
+        self.model.last.weight = nn.Parameter(new_weights)
+        self.model.last.bias = nn.Parameter(new_biases)
 
-            print('last layer of pytorch model updated post retraining')
+        print('last layer of pytorch model updated post retraining')
 
-            return {
-                "message": "Accuracy Score on data: %0.2f" % (score),
-                "success": True
-            }
-        except Exception as e:
-            print(e)
-            return {
-                "message": "Error in 'retrain()': %s" % (e),
-                "success": False
-            }
+        return {
+            "message": "Accuracy Score on data: %0.2f" % (score),
+            "success": True
+        }
 
     def undo(self):
         if len(self.augment_y_train) > 0:

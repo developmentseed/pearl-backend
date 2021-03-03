@@ -92,7 +92,17 @@ class ModelSrv():
         for cls in body['classes']:
             cls['geometry'] = geom2px(cls['geometry'], self)
 
-        self.model.retrain(body['classes'])
+        try:
+            self.model.retrain(body['classes'])
+        except Excpetion as e:
+            await websocket.send(json.dumps({
+                'message': 'error',
+                'data': {
+                    'error': 'retraining error.',
+                    'detailed': e
+                }
+            }))
+            return None
 
         await websocket.send(json.dumps({
             'message': 'model#retrain#complete'
