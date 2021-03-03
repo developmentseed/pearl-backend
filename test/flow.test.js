@@ -313,6 +313,7 @@ test('gpu connection', (t) => {
             ws.send(JSON.stringify({
                 action: 'model#retrain',
                 data: {
+                    name: 'Checkpoint & AOI name'
                     classes: [{
                         name: 'Structure',
                         color: '#f76f73',

@@ -65,6 +65,7 @@ course of a session as informational messages
 | `info#connection`             |       |
 | `info#disconnection`          |       |
 | `model#prediction`            | PNG Inference |
+| `model#retrain`               | Retrain Model & PNG Inference |
 | `error`                       |       |
 
 #### error
@@ -108,6 +109,31 @@ otherwise only the `total` & `processed` tags will be returned
 }
 ```
 
+#### model#retrain
+
+If the AOI is in live mode, the `bounds` and `image` param will be returned,
+otherwise only the `total` & `processed` tags will be returned
+
+```json
+{
+    "message": "model#retrain",
+    "data": {
+        "name": 'Checkpoint & AOI name',
+        "classes": [{
+            "name": "Structure",
+            "color": "#f76f73",
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-79.376936712501418, 38.834394753436762],
+                    [-79.377090146278206, 38.834530999727654]
+                ]
+            }
+        }]
+    }
+}
+```
+
 #### info#connection
 
 ```json
@@ -131,7 +157,6 @@ otherwise only the `total` & `processed` tags will be returned
 | `instance#terminate`  |       |
 | `connection#extend`   | Reset instance termination counter |
 | `model#prediction`    | Inference a GeoJSON polygon |
-| `model#checkpoint`    | Save a checkpoint to the Db |
 | `model#reset`         |       |
 | `model#undo`          |       |
 
@@ -144,14 +169,6 @@ otherwise only the `total` & `processed` tags will be returned
 }
 ```
 
-#### model#checkpoint
-
-```JSON
-{
-    "action": "model#checkpoint"
-}
-```
-
 #### model#prediction
 
 Submit a GeoJSON Polygon for inferencing.
@@ -159,6 +176,7 @@ Submit a GeoJSON Polygon for inferencing.
 ```JSON
 {
     "action": "model#prediction",
+    "name": "Checkpoint/AOI name",
     "data": {
         "polygon": {
             "type": "Polygon",
