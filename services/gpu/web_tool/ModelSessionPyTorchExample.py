@@ -78,11 +78,6 @@ class TorchFineTuning(ModelSession):
         self.output_channels = 10 # don't hard code pull from model input
         self.output_features = 64
 
-        # self.down_weight_padding = 10
-
-        # self.stride_x = self.input_size - self.down_weight_padding*2
-        # self.stride_y = self.input_size - self.down_weight_padding*2
-
         ### TODO
         self.model = FCN(num_input_channels=4, num_output_classes=10, num_filters=64) #to-do fix that 10 is hardcoded
         self._init_model()
@@ -127,12 +122,9 @@ class TorchFineTuning(ModelSession):
         tile = tile / 255.0
         tile = tile.astype(np.float32)
 
-        output, output_features = self.run_model_on_tile(tile)
-        #TO-DO also return output_features
-        #self._last_tile = output_features
+        #self._last_tile = output_features: is this needed?
 
-        print (output.shape)
-        print(output_features.shape)
+        output, output_features = self.run_model_on_tile(tile)
 
         return output, output_features
 
@@ -145,8 +137,8 @@ class TorchFineTuning(ModelSession):
         pixels = [x['geometry'] for x in classes]
         counts = [len(x) for x in pixels]
 
-        # this is wrong fix, maybe by calling .px then if px gives row, column then use that to access out_features
-        self.augment_x_train = [item.px  for sublist in pixels for item in sublist]  # get pixel values and scale
+        # fix, maybe by calling .px then if px gives row, column then use that to access out_features
+        self.augment_x_train = [item.px  for sublist in pixels for item in sublist]  # get pixel values
         names =  [x['name'] for x in classes]
 
         names_retrain = []
