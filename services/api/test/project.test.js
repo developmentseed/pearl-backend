@@ -128,6 +128,7 @@ test('POST /api/project', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            uid: 1,
             name: 'Test Project',
             model_id: 1,
             mosaic: 'naip.latest'
@@ -208,6 +209,7 @@ test('PATCH /api/project/1', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            uid: 1,
             name: 'Renamed Test Project',
             model_id: 1,
             mosaic: 'naip.latest'

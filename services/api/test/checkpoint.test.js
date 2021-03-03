@@ -65,6 +65,7 @@ test('POST /api/project', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            uid: 1,
             name: 'Test Project',
             model_id: 1,
             mosaic: 'naip.latest'
