@@ -14,7 +14,7 @@ class Config {
         this.Environment = args.prod ? 'deploy' : 'local';
         console.log(`ok - Environment: ${this.Environment}`);
 
-        this.Postgres = process.env.Postgres || args.postgres || 'postgres://postgres@localhost:5432/lulc';
+        this.Postgres = process.env.Postgres || 'postgres://postgres@localhost:5432/lulc';
 
         this.TileUrl = process.env.TileUrl || args.tileurl || false;
 

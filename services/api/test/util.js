@@ -47,7 +47,8 @@ class Flight {
             }
 
             try {
-                await drop();
+                const config = await drop();
+                config.pool.end();
             } catch (err) {
                 t.error(err);
             }

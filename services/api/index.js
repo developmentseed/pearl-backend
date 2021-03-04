@@ -21,7 +21,7 @@ const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
     boolean: ['prod'],
-    string: ['postgres', 'port']
+    string: ['port']
 });
 
 const { Pool } = require('pg');

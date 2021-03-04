@@ -17,8 +17,6 @@ async function drop() {
         for (const r of pgres.rows) {
             await config.pool.query(r.drop);
         }
-
-        await config.pool.end();
     } catch (err) {
         throw err;
     }
