@@ -45,6 +45,48 @@ npm run doc
 
 See the main README for how to view API documentation once generated
 
+
+## Database Migrations
+
+We use `knex` to handle database migrations. Whenever making any changes to the database schema, you will need to create a `knex` migration file with the SQL changes to make your change as well as undo your change.
+
+To create a stub migration file:
+
+    npx knex migrate:make <migration_name>
+
+For example:
+
+    npx knex migrate:make add_date_column_to_users
+
+This will create a new migration stub file in the `/api/migrations` folder, using the stub template at `/api/migration.stub`.
+
+Edit the created file that will look like:
+
+```
+exports.up = function(knex) {
+    return knex.schema.raw(``);
+}
+
+exports.down = function(knex) {
+    return knex.schema.raw(``);
+}
+```
+
+You can enter raw SQL as the strings passed to the `knex.schema.raw` method, for the `up` and `down` methods of the migration.
+
+To apply the migration locally:
+
+    npx knex migrate:latest
+
+You should check-in the migration files to the repository.
+
+When you pull code that contains migration changes, similarly, run:
+
+    npx knex migrate:latest
+
+For detailed documentation of `knex`, instructions on reverting migrations, etc. refer to http://knexjs.org/#Migrations-CLI
+
+
 ## Deployment
 
 ### Azure Resources

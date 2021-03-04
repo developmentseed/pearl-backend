@@ -25,7 +25,8 @@ spec:
       containers:
         - name: {{ .Chart.Name }}-api
           image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
-          command: npm run prod
+          command: ["/bin/sh"]
+          args: ["-c", "while true; do npx knex migrate:latest && npm run dev; sleep 10;done"]
           ports:
             - name: http
               containerPort: {{ .Values.api.containerPort }}

@@ -24,7 +24,6 @@ spec:
       containers:
         - name: {{ .Chart.Name }}-socket
           image: "{{ .Values.socket.image.name }}:{{ .Values.socket.image.tag }}"
-          command: npm run prod
           ports:
             - name: http
               containerPort: {{ .Values.socket.containerPort }}
