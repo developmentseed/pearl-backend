@@ -18,6 +18,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
 
 from .ModelSessionAbstract import ModelSession
 
@@ -137,7 +138,7 @@ class TorchFineTuning(ModelSession):
         counts = [len(x) for x in pixels]
 
         # fix, maybe by calling .px then if px gives row, column then use that to access out_features
-        self.augment_x_train = [item.px  for sublist in pixels for item in sublist]  # get pixel values
+        self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
         names =  [x['name'] for x in classes]
 
         names_retrain = []
@@ -178,28 +179,35 @@ class TorchFineTuning(ModelSession):
         print(y_test.shape)
 
 
-        try:
-            self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
-            score = self.augment_model.score(x_test, y_test)
-            LOGGER.debug("Fine-tuning accuracy: %0.4f" % (score))
+        self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
 
-            new_weights = torch.from_numpy(self.augment_model.coefs_[0].T.copy().astype(np.float32)[:,:,np.newaxis,np.newaxis])
-            new_biases = torch.from_numpy(self.augment_model.intercepts_[0].astype(np.float32))
-            new_weights = new_weights.to(self.device)
-            new_biases = new_biases.to(self.device)
+        lr_preds = self.augment_model.predict(x_test)
 
-            self.model.segmentation_head[0].weight = new_weights
-            self.model.segmentation_head[0].bias = new_biases
+        per_class_f1 = f1_score(lr_preds, y_test, average=None)
+        print ("Per Class f1-score: ")
+        print(per_class_f1)
+        global_f1 = f1_score(lr_preds, y_test, average='weighted')
+        print("Global f1-score: %0.4f" % (global_f1))
 
-            return {
-                "message": "Fine-tuning accuracy on data: %0.2f" % (score),
-                "success": True
-            }
-        except Exception as e:
-            return {
-                "message": "Error in 'retrain()': %s" % (e),
-                "success": False
-            }
+
+        score = self.augment_model.score(x_test, y_test)
+        print("Fine-tuning accuracy: %0.4f" % (score))
+
+        new_weights = torch.from_numpy(self.augment_model.coef_.T.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
+        new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
+        new_weights = new_weights.to(self.device)
+        new_biases = new_biases.to(self.device)
+
+        # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
+        self.model.last.weight = nn.Parameter(new_weights)
+        self.model.last.bias = nn.Parameter(new_biases)
+
+        print('last layer of pytorch model updated post retraining')
+
+        return {
+            "message": "Accuracy Score on data: %0.2f" % (score),
+            "success": True
+        }
 
     def undo(self):
         if len(self.augment_y_train) > 0:
@@ -275,8 +283,12 @@ class TorchFineTuning(ModelSession):
 
     def save_state_to(self, directory):
 
-        #TO-DO save updated pytorch model
+        #TO-DO save updated pytorch model?
 
+        #torch.save(model.state_dict(), "retraining_checkpoint.pt") #should this have some sort of unqiue checkpoint indentifier?
+
+
+        # Do we need to save these?
         np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
         np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
@@ -303,6 +315,9 @@ class TorchFineTuning(ModelSession):
 
         self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
         #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
+
+        # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
+        #self.model =
 
         return {
             "message": "Loaded model state",
