@@ -285,9 +285,23 @@
           },
           {
             "group": "Body",
-            "type": "Unknown",
+            "type": "Object[]",
             "optional": false,
             "field": "classes",
+            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "classes.color",
             "description": "<p>undefined</p>"
           }
         ]
@@ -297,7 +311,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -391,7 +405,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bookmarked\": false\n    }]\n}",
           "type": "json"
         }
       ]
@@ -419,14 +433,30 @@
           {
             "group": "Body",
             "type": "String",
-            "optional": false,
+            "optional": true,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>Human readable name of the Checkpoint</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "bookmarked",
+            "description": "<p>Has the checkpoint been bookmarked in the frontend</p>"
           }
         ]
       }
     },
     "description": "<p>Update a checkpoint</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Checkpoints"
   },

@@ -158,9 +158,17 @@ class CheckPoint {
      * @param {Object} checkpoint - Checkpoint Object
      * @param {Boolean} checkpoint.storage Has the storage been uploaded
      * @param {String} checkpoint.name The name of the checkpoint
+     * @param {Array} checkpoint.classes Class list to update (only name & color changes - cannot change length)
      */
     async patch(checkpointid, checkpoint) {
         let pgres;
+
+        if (checkpoint.classes) {
+            const current = await this.get(checkpointid);
+            if (current.classes.length !== checkpoint.classes.length) {
+                throw new Err(400, null, 'Cannot change the number of classes once a checkpoint is created');
+            }
+        }
 
         try {
             pgres = await this.pool.query(`
@@ -168,7 +176,8 @@ class CheckPoint {
                     SET
                         storage = COALESCE($2, storage),
                         name = COALESCE($3, name),
-                        bookmarked = COALESCE($4, bookmarked)
+                        bookmarked = COALESCE($4, bookmarked),
+                        classes = COALESCE($5::JSONB, classes)
                     WHERE
                         id = $1
                     RETURNING *
@@ -176,7 +185,8 @@ class CheckPoint {
                 checkpointid,
                 checkpoint.storage,
                 checkpoint.name,
-                checkpoint.bookmarked
+                checkpoint.bookmarked,
+                JSON.stringify(checkpoint.classes)
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Checkpoint');
