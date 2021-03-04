@@ -16,7 +16,7 @@ const WebSocket = require('ws');
 const test = require('tape');
 const request = require('request');
 const { Pool } = require('pg');
-
+const knexDb = require('../services/api/lib/knex-db');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 
@@ -35,8 +35,8 @@ test('pre-run', async (t) => {
             connectionString: config.Postgres
         });
 
-        await pool.query(String(fs.readFileSync(path.resolve(__dirname, '../services/api/schema.sql'))));
-
+        // await pool.query(String(fs.readFileSync(path.resolve(__dirname, '../services/api/schema.sql'))));
+        await knexDb.migrate.latest();
         const auth = new (require('../services/api/lib/auth').Auth)(pool);
         const authtoken = new (require('../services/api/lib/auth').AuthToken)(pool, config);
 
@@ -52,6 +52,7 @@ test('pre-run', async (t) => {
             uid: 1
         }, 'API Token')).token;
 
+        await knexDb.destroy()
         pool.end();
     } catch (err) {
         t.error(err, 'no errors');
