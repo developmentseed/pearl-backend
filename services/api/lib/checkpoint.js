@@ -36,13 +36,17 @@ class CheckPoint {
 
     /**
      * Return a Row as a JSON Object
+     *
      * @param {Object} row Postgres Database Row
+     *
+     * @returns {Object}
      */
     static json(row) {
         return {
             id: parseInt(row.id),
             project_id: parseInt(row.project_id),
             name: row.name,
+            bookmarked: row.bookmarked,
             classes: row.classes,
             created: row.created,
             storage: row.storage
@@ -71,7 +75,8 @@ class CheckPoint {
                     id,
                     name,
                     created,
-                    storage
+                    storage,
+                    bookmarked
                 FROM
                     checkpoints
                 WHERE
@@ -97,7 +102,8 @@ class CheckPoint {
                     id: parseInt(row.id),
                     name: row.name,
                     created: row.created,
-                    storage: row.storage
+                    storage: row.storage,
+                    bookmarked: row.bookmarked
                 };
             })
         };
@@ -161,14 +167,16 @@ class CheckPoint {
                 UPDATE checkpoints
                     SET
                         storage = COALESCE($2, storage),
-                        name = COALESCE($3, name)
+                        name = COALESCE($3, name),
+                        bookmarked = COALESCE($4, bookmarked)
                     WHERE
                         id = $1
                     RETURNING *
             `, [
                 checkpointid,
                 checkpoint.storage,
-                checkpoint.name
+                checkpoint.name,
+                checkpoint.bookmarked
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Checkpoint');
@@ -194,6 +202,7 @@ class CheckPoint {
                     classes,
                     created,
                     storage,
+                    bookmarked,
                     project_id
                 FROM
                     checkpoints

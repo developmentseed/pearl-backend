@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     client: 'postgresql',
     connection: process.env.Postgres || 'postgres://postgres@localhost:5432/lulc',
@@ -8,6 +10,6 @@ module.exports = {
     migrations: {
         tableName: 'knex_migrations',
         stub: 'migration.stub',
-        directory: __dirname + '/migrations'
+        directory: path.resolve(__dirname, './migrations')
     }
 };

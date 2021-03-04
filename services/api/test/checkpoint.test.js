@@ -75,10 +75,10 @@ test('POST /api/project', (t) => {
     });
 });
 
-test('GET /api/project/1/aoi (empty)', (t) => {
+test('GET /api/project/1/checkpoint (empty)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
+        url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -86,6 +86,11 @@ test('GET /api/project/1/aoi (empty)', (t) => {
     }, (err, res) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
+        t.deepEquals(res.body, {
+            total: 0,
+            project_id: 1,
+            checkpoints: []
+        });
 
         t.end();
     });
@@ -119,6 +124,7 @@ test('POST /api/project/1/checkpoint', (t) => {
             name: 'TEST',
             project_id: 1,
             storage: false,
+            bookmarked: false,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -141,6 +147,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
         },
         body: {
             name: 'NEW NAME',
+            bookmarked: true
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -153,6 +160,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
             name: 'NEW NAME',
             project_id: 1,
             storage: false,
+            bookmarked: true,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -160,6 +168,22 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ]
         });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/checkpoint', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
 
         t.end();
     });

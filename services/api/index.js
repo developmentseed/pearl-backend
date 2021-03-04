@@ -24,7 +24,6 @@ const argv = require('minimist')(process.argv, {
     string: ['port']
 });
 
-const { Pool } = require('pg');
 const Config = require('./lib/config');
 
 if (require.main === module) {
@@ -1031,7 +1030,8 @@ async function server(config, cb) {
      *           "id": 1432,
      *           "name": "Checkpoint Name",
      *           "storage": true,
-     *           "created": "<date>"
+     *           "created": "<date>",
+     *           "bookmarked": false
      *       }]
      *   }
      */
@@ -1072,6 +1072,7 @@ async function server(config, cb) {
      *       "storage": true,
      *       "classes": [ ... ],
      *       "name": "Named Checkpoint",
+     *       "bookmarked": false,
      *       "created": "<date>"
      *   }
      */
@@ -1102,6 +1103,18 @@ async function server(config, cb) {
      *
      * @apiDescription
      *     Update a checkpoint
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "instance_id": 124,
+     *       "storage": true,
+     *       "classes": [ ... ],
+     *       "name": "Named Checkpoint",
+     *       "bookmarked": false,
+     *       "created": "<date>"
+     *   }
      */
     router.patch(
         '/project/:projectid/checkpoint/:checkpointid',

@@ -31,6 +31,9 @@ class Kube {
     /**
      * Create a podspec for a gpu pod based on a given name and env vars.
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
+     *
+     * @param {String} name
+     * @param {Object} env
      */
     makePodSpec(name, env) {
         const nodeSelectorKey = config.nodeSelectorKey;

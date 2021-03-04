@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS checkpoints (
 
     name        TEXT NOT NULL,
     classes     JSONB,
+    bookmarked  BOOLEAN DEFAULT FALSE,
 
     project_id  BIGINT NOT NULL,
     created     TIMESTAMP NOT NULL DEFAULT NOW(),

@@ -1,12 +1,14 @@
 {
     "type": "object",
-    "required": [
-        "name"
-    ],
     "additionalProperties": false,
     "properties": {
         "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Human readable name of the Checkpoint"
+        },
+        "bookmarked": {
+            "type": "boolean",
+            "description": "Has the checkpoint been bookmarked in the frontend"
         }
     }
 }
