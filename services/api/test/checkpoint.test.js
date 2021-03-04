@@ -137,6 +137,34 @@ test('POST /api/project/1/checkpoint', (t) => {
     });
 });
 
+test('PATCH /api/project/1/checkpoint/1 (no class length change)', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+            ]
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 400, 'status: 400');
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'Cannot change the number of classes once a checkpoint is created',
+            messages: []
+        });
+
+        t.end();
+    });
+});
+
 test('PATCH /api/project/1/checkpoint/1', (t) => {
     request({
         json: true,
@@ -147,7 +175,13 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
         },
         body: {
             name: 'NEW NAME',
-            bookmarked: true
+            bookmarked: true,
+            classes: [
+                { name: 'Water', color: '#FF00FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -162,7 +196,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
             storage: false,
             bookmarked: true,
             classes: [
-                { name: 'Water', color: '#0000FF' },
+                { name: 'Water', color: '#FF00FF' },
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
