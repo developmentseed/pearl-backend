@@ -1,4 +1,3 @@
-
 exports.up = function(knex) {
     return knex.schema.raw(`
         ALTER TABLE checkpoints
