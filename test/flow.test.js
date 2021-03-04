@@ -16,12 +16,13 @@ const WebSocket = require('ws');
 const test = require('tape');
 const request = require('request');
 const { Pool } = require('pg');
-const knexDb = require('../services/api/lib/knex-db');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
+const Knex = require('knex');
 
 const { Client } = require('pg');
 const drop = require('../services/api/test/drop');
+const KnexConfig = require('../services/api/knexfile');
 
 let token, instance;
 
@@ -31,14 +32,12 @@ test('pre-run', async (t) => {
     try {
         const config = await drop();
 
-        const pool = new Pool({
-            connectionString: config.Postgres
-        });
+        KnexConfig.connection = config.Postgres;
+        const knex = Knex(KnexConfig);
+        await knex.migrate.latest();
 
-        // await pool.query(String(fs.readFileSync(path.resolve(__dirname, '../services/api/schema.sql'))));
-        await knexDb.migrate.latest();
-        const auth = new (require('../services/api/lib/auth').Auth)(pool);
-        const authtoken = new (require('../services/api/lib/auth').AuthToken)(pool, config);
+        const auth = new (require('../services/api/lib/auth').Auth)(config);
+        const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
 
         const user = await auth.create({
             access: 'admin',
@@ -52,8 +51,8 @@ test('pre-run', async (t) => {
             uid: 1
         }, 'API Token')).token;
 
-        await knexDb.destroy()
-        pool.end();
+        await knex.destroy()
+        config.pool.end();
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -298,6 +297,7 @@ test('gpu connection', (t) => {
             ws.send(JSON.stringify({
                 action: 'model#prediction',
                 data: {
+                    name: 'Seneca Rocks, WV',
                     polygon: {
                         type: 'Polygon',
                         coordinates: [[
@@ -314,6 +314,7 @@ test('gpu connection', (t) => {
             ws.send(JSON.stringify({
                 action: 'model#retrain',
                 data: {
+                    name: 'Seneca Rocks, WV Corrected',
                     classes: [{
                         name: 'Structure',
                         color: '#f76f73',
@@ -425,12 +426,7 @@ test('gpu connection', (t) => {
                     }]
                 }}));
         } else if (msg.message === 'model#retrain#complete') {
-            ws.send(JSON.stringify({
-                action: 'model#checkpoint',
-                data: {
-                    name: 'Test Checkpoint'
-                }
-            }));
+            console.error('DONE RETRAINING');
         } else {
             console.error(JSON.stringify(msg, null, 4))
         }

@@ -32,14 +32,17 @@ class ModelSrv():
             }))
             return
 
-        self.aoi = AOI(self.api, body.get('polygon'))
+        chk = await self.checkpoint(body, websocket)
+        self.aoi = AOI(self.api, body, chk['id'])
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
         for zxy in self.aoi.tiles:
             in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
-            output = self.model.run(in_memraster.data, False)
+            output, output_features = self.model.run(in_memraster.data, False)
+
+            #TO-DO assert statement for output_features dimensions?
 
             assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
 
@@ -87,14 +90,25 @@ class ModelSrv():
 
     async def retrain(self, body, websocket):
         for cls in body['classes']:
-            cls['geometry'] = geom2px(cls['geometry'], self.api)
+            cls['geometry'] = geom2px(cls['geometry'], self)
 
-
-        self.model.retrain(body['classes'])
+        try:
+            self.model.retrain(body['classes'])
+        except Excpetion as e:
+            await websocket.send(json.dumps({
+                'message': 'error',
+                'data': {
+                    'error': 'retraining error.',
+                    'detailed': e
+                }
+            }))
+            return None
 
         await websocket.send(json.dumps({
             'message': 'model#retrain#complete'
         }))
+
+        # TODO Call .prediction to rerun inferences
 
     def add_sample_point(self, row, col, class_idx):
         return self.model.add_sample_point(row, col, class_idx)
@@ -120,9 +134,12 @@ class ModelSrv():
         await websocket.send(json.dumps({
             'message': 'model#checkpoint',
             'data': {
+                'name': checkpoint['name'],
                 'id': checkpoint['id']
             }
         }))
+
+        return checkpoint
 
     def load_state_from(self, directory):
         return self.model.load_state_from(directory)

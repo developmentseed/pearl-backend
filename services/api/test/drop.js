@@ -1,18 +1,10 @@
 'use strict';
 
-const { Client } = require('pg');
-
 async function drop() {
-    const config = require('../lib/config').env();
-
-    const client = new Client({
-        connectionString: config.Postgres
-    });
+    const config = await require('../lib/config').env();
 
     try {
-        await client.connect();
-
-        const pgres = await client.query(`
+        const pgres = await config.pool.query(`
             SELECT
                 'drop table "' || tablename || '" cascade;' AS drop
             FROM
@@ -23,10 +15,8 @@ async function drop() {
         `)
 
         for (const r of pgres.rows) {
-            await client.query(r.drop);
+            await config.pool.query(r.drop);
         }
-
-        await client.end();
     } catch (err) {
         throw err;
     }

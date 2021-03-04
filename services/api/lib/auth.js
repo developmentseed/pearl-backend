@@ -4,8 +4,8 @@ const Err = require('./error');
 const jwt = require('jsonwebtoken');
 
 class Auth {
-    constructor(pool) {
-        this.pool = pool;
+    constructor(config) {
+        this.pool = config.pool;
 
         this.attrs = [
             'flags',
@@ -210,8 +210,8 @@ class Auth {
 }
 
 class AuthToken {
-    constructor(pool, config) {
-        this.pool = pool;
+    constructor(config) {
+        this.pool = config.pool;
         this.config = config;
     }
 

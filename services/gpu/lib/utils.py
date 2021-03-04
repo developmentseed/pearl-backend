@@ -21,10 +21,10 @@ class PX:
         self.xy = xy # Mercator Coordinates
         self.coords = coords #WGS84 Coordinates
         self.px = px # Per Tile Pixel Coordinates
-        self.value = value # Actual Pixel Value (typically R,G,B,NIR) from Imagery Source
+        self.value = value # Pixel Value from retrain numpy array (Model#Run)
 
-def geom2px(geom, api):
-    zoom = api.model['model_zoom']
+def geom2px(geom, modelsrv):
+    zoom = modelsrv.api.model['model_zoom']
 
     coords = []
 
@@ -45,9 +45,10 @@ def geom2px(geom, api):
 
         pixels = rowcol(transform, *xy)
 
-        npy = api.get_tile(xyz.z, xyz.x, xyz.y, iformat='npy')
+        in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat='npy')
+        _, retrain = modelsrv.model.run(in_memraster.data, False)
 
-        value = npy.data[pixels[0], pixels[1]]
+        value = retrain[pixels[0], pixels[1]]
 
         pxs.append(PX(coords, xy, xyz, pixels, value))
 

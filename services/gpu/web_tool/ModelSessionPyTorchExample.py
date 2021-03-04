@@ -18,6 +18,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
 
 from .ModelSessionAbstract import ModelSession
 
@@ -46,6 +47,15 @@ class FCN(nn.Module):
         x = self.last(x)
         return x
 
+    def forward_features(self,inputs):
+        x = F.relu(self.conv1(inputs))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        z = F.relu(self.conv5(x))
+        y = self.last(z)
+        return y, z
+
 class TorchFineTuning(ModelSession):
 
     AUGMENT_MODEL = SGDClassifier(
@@ -60,25 +70,17 @@ class TorchFineTuning(ModelSession):
 
 
     def __init__(self, gpu_id, api):
-        print(len(api.model['classes'])) # Num Classes
-        print(api.model['classes']) # Classses themselves
-
         self.classes = api.model['classes']
 
         self.model_fs = api.model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # will need to figure out for re-training ?
-        self.output_channels = 10 # don't hard code pull from model input
+        self.output_channels = len(self.classes)
         self.output_features = 64
 
-        # self.down_weight_padding = 10
-
-        # self.stride_x = self.input_size - self.down_weight_padding*2
-        # self.stride_y = self.input_size - self.down_weight_padding*2
-
         ### TODO
-        self.model = FCN(num_input_channels=4, num_output_classes=10, num_filters=64) #to-do fix that 10 is hardcoded
+        self.model = FCN(num_input_channels=4, num_output_classes=len(self.classes), num_filters=64) #to-do fix that 10 is hardcoded
         self._init_model()
 
         for param in self.model.parameters():
@@ -95,15 +97,14 @@ class TorchFineTuning(ModelSession):
         self.augment_model.classes_ = np.array(list(range(self.output_channels)))
         self.augment_model.n_features_in_ = self.output_features
         self.augment_model.n_features = self.output_features
-        self.augment_model.n_classes = 10
+        self.augment_model.n_classes = len(self.classes)
 
         self._last_tile = None
 
         self.augment_x_train = []
         self.augment_y_train = []
 
-        self.class_names_mapping = {'No Data': 0, 'Water': 1, 'Emergent Wetlands': 2, 'Tree Canopy': 3, 'Shrubland': 4, 'Low Vegetation': 5, 'Barren': 6, 'Structure': 7, 'Impervious Surface': 8,
-                                    'Impervious Road': 9} #TO-DO this should not be hard-coded
+        self.class_names_mapping = {k: v for v, k in enumerate(x['name'] for x in self.classes)} #map class name to integer value
 
     @property
     def last_tile(self):
@@ -121,11 +122,11 @@ class TorchFineTuning(ModelSession):
         tile = tile / 255.0
         tile = tile.astype(np.float32)
 
-        output = self.run_model_on_tile(tile)
-        #TO-DO also return output_features
-        #self._last_tile = output_features
+        #self._last_tile = output_features: is this needed?
 
-        return output
+        output, output_features = self.run_model_on_tile(tile)
+
+        return output, output_features
 
     def retrain(self, classes, **kwargs):
         self.classes = [{
@@ -136,8 +137,8 @@ class TorchFineTuning(ModelSession):
         pixels = [x['geometry'] for x in classes]
         counts = [len(x) for x in pixels]
 
-        # this is wrong fix, maybe by calling .px then if px gives row, column then use that to access out_features
-        self.augment_x_train = [item.value / 255. for sublist in pixels for item in sublist]  # get pixel values and scale
+        # fix, maybe by calling .px then if px gives row, column then use that to access out_features
+        self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
         names =  [x['name'] for x in classes]
 
         names_retrain = []
@@ -178,28 +179,35 @@ class TorchFineTuning(ModelSession):
         print(y_test.shape)
 
 
-        try:
-            self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
-            score = self.augment_model.score(x_test, y_test)
-            LOGGER.debug("Fine-tuning accuracy: %0.4f" % (score))
+        self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
 
-            new_weights = torch.from_numpy(self.augment_model.coefs_[0].T.copy().astype(np.float32)[:,:,np.newaxis,np.newaxis])
-            new_biases = torch.from_numpy(self.augment_model.intercepts_[0].astype(np.float32))
-            new_weights = new_weights.to(self.device)
-            new_biases = new_biases.to(self.device)
+        lr_preds = self.augment_model.predict(x_test)
 
-            self.model.segmentation_head[0].weight = new_weights
-            self.model.segmentation_head[0].bias = new_biases
+        per_class_f1 = f1_score(lr_preds, y_test, average=None)
+        print ("Per Class f1-score: ")
+        print(per_class_f1)
+        global_f1 = f1_score(lr_preds, y_test, average='weighted')
+        print("Global f1-score: %0.4f" % (global_f1))
 
-            return {
-                "message": "Fine-tuning accuracy on data: %0.2f" % (score),
-                "success": True
-            }
-        except Exception as e:
-            return {
-                "message": "Error in 'retrain()': %s" % (e),
-                "success": False
-            }
+
+        score = self.augment_model.score(x_test, y_test)
+        print("Fine-tuning accuracy: %0.4f" % (score))
+
+        new_weights = torch.from_numpy(self.augment_model.coef_.T.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
+        new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
+        new_weights = new_weights.to(self.device)
+        new_biases = new_biases.to(self.device)
+
+        # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
+        self.model.last.weight = nn.Parameter(new_weights)
+        self.model.last.bias = nn.Parameter(new_biases)
+
+        print('last layer of pytorch model updated post retraining')
+
+        return {
+            "message": "Accuracy Score on data: %0.2f" % (score),
+            "success": True
+        }
 
     def undo(self):
         if len(self.augment_y_train) > 0:
@@ -259,53 +267,59 @@ class TorchFineTuning(ModelSession):
         height = tile.shape[1]
         width = tile.shape[2]
 
-        output = np.zeros((10, height, width), dtype=np.float32) # num_classes hard-coded fix
-        counts = np.zeros((height, width), dtype=np.float32)
-
+        output = np.zeros((len(self.classes), height, width), dtype=np.float32)
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
         with torch.no_grad():
-            t_output = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy, to-do fix for actual batches
-            t_output = F.softmax(t_output, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            predictions, features = self.model.forward_features(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            features = features.cpu().numpy() #embeddings per pixel for the image
 
-        output_hard = t_output[0].argmax(axis=0).astype(np.uint8) #using [0] because using a "fake batch" of 1 tile
+
+        predictions = predictions[0].argmax(axis=0).astype(np.uint8)  #using [0] because using a "fake batch" of 1 tile
+        features = np.moveaxis(features[0], 0, -1)  #using [0] because using a "fake batch" of 1 tile (shape should be 256, 256, 64)
+
+        return  predictions, features
+
+    def save_state_to(self, directory):
+
+        #TO-DO save updated pytorch model?
+
+        #torch.save(model.state_dict(), "retraining_checkpoint.pt") #should this have some sort of unqiue checkpoint indentifier?
 
 
-        #to-do also retrun output features
-        return  output_hard
+        # Do we need to save these?
+        np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
+        np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
-    #def save_state_to(self, directory):
+        joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
 
-        #TO-DO save updated pytorch model
+        # if self.augment_model_trained:
+        #     with open(os.path.join(directory, "trained.txt"), "w") as f:
+        #         f.write("")
 
-        # np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
-        # np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
+        return {
+            "message": "Saved model state",
+            "success": True
+        }
 
-        # joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
+    def load_state_from(self, directory):
 
-        # # if self.augment_model_trained:
-        # #     with open(os.path.join(directory, "trained.txt"), "w") as f:
-        # #         f.write("")
+        self.augment_x_train = []
+        self.augment_y_train = []
 
-        # return {
-        #     "message": "Saved model state",
-        #     "success": True
-        # }
+        for sample in np.load(os.path.join(directory, "augment_x_train.npy")):
+            self.augment_x_train.append(sample)
+        for sample in np.load(os.path.join(directory, "augment_y_train.npy")):
+            self.augment_y_train.append(sample)
 
-    #def load_state_from(self, directory):
+        self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
+        #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
-        # self.augment_x_train = []
-        # self.augment_y_train = []
+        # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
+        #self.model =
 
-        # for sample in np.load(os.path.join(directory, "augment_x_train.npy")):
-        #     self.augment_x_train.append(sample)
-        # for sample in np.load(os.path.join(directory, "augment_y_train.npy")):
-        #     self.augment_y_train.append(sample)
-
-        # self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
-        # #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
-
-        # return {
-        #     "message": "Loaded model state",
-        #     "success": True
-        # }
+        return {
+            "message": "Loaded model state",
+            "success": True
+        }
