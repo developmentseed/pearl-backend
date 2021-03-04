@@ -36,7 +36,10 @@ class AOI {
 
     /**
      * Return a Row as a JSON Object
+     *
      * @param {Object} row Postgres Database Row
+     *
+     * @returns {Object}
      */
     static json(row) {
         const def = {

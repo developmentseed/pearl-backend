@@ -103,6 +103,7 @@ test('POST /api/project/1/checkpoint', (t) => {
             storage: false,
             project_id: 1,
             name: 'Test Checkpoint',
+            bookmarked: false,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -126,6 +127,11 @@ test('GET /api/project/1/aoi (empty)', (t) => {
     }, (err, res) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
+        t.deepEquals(res.body, {
+            total: 0,
+            project_id: 1,
+            aois: []
+        });
 
         t.end();
     });

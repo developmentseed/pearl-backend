@@ -31,7 +31,10 @@ class Instance {
 
     /**
      * Return a Row as a JSON Object
+     *
      * @param {Object} row Postgres Database Row
+     *
+     * @returns {Object}
      */
     static json(row) {
         return {
@@ -58,7 +61,7 @@ class Instance {
         if (!query.page) query.page = 0;
         if (!query.status) query.status = 'active';
 
-        let WHERE = [];
+        const WHERE = [];
 
         if (query.status === 'active') {
             WHERE.push('active IS true');
