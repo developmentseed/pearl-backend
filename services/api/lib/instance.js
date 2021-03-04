@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const { Kube } = require('./kube');
 const kube = new Kube('default');
 class Instance {
-    constructor(pool, config) {
-        this.pool = pool;
+    constructor(config) {
+        this.pool = config.pool;
         this.config = config;
     }
 

@@ -6,8 +6,6 @@ const pkg = require('../package.json');
 const { Config } = require('../index');
 const drop = require('./drop');
 
-const config = Config.env();
-
 class Flight {
 
     constructor() {
@@ -24,7 +22,7 @@ class Flight {
         this.rebuild(test);
 
         test('test server takeoff', (t) => {
-            api.configure({}, async (srv, pool) => {
+            api.configure({}, (srv, pool) => {
                 t.ok(srv, 'server object returned');
                 t.ok(pool, 'pool object returned');
 
@@ -91,8 +89,10 @@ class Flight {
             });
 
             t.test('new user', async (t) => {
-                const auth = new (require('../lib/auth').Auth)(this.pool);
-                const authtoken = new (require('../lib/auth').AuthToken)(this.pool, config);
+                const config = await Config.env();
+
+                const auth = new (require('../lib/auth').Auth)(config);
+                const authtoken = new (require('../lib/auth').AuthToken)(config);
 
                 const testUser = {
                     access: opts.access || 'user',
@@ -104,14 +104,11 @@ class Flight {
                 const user = await auth.create(testUser);
                 const token = await authtoken.generate({ type: 'auth0', ...user }, 'API Token');
 
-                t.deepEquals(Object.keys(token), [
-                    'id',
-                    'name',
-                    'token',
-                    'created'
-                ], 'expected props');
+                t.deepEquals(Object.keys(token), [ 'id', 'name', 'token', 'created' ], 'expected props');
 
-                resolve(token);
+                config.pool.end(() => {
+                    resolve(token);
+                });
             });
         });
     }

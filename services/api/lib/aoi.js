@@ -4,8 +4,8 @@ const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 class AOI {
-    constructor(pool, config) {
-        this.pool = pool;
+    constructor(config) {
+        this.pool = config.pool;
         this.config = config;
 
         // don't access these services unless AzureStorage is truthy

@@ -3,8 +3,8 @@
 const Err = require('./error');
 
 class Project {
-    constructor(pool, config) {
-        this.pool = pool;
+    constructor(config) {
+        this.pool = config.pool;
         this.config = config;
     }
 

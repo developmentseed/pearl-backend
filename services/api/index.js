@@ -32,8 +32,9 @@ if (require.main === module) {
 }
 
 function configure(argv = {}, cb) {
-    const config = Config.env(argv);
-    return server(config, cb);
+    Config.env(argv).then((config) => {
+        return server(config, cb);
+    });
 }
 
 /**
@@ -63,45 +64,20 @@ async function server(config, cb) {
 
     const validate = validator.validate;
 
-    let pool;
-
-    let retry = 5;
-    do {
-        try {
-            pool = new Pool({
-                connectionString: config.Postgres
-            });
-
-            await pool.query('SELECT NOW()');
-        } catch (err) {
-            pool = false;
-
-            if (retry === 0) {
-                console.error('not ok - terminating due to lack of postgres connection');
-                return process.exit(1);
-            }
-
-            retry--;
-            console.error('not ok - unable to get postgres connection');
-            console.error(`ok - retrying... (${5 - retry}/5)`);
-            await sleep(5000);
-        }
-    } while (!pool);
-
     try {
-        await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
+        await config.pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
     } catch (err) {
         throw new Error(err);
     }
 
-    const project = new (require('./lib/project').Project)(pool, config);
+    const project = new (require('./lib/project').Project)(config);
     const proxy = new (require('./lib/proxy').Proxy)(config);
-    const auth = new (require('./lib/auth').Auth)(pool);
-    const authtoken = new (require('./lib/auth').AuthToken)(pool, config);
-    const model = new (require('./lib/model').Model)(pool, config);
-    const instance = new (require('./lib/instance').Instance)(pool, config);
-    const checkpoint = new (require('./lib/checkpoint').CheckPoint)(pool, config);
-    const aoi = new (require('./lib/aoi').AOI)(pool, config);
+    const auth = new (require('./lib/auth').Auth)(config);
+    const authtoken = new (require('./lib/auth').AuthToken)(config);
+    const model = new (require('./lib/model').Model)(config);
+    const instance = new (require('./lib/instance').Instance)(config);
+    const checkpoint = new (require('./lib/checkpoint').CheckPoint)(config);
+    const aoi = new (require('./lib/aoi').AOI)(config);
     const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
@@ -1556,17 +1532,11 @@ async function server(config, cb) {
     const srv = app.listen(config.Port, (err) => {
         if (err) return err;
 
-        if (cb) return cb(srv, pool);
+        if (cb) return cb(srv, config.pool);
 
         console.error(`ok - running ${config.BaseUrl}`);
     });
 
-}
-
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
 }
 
 module.exports = {
