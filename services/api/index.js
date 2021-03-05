@@ -713,6 +713,44 @@ async function server(config, cb) {
     });
 
     /**
+     * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
+     * @apiVersion 1.0.0
+     * @apiName TileJSONAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return tilejson for a given AOI
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "name": "I'm an AOI",
+     *       "checkpoint_id": 1,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON "}
+     *   }
+     */
+    router.get('/project/:projectid/aoi/:aoiid/tiles', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'aoiid');
+
+            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            const url = await aoi.url(a.id);
+
+            console.error(url);
+
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/project/:projectid/aoi/:aoiid/upload Upload AOI
      * @apiVersion 1.0.0
      * @apiName UploadAOI

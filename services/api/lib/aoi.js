@@ -1,7 +1,13 @@
 'use strict';
 
 const Err = require('./error');
-const { BlobServiceClient } = require('@azure/storage-blob');
+const moment = require('moment');
+const {
+    BlobSASPermissions,
+    SharedKeyCredential,
+    generateBlobSASQueryParameters,
+    BlobServiceClient
+} = require('@azure/storage-blob');
 
 class AOI {
     constructor(config) {
@@ -32,6 +38,24 @@ class AOI {
         }
 
         return aoi;
+    }
+
+    /**
+     * Return a sharing URL that can be used to titiler
+     *
+     * @param {Number} aoiid AOI ID to get a share URL for
+     */
+    async url(aoiid) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
+
+        const url = new URL(await this.container_client.generateSasUrl({
+            permissions: BlobSASPermissions.parse("r").toString(),
+            expiresOn: moment().add(365, 'days'),
+        }));
+
+        url.pathname = `/aois/aoi-${aoiid}.geotiff`;
+
+        return url;
     }
 
     /**
