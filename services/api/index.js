@@ -721,17 +721,6 @@ async function server(config, cb) {
      *
      * @apiDescription
      *     Return tilejson for a given AOI
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "name": "I'm an AOI",
-     *       "checkpoint_id": 1,
-     *       "storage": true,
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON "}
-     *   }
      */
     router.get('/project/:projectid/aoi/:aoiid/tiles', requiresAuth, async (req, res) => {
         try {
@@ -743,8 +732,31 @@ async function server(config, cb) {
 
             const url = await aoi.url(a.id);
 
-            console.error(url);
+            throw new Err(501, null, 'TileJSON Not Yet Implemented');
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/tiles/:z/:x/:y.png MVT AOI
+     * @apiVersion 1.0.0
+     * @apiName MVTAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a MVT for a given AOI
+     */
+    router.get('/project/:projectid/aoi/:aoiid/tiles', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'aoiid');
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
+
+            throw new Err(501, null, 'MVT Not Yet Implemented');
         } catch (err) {
             return Err.respond(err, res);
         }
