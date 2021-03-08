@@ -1020,7 +1020,7 @@ async function server(config, cb) {
             const files = [];
 
             busboy.on('file', (fieldname, file) => {
-                files.push(model.upload(req.params.checkpointid, file));
+                files.push(checkpoint.upload(req.params.checkpointid, file));
             });
 
             busboy.on('finish', async () => {
