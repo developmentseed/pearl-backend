@@ -6,7 +6,7 @@ api:
   containerPort: 2000
   env:
     SigningSecret: {{STAGING_SIGNING_SECRET}}
-    Postgres: {{PRODUCTION_POSTGRES}}
+    Postgres: {{STAGING_POSTGRES}}
     AZURE_STORAGE_CONNECTION_STRING: {{STAGING_AZURE_STORAGE_CONNECTION_STRING}}
 socket:
   enabled: true
