@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS checkpoints (
     project_id  BIGINT NOT NULL,
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
     storage     BOOLEAN NOT NULL DEFAULT False,
-    geoms       GEOMETRY(Point, 4326)[],
+    geoms       JSONB[],
 
     CONSTRAINT fk_project
         FOREIGN KEY (project_id)
