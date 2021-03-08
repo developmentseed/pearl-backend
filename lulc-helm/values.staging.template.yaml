@@ -28,11 +28,11 @@ tilesScaler:
     resourceGroupName: {{CLUSTER_RESOURCE_GROUP}}
     activeDirectoryClientId: {{STAGING_CLIENT_ID}}
     activeDirectoryClientPassword: {{STAGING_CLIENT_SECRET}}
-ingress-azure:
-  appgw:
-    subscriptionId: {{STAGING_APPGW_SUBSCRIPTION_ID}}
-    resourceGroup: {{STAGING_APPGW_RESOURCE_GROUP}}
-    name: {{STAGING_APPGW_NAME}}
-  armAuth:
-     type: servicePrincipal
-     secretJSON: {{STAGING_SERVICE_PRINCIPAL_BASE64}}
+# ingress-azure:
+#   appgw:
+#     subscriptionId: {{STAGING_APPGW_SUBSCRIPTION_ID}}
+#     resourceGroup: {{STAGING_APPGW_RESOURCE_GROUP}}
+#     name: {{STAGING_APPGW_NAME}}
+#   armAuth:
+#      type: servicePrincipal
+#      secretJSON: {{STAGING_SERVICE_PRINCIPAL_BASE64}}
