@@ -84,7 +84,7 @@ class API():
 
         LOGGER.info("ok - POST " + url)
 
-        zip_fs = self.tmp_dir + 'checkpoints/checkpoint-{}.zip'.format(checkpointid)
+        zip_fs = self.tmp_dir + '/checkpoints/checkpoint-{}.zip'.format(checkpointid)
 
         zipf = zipfile.ZipFile(zip_fs, 'w', zipfile.ZIP_DEFLATED)
         for root, dirs, files in os.walk(ch_dir):
