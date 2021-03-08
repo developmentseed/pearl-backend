@@ -1,28 +1,28 @@
 environment: dev
-domain: lulc-test.ds.io
+domain: lulc-staging.ds.io
 api:
   enabled: true
   replicaCount: 1
   containerPort: 2000
   env:
     SigningSecret: {{STAGING_SIGNING_SECRET}}
-    Postgres: {{STAGING_POSTGRES}}
+    Postgres: {{PRODUCTION_POSTGRES}}
     AZURE_STORAGE_CONNECTION_STRING: {{STAGING_AZURE_STORAGE_CONNECTION_STRING}}
 socket:
   enabled: true
   containerPort: 1999
 tiles:
   enabled: true
+  replicaCount: 2
   containerPort: 8000
-
   env:
     Debug: TRUE
     Backends: {{STAGING_MOSAIC_BACKEND}}
     Host: {{STAGING_MOSAIC_HOST}}
-    WebConcurrency: 1
+    WebConcurrency: 2
 tilesScaler:
   env:
-    backendPool: pool-default-lulc-test-lulc-helm-tiles-80-bp-8000~bp-default-lulc-test-lulc-helm-tiles-80-8000-lulc-test-lulc-helm-ingress-tiles
+    backendPool: pool-default-lulc-staging-lulc-helm-tiles-80-bp-8000~bp-default-lulc-staging-lulc-helm-tiles-80-8000-029e669b1fed84821a79034b9b2e4ee9
     tenantId: {{STAGING_TENANT_ID}}
     subscriptionId: {{STAGING_SUBSCRIPTION_ID}}
     resourceGroupName: {{CLUSTER_RESOURCE_GROUP}}
