@@ -18,6 +18,7 @@ class ModelSrv():
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
         self.aoi = None
+        self.chk = None
         self.processing = False
         self.api = api
         self.model = model
@@ -28,8 +29,10 @@ class ModelSrv():
 
         self.processing = True
 
-        chk = await self.checkpoint(body, websocket)
-        self.aoi = AOI(self.api, body, chk['id'])
+        if self.chk is None:
+            await self.checkpoint(body, websocket)
+
+        self.aoi = AOI(self.api, body, self.chk['id'])
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
@@ -109,6 +112,8 @@ class ModelSrv():
             'message': 'model#retrain#complete'
         }))
 
+        await self.checkpoint(body, websocket)
+
         # TODO Call .prediction to rerun inferences
 
     async def checkpoint(self, body, websocket):
@@ -131,6 +136,7 @@ class ModelSrv():
             }
         }))
 
+        self.chk = checkpoint
         return checkpoint
 
     def load(self, directory):
