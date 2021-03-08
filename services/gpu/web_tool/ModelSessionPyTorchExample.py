@@ -71,7 +71,6 @@ class TorchFineTuning(ModelSession):
 
     def __init__(self, gpu_id, api):
         self.classes = api.model['classes']
-        print (self.classes)
 
         self.model_fs = api.model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -137,13 +136,12 @@ class TorchFineTuning(ModelSession):
 
         pixels = [x['geometry'] for x in classes]
         counts = [len(x) for x in pixels]
-        print (counts)
+        total = sum(counts)
 
         # add re-training counts to classes attribute
-
         for i, c in enumerate(counts):
              self.classes[i]['retraining_counts'] = c
-        print(self.classes)
+             self.classes[i]['retraining_counts_percent'] = c / sum(counts)
 
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
         names =  [x['name'] for x in classes]
@@ -180,22 +178,33 @@ class TorchFineTuning(ModelSession):
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.2, random_state=0)
 
-        print (x_train.shape)
-        print (x_test.shape)
-        print (y_train.shape)
-        print(y_test.shape)
-
 
         self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
 
         lr_preds = self.augment_model.predict(x_test)
 
-        per_class_f1 = f1_score(lr_preds, y_test, average=None)
-        print ("Per Class f1-score: ")
-        print(per_class_f1)
-        global_f1 = f1_score(lr_preds, y_test, average='weighted')
-        print("Global f1-score: %0.4f" % (global_f1))
 
+        per_class_f1 = f1_score(y_test, lr_preds, average=None)
+        print ("Per Class f1-score: ")
+        print (per_class_f1)
+
+        # add per class f1 to classes attribute
+        f1_labels = np.unique(np.concatenate((y_test, lr_preds)))
+        per_class_f1_final = np.zeros(len(names))
+
+        missing_labels = np.setdiff1d(list(np.arange(len(names))), f1_labels)
+
+        # where the unique cls id exist, fill in f1 per calss
+        per_class_f1_final[f1_labels] =  per_class_f1
+        # where is the missing id, fill in np.nan
+        per_class_f1_final[missing_labels] = np.nan
+
+        # add  retrainingper class f1-scores counts to classes attribute
+        for i, f1 in enumerate(per_class_f1_final):
+             self.classes[i]['retraining_f1score'] = f1
+
+        global_f1 = f1_score(y_test, lr_preds, average='weighted')
+        print("Global f1-score: %0.4f" % (global_f1))
 
         score = self.augment_model.score(x_test, y_test)
         print("Fine-tuning accuracy: %0.4f" % (score))
