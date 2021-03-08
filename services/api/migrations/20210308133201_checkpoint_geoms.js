@@ -1,7 +1,7 @@
 exports.up = function(knex) {
     return knex.schema.raw(`
         ALTER TABLE checkpoints
-            ADD COLUMN geoms GEOMETRY(Point, 4326)[];
+            ADD COLUMN geoms GEOMETRY(MultiPoint, 4326)[];
     `);
 }
 

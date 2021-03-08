@@ -2,6 +2,7 @@
 
 const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
+const wkx = require('wkx');
 
 class CheckPoint {
     constructor(config) {
@@ -235,25 +236,33 @@ class CheckPoint {
      *
      * @param {Number} projectid - Checkpoint related to a specific instance
      * @param {Object} checkpoint - Checkpoint Object
+     * @param {String} checkpoint.name - Human readable name
+     * @param {Object[]} checkpoint.classes - Checkpoint Class names
+     * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
      */
     async create(projectid, checkpoint) {
-        if (!checkpoint) checkpoint = {};
+        checkpoint.geoms = checkpoint.geoms.map((geom) => {
+            return wkx.Geometry.parseGeoJSON(geom).toWkb();
+        });
 
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoints (
                     project_id,
                     name,
-                    classes
+                    classes,
+                    geoms
                 ) VALUES (
                     $1,
                     $2,
-                    $3::JSONB
+                    $3::JSONB,
+                    $4::GEOMETRY[]
                 ) RETURNING *
             `, [
                 projectid,
                 checkpoint.name,
-                JSON.stringify(checkpoint.classes)
+                JSON.stringify(checkpoint.classes),
+                checkpoint.geoms
             ]);
 
             return CheckPoint.json(pgres.rows[0]);
