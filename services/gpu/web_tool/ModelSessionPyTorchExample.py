@@ -65,12 +65,13 @@ class TorchFineTuning(ModelSession):
         learning_rate="constant",
         eta0=0.001,
         warm_start=True,
-        verbose=True
+        verbose=False
     )
 
 
     def __init__(self, gpu_id, api):
         self.classes = api.model['classes']
+        print (self.classes)
 
         self.model_fs = api.model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -136,8 +137,14 @@ class TorchFineTuning(ModelSession):
 
         pixels = [x['geometry'] for x in classes]
         counts = [len(x) for x in pixels]
+        print (counts)
 
-        # fix, maybe by calling .px then if px gives row, column then use that to access out_features
+        # add re-training counts to classes attribute
+
+        for i, c in enumerate(counts):
+             self.classes[i]['retraining_counts'] = c
+        print(self.classes)
+
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
         names =  [x['name'] for x in classes]
 
