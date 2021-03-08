@@ -64,7 +64,7 @@ jobs:
       with:
         _input-file: './lulc-helm/values.staging.template.yaml'
         _format-key: '{{key}}'
-        _output-file: './lulc-helm/values.prod.yaml'
+        _output-file: './lulc-helm/values.staging.yaml'
         STAGING_SIGNING_SECRET: ${{ secrets.STAGING_SIGNING_SECRET }}
         PRODUCTION_POSTGRES: ${{ secrets.PRODUCTION_POSTGRES }}
         STAGING_MOSAIC_BACKEND: ${{ env.STAGING_MOSAIC_BACKEND }}
