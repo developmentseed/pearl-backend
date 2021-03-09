@@ -739,7 +739,15 @@ async function server(config, cb) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-            await proxy.request(req, res);
+            const response = await proxy.request(req);
+
+            const tj = JSON.parse(response.body))
+
+            // This is verbose as if the upstream JSON response changes
+            // and includes the URL in another place, we leak an access cred
+            res.json({
+
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
