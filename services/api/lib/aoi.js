@@ -53,7 +53,7 @@ class AOI {
             expiresOn: moment().add(365, 'days'),
         }));
 
-        url.pathname = `/aois/aoi-${aoiid}.geotiff`;
+        url.pathname = `/aois/aoi-${aoiid}.tiff`;
 
         return url;
     }
@@ -97,7 +97,7 @@ class AOI {
     async upload(aoiid, file) {
         if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
+        const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
 
         try {
             await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
@@ -124,7 +124,7 @@ class AOI {
         const aoi = await this.get(aoiid);
         if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.geotiff`);
+        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
         const dwn = await blob_client.download(0);
 
         dwn.readableStreamBody.pipe(res);

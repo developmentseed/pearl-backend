@@ -47,4 +47,4 @@ class CustomPathParams(DefaultDependency):
     def __post_init__(self):
         """Parse url_params."""
         if self.url_params:
-            self.url += f"?{b64decode(self.url_params).decode()}"
+            self.url += f"{b64decode(self.url_params).decode()}"
