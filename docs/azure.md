@@ -168,17 +168,17 @@ az network application-gateway create -n lulcStagingApplicationGateway3 -l weste
 Peer Application Gateway and cluster networks:
 
 ```
-nodeResourceGroup=$(az aks show -n lulcStagingAks3 -g lulcStaging -o tsv --query "nodeResourceGroup")
+nodeResourceGroup=$(az aks show -n lulcProductionAks -g lulcProduction -o tsv --query "nodeResourceGroup")
 
 aksVnetName=$(az network vnet list -g $nodeResourceGroup -o tsv --query "[0].name")
 
 aksVnetId=$(az network vnet show -n $aksVnetName -g $nodeResourceGroup -o tsv --query "id")
 
-az network vnet peering create -n lulcStagingAppGWtoAKSVnetPeering3 -g lulcStaging --vnet-name lulcStagingVnet3 --remote-vnet $aksVnetId --allow-vnet-access
+az network vnet peering create -n lulcProductionAppGWtoAKSVnetPeering -g lulcProduction --vnet-name lulcProductionVnet --remote-vnet $aksVnetId --allow-vnet-access
 
-appGWVnetId=$(az network vnet show -n lulcStagingVnet3 -g lulcStaging -o tsv --query "id")
+appGWVnetId=$(az network vnet show -n lulcProductionVnet -g lulcProduction -o tsv --query "id")
 
-az network vnet peering create -n lulcStagingAKStoAppGWVnetPeering3 -g $nodeResourceGroup --vnet-name $aksVnetName --remote-vnet $appGWVnetId --allow-vnet-access
+az network vnet peering create -n lulcProductionAKStoAppGWVnetPeering -g $nodeResourceGroup --vnet-name $aksVnetName --remote-vnet $appGWVnetId --allow-vnet-access
 
 ```
 ## Create custom HTTP metric
@@ -244,4 +244,9 @@ spec:
 EOF
 
 
+```
+
+## Azure flexible PostgreSQL 12
+```
+az postgres flexible-server create --resource-group lulcProduction --name lulcdbproduction  --location westeurope --admin-user lulc --admin-password <pwd> --version 12 --vnet aks-vnet-30152110 --subnet aks-postgres
 ```

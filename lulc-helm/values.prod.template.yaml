@@ -1,5 +1,5 @@
 environment: prod
-domain: lulc-staging.ds.io
+domain: lulc.ds.io
 api:
   enabled: true
   replicaCount: 1
@@ -7,7 +7,7 @@ api:
   env:
     SigningSecret: {{STAGING_SIGNING_SECRET}}
     Postgres: {{PRODUCTION_POSTGRES}}
-    AZURE_STORAGE_CONNECTION_STRING: {{STAGING_AZURE_STORAGE_CONNECTION_STRING}}
+    AZURE_STORAGE_CONNECTION_STRING: {{PRODUCTION_AZURE_STORAGE_CONNECTION_STRING}}
 socket:
   enabled: true
   containerPort: 1999
@@ -22,17 +22,19 @@ tiles:
     WebConcurrency: 2
 tilesScaler:
   env:
-    backendPool: pool-default-lulc-staging-lulc-helm-tiles-80-bp-8000~bp-default-lulc-staging-lulc-helm-tiles-80-8000-029e669b1fed84821a79034b9b2e4ee9
+    backendPool: pool-default-lulc-production-lulc-helm-tiles-80-bp-8000~bp-default-lulc-production-lulc-helm-tiles-80-8-374794b60d6d018518c60d63627773ba
     tenantId: {{STAGING_TENANT_ID}}
     subscriptionId: {{STAGING_SUBSCRIPTION_ID}}
     resourceGroupName: {{CLUSTER_RESOURCE_GROUP}}
-    activeDirectoryClientId: {{STAGING_CLIENT_ID}}
-    activeDirectoryClientPassword: {{STAGING_CLIENT_SECRET}}
-ingress-azure:
-  appgw:
-    subscriptionId: {{STAGING_APPGW_SUBSCRIPTION_ID}}
-    resourceGroup: {{STAGING_APPGW_RESOURCE_GROUP}}
-    name: {{STAGING_APPGW_NAME}}
-  armAuth:
-     type: servicePrincipal
-     secretJSON: {{STAGING_SERVICE_PRINCIPAL_BASE64}}
+    activeDirectoryClientId: {{PRODUCTION_CLIENT_ID}}
+    activeDirectoryClientPassword: {{PRODUCTION_CLIENT_SECRET}}
+
+# This is now run manually on the cluster
+# ingress-azure:
+#   appgw:
+#     subscriptionId: {{STAGING_APPGW_SUBSCRIPTION_ID}}
+#     resourceGroup: {{STAGING_APPGW_RESOURCE_GROUP}}
+#     name: {{STAGING_APPGW_NAME}}
+#   armAuth:
+#      type: servicePrincipal
+#      secretJSON: {{STAGING_SERVICE_PRINCIPAL_BASE64}}
