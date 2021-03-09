@@ -75,20 +75,25 @@ class TorchFineTuning(ModelSession):
         self.model_fs = api.model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        # will need to figure out for re-training ?
+        # will need to figure out for re-training
         self.output_channels = len(self.classes)
         self.output_features = 64
 
         ### TODO
-        self.model = FCN(num_input_channels=4, num_output_classes=len(self.classes), num_filters=64) #to-do fix that 10 is hardcoded
+        self.model = FCN(num_input_channels=4, num_output_classes=len(self.classes), num_filters=64)
         self._init_model()
 
         for param in self.model.parameters():
            param.requires_grad = False
 
         # will need to figure out for re-training
-        self.initial_weights = self.model.last.weight.cpu().detach().numpy().squeeze()
-        self.initial_biases = self.model.last.bias.cpu().detach().numpy()
+        self.initial_weights = self.model.last.weight.cpu().detach().numpy().squeeze()  #(10, 64)
+        print('initial_weights shape')
+        print(self.initial_weights.shape)
+        self.initial_biases = self.model.last.bias.cpu().detach().numpy()  #(10,)
+        print('initial_biases shape')
+        print (self.initial_biases.shape)
+        print(self.initial_biases)
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
 
@@ -97,7 +102,6 @@ class TorchFineTuning(ModelSession):
         self.augment_model.classes_ = np.array(list(range(self.output_channels)))
         self.augment_model.n_features_in_ = self.output_features
         self.augment_model.n_features = self.output_features
-        self.augment_model.n_classes = len(self.classes)
 
         self._last_tile = None
 
@@ -162,6 +166,9 @@ class TorchFineTuning(ModelSession):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
+        print ('unique y_train shape:')
+        print(np.unique(y_train).shape)
+
         print(x_train.shape)
         print(y_train.shape)
 
@@ -210,7 +217,12 @@ class TorchFineTuning(ModelSession):
         print("Fine-tuning accuracy: %0.4f" % (score))
 
         new_weights = torch.from_numpy(self.augment_model.coef_.T.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
+        print ("new weights shape")
+        print(new_weights.shape)
         new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
+        print ("new biases shape")
+        print (new_biases.shape)
+        print(new_biases)
         new_weights = new_weights.to(self.device)
         new_biases = new_biases.to(self.device)
 
@@ -301,8 +313,7 @@ class TorchFineTuning(ModelSession):
 
         #TO-DO save updated pytorch model?
 
-        #torch.save(model.state_dict(), "retraining_checkpoint.pt") #should this have some sort of unqiue checkpoint indentifier?
-
+        torch.save(model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt")) #should this have some sort of unqiue checkpoint indentifier?
 
         # Do we need to save these?
         np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
@@ -333,7 +344,7 @@ class TorchFineTuning(ModelSession):
         #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
-        #self.model =
+        self.model_fs =
 
         return {
             "message": "Loaded model state",
