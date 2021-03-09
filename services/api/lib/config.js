@@ -32,8 +32,8 @@ class Config {
         this.nodeSelectorKey = process.env.nodeSelectorKey || 'agentpool';
         this.nodeSelectorValue = process.env.nodeSelectorValue || 'gpunodepool';
 
-        this.ApiUrl = process.env.API || '';
-        this.SocketUrl = process.env.SOCKET || '';
+        this.ApiUrl = process.env.ApiUrl || '';
+        this.SocketUrl = process.env.SocketUrl || '';
 
         this.pool = false;
         let retry = 5;
