@@ -1,16 +1,20 @@
 'use strict';
 
 const k8s = require('@kubernetes/client-node');
-const Config = require('./config');
-const config = Config.env({});
+
+/**
+ * @class Kube
+ */
 class Kube {
 
     /**
      * Kubernetes Client
      *
+     * @param {Config} config Server Config
      * @param {String} [namespace="default"] - Client Namespace
      */
-    constructor(namespace) {
+    constructor(config, namespace) {
+        this.config = config;
         this.kc = new k8s.KubeConfig();
         this.kc.loadFromDefault();
         this.k8sApi = this.kc.makeApiClient(k8s.CoreV1Api);
@@ -36,11 +40,11 @@ class Kube {
      * @param {Object} env
      */
     makePodSpec(name, env) {
-        const nodeSelectorKey = config.nodeSelectorKey;
-        const nodeSelectorValue = config.nodeSelectorValue;
-        const deploymentName = config.Deployment;
-        const gpuImageName = config.GpuImageName;
-        const gpuImageTag = config.GpuImageTag;
+        const nodeSelectorKey = this.config.nodeSelectorKey;
+        const nodeSelectorValue = this.config.nodeSelectorValue;
+        const deploymentName = this.config.Deployment;
+        const gpuImageName = this.config.GpuImageName;
+        const gpuImageTag = this.config.GpuImageTag;
 
         const nodeSelector = {};
         nodeSelector[nodeSelectorKey] = nodeSelectorValue;

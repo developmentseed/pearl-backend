@@ -248,5 +248,5 @@ EOF
 
 ## Azure flexible PostgreSQL 12
 ```
-az postgres flexible-server create --resource-group lulcProduction --name lulcdbproduction  --location westeurope --admin-user lulc --admin-password dP8XbxvUCgnW[F --version 12 --vnet aks-vnet-30152110
+az postgres flexible-server create --resource-group lulcProduction --name lulcdbproduction  --location westeurope --admin-user lulc --admin-password <pwd> --version 12 --vnet aks-vnet-30152110 --subnet aks-postgres
 ```
