@@ -1085,22 +1085,6 @@ async function server(config, cb) {
                 await Param.int(req, 'projectid');
                 await project.has_auth(req.auth, req.params.projectid);
 
-                if (req.body.geoms && req.body.geoms.length !== req.body.classes.length) {
-                    throw new Err(400, null, 'geoms array must be parallel with classes array');
-                } else if (!req.body.geoms) {
-                    req.body.geoms = req.body.classes.map((e) => {
-                        return { type: 'MultiPoint', coordinates: [] };
-                    });
-                } else {
-                    req.body.geoms = req.body.geoms.map((e) => {
-                        if (!e || e.type !== 'MultiPoint') {
-                            return { type: 'MultiPoint', coordinates: [] };
-                        }
-
-                        return e;
-                    });
-                }
-
                 return res.json(await checkpoint.create(req.params.projectid, req.body));
             } catch (err) {
                 return Err.respond(err, res);

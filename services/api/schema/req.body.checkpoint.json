@@ -28,13 +28,6 @@
                     }
                 }
             }
-        },
-        "geoms": {
-            "type": "array",
-            "description": "Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes",
-            "items": {
-                "type": ["null", "object"]
-            }
         }
     }
 }
