@@ -3,11 +3,19 @@
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const { Kube } = require('./kube');
-const kube = new Kube('default');
+
+/**
+ * @class
+ */
 class Instance {
+    /**
+     * @param {Config} config Server Config
+     */
     constructor(config) {
         this.pool = config.pool;
         this.config = config;
+
+        this.kube = new Kube(config, 'default');
     }
 
     /**
