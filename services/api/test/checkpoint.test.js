@@ -186,7 +186,6 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
     }, (err, res) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
-
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -208,10 +207,10 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
     });
 });
 
-test('GET /api/project/1/checkpoint/1', (t) => {
+test('GET /api/project/1/checkpoint', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        url: 'http://localhost:2000/api/project/1/aoi',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -219,60 +218,6 @@ test('GET /api/project/1/checkpoint/1', (t) => {
     }, (err, res) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            project_id: 1,
-            name: 'NEW NAME',
-            bookmarked: true,
-            classes: [
-                { name: 'Water', color: '#FF00FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-            storage: false }
-        );
-
-        t.end();
-    });
-});
-
-test('Set Storage: true', async (t) => {
-    await flight.pool.query(`
-        UPDATE checkpoints SET storage = True
-    `);
-
-    t.end();
-});
-
-test('GET /api/project/1/checkpoint (empty)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        t.ok(res.body.checkpoints[0].created, '.checkpoints[0].created: <date');
-        delete res.body.checkpoints[0].created;
-
-        t.deepEquals(res.body, {
-            total: 1,
-            project_id: 1,
-            checkpoints: [{
-                id: 1,
-                name: 'NEW NAME',
-                storage: true,
-                bookmarked: true
-            }]
-        });
 
         t.end();
     });
