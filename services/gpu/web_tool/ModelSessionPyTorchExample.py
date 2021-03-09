@@ -216,13 +216,8 @@ class TorchFineTuning(ModelSession):
         score = self.augment_model.score(x_test, y_test)
         print("Fine-tuning accuracy: %0.4f" % (score))
 
-        new_weights = torch.from_numpy(self.augment_model.coef_.T.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
-        print ("new weights shape")
-        print(new_weights.shape)
+        new_weights = torch.from_numpy(self.augment_model.coef_.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
         new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
-        print ("new biases shape")
-        print (new_biases.shape)
-        print(new_biases)
         new_weights = new_weights.to(self.device)
         new_biases = new_biases.to(self.device)
 
@@ -311,7 +306,6 @@ class TorchFineTuning(ModelSession):
 
     def save_state_to(self, directory):
 
-        #TO-DO save updated pytorch model?
 
         torch.save(model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt")) #should this have some sort of unqiue checkpoint indentifier?
 
@@ -320,11 +314,6 @@ class TorchFineTuning(ModelSession):
         np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
         joblib.dump(self.augment_model, os.path.join(directory, "augment_model.p")) # how to save sklearn models (used in re-training)
-
-        # if self.augment_model_trained:
-        #     with open(os.path.join(directory, "trained.txt"), "w") as f:
-        #         f.write("")
-
         return {
             "message": "Saved model state",
             "success": True
@@ -344,7 +333,11 @@ class TorchFineTuning(ModelSession):
         #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
-        self.model_fs =
+        # how to we update for the correct number of classes post retraining?
+        self.model_fs = os.path.join(directory, "retraining_checkpoint.pt")
+
+        self.model = FCN(num_input_channels=4, num_output_classes=len(self.classes), num_filters=64)
+        self._init_model()
 
         return {
             "message": "Loaded model state",
