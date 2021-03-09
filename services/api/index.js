@@ -723,6 +723,8 @@ async function server(config, cb) {
      *     Return tilejson for a given AOI
      */
     router.get('/project/:projectid/aoi/:aoiid/tiles', requiresAuth, async (req, res) => {
+        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -730,9 +732,14 @@ async function server(config, cb) {
             const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const url = await aoi.url(a.id);
+            const tiffurl = await aoi.url(a.id);
 
-            throw new Err(501, null, 'TileJSON Not Yet Implemented');
+            req.url = '/cog/tilejson.json';
+
+            req.query.url = tiffurl.origin + tiffurl.pathname;
+            req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+            await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }
