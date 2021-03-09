@@ -18,22 +18,21 @@ class ModelSrv():
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
         self.aoi = None
+        self.chk = None
+        self.processing = False
         self.api = api
         self.model = model
 
     async def prediction(self, body, websocket):
-        if self.aoi is not None:
-            await websocket.send(json.dumps({
-                'message': 'error',
-                'data': {
-                    'error': 'Previous AOI still processing',
-                    'detailed': 'The API is only capable of handling a single AOI at a time. Wait until the AOI is complete and resubmit'
-                }
-            }))
-            return
+        if self.processing is True:
+            return await is_processing(websocket)
 
-        chk = await self.checkpoint(body, websocket)
-        self.aoi = AOI(self.api, body, chk['id'])
+        self.processing = True
+
+        if self.chk is None:
+            await self.checkpoint(body, websocket)
+
+        self.aoi = AOI(self.api, body, self.chk['id'])
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
@@ -86,9 +85,14 @@ class ModelSrv():
             'message': 'model#prediction#complete'
         }))
 
-        self.aoi = None
+        self.processing = False
 
     async def retrain(self, body, websocket):
+        if self.processing is True:
+            return await is_processing(websocket)
+
+        self.processing = True
+
         for cls in body['classes']:
             cls['geometry'] = geom2px(cls['geometry'], self)
 
@@ -108,16 +112,9 @@ class ModelSrv():
             'message': 'model#retrain#complete'
         }))
 
+        await self.checkpoint(body, websocket)
+
         # TODO Call .prediction to rerun inferences
-
-    def add_sample_point(self, row, col, class_idx):
-        return self.model.add_sample_point(row, col, class_idx)
-
-    def undo(self):
-        return self.model.undo()
-
-    def reset(self):
-        return self.model.reset()
 
     async def checkpoint(self, body, websocket):
         checkpoint = self.api.create_checkpoint(
@@ -139,7 +136,17 @@ class ModelSrv():
             }
         }))
 
+        self.chk = checkpoint
         return checkpoint
 
-    def load_state_from(self, directory):
+    def load(self, directory):
         return self.model.load_state_from(directory)
+
+async def is_processing(websocket):
+    await websocket.send(json.dumps({
+        'message': 'error',
+        'data': {
+            'error': 'GPU is Busy',
+            'detailed': 'The API is only capable of handling a single processing command at a time. Wait until the retraining/prediction is complete and resubmit'
+        }
+    }))
