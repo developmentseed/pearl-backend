@@ -27,6 +27,8 @@ class ModelSrv():
         if self.processing is True:
             return await is_processing(websocket)
 
+        LOGGER.info("ok - starting prediction");
+
         self.processing = True
 
         if self.chk is None:
@@ -114,7 +116,11 @@ class ModelSrv():
 
         await self.checkpoint(body, websocket)
 
-        # TODO Call .prediction to rerun inferences
+        self.processing = False
+        await self.prediction({
+            'name': body['name'],
+            'polygon': self.aoi.poly
+        }, websocket)
 
     async def checkpoint(self, body, websocket):
         checkpoint = self.api.create_checkpoint(
@@ -143,6 +149,7 @@ class ModelSrv():
         return self.model.load_state_from(directory)
 
 async def is_processing(websocket):
+    LOGGER.info("not ok  - Can't process message - busy");
     await websocket.send(json.dumps({
         'message': 'error',
         'data': {
