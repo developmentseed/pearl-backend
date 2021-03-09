@@ -12,6 +12,7 @@ from titiler.resources.enums import OptionalHeaders
 from .endpoints.factory import MosaicTilerFactory
 from .cache import setup_cache
 from .settings import ApiSettings
+from .dependencies import CustomPathParams
 
 
 api_settings = ApiSettings()
@@ -41,7 +42,7 @@ mosaic_endpoint = MosaicTilerFactory(
 )
 app.include_router(mosaic_endpoint.router, prefix="/mosaic", tags=["Mosaic"])
 
-cog_endpoints = TilerFactory(router_prefix="cog", optional_headers=optional_headers)
+cog_endpoints = TilerFactory(router_prefix="cog", optional_headers=optional_headers, path_dependency=CustomPathParams)
 app.include_router(cog_endpoints.router, prefix="/cog", tags=["COG"])
 
 tms_endpoint = TMSFactory()
