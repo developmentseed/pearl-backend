@@ -79,7 +79,6 @@ class TorchFineTuning(ModelSession):
         self.output_channels = len(self.classes)
         self.output_features = 64
 
-        ### TODO
         self.model = FCN(num_input_channels=4, num_output_classes=len(self.classes), num_filters=64) #to-do fix that 10 is hardcoded
         self._init_model()
 
@@ -160,12 +159,6 @@ class TorchFineTuning(ModelSession):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
-        print(x_train.shape)
-        print(y_train.shape)
-
-        print (x_train)
-        print(y_train)
-
         if x_train.shape[0] == 0:
             return {
                 "message": "Need to add training samples in order to train",
@@ -175,12 +168,6 @@ class TorchFineTuning(ModelSession):
         # split re-training data into test 20% and train 80%
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.2, random_state=0)
-
-        print (x_train.shape)
-        print (x_test.shape)
-        print (y_train.shape)
-        print(y_test.shape)
-
 
         self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
 
@@ -199,8 +186,6 @@ class TorchFineTuning(ModelSession):
         new_weights = torch.from_numpy(self.augment_model.coef_.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
         new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
         new_weights = new_weights.to(self.device)
-        print ('new weights shape:')
-        print(new_weights.shape)
         new_biases = new_biases.to(self.device)
 
         # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
