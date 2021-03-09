@@ -260,10 +260,30 @@ test('GET /api/project/1/aoi', (t) => {
     });
 });
 
-test('GET /api/project/1/aoi/1/tiles', (t) => {
+// The following 2 tests are skipped as they can't run without
+// TiTiler running as well - should add something like this to flow.test.js
+test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000/api/project/1/aoi/1/tiles',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        console.error(res.body);
+
+        t.end();
+    });
+});
+
+test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/tiles/9/143/195',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`

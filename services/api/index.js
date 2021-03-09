@@ -735,18 +735,29 @@ async function server(config, cb) {
             const tiffurl = await aoi.url(a.id);
 
             req.url = '/cog/tilejson.json';
-
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
             const response = await proxy.request(req);
 
-            const tj = JSON.parse(response.body))
+            if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
+
+            const tj = JSON.parse(response.body);
 
             // This is verbose as if the upstream JSON response changes
             // and includes the URL in another place, we leak an access cred
             res.json({
-
+                tilejson: tj.tilejson,
+                name: `aoi-${req.params.aoiid}`,
+                version: tj.version,
+                schema: tj.scheme,
+                tiles: [
+                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}.png`
+                ],
+                minzoom: tj.minzoom,
+                maxzoom: tj.maxzoom,
+                bounds: tj.bounds,
+                center: tj.center
             });
         } catch (err) {
             return Err.respond(err, res);
@@ -754,16 +765,16 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/project/:project/aoi/:aoiid/tiles/:z/:x/:y.png MVT AOI
+     * @api {get} /api/project/:project/aoi/:aoiid/tiles/:z/:x/:y Tile AOI
      * @apiVersion 1.0.0
-     * @apiName MVTAOI
+     * @apiName TileAOI
      * @apiGroup AOI
      * @apiPermission user
      *
      * @apiDescription
-     *     Return a MVT for a given AOI
+     *     Return a Tile for a given AOI
      */
-    router.get('/project/:projectid/aoi/:aoiid/tiles', requiresAuth, async (req, res) => {
+    router.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -771,7 +782,15 @@ async function server(config, cb) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            throw new Err(501, null, 'MVT Not Yet Implemented');
+            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            const tiffurl = await aoi.url(a.id);
+            req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
+            req.query.url = tiffurl.origin + tiffurl.pathname;
+            req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+            await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }
