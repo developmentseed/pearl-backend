@@ -65,7 +65,7 @@ class TorchFineTuning(ModelSession):
         learning_rate="constant",
         eta0=0.001,
         warm_start=True,
-        verbose=True
+        verbose=False
     )
 
 
@@ -88,6 +88,9 @@ class TorchFineTuning(ModelSession):
 
         # will need to figure out for re-training
         self.initial_weights = self.model.last.weight.cpu().detach().numpy().squeeze()
+        print ('initial weights un-squeezed shape:')
+        print(self.model.last.weight.cpu().detach().numpy().shape)
+
         self.initial_biases = self.model.last.bias.cpu().detach().numpy()
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
@@ -193,9 +196,11 @@ class TorchFineTuning(ModelSession):
         score = self.augment_model.score(x_test, y_test)
         print("Fine-tuning accuracy: %0.4f" % (score))
 
-        new_weights = torch.from_numpy(self.augment_model.coef_.T.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
+        new_weights = torch.from_numpy(self.augment_model.coef_.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
         new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
         new_weights = new_weights.to(self.device)
+        print ('new weights shape:')
+        print(new_weights.shape)
         new_biases = new_biases.to(self.device)
 
         # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
