@@ -95,7 +95,6 @@ class TorchFineTuning(ModelSession):
 
         self.augment_model.coef_ = self.initial_weights.astype(np.float64)
         self.augment_model.intercept_ = self.initial_biases.astype(np.float64)
-        self.augment_model.classes_ = np.array(list(range(self.output_channels)))
 
         self._last_tile = None
 
@@ -160,20 +159,43 @@ class TorchFineTuning(ModelSession):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
+        self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+
         if x_train.shape[0] == 0:
             return {
                 "message": "Need to add training samples in order to train",
                 "success": False
             }
 
+
+
         # split re-training data into test 20% and train 80%
+        # TO-DO confirm post split that all unqiue class labels are present in training!
         x_train, x_test, y_train, y_test = train_test_split(
-                                            x_train, y_train, test_size=0.2, random_state=0)
+                                            x_train, y_train, test_size=0.1, random_state=0)
+
+        self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+
+        # Check to see if new classes are added and randomly initaalize weights/biases for new classes.
+        if len(np.unique(y_train)) != len(self.augment_model.intercept_):
+            b = self.augment_model.intercept_
+            w = self.augment_model.bias
+
+            random_new_bias = np.round(b.max() - b.min() * np.random.random_sample() + b.min(), 8)
+            random_new_weights = np.round(w.max() - w.min() * np.random.random_sample(((64, 1, 1))) + w.min(), 8)
+            random_new_weights = np.expand_dims(random_new_weights, axis=0)
+
+            self.augment_model.intercept_ = np.append(b, random_new_bias)
+            self.augment_model.coef_ = np.vstack((w, random_new_weights_2))
 
 
+        print ('y train unique')
+        print (np.unique(y_train))
         self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
 
         lr_preds = self.augment_model.predict(x_test)
+        print ('augment model classes')
+        print(self.augment_model.classes_)
 
 
         per_class_f1 = f1_score(y_test, lr_preds, average=None)
