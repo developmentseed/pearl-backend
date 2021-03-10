@@ -1080,6 +1080,8 @@ async function server(config, cb) {
             if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
             if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
+            return res.send(await checkpoint.mvt(req.params.checkpointid, req.params.z, req.params.x, req.params.y));
+
         } catch (err) {
             return Err.respond(err, res);
         }

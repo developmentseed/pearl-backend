@@ -129,9 +129,16 @@ class ModelSrv():
         }, websocket)
 
     async def checkpoint(self, body, websocket):
+        classes = []
+        for cls in self.model.classes:
+            classes.append({
+                'name': cls['name'],
+                'color': cls['color']
+            });
+
         checkpoint = self.api.create_checkpoint(
             body['name'],
-            self.model.classes,
+            classes,
             body['geoms']
         )
 

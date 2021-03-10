@@ -314,4 +314,22 @@ test('GET /api/project/1/checkpoint/1/tiles - no geometry', (t) => {
     });
 });
 
+test('GET /api/project/1/checkpoint/1/tiles/1/0/0.mvt - no geometry', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles/1/0/0.mvt',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 404, 'status: 404');
+
+        t.deepEquals(res.body, { status: 404, message: 'Checkpoint has no geometries to serve', messages: [] });
+
+        t.end();
+    });
+});
+
 flight.landing(test);

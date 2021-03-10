@@ -272,7 +272,7 @@ class CheckPoint {
     /**
      * Create a new Checkpoint
      *
-     * @param {Number} projectid - Checkpoint related to a specific instance
+     * @param {Number} projectid - Project ID the checkpoint is a part of
      * @param {Object} checkpoint - Checkpoint Object
      * @param {String} checkpoint.name - Human readable name
      * @param {Object[]} checkpoint.classes - Checkpoint Class names
@@ -305,6 +305,64 @@ class CheckPoint {
         } catch (err) {
             throw new Err(500, err, 'Failed to create checkpoint');
         }
+    }
+
+    /**
+     * Return a Mapbox Vector Tile of the checkpoint Geom
+     *
+     * @param {Number} checkpointid - Checkpoint ID
+     * @param {Number} z - Z Tile Coordinate
+     * @param {Number} x - X Tile Coordinate
+     * @param {Number} y - Y Tile Coordinate
+     */
+    async mvt(checkpointid, z, x, y) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                FROM (
+                    SELECT
+                        ST_AsMVTGeom(
+                            geom,
+                            ST_TileEnvelope($2, $3, $4),
+                            4096,
+                            256,
+                            false
+                        ) AS geom
+                    FROM (
+                        SELECT
+                            id,
+                            r.geom
+                        FROM (
+                            SELECT
+                                id,
+                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.geoms)), 3857) AS geom
+                            FROM
+                                checkpoints
+                            WHERE
+                                checkpoints.id = $1
+                        ) r
+                        WHERE
+                            ST_Intersects(
+                                geom,
+                                ST_TileEnvelope($2, $3, $4)
+                            )
+                    ) n
+                    GROUP BY
+                        id,
+                        geom
+                ) q
+
+            `, [
+                checkpointid,
+                z, x, y
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to create checkpoint MVT');
+        }
+
+        return pgres.rows[0].mvt;
     }
 }
 
