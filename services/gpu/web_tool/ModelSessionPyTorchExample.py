@@ -88,20 +88,14 @@ class TorchFineTuning(ModelSession):
 
         # will need to figure out for re-training
         self.initial_weights = self.model.last.weight.cpu().detach().numpy().squeeze()  #(10, 64)
-        print('initial_weights shape')
-        print(self.initial_weights.shape)
         self.initial_biases = self.model.last.bias.cpu().detach().numpy()  #(10,)
-        print('initial_biases shape')
-        print (self.initial_biases.shape)
-        print(self.initial_biases)
+
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
 
         self.augment_model.coef_ = self.initial_weights.astype(np.float64)
         self.augment_model.intercept_ = self.initial_biases.astype(np.float64)
         self.augment_model.classes_ = np.array(list(range(self.output_channels)))
-        self.augment_model.n_features_in_ = self.output_features
-        self.augment_model.n_features = self.output_features
 
         self._last_tile = None
 
@@ -166,15 +160,6 @@ class TorchFineTuning(ModelSession):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
-        print ('unique y_train shape:')
-        print(np.unique(y_train).shape)
-
-        print(x_train.shape)
-        print(y_train.shape)
-
-        print (x_train)
-        print(y_train)
-
         if x_train.shape[0] == 0:
             return {
                 "message": "Need to add training samples in order to train",
@@ -219,7 +204,11 @@ class TorchFineTuning(ModelSession):
         new_weights = torch.from_numpy(self.augment_model.coef_.copy().astype(np.float32)[:, :, np.newaxis, np.newaxis])
         new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
         new_weights = new_weights.to(self.device)
+        print ('new_weights shape: ')
+        print(new_weights.shape)
         new_biases = new_biases.to(self.device)
+        print ('new_biases shape: ')
+        print(new_biases.shape)
 
         # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
         self.model.last.weight = nn.Parameter(new_weights)
@@ -307,7 +296,7 @@ class TorchFineTuning(ModelSession):
     def save_state_to(self, directory):
 
 
-        torch.save(model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt")) #should this have some sort of unqiue checkpoint indentifier?
+        torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt")) #should this have some sort of unqiue checkpoint indentifier?
 
         # Do we need to save these?
         np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
