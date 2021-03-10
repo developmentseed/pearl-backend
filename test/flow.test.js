@@ -325,7 +325,7 @@ test('gpu connection', (t) => {
                                 [-79.377090146278206, 38.834530999727654]
                             ]
                         }
-                    },{
+                    }, {
                         name: 'Water',
                         color: '#0000FF',
                         geometry: {
@@ -335,7 +335,7 @@ test('gpu connection', (t) => {
                                 [-79.377184066049367, 38.834321175495617]
                             ]
                         }
-                    },{
+                    }, {
                         name: 'No Data',
                         color: '#62a092',
                         geometry: {
@@ -344,7 +344,7 @@ test('gpu connection', (t) => {
                                 [-79.377054334995179, 38.834430418523333]
                             ]
                         }
-                    },{
+                    }, {
                         name: 'Impervious Road',
                         color: '#ffb703',
                         geometry: {
@@ -354,7 +354,7 @@ test('gpu connection', (t) => {
                                 [-79.376966596942438, 38.834323695161871]
                             ]
                         },
-                    },{
+                    }, {
                         name: 'Emergent Wetlands',
                         color: '#008000',
                         geometry: {
@@ -363,7 +363,7 @@ test('gpu connection', (t) => {
                                 [-79.37693751489175, 38.834455284388312]
                             ]
                         }
-                    },{
+                    }, {
                         name: 'Impervious Surface',
                         color: '#ffb703',
                         geometry: {
@@ -374,7 +374,7 @@ test('gpu connection', (t) => {
                                 [-79.376910948390474, 38.834417625757332]
                             ]
                         }
-                    },{
+                    }, {
                         name: 'Tree Canopy',
                         color: '#80FF80',
                         geometry: {
@@ -384,7 +384,7 @@ test('gpu connection', (t) => {
                                 [-79.377060944876419, 38.834393055366228]
                             ]
                         }
-                    },{
+                    }, {
                         name: 'Shrubland',
                         color: '#806060',
                         geometry: {
@@ -394,7 +394,7 @@ test('gpu connection', (t) => {
                                 [-79.376993520578864, 38.834320148825498]
                             ],
                         },
-                    },{
+                    }, {
                         name: 'Barren',
                         color: '#027fdc',
                         geometry: {
@@ -404,7 +404,7 @@ test('gpu connection', (t) => {
                                 [-79.377184762372309, 38.834317436038809]
                             ]
                         },
-                    },{
+                    }, {
                         name: 'Low Vegetation',
                         color: '#07c4c5',
                         geometry: {
@@ -413,7 +413,7 @@ test('gpu connection', (t) => {
                                 [-79.376824957802995, 38.834323027184489]
                             ]
                         },
-                    },{
+                    }, {
                         name: 'Tundra',
                         color: '#ffffff',
                         geometry: {
@@ -423,8 +423,20 @@ test('gpu connection', (t) => {
                                 [-79.37707642397551, 38.834321754940582]
                             ]
                         }
-                    }]
-                }}));
+                    }, {
+                        name: 'Mountain',
+                        color: '#a4afbf',
+                        geometry: {
+                            type: 'MultiPoint',
+                            coordinates: [
+                                [-79.378064851017821, 38.834368202090261],
+                                [-79.37907642397551, 38.834321754940582]
+                            ]
+                        }
+                    }
+                    ]
+                }
+            }));
         } else if (msg.message === 'model#retrain#complete') {
             console.error('DONE RETRAINING');
         } else {
