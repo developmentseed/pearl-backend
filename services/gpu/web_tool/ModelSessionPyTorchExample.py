@@ -179,14 +179,15 @@ class TorchFineTuning(ModelSession):
         # Check to see if new classes are added and randomly initaalize weights/biases for new classes.
         if len(np.unique(y_train)) != len(self.augment_model.intercept_):
             b = self.augment_model.intercept_
-            w = self.augment_model.bias
+            w = self.augment_model.coef_
 
             random_new_bias = np.round(b.max() - b.min() * np.random.random_sample() + b.min(), 8)
+
             random_new_weights = np.round(w.max() - w.min() * np.random.random_sample(((64, 1, 1))) + w.min(), 8)
-            random_new_weights = np.expand_dims(random_new_weights, axis=0)
+            random_new_weights = np.expand_dims(random_new_weights, axis=0).squeeze()
 
             self.augment_model.intercept_ = np.append(b, random_new_bias)
-            self.augment_model.coef_ = np.vstack((w, random_new_weights_2))
+            self.augment_model.coef_ = np.vstack((w, random_new_weights))
 
 
         print ('y train unique')
