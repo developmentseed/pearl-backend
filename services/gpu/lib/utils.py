@@ -66,7 +66,7 @@ def geom2px(geom, modelsrv):
 
         value = retrain[pixels[0], pixels[1]]
 
-        pxs.append(PX(coords, xy, xyz, pixels, value))
+        pxs.append(PX(coord, xy, xyz, pixels, value))
 
     return pxs
 

@@ -1024,6 +1024,42 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles TileJSON Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName TileJSONCheckpoint
+     * @apiGroup Checkpoint
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return tilejson for a given Checkpoint
+     */
+    router.get('/project/:projectid/checkpoint/:checkpointid/tiles', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
+
+            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            if (!c.checkpoint) throw new Err(404, null, 'Checkpoint has not been uploaded');
+
+            res.json({
+                tilejson: '2.2.0',
+                name: `checkpoint-${req.params.checkpointid}`,
+                version: '1.0.0',
+                schema: 'xyz',
+                tiles: [
+                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}.png`
+                ],
+                minzoom: tj.minzoom,
+                maxzoom: tj.maxzoom,
+                bounds: tj.bounds,
+                center: tj.center
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/project/:projectid/checkpoint/:checkpointid/upload Upload Checkpoint
      * @apiVersion 1.0.0
      * @apiName UploadCheckpoint

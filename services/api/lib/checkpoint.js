@@ -42,7 +42,7 @@ class CheckPoint {
      * @returns {Object}
      */
     static json(row) {
-        return {
+        const chpt = {
             id: parseInt(row.id),
             project_id: parseInt(row.project_id),
             name: row.name,
@@ -51,6 +51,25 @@ class CheckPoint {
             created: row.created,
             storage: row.storage
         };
+
+        if (row.geoms) {
+            const counts = row.geoms.filter((geom) => {
+                if (!geom) return false;
+                if (!geom.coordinates.length) return false;
+                return true;
+            }).length;
+
+            if (counts && row.bounds) {
+                chpt.bounds = row.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ');
+            }
+
+            if (counts && row.center) {
+                chpt.center = row.center.replace(/(POINT|\(|\))/g, '').split(' ');
+            }
+        }
+
+        console.error(chpt)
+        return chpt;
     }
 
     /**
@@ -206,21 +225,36 @@ class CheckPoint {
         let pgres;
         try {
             pgres = await this.pool.query(`
-               SELECT
-                    id,
-                    name,
-                    classes,
-                    created,
-                    storage,
-                    bookmarked,
-                    project_id
+                SELECT
+                    checkpoints.id,
+                    checkpoints.name,
+                    checkpoints.classes,
+                    checkpoints.created,
+                    checkpoints.storage,
+                    checkpoints.bookmarked,
+                    checkpoints.project_id,
+                    checkpoints.geoms,
+                    ST_AsText(ST_Centroid(ST_Envelope(ST_Collect(geom)))) AS center,
+                    ST_Extent(geom) AS bounds
                 FROM
+                    (SELECT id, ST_GeomFromGeoJSON(Unnest(geoms)) as geom FROM checkpoints WHERE id = $1) g,
                     checkpoints
                 WHERE
-                    id = $1
+                    checkpoints.id = $1
+                GROUP BY
+                    g.id,
+                    checkpoints.id,
+                    checkpoints.name,
+                    checkpoints.classes,
+                    checkpoints.created,
+                    checkpoints.storage,
+                    checkpoints.bookmarked,
+                    checkpoints.project_id,
+                    checkpoints.geoms
             `, [
                 checkpointid
             ]);
+
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get checkpoint');
         }
