@@ -1236,7 +1236,7 @@ async function server(config, cb) {
                 if (req.body.geoms && req.body.geoms.length !== req.body.classes.length) {
                     throw new Err(400, null, 'geoms array must be parallel with classes array');
                 } else if (!req.body.geoms) {
-                    req.body.geoms = req.body.classes.map((e) => {
+                    req.body.geoms = req.body.classes.map(() => {
                         return { type: 'MultiPoint', coordinates: [] };
                     });
                 } else {

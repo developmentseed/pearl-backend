@@ -110,6 +110,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
+            geoms: [ { type: 'MultiPoint', coordinates: [] }, { type: 'MultiPoint', coordinates: [] }, { type: 'MultiPoint', coordinates: [] }, { type: 'MultiPoint', coordinates: [] } ]
         });
 
         t.end();

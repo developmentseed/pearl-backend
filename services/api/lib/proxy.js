@@ -1,7 +1,7 @@
 'use strict';
 
 const request = require('request');
-const {promisify} = require('util');
+const { promisify } = require('util');
 const arequest = promisify(request);
 
 /**
