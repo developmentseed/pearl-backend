@@ -3,11 +3,19 @@
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const { Kube } = require('./kube');
-const kube = new Kube('default');
+
+/**
+ * @class
+ */
 class Instance {
+    /**
+     * @param {Config} config Server Config
+     */
     constructor(config) {
         this.pool = config.pool;
         this.config = config;
+
+        this.kube = new Kube(config, 'default');
     }
 
     /**
@@ -137,7 +145,7 @@ class Instance {
 
             let pod = {};
             if (this.config.Environment !== 'local') {
-                const podSpec = kube.makePodSpec(instanceId, [{
+                const podSpec = this.kube.makePodSpec(instanceId, [{
                     name: 'INSTANCE_ID',
                     value: instanceId.toString()
                 },{
@@ -151,7 +159,7 @@ class Instance {
                     value: this.config.SigningSecret
                 }]);
 
-                pod = await kube.createPod(podSpec);
+                pod = await this.kube.createPod(podSpec);
             }
 
             return {
