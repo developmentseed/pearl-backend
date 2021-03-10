@@ -296,6 +296,8 @@ test('gpu connection', (t) => {
 
         // Messages in this IF queue are in chrono order
         if (msg.message === 'info#connected') {
+            first = true;
+
             ws.send(JSON.stringify({
                 action: 'model#prediction',
                 data: {

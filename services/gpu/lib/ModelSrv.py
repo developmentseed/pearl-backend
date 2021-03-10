@@ -2,7 +2,7 @@ import os
 import base64
 import json
 import numpy as np
-from .utils import pred2png, geom2px
+from .utils import pred2png, geom2px, pxs2geojson
 from .AOI import AOI
 from .MemRaster import MemRaster
 from web_tool.Utils import serialize, deserialize
@@ -32,7 +32,10 @@ class ModelSrv():
         self.processing = True
 
         if self.chk is None:
-            await self.checkpoint(body, websocket)
+            await self.checkpoint({
+                'name': body['name'],
+                'geoms': [None] * len(self.model.classes)
+            }, websocket)
 
         self.aoi = AOI(self.api, body, self.chk['id'])
 
@@ -114,7 +117,10 @@ class ModelSrv():
             'message': 'model#retrain#complete'
         }))
 
-        await self.checkpoint(body, websocket)
+        await self.checkpoint({
+            'name': body['name'],
+            'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']])
+        }, websocket)
 
         self.processing = False
         await self.prediction({
@@ -125,7 +131,8 @@ class ModelSrv():
     async def checkpoint(self, body, websocket):
         checkpoint = self.api.create_checkpoint(
             body['name'],
-            self.model.classes
+            self.model.classes,
+            body['geoms']
         )
 
         chdir = self.checkpoint_dir + str(checkpoint['id']) + '/'
