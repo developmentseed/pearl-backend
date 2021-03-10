@@ -1027,7 +1027,7 @@ async function server(config, cb) {
      * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles TileJSON Checkpoint
      * @apiVersion 1.0.0
      * @apiName TileJSONCheckpoint
-     * @apiGroup Checkpoint
+     * @apiGroup Checkpoints
      * @apiPermission user
      *
      * @apiDescription
@@ -1040,7 +1040,6 @@ async function server(config, cb) {
 
             const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
             if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
-
             if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
             res.json({
@@ -1054,6 +1053,33 @@ async function server(config, cb) {
                 bounds: c.bounds,
                 center: c.center
             });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt Tile Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName TileCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a Tile for a given AOI
+     */
+    router.get('/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
+
+            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
+
         } catch (err) {
             return Err.respond(err, res);
         }
