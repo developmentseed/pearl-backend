@@ -62,11 +62,15 @@ class CheckPoint {
             }).length;
 
             if (counts && row.bounds) {
-                chpt.bounds = row.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ');
+                chpt.bounds = row.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ').map((cd) => {
+                    return Number(cd);
+                });
             }
 
             if (counts && row.center) {
-                chpt.center = row.center.replace(/(POINT|\(|\))/g, '').split(' ');
+                chpt.center = row.center.replace(/(POINT|\(|\))/g, '').split(' ').map((cd) => {
+                    return Number(cd);
+                });
             }
         }
 
