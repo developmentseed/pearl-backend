@@ -1049,10 +1049,8 @@ async function server(config, cb) {
                 tiles: [
                     `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}.png`
                 ],
-                minzoom: tj.minzoom,
-                maxzoom: tj.maxzoom,
-                bounds: tj.bounds,
-                center: tj.center
+                bounds: c.bounds,
+                center: c.center
             });
         } catch (err) {
             return Err.respond(err, res);
