@@ -53,6 +53,8 @@ class CheckPoint {
         };
 
         if (row.geoms) {
+            chpt.geoms = row.geoms;
+
             const counts = row.geoms.filter((geom) => {
                 if (!geom) return false;
                 if (!geom.coordinates.length) return false;
@@ -68,7 +70,6 @@ class CheckPoint {
             }
         }
 
-        console.error(chpt)
         return chpt;
     }
 

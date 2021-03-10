@@ -130,7 +130,13 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ]
+            ],
+            geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+           ]
         });
 
         t.end();
@@ -201,7 +207,13 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ]
+            ],
+            geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+           ]
         });
 
         t.end();
@@ -233,8 +245,14 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
-            storage: false }
-        );
+            storage: false,
+            geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+           ]
+        });
 
         t.end();
     });
