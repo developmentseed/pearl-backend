@@ -274,7 +274,7 @@ test('Set Storage: true', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/checkpoint (empty)', (t) => {
+test('GET /api/project/1/checkpoint', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000/api/project/1/checkpoint',

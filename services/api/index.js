@@ -1039,7 +1039,9 @@ async function server(config, cb) {
             await Param.int(req, 'checkpointid');
 
             const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
-            if (!c.checkpoint) throw new Err(404, null, 'Checkpoint has not been uploaded');
+            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+
+            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
             res.json({
                 tilejson: '2.2.0',

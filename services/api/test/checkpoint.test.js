@@ -266,7 +266,7 @@ test('Set Storage: true', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/checkpoint (empty)', (t) => {
+test('GET /api/project/1/checkpoint', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000/api/project/1/checkpoint',
@@ -291,6 +291,24 @@ test('GET /api/project/1/checkpoint (empty)', (t) => {
                 bookmarked: true
             }]
         });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/checkpoint/1/tiles - no geometry', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 404, 'status: 404');
+
+        t.deepEquals(res.body, { status: 404, message: 'Checkpoint has no geometries to serve', messages: [] });
 
         t.end();
     });
