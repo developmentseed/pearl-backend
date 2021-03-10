@@ -304,4 +304,32 @@ test('GET /api/project/1/checkpoint', (t) => {
     });
 });
 
+test('GET /api/project/1/checkpoint/1/tiles - geometries', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, {
+            tilejson: '2.2.0',
+            name: 'checkpoint-1',
+            version: '1.0.0',
+            schema: 'xyz',
+            tiles: [ '/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt' ],
+            bounds: [ -86.8359375, 34.8859309407532, -73.828125, 51.1793429792893 ],
+            center: [ -80.33203125, 43.0326369600212 ]
+        });
+
+        t.end();
+    });
+});
+
+
+
 flight.landing(test);

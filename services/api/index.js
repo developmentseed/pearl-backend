@@ -752,7 +752,7 @@ async function server(config, cb) {
                 version: tj.version,
                 schema: tj.scheme,
                 tiles: [
-                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}.png`
+                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}`
                 ],
                 minzoom: tj.minzoom,
                 maxzoom: tj.maxzoom,
@@ -1049,7 +1049,7 @@ async function server(config, cb) {
                 version: '1.0.0',
                 schema: 'xyz',
                 tiles: [
-                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}.png`
+                    `/project/${req.params.projectid}/checkpoint/${req.params.checkpointid}/tiles/{z}/{x}/{y}.mvt`
                 ],
                 bounds: c.bounds,
                 center: c.center
