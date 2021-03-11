@@ -40,7 +40,7 @@ class ModelSrv():
 
             self.aoi = AOI(self.api, body, self.chk['id'])
 
-            color_list = [item["color"] for item in self.api.model['classes']]
+            color_list = [item["color"] for item in self.model.classes]
 
             while len(self.aoi.tiles) > 0:
                 zxy = self.aoi.tiles.pop()
@@ -55,10 +55,6 @@ class ModelSrv():
                 LOGGER.info("ok - generated inference");
 
                 if self.aoi.live:
-                    # if output.shape[2] > len(color_list): # TO-DO fix this check to be in the unique pred values are > color list, or max value predicted > len(color_lst + 1)
-                    #     LOGGER.warning("The colour list does not match class list")
-                    #     output = output[:,:,:len(color_list)]
-
                     # Create color versions of predictions
                     png = pred2png(output, color_list) # investigate this
 
@@ -89,6 +85,8 @@ class ModelSrv():
 
             self.aoi.upload_fabric()
 
+            LOGGER.info("ok - done prediction");
+
             await websocket.send(json.dumps({
                 'message': 'model#prediction#complete'
             }))
@@ -112,12 +110,16 @@ class ModelSrv():
             if self.processing is True:
                 return await is_processing(websocket)
 
+            LOGGER.info("ok - starting retrain");
+
             self.processing = True
 
             for cls in body['classes']:
                 cls['geometry'] = geom2px(cls['geometry'], self)
 
             self.model.retrain(body['classes'])
+
+            LOGGER.info("ok - done retrain");
 
             await websocket.send(json.dumps({
                 'message': 'model#retrain#complete'
