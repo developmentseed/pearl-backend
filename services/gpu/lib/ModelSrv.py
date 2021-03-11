@@ -104,7 +104,8 @@ class ModelSrv():
                     'detailed': str(e)
                 }
             }))
-            return None
+
+            raise e
 
     async def retrain(self, body, websocket):
         try:
@@ -138,7 +139,8 @@ class ModelSrv():
                     'detailed': str(e)
                 }
             }))
-            return None
+
+            raise None
 
         await self.prediction({
             'name': body['name'],
