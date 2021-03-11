@@ -111,7 +111,13 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ]
+            ],
+            geoms: [
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+           ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -132,10 +138,10 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
            ]
         });
 
@@ -209,10 +215,10 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
            ]
         });
 
@@ -246,11 +252,13 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
+            bounds: [ -86.8359375, 34.8859309407532, -73.828125, 51.1793429792893 ],
+            center: [ -80.33203125, 43.0326369600212 ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
            ]
         });
 
@@ -296,7 +304,7 @@ test('GET /api/project/1/checkpoint', (t) => {
     });
 });
 
-test('GET /api/project/1/checkpoint/1/tiles - no geometry', (t) => {
+test('GET /api/project/1/checkpoint/1/tiles - geometries', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles',
@@ -306,15 +314,23 @@ test('GET /api/project/1/checkpoint/1/tiles - no geometry', (t) => {
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 404, 'status: 404');
+        t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(res.body, { status: 404, message: 'Checkpoint has no geometries to serve', messages: [] });
+        t.deepEquals(res.body, {
+            tilejson: '2.2.0',
+            name: 'checkpoint-1',
+            version: '1.0.0',
+            schema: 'xyz',
+            tiles: [ '/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt' ],
+            bounds: [ -86.8359375, 34.8859309407532, -73.828125, 51.1793429792893 ],
+            center: [ -80.33203125, 43.0326369600212 ]
+        });
 
         t.end();
     });
 });
 
-test('GET /api/project/1/checkpoint/1/tiles/1/0/0.mvt - no geometry', (t) => {
+test('GET /api/project/1/checkpoint/1/tiles/1/0/0 - geometries', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles/1/0/0.mvt',
@@ -324,9 +340,9 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0.mvt - no geometry', (t) => {
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 404, 'status: 404');
+        t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(res.body, { status: 404, message: 'Checkpoint has no geometries to serve', messages: [] });
+        t.deepEquals(Buffer.from(res.body).toString('hex'), '1a250a0464617461120d1801220911efbfbd21efbfbd32efbfbd04efbfbd0712091801220509efbfbd21efbfbd3228efbfbd207802');
 
         t.end();
     });

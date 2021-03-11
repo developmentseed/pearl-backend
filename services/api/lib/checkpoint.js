@@ -42,7 +42,7 @@ class CheckPoint {
      * @returns {Object}
      */
     static json(row) {
-        return {
+        const chpt = {
             id: parseInt(row.id),
             project_id: parseInt(row.project_id),
             name: row.name,
@@ -51,6 +51,30 @@ class CheckPoint {
             created: row.created,
             storage: row.storage
         };
+
+        if (row.geoms) {
+            chpt.geoms = row.geoms;
+
+            const counts = row.geoms.filter((geom) => {
+                if (!geom) return false;
+                if (!geom.coordinates.length) return false;
+                return true;
+            }).length;
+
+            if (counts && row.bounds) {
+                chpt.bounds = row.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ').map((cd) => {
+                    return Number(cd);
+                });
+            }
+
+            if (counts && row.center) {
+                chpt.center = row.center.replace(/(POINT|\(|\))/g, '').split(' ').map((cd) => {
+                    return Number(cd);
+                });
+            }
+        }
+
+        return chpt;
     }
 
     /**
@@ -206,21 +230,36 @@ class CheckPoint {
         let pgres;
         try {
             pgres = await this.pool.query(`
-               SELECT
-                    id,
-                    name,
-                    classes,
-                    created,
-                    storage,
-                    bookmarked,
-                    project_id
+                SELECT
+                    checkpoints.id,
+                    checkpoints.name,
+                    checkpoints.classes,
+                    checkpoints.created,
+                    checkpoints.storage,
+                    checkpoints.bookmarked,
+                    checkpoints.project_id,
+                    checkpoints.geoms,
+                    ST_AsText(ST_Centroid(ST_Envelope(ST_Collect(geom)))) AS center,
+                    ST_Extent(geom) AS bounds
                 FROM
+                    (SELECT id, ST_GeomFromGeoJSON(Unnest(geoms)) as geom FROM checkpoints WHERE id = $1) g,
                     checkpoints
                 WHERE
-                    id = $1
+                    checkpoints.id = $1
+                GROUP BY
+                    g.id,
+                    checkpoints.id,
+                    checkpoints.name,
+                    checkpoints.classes,
+                    checkpoints.created,
+                    checkpoints.storage,
+                    checkpoints.bookmarked,
+                    checkpoints.project_id,
+                    checkpoints.geoms
             `, [
                 checkpointid
             ]);
+
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get checkpoint');
         }
@@ -233,33 +272,97 @@ class CheckPoint {
     /**
      * Create a new Checkpoint
      *
-     * @param {Number} projectid - Checkpoint related to a specific instance
+     * @param {Number} projectid - Project ID the checkpoint is a part of
      * @param {Object} checkpoint - Checkpoint Object
+     * @param {String} checkpoint.name - Human readable name
+     * @param {Object[]} checkpoint.classes - Checkpoint Class names
+     * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
      */
     async create(projectid, checkpoint) {
-        if (!checkpoint) checkpoint = {};
-
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoints (
                     project_id,
                     name,
-                    classes
+                    classes,
+                    geoms
                 ) VALUES (
                     $1,
                     $2,
-                    $3::JSONB
+                    $3::JSONB,
+                    $4::JSONB[]
                 ) RETURNING *
             `, [
                 projectid,
                 checkpoint.name,
-                JSON.stringify(checkpoint.classes)
+                JSON.stringify(checkpoint.classes),
+                checkpoint.geoms.map((e) => {
+                    return JSON.stringify(e);
+                })
             ]);
 
             return CheckPoint.json(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to create checkpoint');
         }
+    }
+
+    /**
+     * Return a Mapbox Vector Tile of the checkpoint Geom
+     *
+     * @param {Number} checkpointid - Checkpoint ID
+     * @param {Number} z - Z Tile Coordinate
+     * @param {Number} x - X Tile Coordinate
+     * @param {Number} y - Y Tile Coordinate
+     */
+    async mvt(checkpointid, z, x, y) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                SELECT
+                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                FROM (
+                    SELECT
+                        ST_AsMVTGeom(
+                            geom,
+                            ST_TileEnvelope($2, $3, $4),
+                            4096,
+                            256,
+                            false
+                        ) AS geom
+                    FROM (
+                        SELECT
+                            id,
+                            r.geom
+                        FROM (
+                            SELECT
+                                id,
+                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.geoms)), 3857) AS geom
+                            FROM
+                                checkpoints
+                            WHERE
+                                checkpoints.id = $1
+                        ) r
+                        WHERE
+                            ST_Intersects(
+                                geom,
+                                ST_TileEnvelope($2, $3, $4)
+                            )
+                    ) n
+                    GROUP BY
+                        id,
+                        geom
+                ) q
+
+            `, [
+                checkpointid,
+                z, x, y
+            ]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to create checkpoint MVT');
+        }
+
+        return pgres.rows[0].mvt;
     }
 }
 

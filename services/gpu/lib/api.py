@@ -59,7 +59,7 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def create_checkpoint(self, name, classes):
+    def create_checkpoint(self, name, classes, geoms):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint'
 
         LOGGER.info("ok - POST " + url)
@@ -70,7 +70,8 @@ class API():
             },
             data = json.dumps({
                 'name': name,
-                'classes': classes
+                'classes': classes,
+                'geoms': geoms
             })
         )
 
@@ -84,7 +85,7 @@ class API():
 
         LOGGER.info("ok - POST " + url)
 
-        zip_fs = self.tmp_dir + 'checkpoints/checkpoint-{}.zip'.format(checkpointid)
+        zip_fs = self.tmp_dir + '/checkpoints/checkpoint-{}.zip'.format(checkpointid)
 
         zipf = zipfile.ZipFile(zip_fs, 'w', zipfile.ZIP_DEFLATED)
         for root, dirs, files in os.walk(ch_dir):

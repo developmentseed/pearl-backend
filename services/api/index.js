@@ -752,7 +752,7 @@ async function server(config, cb) {
                 version: tj.version,
                 schema: tj.scheme,
                 tiles: [
-                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}.png`
+                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}`
                 ],
                 minzoom: tj.minzoom,
                 maxzoom: tj.maxzoom,
@@ -1024,6 +1024,70 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles TileJSON Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName TileJSONCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return tilejson for a given Checkpoint
+     */
+    router.get('/project/:projectid/checkpoint/:checkpointid/tiles', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
+
+            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
+
+            res.json({
+                tilejson: '2.2.0',
+                name: `checkpoint-${req.params.checkpointid}`,
+                version: '1.0.0',
+                schema: 'xyz',
+                tiles: [
+                    `/project/${req.params.projectid}/checkpoint/${req.params.checkpointid}/tiles/{z}/{x}/{y}.mvt`
+                ],
+                bounds: c.bounds,
+                center: c.center
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt Tile Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName TileCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a Tile for a given AOI
+     */
+    router.get('/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
+
+            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
+
+            return res.send(await checkpoint.mvt(req.params.checkpointid, req.params.z, req.params.x, req.params.y));
+
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/project/:projectid/checkpoint/:checkpointid/upload Upload Checkpoint
      * @apiVersion 1.0.0
      * @apiName UploadCheckpoint
@@ -1168,6 +1232,22 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await project.has_auth(req.auth, req.params.projectid);
+
+                if (req.body.geoms && req.body.geoms.length !== req.body.classes.length) {
+                    throw new Err(400, null, 'geoms array must be parallel with classes array');
+                } else if (!req.body.geoms) {
+                    req.body.geoms = req.body.classes.map(() => {
+                        return { type: 'MultiPoint', coordinates: [] };
+                    });
+                } else {
+                    req.body.geoms = req.body.geoms.map((e) => {
+                        if (!e || e.type !== 'MultiPoint') {
+                            return { type: 'MultiPoint', coordinates: [] };
+                        }
+
+                        return e;
+                    });
+                }
 
                 return res.json(await checkpoint.create(req.params.projectid, req.body));
             } catch (err) {

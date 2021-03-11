@@ -145,7 +145,7 @@ class Instance {
 
             let pod = {};
             if (this.config.Environment !== 'local') {
-                const podSpec = kube.makePodSpec(instanceId, [{
+                const podSpec = this.kube.makePodSpec(instanceId, [{
                     name: 'INSTANCE_ID',
                     value: instanceId.toString()
                 },{
@@ -159,7 +159,7 @@ class Instance {
                     value: this.config.SigningSecret
                 }]);
 
-                pod = await kube.createPod(podSpec);
+                pod = await this.kube.createPod(podSpec);
             }
 
             return {

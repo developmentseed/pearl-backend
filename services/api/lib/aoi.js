@@ -4,8 +4,6 @@ const Err = require('./error');
 const moment = require('moment');
 const {
     BlobSASPermissions,
-    SharedKeyCredential,
-    generateBlobSASQueryParameters,
     BlobServiceClient
 } = require('@azure/storage-blob');
 
@@ -49,8 +47,8 @@ class AOI {
         if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
 
         const url = new URL(await this.container_client.generateSasUrl({
-            permissions: BlobSASPermissions.parse("r").toString(),
-            expiresOn: moment().add(365, 'days'),
+            permissions: BlobSASPermissions.parse('r').toString(),
+            expiresOn: moment().add(365, 'days')
         }));
 
         url.pathname = `/aois/aoi-${aoiid}.tiff`;
