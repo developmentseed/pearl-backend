@@ -101,7 +101,7 @@ class ModelSrv():
                 'message': 'error',
                 'data': {
                     'error': 'processing error',
-                    'detailed': e
+                    'detailed': str(e)
                 }
             }))
             return None
@@ -135,7 +135,7 @@ class ModelSrv():
                 'message': 'error',
                 'data': {
                     'error': 'retrain error',
-                    'detailed': e
+                    'detailed': str(e)
                 }
             }))
             return None
