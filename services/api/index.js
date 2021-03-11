@@ -713,6 +713,90 @@ async function server(config, cb) {
     });
 
     /**
+     * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
+     * @apiVersion 1.0.0
+     * @apiName TileJSONAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return tilejson for a given AOI
+     */
+    router.get('/project/:projectid/aoi/:aoiid/tiles', requiresAuth, async (req, res) => {
+        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'aoiid');
+
+            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            const tiffurl = await aoi.url(a.id);
+
+            req.url = '/cog/tilejson.json';
+            req.query.url = tiffurl.origin + tiffurl.pathname;
+            req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+            const response = await proxy.request(req);
+
+            if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
+
+            const tj = JSON.parse(response.body);
+
+            // This is verbose as if the upstream JSON response changes
+            // and includes the URL in another place, we leak an access cred
+            res.json({
+                tilejson: tj.tilejson,
+                name: `aoi-${req.params.aoiid}`,
+                version: tj.version,
+                schema: tj.scheme,
+                tiles: [
+                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}`
+                ],
+                minzoom: tj.minzoom,
+                maxzoom: tj.maxzoom,
+                bounds: tj.bounds,
+                center: tj.center
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/tiles/:z/:x/:y Tile AOI
+     * @apiVersion 1.0.0
+     * @apiName TileAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a Tile for a given AOI
+     */
+    router.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'aoiid');
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
+
+            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            const tiffurl = await aoi.url(a.id);
+            req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
+            req.query.url = tiffurl.origin + tiffurl.pathname;
+            req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+            await proxy.request(req, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/project/:projectid/aoi/:aoiid/upload Upload AOI
      * @apiVersion 1.0.0
      * @apiName UploadAOI
@@ -940,6 +1024,70 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles TileJSON Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName TileJSONCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return tilejson for a given Checkpoint
+     */
+    router.get('/project/:projectid/checkpoint/:checkpointid/tiles', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
+
+            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
+
+            res.json({
+                tilejson: '2.2.0',
+                name: `checkpoint-${req.params.checkpointid}`,
+                version: '1.0.0',
+                schema: 'xyz',
+                tiles: [
+                    `/project/${req.params.projectid}/checkpoint/${req.params.checkpointid}/tiles/{z}/{x}/{y}.mvt`
+                ],
+                bounds: c.bounds,
+                center: c.center
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt Tile Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName TileCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a Tile for a given AOI
+     */
+    router.get('/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'checkpointid');
+            await Param.int(req, 'z');
+            await Param.int(req, 'x');
+            await Param.int(req, 'y');
+
+            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
+
+            return res.send(await checkpoint.mvt(req.params.checkpointid, req.params.z, req.params.x, req.params.y));
+
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {post} /api/project/:projectid/checkpoint/:checkpointid/upload Upload Checkpoint
      * @apiVersion 1.0.0
      * @apiName UploadCheckpoint
@@ -1084,6 +1232,22 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await project.has_auth(req.auth, req.params.projectid);
+
+                if (req.body.geoms && req.body.geoms.length !== req.body.classes.length) {
+                    throw new Err(400, null, 'geoms array must be parallel with classes array');
+                } else if (!req.body.geoms) {
+                    req.body.geoms = req.body.classes.map(() => {
+                        return { type: 'MultiPoint', coordinates: [] };
+                    });
+                } else {
+                    req.body.geoms = req.body.geoms.map((e) => {
+                        if (!e || e.type !== 'MultiPoint') {
+                            return { type: 'MultiPoint', coordinates: [] };
+                        }
+
+                        return e;
+                    });
+                }
 
                 return res.json(await checkpoint.create(req.params.projectid, req.body));
             } catch (err) {

@@ -110,6 +110,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
+            geoms: [ { type: 'MultiPoint', coordinates: [] }, { type: 'MultiPoint', coordinates: [] }, { type: 'MultiPoint', coordinates: [] }, { type: 'MultiPoint', coordinates: [] } ]
         });
 
         t.end();
@@ -217,6 +218,21 @@ test('GET /api/project/1/aoi/1', (t) => {
     });
 });
 
+test('[meta] Set model.storage: true', async (t) => {
+    try {
+        await flight.pool.query(`
+            UPDATE
+                aois
+            SET
+                storage = true
+        `, []);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('GET /api/project/1/aoi', (t) => {
     request({
         json: true,
@@ -237,9 +253,47 @@ test('GET /api/project/1/aoi', (t) => {
             aois: [{
                 id: 1,
                 name: 'Test AOI',
-                storage: false
+                storage: true
             }]
         });
+
+        t.end();
+    });
+});
+
+// The following 2 tests are skipped as they can't run without
+// TiTiler running as well - should add something like this to flow.test.js
+test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/tiles',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        console.error(res.body);
+
+        t.end();
+    });
+});
+
+test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/tiles/9/143/195',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        console.error(res.body);
 
         t.end();
     });

@@ -205,6 +205,42 @@
     "groupTitle": "AOI"
   },
   {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/tiles/:z/:x/:y",
+    "title": "Tile AOI",
+    "version": "1.0.0",
+    "name": "TileAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a Tile for a given AOI</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/tiles",
+    "title": "TileJSON AOI",
+    "version": "1.0.0",
+    "name": "TileJSONAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return tilejson for a given AOI</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
     "type": "post",
     "url": "/api/project/:projectid/aoi/:aoiid/upload",
     "title": "Upload AOI",
@@ -303,6 +339,13 @@
             "optional": false,
             "field": "classes.color",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Null/Object[]",
+            "optional": true,
+            "field": "geoms",
+            "description": "<p>Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes undefined</p>"
           }
         ]
       }
@@ -443,6 +486,27 @@
             "optional": true,
             "field": "bookmarked",
             "description": "<p>Has the checkpoint been bookmarked in the frontend</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object[]",
+            "optional": true,
+            "field": "classes",
+            "description": "<p>Named output classes &amp; their associated colours. NOTE: Patching cannot change the number of classes undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "classes.color",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -457,6 +521,42 @@
         }
       ]
     },
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt",
+    "title": "Tile Checkpoint",
+    "version": "1.0.0",
+    "name": "TileCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a Tile for a given AOI</p>",
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/checkpoint/:checkpointid/tiles",
+    "title": "TileJSON Checkpoint",
+    "version": "1.0.0",
+    "name": "TileJSONCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return tilejson for a given Checkpoint</p>",
     "filename": "./index.js",
     "groupTitle": "Checkpoints"
   },

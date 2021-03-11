@@ -289,11 +289,15 @@ test('gpu connection', (t) => {
         }
     });
 
+    let first = true;
+
     ws.on('message', (msg) => {
         msg = JSON.parse(msg)
 
         // Messages in this IF queue are in chrono order
         if (msg.message === 'info#connected') {
+            first = true;
+
             ws.send(JSON.stringify({
                 action: 'model#prediction',
                 data: {
@@ -310,7 +314,8 @@ test('gpu connection', (t) => {
                     }
                 }
             }));
-        } else if (msg.message === 'model#prediction#complete') {
+        } else if (first && msg.message === 'model#prediction#complete') {
+            first = false;
             ws.send(JSON.stringify({
                 action: 'model#retrain',
                 data: {

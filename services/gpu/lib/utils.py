@@ -23,6 +23,22 @@ class PX:
         self.px = px # Per Tile Pixel Coordinates
         self.value = value # Pixel Value from retrain numpy array (Model#Run)
 
+def pxs2geojson(classes):
+    geoms = []
+    for cls in classes:
+        geo = {
+            'type': 'MultiPoint',
+            'coordinates': []
+        }
+
+        for px in cls:
+            geo['coordinates'].append(px.coords)
+
+        geoms.append(geo)
+
+    return geoms
+
+
 def geom2px(geom, modelsrv):
     zoom = modelsrv.api.model['model_zoom']
 
@@ -50,7 +66,7 @@ def geom2px(geom, modelsrv):
 
         value = retrain[pixels[0], pixels[1]]
 
-        pxs.append(PX(coords, xy, xyz, pixels, value))
+        pxs.append(PX(coord, xy, xyz, pixels, value))
 
     return pxs
 
