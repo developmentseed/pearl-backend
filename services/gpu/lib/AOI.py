@@ -15,10 +15,7 @@ from shapely.geometry import box
 from functools import partial
 from shapely.ops import transform
 from shapely.geometry import shape
-from tiletanic import tilecover, tileschemes
 import mercantile
-
-tiler = tileschemes.WebMercator()
 
 LOGGER = logging.getLogger("server")
 
@@ -65,8 +62,8 @@ class AOI():
         extrema = supermercado.burntiles.tile_extrema(bounds, zoom)
         transform = supermercado.burntiles.make_transform(extrema, zoom)
 
-        height = (extrema["y"]["max"] - extrema["y"]["min"] + 1) * 256
-        width = (extrema["x"]["max"] - extrema["x"]["min"] + 1) * 256
+        height = (extrema["y"]["max"] - extrema["y"]["min"] + 2) * 256
+        width = (extrema["x"]["max"] - extrema["x"]["min"] + 2) * 256
 
         memfile = MemoryFile()
         writer = memfile.open(
@@ -84,16 +81,7 @@ class AOI():
     @staticmethod
     def gen_tiles(poly, zoom):
         poly = shape(geojson.loads(json.dumps(poly)))
-
-        project = pyproj.Transformer.from_proj(
-            pyproj.Proj('epsg:4326'),
-            pyproj.Proj('epsg:3857'),
-            always_xy=True
-        )
-
-        poly = transform(project.transform, poly)
-
-        return list(tilecover.cover_geometry(tiler, poly, zoom))
+        return list(mercantile.tiles(*poly.bounds, zoom))
 
     @staticmethod
     def area(bounds):

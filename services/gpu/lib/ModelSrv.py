@@ -65,6 +65,7 @@ class ModelSrv():
                     'message': 'model#prediction',
                     'data': {
                         'bounds': in_memraster.bounds,
+                        'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
                         'image': png,
                         'total': self.aoi.total,
                         'processed': len(self.aoi.tiles)
