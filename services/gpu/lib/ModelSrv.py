@@ -94,7 +94,7 @@ class ModelSrv():
             }))
 
             self.processing = False
-        except Excpetion as e:
+        except Exception as e:
             self.processing = False
 
             await websocket.send(json.dumps({
@@ -128,7 +128,7 @@ class ModelSrv():
             }, websocket)
 
             self.processing = False
-        except Excpetion as e:
+        except Exception as e:
             self.processing = False
 
             await websocket.send(json.dumps({
