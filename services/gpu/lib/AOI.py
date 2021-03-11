@@ -48,8 +48,8 @@ class AOI():
         data = fragment.data.argmax(axis=-1).astype(np.uint8)
         data = np.expand_dims(data, axis=0)
 
-        col_off = (self.extrema["x"]["min"] - fragment.x) * 256
-        row_off = (self.extrema["y"]["min"] - fragment.y) * 256
+        col_off = (fragment.x - self.extrema["x"]["min"]) * 256
+        row_off = (fragment.y - self.extrema["y"]["min"]) * 256
 
         self.fabric.write(data, window=Window(col_off, row_off, 256, 256))
 
@@ -62,8 +62,8 @@ class AOI():
         extrema = supermercado.burntiles.tile_extrema(bounds, zoom)
         transform = supermercado.burntiles.make_transform(extrema, zoom)
 
-        height = (extrema["y"]["max"] - extrema["y"]["min"] + 2) * 256
-        width = (extrema["x"]["max"] - extrema["x"]["min"] + 2) * 256
+        height = (extrema["y"]["max"] - extrema["y"]["min"]) * 256
+        width = (extrema["x"]["max"] - extrema["x"]["min"]) * 256
 
         memfile = MemoryFile()
         writer = memfile.open(
@@ -112,7 +112,7 @@ class AOI():
                 bounds[1] = tilebounds.south
             if tilebounds.east > bounds[2]:
                 bounds[2] = tilebounds.east
-            if tilebounds.north < bounds[3]:
+            if tilebounds.north > bounds[3]:
                 bounds[3] = tilebounds.north
 
         return list(bounds)
