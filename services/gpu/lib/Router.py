@@ -52,7 +52,7 @@ class Router():
                             traceback.print_exc()
 
                     else:
-                        LOGGER.info('ok - Unknown Message')
+                        LOGGER.info('ok - Unknown Message: {}'.format(msg.get('message')))
 
                 elif msg.get('action') is not None:
                     action = msg.get('action')
@@ -67,5 +67,5 @@ class Router():
                     elif action == "instance#terminate":
                         terminate = True
                     else:
-                        LOGGER.info('ok - Unknown Action')
+                        LOGGER.info('ok - Unknown Action: {}'.format(msg.get('action')))
 

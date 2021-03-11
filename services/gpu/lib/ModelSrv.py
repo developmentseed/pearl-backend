@@ -24,105 +24,126 @@ class ModelSrv():
         self.model = model
 
     async def prediction(self, body, websocket):
-        if self.processing is True:
-            return await is_processing(websocket)
-
-        LOGGER.info("ok - starting prediction");
-
-        self.processing = True
-
-        if self.chk is None:
-            await self.checkpoint({
-                'name': body['name'],
-                'geoms': [None] * len(self.model.classes)
-            }, websocket)
-
-        self.aoi = AOI(self.api, body, self.chk['id'])
-
-        color_list = [item["color"] for item in self.api.model['classes']]
-
-        for zxy in self.aoi.tiles:
-            in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
-
-            output, output_features = self.model.run(in_memraster.data, False)
-
-            #TO-DO assert statement for output_features dimensions?
-
-            assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
-
-            LOGGER.info("ok - generated inference");
-
-            if self.aoi.live:
-                # if output.shape[2] > len(color_list): # TO-DO fix this check to be in the unique pred values are > color list, or max value predicted > len(color_lst + 1)
-                #     LOGGER.warning("The colour list does not match class list")
-                #     output = output[:,:,:len(color_list)]
-
-                # Create color versions of predictions
-                png = pred2png(output, color_list) # investigate this
-
-                LOGGER.info("ok - returning inference");
-                await websocket.send(json.dumps({
-                    'message': 'model#prediction',
-                    'data': {
-                        'bounds': in_memraster.bounds,
-                        'image': png,
-                        'total': self.aoi.total,
-                        'processed': len(self.aoi.tiles)
-                    }
-                }))
-            else:
-                await websocket.send(json.dumps({
-                    'message': 'model#prediction',
-                    'data': {
-                        'total': self.aoi.total,
-                        'processed': len(self.aoi.tiles)
-                    }
-                }))
-
-            # Push tile into geotiff fabric
-            output = np.expand_dims(output, axis=-1)
-            output = MemRaster(output, in_memraster.crs, in_memraster.tile)
-            self.aoi.add_to_fabric(output)
-
-        self.aoi.upload_fabric()
-
-        await websocket.send(json.dumps({
-            'message': 'model#prediction#complete'
-        }))
-
-        self.processing = False
-
-    async def retrain(self, body, websocket):
-        if self.processing is True:
-            return await is_processing(websocket)
-
-        self.processing = True
-
-        for cls in body['classes']:
-            cls['geometry'] = geom2px(cls['geometry'], self)
-
         try:
-            self.model.retrain(body['classes'])
-        except Excpetion as e:
+            if self.processing is True:
+                return await is_processing(websocket)
+
+            LOGGER.info("ok - starting prediction");
+
+            self.processing = True
+
+            if self.chk is None:
+                await self.checkpoint({
+                    'name': body['name'],
+                    'geoms': [None] * len(self.model.classes)
+                }, websocket)
+
+            self.aoi = AOI(self.api, body, self.chk['id'])
+
+            color_list = [item["color"] for item in self.model.classes]
+
+            while len(self.aoi.tiles) > 0:
+                zxy = self.aoi.tiles.pop()
+                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+
+                output, output_features = self.model.run(in_memraster.data, False)
+
+                #TO-DO assert statement for output_features dimensions?
+
+                assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
+
+                LOGGER.info("ok - generated inference");
+
+                if self.aoi.live:
+                    # Create color versions of predictions
+                    png = pred2png(output, color_list) # investigate this
+
+                    LOGGER.info("ok - returning inference");
+                    await websocket.send(json.dumps({
+                        'message': 'model#prediction',
+                        'data': {
+                            'bounds': in_memraster.bounds,
+                            'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
+                            'image': png,
+                            'total': self.aoi.total,
+                            'processed': self.aoi.total - len(self.aoi.tiles)
+                        }
+                    }))
+                else:
+                    await websocket.send(json.dumps({
+                        'message': 'model#prediction',
+                        'data': {
+                            'total': self.aoi.total,
+                            'processed': len(self.aoi.tiles)
+                        }
+                    }))
+
+                # Push tile into geotiff fabric
+                output = np.expand_dims(output, axis=-1)
+                output = MemRaster(output, in_memraster.crs, in_memraster.tile)
+                self.aoi.add_to_fabric(output)
+
+            self.aoi.upload_fabric()
+
+            LOGGER.info("ok - done prediction");
+
+            await websocket.send(json.dumps({
+                'message': 'model#prediction#complete'
+            }))
+
+            self.processing = False
+        except Exception as e:
+            self.processing = False
+
             await websocket.send(json.dumps({
                 'message': 'error',
                 'data': {
-                    'error': 'retraining error.',
-                    'detailed': e
+                    'error': 'processing error',
+                    'detailed': str(e)
                 }
             }))
-            return None
 
-        await websocket.send(json.dumps({
-            'message': 'model#retrain#complete'
-        }))
+            raise e
 
-        await self.checkpoint({
-            'name': body['name'],
-            'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']])
-        }, websocket)
+    async def retrain(self, body, websocket):
+        try:
+            if self.processing is True:
+                return await is_processing(websocket)
 
-        self.processing = False
+            LOGGER.info("ok - starting retrain");
+
+            self.processing = True
+
+            for cls in body['classes']:
+                cls['geometry'] = geom2px(cls['geometry'], self)
+
+            self.model.retrain(body['classes'])
+
+            LOGGER.info("ok - done retrain");
+
+            await websocket.send(json.dumps({
+                'message': 'model#retrain#complete'
+            }))
+
+            await self.checkpoint({
+                'name': body['name'],
+                'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']])
+            }, websocket)
+
+            self.processing = False
+        except Exception as e:
+            self.processing = False
+
+            await websocket.send(json.dumps({
+                'message': 'error',
+                'data': {
+                    'error': 'retrain error',
+                    'detailed': str(e)
+                }
+            }))
+
+            raise None
+
         await self.prediction({
             'name': body['name'],
             'polygon': self.aoi.poly

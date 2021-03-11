@@ -37,7 +37,8 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = arg([args.gpu_id], "")
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-    os.environ['INSTANCE_ID'] = arg([os.environ.get('INSTANCE_ID'), args.instance_id])
+    # Fallback to INSTANCE_ID 1 if not set - assume local test env
+    os.environ['INSTANCE_ID'] = arg([os.environ.get('INSTANCE_ID'), args.instance_id, '1'])
     os.environ["API"] = arg([os.environ.get("API"), args.api], 'http://localhost:2000')
 
     os.environ["SOCKET"] = arg([os.environ.get("SOCKET"), args.socket], 'ws://localhost:1999')
