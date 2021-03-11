@@ -41,7 +41,8 @@ class ModelSrv():
 
         color_list = [item["color"] for item in self.api.model['classes']]
 
-        for zxy in self.aoi.tiles:
+        while len(self.aoi.tiles) > 0:
+            zxy = self.aoi.tiles.pop()
             in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
             output, output_features = self.model.run(in_memraster.data, False)
@@ -68,7 +69,7 @@ class ModelSrv():
                         'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
                         'image': png,
                         'total': self.aoi.total,
-                        'processed': len(self.aoi.tiles)
+                        'processed': self.aoi.total - len(self.aoi.tiles)
                     }
                 }))
             else:
