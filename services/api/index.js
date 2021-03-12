@@ -1585,7 +1585,7 @@ async function server(config, cb) {
      * @apiVersion 1.0.0
      * @apiName GetJson
      * @apiGroup Mosaic
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return a TileJSON object for a given mosaic layer
@@ -1609,7 +1609,7 @@ async function server(config, cb) {
      *       "center": [ -95.87494149186512, 36.9693324794906, 12 ]
      *   }
      */
-    router.get('/mosaic/:layer', requiresAuth, async (req, res) => {
+    router.get('/mosaic/:layer', async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
@@ -1622,11 +1622,11 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/mosaic/:layer Get Tile
+     * @api {get} /mosaic/:layer/tiles/:z/:x/:y.:format Get Tile
      * @apiVersion 1.0.0
      * @apiName GetTile
      * @apiGroup Mosaic
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiSchema (Query) {jsonschema=./schema/req.query.tile.json} apiParam
      *
@@ -1639,7 +1639,7 @@ async function server(config, cb) {
      *     Return an aerial imagery tile for a given set of mercator coordinates
      *
      */
-    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', requiresAuth, async (req, res) => {
+    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
