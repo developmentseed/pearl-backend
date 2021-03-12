@@ -667,7 +667,8 @@ async function server(config, cb) {
      *       "id": 1,
      *       "uid": 123,
      *       "active": true,
-     *       "created": "<date>"
+     *       "created": "<date>",
+     *       "token": "<instance token>"
      *   }
      */
     router.get('/project/:projectid/instance/:instanceid', requiresAuth, async (req, res) => {
