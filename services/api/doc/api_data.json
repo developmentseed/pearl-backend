@@ -1000,9 +1000,9 @@
     "group": "Mosaic",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return a TileJSON object for a given mosaic layer</p>",
@@ -1020,16 +1020,16 @@
   },
   {
     "type": "get",
-    "url": "/api/mosaic/:layer",
+    "url": "/mosaic/:layer/tiles/:z/:x/:y.:format",
     "title": "Get Tile",
     "version": "1.0.0",
     "name": "GetTile",
     "group": "Mosaic",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "parameter": {
