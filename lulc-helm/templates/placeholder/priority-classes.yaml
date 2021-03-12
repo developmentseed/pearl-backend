@@ -1,0 +1,17 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: placeholder
+value: 0
+preemptionPolicy: Never
+globalDefault: false
+description: 'placeholder'
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: normal
+value: 1
+preemptionPolicy: Never
+globalDefault: true
+description: 'normal'
