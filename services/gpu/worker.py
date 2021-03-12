@@ -49,7 +49,7 @@ def main():
     model = load(args.gpu_id, api)
 
     asyncio.get_event_loop().run_until_complete(
-        connection('{}?token={}'.format(os.environ["SOCKET"], api.token), model)
+        connection('{}?token={}'.format(os.environ["SOCKET"], api.token.replace('api.', '')), model)
     )
 
 async def connection(uri, model):
