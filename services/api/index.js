@@ -1686,6 +1686,26 @@ async function server(config, cb) {
         }
     });
 
+    /**
+     * @api {delete} /api/instance Deactivate Instances
+     * @apiVersion 1.0.0
+     * @apiName DeactivateInstance
+     * @apiGroup Instance
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Set all instances to active: false - used by the socket server upon initial api connection
+     */
+    router.delete('/instance', requiresAuth, async (req, res) => {
+        try {
+            await auth.is_admin(req);
+
+            return res.json(await instance.reset());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     router.all('*', (req, res) => {
         return res.status(404).json({
             status: 404,

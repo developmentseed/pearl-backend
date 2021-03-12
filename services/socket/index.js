@@ -47,6 +47,8 @@ function server(argv, config, cb) {
         });
     });
 
+    await config.api.deactivate();
+
     srv.on('request', app);
 
     const wss = new WebSocket.Server({

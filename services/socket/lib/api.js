@@ -19,6 +19,14 @@ class API {
         });
     }
 
+    deactivate() {
+        await request({
+            json: true,
+            method: 'DELETE',
+            url: new URL(this.API + '/instance')
+        });
+    }
+
     state(id, active) {
         await request({
             json: true,

@@ -209,6 +209,22 @@ class Instance {
         pgres.rows[0].token = this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id);
         return Instance.json(pgres.rows[0]);
     }
+
+    /**
+     * Set all instance states to active: false
+     */
+    async reset() {
+        try {
+            const pgres = await this.pool.query(`
+                UPDATE instances
+                    SET active = False
+            `, []);
+        } catch (err) {
+            throw new Err(500, err, 'Internal Instance Error');
+        }
+
+        return true;
+    }
 }
 
 module.exports = {
