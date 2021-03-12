@@ -68,7 +68,8 @@ class Kube {
                         env: env
                     }
                 ],
-                nodeSelector: nodeSelector
+                nodeSelector: nodeSelector,
+                restartPolicy: 'Never'
             }
         };
     }
