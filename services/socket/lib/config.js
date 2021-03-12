@@ -1,8 +1,6 @@
 'use strict';
 
 const pkg = require('../package.json');
-const { promisify } = require('util');
-const request = promisify(require('request'));
 const API = require('./api');
 
 /**
@@ -30,17 +28,15 @@ class Config {
 
         this.Port = args.port || 1999;
 
-        let maxretry = 20;
+        const maxretry = 20;
         let retry = maxretry;
         this.Timeout = false;
 
-        const api = new URL(this.API + '/api');
         do {
             try {
                 await sleep(5000);
 
-                console.error(`ok - GET ${api}`);
-                const meta = this.api.meta();
+                const meta = await this.api.meta();
                 if (meta.statusCode !== 200) throw new Error(meta.body);
 
                 this.Timeout = meta.body.limits.instance_window * 1000;

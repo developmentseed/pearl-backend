@@ -44,18 +44,12 @@ def main():
     os.environ["SOCKET"] = arg([os.environ.get("SOCKET"), args.socket], 'ws://localhost:1999')
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], 'dev-secret')
 
-    api = API(os.environ["API"], 'api.' + token, os.environ['INSTANCE_ID'])
-
-    token = jwt.encode({
-        "t": "admin",
-        "p": api.project_id,
-        "i": api.instance_id
-    }, os.environ["SigningSecret"], algorithm="HS256")
+    api = API(os.environ["API"], os.environ['INSTANCE_ID'])
 
     model = load(args.gpu_id, api)
 
     asyncio.get_event_loop().run_until_complete(
-        connection('{}?token={}'.format(os.environ["SOCKET"], token), model)
+        connection('{}?token={}'.format(os.environ["SOCKET"], api.token), model)
     )
 
 async def connection(uri, model):

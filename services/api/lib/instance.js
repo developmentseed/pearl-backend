@@ -28,7 +28,7 @@ class Instance {
      */
     async has_auth(project, auth, projectid, instanceid) {
         const proj = await project.has_auth(auth, projectid);
-        const instance = await this.get(instanceid);
+        const instance = await this.get(auth, instanceid);
 
         if (instance.project_id !== proj.id) {
             throw new Err(400, null, `Instance #${instanceid} is not associated with project #${projectid}`);
@@ -185,7 +185,7 @@ class Instance {
      *
      * @param {Number} instanceid Instance ID to get
      */
-    async get(instanceid) {
+    async get(auth, instanceid) {
         let pgres;
 
         try {

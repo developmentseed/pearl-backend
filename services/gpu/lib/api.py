@@ -1,4 +1,5 @@
 import os
+import jwt
 import json
 import requests
 import pyproj
@@ -24,9 +25,13 @@ tiler = tileschemes.WebMercator()
 
 class API():
 
-    def __init__(self, url, token, instance_id):
+    def __init__(self, url, instance_id):
         self.url = url
-        self.token = token
+
+        self.token = 'api.' + jwt.encode({
+            "t": "admin",
+            "i": os.environ['INSTANCE_ID']
+        }, os.environ["SigningSecret"], algorithm="HS256")
 
         self.tmp_dir = '/tmp/gpu-api'
 
@@ -44,8 +49,15 @@ class API():
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
 
-        self.project_id = self.instance['project_id']
         self.instance_id = instance_id
+        self.project_id = self.instance['project_id']
+
+        self.token = 'api.' + jwt.encode({
+            "t": "admin",
+            "p": self.project_id,
+            "i": self.instance_id
+        }, os.environ["SigningSecret"], algorithm="HS256")
+
         self.project = self.project_meta()
 
         self.model_id = self.project['model_id']

@@ -154,10 +154,7 @@ async function server(config, cb) {
     router.use(morgan('combined'));
     router.use(bodyparser.text());
     router.use(bodyparser.urlencoded({ extended: true }));
-    router.use(bodyparser.json({
-        limit: '50mb'
-    }));
-
+    router.use(bodyparser.json({ limit: '50mb' }));
 
     /*
      * Validate Auth0 JWT tokens
@@ -1657,7 +1654,7 @@ async function server(config, cb) {
     /**
      * @api {get} /api/instance/:instanceid Self Instance
      * @apiVersion 1.0.0
-     * @apiName GetInstance
+     * @apiName SelfInstance
      * @apiGroup Instance
      * @apiPermission admin
      *
@@ -1680,7 +1677,7 @@ async function server(config, cb) {
             await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
-            return res.json(await instance.get(req.params.instanceid));
+            return res.json(await instance.get(req.auth, req.params.instanceid));
         } catch (err) {
             return Err.respond(err, res);
         }

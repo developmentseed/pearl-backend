@@ -1,6 +1,6 @@
 'use strict';
 
-const {promisify} = require('util');
+const { promisify } = require('util');
 const request = promisify(require('request'));
 
 /**
@@ -11,28 +11,49 @@ class API {
         this.base = base;
     }
 
-    meta() {
-        await request({
+    async meta() {
+        const url = new URL(this.base + '/api');
+
+        console.error(`ok - GET ${url}`);
+        const res = await request({
             json: true,
             method: 'GET',
-            url: new URL(this.API + '/api')
+            url: url
         });
+        console.error(`ok - RES ${url} ${res.statusCode}`);
+
+        return res;
     }
 
-    deactivate() {
-        await request({
+    async deactivate() {
+        const url = new URL(this.base + '/api/instance');
+
+        console.error(`ok - DELETE ${url}`);
+        const res = await request({
             json: true,
             method: 'DELETE',
-            url: new URL(this.API + '/instance')
+            url: url
         });
+        console.error(`ok - RES ${url} ${res.statusCode}`);
+
+        return res;
     }
 
-    state(id, active) {
-        await request({
+    async state(projectid, instanceid, active) {
+        const url = new URL(this.base + `/api/project/${projectid}/instance/${instanceid}`);
+
+        console.error(`ok - PATCH ${url}`);
+        const res = await request({
             json: true,
             method: 'PATCH',
-            url: new URL(this.API + '/api')
+            url: url,
+            body: {
+                active: active
+            }
         });
+        console.error(`ok - RES ${url} ${res.statusCode}`);
+
+        return res;
     }
 }
 

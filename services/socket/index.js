@@ -39,7 +39,7 @@ async function configure(argv = {}, cb) {
  * @param {Config} config
  * @param {function} cb
  */
-function server(argv, config, cb) {
+async function server(argv, config, cb) {
     app.get('/health', (req, res) => {
         return res.json({
             healthy: true,
@@ -74,12 +74,12 @@ function server(argv, config, cb) {
         ws.auth = req.auth;
 
         pool.connected(ws);
-        console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} connected`);
+        console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i} connected`);
 
         Timeout.client(ws);
 
         ws.on('close', () => {
-            console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} disconnected`);
+            console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i} disconnected`);
             pool.disconnected(ws);
         });
 
