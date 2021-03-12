@@ -35,7 +35,7 @@ class Timeout {
         self.pool.gpus.forEach((ws) => {
             if ((+new Date()) - ws.activity > self.config.Timeout) {
                 this.pool.gpu(ws.auth.i).send(JSON.stringify({
-                    message: 'instance#terminate'
+                    action: 'instance#terminate'
                 }));
             }
         });

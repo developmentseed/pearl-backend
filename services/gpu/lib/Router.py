@@ -49,6 +49,7 @@ class Router():
                             await self.msg[message](msg.get('data', {}), self.websocket)
                         except Exception as e:
                             LOGGER.error("not ok - failed to process: " + message)
+                            LOGGER.error("Error: {0}".format(e))
                             traceback.print_exc()
 
                     else:
@@ -63,6 +64,7 @@ class Router():
                             await self.act[action](msg.get('data', {}), self.websocket)
                         except Exception as e:
                             LOGGER.error("not ok - failed to process: " + action)
+                            LOGGER.error("Error: {0}".format(e))
                             traceback.print_exc()
                     elif action == "instance#terminate":
                         terminate = True

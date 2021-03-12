@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-placeholder
+  labels:
+    component: placeholder-deployment
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "lulc-helm.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-placeholder
+  template:
+    metadata:
+      labels:
+        app: {{ template "lulc-helm.name" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-placeholder
+    spec:
+      terminationGracePeriodSeconds: 0
+      priorityClassName: placeholder
+      containers:
+      - name: placeholder
+        image: {{ .Values.gpu.image.name }}:{{ .Values.gpu.image.tag }}
+        command: ['/bin/sh']
+        args: ["-c", "echo", "pulling image and preparing a new gpu node."]
+        resources:
+          requests:
+            nvidia.com/gpu: 1
+          limits:
+            nvidia.com/gpu: 1
