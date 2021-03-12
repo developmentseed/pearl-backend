@@ -28,7 +28,7 @@ class Instance {
      */
     async has_auth(project, auth, projectid, instanceid) {
         const proj = await project.has_auth(auth, projectid);
-        const instance = await this.get(instanceid);
+        const instance = await this.get(auth, instanceid);
 
         if (instance.project_id !== proj.id) {
             throw new Err(400, null, `Instance #${instanceid} is not associated with project #${projectid}`);
@@ -45,12 +45,16 @@ class Instance {
      * @returns {Object}
      */
     static json(row) {
-        return {
+        const inst = {
             id: parseInt(row.id),
             project_id: parseInt(row.project_id),
             created: row.created,
             active: row.active
         };
+
+        if (row.token) inst.token = row.token;
+
+        return inst;
     }
 
     /**
@@ -119,6 +123,15 @@ class Instance {
         };
     }
 
+    token(auth, projectid, instanceid) {
+        return jwt.sign({
+            t: 'inst',
+            u: auth.uid,
+            p: parseInt(projectid),
+            i: parseInt(instanceid)
+        }, this.config.SigningSecret, { expiresIn: '12h' });
+    }
+
     async create(auth, instance) {
         if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
@@ -134,12 +147,6 @@ class Instance {
             `, [
                 instance.project_id
             ]);
-
-            const token = jwt.sign({
-                t: 'inst',
-                u: auth.uid,
-                i: parseInt(pgres.rows[0].id)
-            }, this.config.SigningSecret, { expiresIn: '12h' });
 
             const instanceId = parseInt(pgres.rows[0].id);
 
@@ -165,7 +172,7 @@ class Instance {
             return {
                 id: parseInt(pgres.rows[0].id),
                 created: pgres.rows[0].created,
-                token: token,
+                token: this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id),
                 pod: pod
             };
         } catch (err) {
@@ -178,7 +185,7 @@ class Instance {
      *
      * @param {Number} instanceid Instance ID to get
      */
-    async get(instanceid) {
+    async get(auth, instanceid) {
         let pgres;
 
         try {
@@ -199,7 +206,55 @@ class Instance {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
+        pgres.rows[0].token = this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id);
         return Instance.json(pgres.rows[0]);
+    }
+
+    /**
+     * Update Instance Properties
+     *
+     * @param {Number} instanceid - Specific Instance id
+     * @param {Object} instance - Instance Object
+     * @param {String} instance.active The state of the instance
+     */
+    async patch(instanceid, instance) {
+        let pgres;
+
+        try {
+            pgres = await this.pool.query(`
+                UPDATE instances
+                    SET
+                        active = COALESCE($2, active)
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [
+                instanceid,
+                instance.active
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to update Instance');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Instance not found');
+
+        return Instance.json(pgres.rows[0]);
+    }
+
+    /**
+     * Set all instance states to active: false
+     */
+    async reset() {
+        try {
+            const pgres = await this.pool.query(`
+                UPDATE instances
+                    SET active = False
+            `, []);
+        } catch (err) {
+            throw new Err(500, err, 'Internal Instance Error');
+        }
+
+        return true;
     }
 }
 

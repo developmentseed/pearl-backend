@@ -615,6 +615,24 @@
     "groupTitle": "Instance"
   },
   {
+    "type": "delete",
+    "url": "/api/instance",
+    "title": "Deactivate Instances",
+    "version": "1.0.0",
+    "name": "DeactivateInstance",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Set all instances to active: false - used by the socket server upon initial api connection</p>",
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
     "type": "get",
     "url": "/api/project/:projectid/instance/:instanceid",
     "title": "Get Instance",
@@ -633,34 +651,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "Instance"
-  },
-  {
-    "type": "get",
-    "url": "/api/instance/:instanceid",
-    "title": "Self Instance",
-    "version": "1.0.0",
-    "name": "GetInstance",
-    "group": "Instance",
-    "permission": [
-      {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be an admin to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>A newly instantiated GPU Instance does not know what it's project id is. This API allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\"\n    \"pod\": { ... }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\",\n    \"token\": \"<instance token>\"\n}",
           "type": "json"
         }
       ]
@@ -756,6 +747,33 @@
           }
         ]
       }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Instance"
+  },
+  {
+    "type": "get",
+    "url": "/api/instance/:instanceid",
+    "title": "Self Instance",
+    "version": "1.0.0",
+    "name": "SelfInstance",
+    "group": "Instance",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>A newly instantiated GPU Instance does not know what it's project id is. This API allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\"\n    \"pod\": { ... }\n}",
+          "type": "json"
+        }
+      ]
     },
     "filename": "./index.js",
     "groupTitle": "Instance"

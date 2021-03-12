@@ -22,8 +22,6 @@ if (require.main === module) {
     configure(argv);
 }
 
-const pool = new Pool();
-
 async function configure(argv = {}, cb) {
     try {
         const config = await Config.env(argv);
@@ -39,13 +37,17 @@ async function configure(argv = {}, cb) {
  * @param {Config} config
  * @param {function} cb
  */
-function server(argv, config, cb) {
+async function server(argv, config, cb) {
+    const pool = new Pool(config);
+
     app.get('/health', (req, res) => {
         return res.json({
             healthy: true,
             message: 'Good to go'
         });
     });
+
+    await config.api.deactivate();
 
     srv.on('request', app);
 
@@ -72,12 +74,12 @@ function server(argv, config, cb) {
         ws.auth = req.auth;
 
         pool.connected(ws);
-        console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} connected`);
+        console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i} connected`);
 
         Timeout.client(ws);
 
         ws.on('close', () => {
-            console.error(`ok - ${ws.auth.t === "admin" ? "GPU" : "Client"} instance #${ws.auth.i} disconnected`);
+            console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i} disconnected`);
             pool.disconnected(ws);
         });
 

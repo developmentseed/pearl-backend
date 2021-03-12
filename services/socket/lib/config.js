@@ -1,8 +1,7 @@
 'use strict';
 
 const pkg = require('../package.json');
-const { promisify } = require('util');
-const request = promisify(require('request'));
+const API = require('./api');
 
 /**
  * @class Config
@@ -25,26 +24,19 @@ class Config {
 
         this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
-        this.API = args.api || process.env.API || 'http://localhost:2000';
+        this.api = new API(args.api || process.env.API || 'http://localhost:2000', this.SigningSecret);
 
         this.Port = args.port || 1999;
 
-        let maxretry = 20;
+        const maxretry = 20;
         let retry = maxretry;
         this.Timeout = false;
 
-        const api = new URL(this.API + '/api');
         do {
             try {
                 await sleep(5000);
 
-                console.error(`ok - GET ${api}`);
-                const meta = await request({
-                    json: true,
-                    method: 'GET',
-                    url: api
-                });
-
+                const meta = await this.api.meta();
                 if (meta.statusCode !== 200) throw new Error(meta.body);
 
                 this.Timeout = meta.body.limits.instance_window * 1000;

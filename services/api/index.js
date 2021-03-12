@@ -154,10 +154,7 @@ async function server(config, cb) {
     router.use(morgan('combined'));
     router.use(bodyparser.text());
     router.use(bodyparser.urlencoded({ extended: true }));
-    router.use(bodyparser.json({
-        limit: '50mb'
-    }));
-
+    router.use(bodyparser.json({ limit: '50mb' }));
 
     /*
      * Validate Auth0 JWT tokens
@@ -462,10 +459,9 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'instanceid');
-
                 await auth.is_admin(req);
 
-                // TODO Allow patching
+                return res.json(await instance.patch(req.params.instanceid, req.body));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -667,7 +663,8 @@ async function server(config, cb) {
      *       "id": 1,
      *       "uid": 123,
      *       "active": true,
-     *       "created": "<date>"
+     *       "created": "<date>",
+     *       "token": "<instance token>"
      *   }
      */
     router.get('/project/:projectid/instance/:instanceid', requiresAuth, async (req, res) => {
@@ -1656,7 +1653,7 @@ async function server(config, cb) {
     /**
      * @api {get} /api/instance/:instanceid Self Instance
      * @apiVersion 1.0.0
-     * @apiName GetInstance
+     * @apiName SelfInstance
      * @apiGroup Instance
      * @apiPermission admin
      *
@@ -1679,7 +1676,27 @@ async function server(config, cb) {
             await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
-            return res.json(await instance.get(req.params.instanceid));
+            return res.json(await instance.get(req.auth, req.params.instanceid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {delete} /api/instance Deactivate Instances
+     * @apiVersion 1.0.0
+     * @apiName DeactivateInstance
+     * @apiGroup Instance
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Set all instances to active: false - used by the socket server upon initial api connection
+     */
+    router.delete('/instance', requiresAuth, async (req, res) => {
+        try {
+            await auth.is_admin(req);
+
+            return res.json(await instance.reset());
         } catch (err) {
             return Err.respond(err, res);
         }
