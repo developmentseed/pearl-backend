@@ -123,10 +123,11 @@ class Instance {
         };
     }
 
-    token(auth, instanceid) {
+    token(auth, projectid, instanceid) {
         return jwt.sign({
             t: 'inst',
             u: auth.uid,
+            p: parseInt(projectid),
             i: parseInt(instanceid)
         }, this.config.SigningSecret, { expiresIn: '12h' });
     }
@@ -171,7 +172,7 @@ class Instance {
             return {
                 id: parseInt(pgres.rows[0].id),
                 created: pgres.rows[0].created,
-                token: this.token(auth, pgres.rows[0].id),
+                token: this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id),
                 pod: pod
             };
         } catch (err) {
@@ -205,7 +206,7 @@ class Instance {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
-        pgres.rows[0].token = this.token(auth, pgres.rows[0].id);
+        pgres.rows[0].token = this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id);
         return Instance.json(pgres.rows[0]);
     }
 }

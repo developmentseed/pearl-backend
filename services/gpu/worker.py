@@ -44,12 +44,13 @@ def main():
     os.environ["SOCKET"] = arg([os.environ.get("SOCKET"), args.socket], 'ws://localhost:1999')
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], 'dev-secret')
 
+    api = API(os.environ["API"], 'api.' + token, os.environ['INSTANCE_ID'])
+
     token = jwt.encode({
         "t": "admin",
-        "i": os.environ['INSTANCE_ID']
+        "p": api.project_id,
+        "i": api.instance_id
     }, os.environ["SigningSecret"], algorithm="HS256")
-
-    api = API(os.environ["API"], 'api.' + token, os.environ['INSTANCE_ID'])
 
     model = load(args.gpu_id, api)
 
