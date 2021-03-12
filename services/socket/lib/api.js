@@ -2,13 +2,19 @@
 
 const { promisify } = require('util');
 const request = promisify(require('request'));
+const jwt = require('jsonwebtoken');
 
 /**
  * @class API
  */
 class API {
-    constructor(base) {
+    constructor(base, SigningSecret) {
         this.base = base;
+
+        this.token = 'api.' + jwt.sign({
+            t: 'admin'
+        }, SigningSecret);
+
     }
 
     async meta() {
@@ -18,6 +24,9 @@ class API {
         const res = await request({
             json: true,
             method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${this.token}`
+            },
             url: url
         });
         console.error(`ok - RES ${url} ${res.statusCode}`);
@@ -32,6 +41,9 @@ class API {
         const res = await request({
             json: true,
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${this.token}`
+            },
             url: url
         });
         console.error(`ok - RES ${url} ${res.statusCode}`);
@@ -39,7 +51,7 @@ class API {
         return res;
     }
 
-    async state(projectid, instanceid, active) {
+    async instance_state(projectid, instanceid, active) {
         const url = new URL(this.base + `/api/project/${projectid}/instance/${instanceid}`);
 
         console.error(`ok - PATCH ${url}`);
@@ -47,10 +59,14 @@ class API {
             json: true,
             method: 'PATCH',
             url: url,
+            headers: {
+                'Authorization': `Bearer ${this.token}`
+            },
             body: {
                 active: active
             }
         });
+        console.error(res.body)
         console.error(`ok - RES ${url} ${res.statusCode}`);
 
         return res;

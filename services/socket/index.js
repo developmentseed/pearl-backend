@@ -22,8 +22,6 @@ if (require.main === module) {
     configure(argv);
 }
 
-const pool = new Pool();
-
 async function configure(argv = {}, cb) {
     try {
         const config = await Config.env(argv);
@@ -40,6 +38,8 @@ async function configure(argv = {}, cb) {
  * @param {function} cb
  */
 async function server(argv, config, cb) {
+    const pool = new Pool(config);
+
     app.get('/health', (req, res) => {
         return res.json({
             healthy: true,

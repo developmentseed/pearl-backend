@@ -459,10 +459,9 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'instanceid');
-
                 await auth.is_admin(req);
 
-                // TODO Allow patching
+                return res.json(await instance.patch(req.params.instanceid, req.body));
             } catch (err) {
                 return Err.respond(err, res);
             }

@@ -7,9 +7,10 @@
  * @prop {Object} clients instance_id to websocket connection map of clients
  */
 class Pool {
-    constructor() {
+    constructor(config) {
         this.gpus = new Map();
         this.clients = new Map();
+        this.config = config;
     }
 
     /**
@@ -27,6 +28,8 @@ class Pool {
 
         if (ws.auth.t === 'admin') {
             this.add_gpu(ws);
+
+            this.config.api.instance_state(ws.auth.p, ws.auth.i, true);
 
             if (this.has_client(ws.auth.i)) {
                 this.gpu(ws.auth.i).send(JSON.stringify({
@@ -66,6 +69,8 @@ class Pool {
     disconnected(ws) {
         if (ws.auth.t === 'admin') {
             this.gpus.delete(ws.auth.i);
+
+            this.config.api.instance_state(ws.auth.p, ws.auth.i, false);
 
             if (this.has_client(ws.auth.i)) {
                 this.client(ws.auth.i).send(JSON.stringify({

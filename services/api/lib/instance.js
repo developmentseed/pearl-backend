@@ -211,6 +211,37 @@ class Instance {
     }
 
     /**
+     * Update Instance Properties
+     *
+     * @param {Number} instanceid - Specific Instance id
+     * @param {Object} instance - Instance Object
+     * @param {String} instance.active The state of the instance
+     */
+    async patch(instanceid, instance) {
+        let pgres;
+
+        try {
+            pgres = await this.pool.query(`
+                UPDATE instances
+                    SET
+                        active = COALESCE($2, active)
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [
+                instanceid,
+                instance.active
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to update Instance');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Instance not found');
+
+        return Instance.json(pgres.rows[0]);
+    }
+
+    /**
      * Set all instance states to active: false
      */
     async reset() {
