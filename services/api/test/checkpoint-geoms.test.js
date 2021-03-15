@@ -117,7 +117,12 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+           ],
+           analytics: {
+               counts: 1,
+               f1score: 1,
+               percent: 1
+           }
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -142,7 +147,12 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+           ],
+           analytics: {
+               counts: 1,
+               f1score: 1,
+               percent: 1
+           }
         });
 
         t.end();
@@ -219,7 +229,12 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+           ],
+           analytics: {
+               counts: 1,
+               f1score: 1,
+               percent: 1
+           }
         });
 
         t.end();
@@ -259,7 +274,12 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+           ],
+           analytics: {
+               counts: 1,
+               f1score: 1,
+               percent: 1
+           }
         });
 
         t.end();

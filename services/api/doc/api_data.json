@@ -321,6 +321,34 @@
           },
           {
             "group": "Body",
+            "type": "Object",
+            "optional": false,
+            "field": "analytics",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "analytics.counts",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "analytics.percent",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "analytics.f1score",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
