@@ -116,9 +116,9 @@ test('new model', (t) => {
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body), [
-            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
-        ], 'expected props');
+        t.deepEquals(Object.keys(body).sort(), [
+            'id', 'bounds', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
+        ].sort(), 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
 
@@ -129,6 +129,7 @@ test('new model', (t) => {
             active: true,
             uid: 1,
             name: 'NAIP Supervised',
+            bounds: [-180, -90, 180, 90],
             model_type: 'pytorch_example',
             model_inputshape: [256, 256, 4],
             model_zoom: 17,
@@ -168,9 +169,9 @@ test('new model - storage: true', (t) => {
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body), [
-            'id', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
-        ], 'expected props');
+        t.deepEquals(Object.keys(body).sort(), [
+            'id', 'bounds', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
+        ].sort(), 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
 
@@ -181,6 +182,7 @@ test('new model - storage: true', (t) => {
             active: true,
             uid: 1,
             name: 'NAIP Supervised',
+            bounds: [-180, -90, 180, 90],
             model_type: 'pytorch_example',
             model_inputshape: [256, 256, 4],
             model_zoom: 17,

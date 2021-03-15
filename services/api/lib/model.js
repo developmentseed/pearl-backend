@@ -146,7 +146,19 @@ class Model {
                         bounds = COALESCE(ST_GeomFromGeoJSON($3::JSON), bounds)
                     WHERE
                         id = $1
-                    RETURNING *
+                    RETURNING
+                        id,
+                        created,
+                        active,
+                        uid,
+                        name,
+                        model_type,
+                        model_inputshape,
+                        model_zoom,
+                        storage,
+                        classes,
+                        meta,
+                        ST_AsGeoJSON(bounds)::JSON AS bounds
             `, [
                 modelid,
                 model.storage,
@@ -158,8 +170,6 @@ class Model {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Model not found');
 
-        if (model.bounds) pgres.rows[0].bounds = model.bounds;
-        else delete pgres.rows[0].bounds
         return Model.json(pgres.rows[0]);
     }
 
