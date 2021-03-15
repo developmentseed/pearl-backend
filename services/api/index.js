@@ -1556,7 +1556,7 @@ async function server(config, cb) {
      * @apiVersion 1.0.0
      * @apiName ListMosaic
      * @apiGroup Mosaic
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return a list of currently supported mosaic layers
@@ -1569,7 +1569,7 @@ async function server(config, cb) {
      *       ]
      *   }
      */
-    router.get('/mosaic', requiresAuth, async (req, res) => {
+    router.get('/mosaic', async (req, res) => {
         try {
             return res.json(Mosaic.list());
         } catch (err) {
