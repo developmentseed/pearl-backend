@@ -1,4 +1,5 @@
 import os
+import jwt
 import json
 import requests
 import pyproj
@@ -7,8 +8,10 @@ import logging
 import geojson
 import mercantile
 import zipfile
+import urllib3
 from os import path
 from io import BytesIO
+from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from shapely.ops import transform
 from shapely.geometry import shape
@@ -22,9 +25,13 @@ tiler = tileschemes.WebMercator()
 
 class API():
 
-    def __init__(self, url, token, instance_id):
+    def __init__(self, url, instance_id):
         self.url = url
-        self.token = token
+
+        self.token = 'api.' + jwt.encode({
+            "t": "admin",
+            "i": os.environ['INSTANCE_ID']
+        }, os.environ["SigningSecret"], algorithm="HS256")
 
         self.tmp_dir = '/tmp/gpu-api'
 
@@ -32,11 +39,25 @@ class API():
         os.makedirs(self.tmp_dir + '/tiles', exist_ok=True)
         os.makedirs(self.tmp_dir + '/checkpoints', exist_ok=True)
 
+        self.requests = requests.Session()
+        self.requests.mount(url, HTTPAdapter(max_retries = urllib3.util.Retry(
+            total = 10,
+            backoff_factor = 0.1,
+            status_forcelist = [ 500, 502, 503, 504 ]
+        )))
+
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
 
-        self.project_id = self.instance['project_id']
         self.instance_id = instance_id
+        self.project_id = self.instance['project_id']
+
+        self.token = 'api.' + jwt.encode({
+            "t": "admin",
+            "p": self.project_id,
+            "i": self.instance_id
+        }, os.environ["SigningSecret"], algorithm="HS256")
+
         self.project = self.project_meta()
 
         self.model_id = self.project['model_id']
@@ -50,7 +71,7 @@ class API():
         url = self.url + '/api'
 
         LOGGER.info("ok - GET " + url)
-        r = requests.get(url, headers={
+        r = self.requests.get(url, headers={
             "authorization": "Bearer " + self.token
         })
 
@@ -63,7 +84,7 @@ class API():
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint'
 
         LOGGER.info("ok - POST " + url)
-        r = requests.post(url,
+        r = self.requests.post(url,
             headers={
                 "authorization": "Bearer " + self.token,
                 "content-type": "application/json"
@@ -95,7 +116,7 @@ class API():
 
         encoder = MultipartEncoder([('file', ('filename', open(zip_fs, 'rb'), 'application/zip'))])
 
-        r = requests.post(url,
+        r = self.requests.post(url,
             headers={
                 "Authorization": "Bearer " + self.token,
                 'Content-Type': encoder.content_type
@@ -112,7 +133,7 @@ class API():
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'
 
         LOGGER.info("ok - POST " + url)
-        r = requests.post(url,
+        r = self.requests.post(url,
             headers={
                 "authorization": "Bearer " + self.token,
                 "content-type": "application/json"
@@ -140,7 +161,7 @@ class API():
 
         encoder = MultipartEncoder([('file', ('filename', open(geo_path, 'rb'), 'image/tiff'))])
 
-        r = requests.post(url,
+        r = self.requests.post(url,
             headers={
                 "Authorization": "Bearer " + self.token,
                 'Content-Type': encoder.content_type
@@ -157,7 +178,7 @@ class API():
         url = self.url + '/api/mosaic/' + self.mosaic_id
 
         LOGGER.info("ok - GET " + url)
-        r = requests.get(url, headers={
+        r = self.requests.get(url, headers={
             "authorization": "Bearer " + self.token
         })
 
@@ -175,7 +196,7 @@ class API():
 
             if cache or not os.path.isfile(tmpfs):
                 LOGGER.info("ok - GET " + url)
-                r = requests.get(url, headers={
+                r = self.requests.get(url, headers={
                     "authorization": "Bearer " + self.token
                 })
 
@@ -201,7 +222,7 @@ class API():
             return memraster
         else:
             LOGGER.info("ok - GET " + url)
-            r = requests.get(url, headers={
+            r = self.requests.get(url, headers={
                 "authorization": "Bearer " + self.token
             })
 
@@ -214,7 +235,7 @@ class API():
         url = self.url + '/api/instance/' + str(instance_id)
 
         LOGGER.info("ok - GET " + url)
-        r = requests.get(url, headers={
+        r = self.requests.get(url, headers={
             "authorization": "Bearer " + self.token
         })
 
@@ -227,7 +248,7 @@ class API():
         url = self.url + '/api/project/' + str(self.project_id)
 
         LOGGER.info("ok - GET " + url)
-        r = requests.get(url, headers={
+        r = self.requests.get(url, headers={
             "authorization": "Bearer " + self.token
         })
 
@@ -240,7 +261,7 @@ class API():
         url = self.url + '/api/model/' + str(self.model_id)
 
         LOGGER.info("ok - GET " + url)
-        r = requests.get(url, headers={
+        r = self.requests.get(url, headers={
             "authorization": "Bearer " + self.token
         })
 
@@ -257,7 +278,7 @@ class API():
 
             LOGGER.info("ok - GET " + url)
 
-            r = requests.get(url, headers={
+            r = self.requests.get(url, headers={
                 "authorization": "Bearer " + self.token
             })
 

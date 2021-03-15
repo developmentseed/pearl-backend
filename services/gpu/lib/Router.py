@@ -49,10 +49,11 @@ class Router():
                             await self.msg[message](msg.get('data', {}), self.websocket)
                         except Exception as e:
                             LOGGER.error("not ok - failed to process: " + message)
+                            LOGGER.error("Error: {0}".format(e))
                             traceback.print_exc()
 
                     else:
-                        LOGGER.info('ok - Unknown Message')
+                        LOGGER.info('ok - Unknown Message: {}'.format(msg.get('message')))
 
                 elif msg.get('action') is not None:
                     action = msg.get('action')
@@ -63,9 +64,10 @@ class Router():
                             await self.act[action](msg.get('data', {}), self.websocket)
                         except Exception as e:
                             LOGGER.error("not ok - failed to process: " + action)
+                            LOGGER.error("Error: {0}".format(e))
                             traceback.print_exc()
                     elif action == "instance#terminate":
                         terminate = True
                     else:
-                        LOGGER.info('ok - Unknown Action')
+                        LOGGER.info('ok - Unknown Action: {}'.format(msg.get('action')))
 

@@ -74,6 +74,7 @@ class TorchFineTuning(ModelSession):
 
         self.model_fs = api.model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        print(self.device)
 
         # will need to figure out for re-training
         self.output_channels = len(self.classes)

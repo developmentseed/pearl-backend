@@ -37,23 +37,19 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = arg([args.gpu_id], "")
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-    os.environ['INSTANCE_ID'] = arg([os.environ.get('INSTANCE_ID'), args.instance_id])
+    # Fallback to INSTANCE_ID 1 if not set - assume local test env
+    os.environ['INSTANCE_ID'] = arg([os.environ.get('INSTANCE_ID'), args.instance_id, '1'])
     os.environ["API"] = arg([os.environ.get("API"), args.api], 'http://localhost:2000')
 
     os.environ["SOCKET"] = arg([os.environ.get("SOCKET"), args.socket], 'ws://localhost:1999')
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], 'dev-secret')
 
-    token = jwt.encode({
-        "t": "admin",
-        "i": os.environ['INSTANCE_ID']
-    }, os.environ["SigningSecret"], algorithm="HS256")
-
-    api = API(os.environ["API"], 'api.' + token, os.environ['INSTANCE_ID'])
+    api = API(os.environ["API"], os.environ['INSTANCE_ID'])
 
     model = load(args.gpu_id, api)
 
     asyncio.get_event_loop().run_until_complete(
-        connection('{}?token={}'.format(os.environ["SOCKET"], token), model)
+        connection('{}?token={}'.format(os.environ["SOCKET"], api.token.replace('api.', '')), model)
     )
 
 async def connection(uri, model):
