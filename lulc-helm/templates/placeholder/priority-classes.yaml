@@ -12,6 +12,6 @@ kind: PriorityClass
 metadata:
   name: normal
 value: 1
-preemptionPolicy: Never
+preemptionPolicy: PreemptLowerPriority
 globalDefault: true
 description: 'normal'
