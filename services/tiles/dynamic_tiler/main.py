@@ -7,12 +7,12 @@ from starlette.middleware.cors import CORSMiddleware
 from titiler.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 from titiler.middleware import CacheControlMiddleware, TotalTimeMiddleware
 from titiler.endpoints.factory import TilerFactory, TMSFactory
-from titiler.resources.enums import OptionalHeaders
+from titiler.resources.enums import OptionalHeader
 
 from .endpoints.factory import MosaicTilerFactory
 from .cache import setup_cache
 from .settings import ApiSettings
-from .dependencies import CustomPathParams
+from .dependencies import CustomPathParams, CustomMosaicParams
 
 
 api_settings = ApiSettings()
@@ -32,17 +32,23 @@ if api_settings.cors_origins:
 optional_headers = []
 if api_settings.debug:
     app.add_middleware(TotalTimeMiddleware)
-    optional_headers = [OptionalHeaders.x_assets, OptionalHeaders.server_timing]
+    optional_headers = [OptionalHeader.x_assets, OptionalHeader.server_timing]
 
 app.add_event_handler("startup", setup_cache)
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
 
 mosaic_endpoint = MosaicTilerFactory(
-    router_prefix="mosaic", optional_headers=optional_headers
+    path_dependency=CustomMosaicParams,
+    router_prefix="mosaic",
+    optional_headers=optional_headers,
 )
 app.include_router(mosaic_endpoint.router, prefix="/mosaic", tags=["Mosaic"])
 
-cog_endpoints = TilerFactory(router_prefix="cog", optional_headers=optional_headers, path_dependency=CustomPathParams)
+cog_endpoints = TilerFactory(
+    path_dependency=CustomPathParams,
+    router_prefix="cog",
+    optional_headers=optional_headers,
+)
 app.include_router(cog_endpoints.router, prefix="/cog", tags=["COG"])
 
 tms_endpoint = TMSFactory()
