@@ -165,7 +165,8 @@ class ModelSrv():
         checkpoint = self.api.create_checkpoint(
             body['name'],
             classes,
-            body['geoms']
+            body['geoms'],
+            body['analytics']
         )
 
         chdir = self.checkpoint_dir + str(checkpoint['id']) + '/'
