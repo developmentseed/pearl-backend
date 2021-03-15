@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS models (
 
     storage                 BOOLEAN,
     classes                 JSONB,
-    meta                    JSONB
+    meta                    JSONB,
+    bounds                  GEOMETRY(POLYGON, 4326)
 );
 
 CREATE TABLE IF NOT EXISTS projects (
