@@ -166,7 +166,7 @@ class ModelSrv():
             body['name'],
             classes,
             body['geoms'],
-            body['analytics']
+            body.get('analytics')
         )
 
         chdir = self.checkpoint_dir + str(checkpoint['id']) + '/'
