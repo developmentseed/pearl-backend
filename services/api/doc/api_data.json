@@ -1008,6 +1008,13 @@
             "optional": true,
             "field": "storage",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number[]/Null",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>Recommended geographic area on which this model can be used</p>"
           }
         ]
       }
@@ -1531,7 +1538,7 @@
   },
   {
     "type": "patch",
-    "url": "/api/project",
+    "url": "/api/project/:projectid",
     "title": "Patch Project",
     "version": "1.0.0",
     "name": "PatchProject",
