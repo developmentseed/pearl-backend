@@ -858,6 +858,13 @@
           },
           {
             "group": "Body",
+            "type": "Number[]/Null",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>Recommended geographic area on which this model can be used</p>"
+          },
+          {
+            "group": "Body",
             "type": "Object",
             "optional": false,
             "field": "meta",
@@ -1374,9 +1381,9 @@
     "group": "Mosaic",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return a list of currently supported mosaic layers</p>",

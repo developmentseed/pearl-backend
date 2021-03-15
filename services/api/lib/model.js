@@ -33,7 +33,8 @@ class Model {
             model_zoom: row.model_zoom,
             storage: row.storage,
             classes: row.classes,
-            meta: row.meta
+            meta: row.meta,
+            bounds: row.bounds
         };
     }
 
@@ -57,9 +58,10 @@ class Model {
                     model_zoom,
                     storage,
                     classes,
-                    meta
+                    meta,
+                    bounds
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
                 ) RETURNING *
             `, [
                 model.active,
@@ -70,7 +72,8 @@ class Model {
                 model.model_zoom,
                 model.storage,
                 JSON.stringify(model.classes),
-                model.meta
+                model.meta,
+                model.bounds
             ]);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
@@ -109,6 +112,7 @@ class Model {
      * @param {Number} modelid - Specific Model id
      * @param {Object} model - Model Object
      * @param {Boolean} model.storage Has the storage been uploaded
+     * @param {null|Number[]} model.bounds EPSG4326 Bounds of model
      */
     async patch(modelid, model) {
         let pgres;
@@ -117,13 +121,15 @@ class Model {
             pgres = await this.pool.query(`
                 UPDATE models
                     SET
-                        storage = COALESCE($2, storage)
+                        storage = COALESCE($2, storage),
+                        bounds = COALESCE($3, bounds)
                     WHERE
                         id = $1
                     RETURNING *
             `, [
                 modelid,
-                model.storage
+                model.storage,
+                model.bounds
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Model');
@@ -166,7 +172,8 @@ class Model {
                     created,
                     active,
                     uid,
-                    name
+                    name,
+                    bounds
                 FROM
                     models
                 WHERE
@@ -184,7 +191,8 @@ class Model {
                     created: r.created,
                     active: r.active,
                     uid: parseInt(r.uid),
-                    name: r.name
+                    name: r.name,
+                    bounds: r.bounds
                 };
             })
         };
@@ -211,7 +219,8 @@ class Model {
                     model_zoom,
                     storage,
                     classes,
-                    meta
+                    meta,
+                    bounds
                 FROM
                     models
                 WHERE
