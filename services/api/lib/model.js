@@ -2,6 +2,8 @@
 
 const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
+const poly = require('@turf/bbox-polygon').default;
+const bbox = require('@turf/bbox').default;
 
 class Model {
     constructor(config) {
@@ -22,6 +24,8 @@ class Model {
      * @returns {Object}
      */
     static json(row) {
+        if (typeof row.bounds === 'string') row.bounds = JSON.parse(row.bounds)
+
         return {
             id: parseInt(row.id),
             created: row.created,
@@ -34,7 +38,7 @@ class Model {
             storage: row.storage,
             classes: row.classes,
             meta: row.meta,
-            bounds: row.bounds
+            bounds: bbox(row.bounds)
         };
     }
 
@@ -46,6 +50,9 @@ class Model {
      */
     async create(model, user) {
         let pgres;
+
+        if (!model.bounds) model.bounds = [-180, -90, 180, 90];
+        model.bounds = poly([-180, -90, 180, 90]).geometry;
 
         try {
             pgres = await this.pool.query(`
@@ -61,8 +68,20 @@ class Model {
                     meta,
                     bounds
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
-                ) RETURNING *
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromGeoJSON($10::JSON)
+                ) RETURNING
+                    id,
+                    created,
+                    active,
+                    uid,
+                    name,
+                    model_type,
+                    model_inputshape,
+                    model_zoom,
+                    storage,
+                    classes,
+                    meta,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds
             `, [
                 model.active,
                 user.uid,
@@ -73,12 +92,13 @@ class Model {
                 model.storage,
                 JSON.stringify(model.classes),
                 model.meta,
-                model.bounds
+                JSON.stringify(model.bounds)
             ]);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }
 
+        pgres.rows[0].bounds = model.bounds;
         return Model.json(pgres.rows[0]);
     }
 
@@ -117,19 +137,20 @@ class Model {
     async patch(modelid, model) {
         let pgres;
 
+        if (model.bounds) model.bounds = poly(model.bounds).geometry;
         try {
             pgres = await this.pool.query(`
                 UPDATE models
                     SET
                         storage = COALESCE($2, storage),
-                        bounds = COALESCE($3, bounds)
+                        bounds = COALESCE(ST_GeomFromGeoJSON($3::JSON), bounds)
                     WHERE
                         id = $1
                     RETURNING *
             `, [
                 modelid,
                 model.storage,
-                model.bounds
+                JSON.stringify(model.bounds)
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Model');
@@ -137,6 +158,8 @@ class Model {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Model not found');
 
+        if (model.bounds) pgres.rows[0].bounds = model.bounds;
+        else delete pgres.rows[0].bounds
         return Model.json(pgres.rows[0]);
     }
 
@@ -173,7 +196,7 @@ class Model {
                     active,
                     uid,
                     name,
-                    bounds
+                    ST_AsGeoJSON(bounds)::JSON AS bounds
                 FROM
                     models
                 WHERE
@@ -192,7 +215,7 @@ class Model {
                     active: r.active,
                     uid: parseInt(r.uid),
                     name: r.name,
-                    bounds: r.bounds
+                    bounds: bbox(r.bounds)
                 };
             })
         };
@@ -220,7 +243,7 @@ class Model {
                     storage,
                     classes,
                     meta,
-                    bounds
+                    ST_AsGeoJSON(bounds)::JSON AS bounds
                 FROM
                     models
                 WHERE
