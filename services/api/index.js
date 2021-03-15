@@ -572,7 +572,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {patch} /api/project Patch Project
+     * @api {patch} /api/project/:projectid Patch Project
      * @apiVersion 1.0.0
      * @apiName PatchProject
      * @apiGroup Projects
