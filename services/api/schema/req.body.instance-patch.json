@@ -5,6 +5,14 @@
         "active": {
             "type": "boolean",
             "description": "Is the instance currently running"
+        },
+        "aoi_id": {
+            "type": "integer",
+            "description": "The current AOI loaded on the instance"
+        },
+        "checkpoint_id": {
+            "type": "integer",
+            "description": "The current checkpoint loaded on the instance"
         }
     }
 }

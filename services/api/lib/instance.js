@@ -97,6 +97,8 @@ class Instance {
                     instances
                 WHERE
                     project_id = $3
+                ORDER BY
+                    last_update
                 LIMIT
                     $1
                 OFFSET
@@ -123,6 +125,15 @@ class Instance {
         };
     }
 
+    /**
+     * Generate an Instance Token for authenticated with a websocket
+     *
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     * @param {Number} instanceid Instance ID to get
+     *
+     * @returns {String} Auth Token
+     */
     token(auth, projectid, instanceid) {
         return jwt.sign({
             t: 'inst',
@@ -132,6 +143,14 @@ class Instance {
         }, this.config.SigningSecret, { expiresIn: '12h' });
     }
 
+    /**
+     * Create a new GPU instance
+     *
+     * @param {Object} auth - Express Request Auth object
+     * @param {Object} instance - Instance Object
+     * @param {Number} instance.aoi_id The current AOI loaded on the instance
+     * @param {Number} instance.checkpoint_id The current checkpoint loaded on the instance
+     */
     async create(auth, instance) {
         if (!auth.uid) {
             throw new Err(500, null, 'Server could not determine user id');
@@ -140,31 +159,28 @@ class Instance {
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO instances (
-                    project_id
+                    project_id,
+                    aoi_id,
+                    checkpoint_id
                 ) VALUES (
                     $1
                 ) RETURNING *
             `, [
-                instance.project_id
+                instance.project_id,
+                instance.aoi_id,
+                instance.checkpoint_id
             ]);
 
             const instanceId = parseInt(pgres.rows[0].id);
 
             let pod = {};
             if (this.config.Environment !== 'local') {
-                const podSpec = this.kube.makePodSpec(instanceId, [{
-                    name: 'INSTANCE_ID',
-                    value: instanceId.toString()
-                },{
-                    name: 'API',
-                    value: this.config.ApiUrl
-                },{
-                    name: 'SOCKET',
-                    value: this.config.SocketUrl
-                },{
-                    name: 'SigningSecret',
-                    value: this.config.SigningSecret
-                }]);
+                const podSpec = this.kube.makePodSpec(instanceId, [
+                    { name: 'INSTANCE_ID', value: instanceId.toString() },
+                    { name: 'API', value: this.config.ApiUrl },
+                    { name: 'SOCKET', value: this.config.SocketUrl },
+                    { name: 'SigningSecret', value: this.config.SigningSecret }
+                ]);
 
                 pod = await this.kube.createPod(podSpec);
             }
@@ -183,6 +199,7 @@ class Instance {
     /**
      * Retrieve information about an instance
      *
+     * @param {Object} auth - Express Request Auth object
      * @param {Number} instanceid Instance ID to get
      */
     async get(auth, instanceid) {
@@ -216,6 +233,8 @@ class Instance {
      * @param {Number} instanceid - Specific Instance id
      * @param {Object} instance - Instance Object
      * @param {String} instance.active The state of the instance
+     * @param {Number} instance.aoi_id The current AOI loaded on the instance
+     * @param {Number} instance.checkpoint_id The current checkpoint loaded on the instance
      */
     async patch(instanceid, instance) {
         let pgres;
@@ -224,13 +243,18 @@ class Instance {
             pgres = await this.pool.query(`
                 UPDATE instances
                     SET
-                        active = COALESCE($2, active)
+                        active = COALESCE($2, active),
+                        aoi_id = COALESCE($3, aoi_id),
+                        checkpoint_id = COALESCE($4, checkpoint_id),
+                        last_update = NOW()
                     WHERE
                         id = $1
                     RETURNING *
             `, [
                 instanceid,
-                instance.active
+                instance.active,
+                instance.aoi_id,
+                instance.checkpoint_id
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Instance');
@@ -243,6 +267,8 @@ class Instance {
 
     /**
      * Set all instance states to active: false
+     *
+     * @returns {boolean}
      */
     async reset() {
         try {
