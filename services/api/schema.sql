@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS checkpoints (
     created     TIMESTAMP NOT NULL DEFAULT NOW(),
     storage     BOOLEAN NOT NULL DEFAULT False,
     geoms       JSONB[],
+    analytics   JSONB,
 
     CONSTRAINT fk_project
         FOREIGN KEY (project_id)

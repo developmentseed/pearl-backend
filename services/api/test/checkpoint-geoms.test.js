@@ -117,7 +117,13 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+            ],
+            analytics: [
+                { counts: 1, f1score: 1, percent: 1 },
+                { counts: 2, f1score: 2, percent: 2 },
+                { counts: 3, f1score: 3, percent: 3 },
+                { counts: 4, f1score: 4, percent: 4 }
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -142,7 +148,13 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+            ],
+            analytics: [
+                { counts: 1, f1score: 1, percent: 1 },
+                { counts: 2, f1score: 2, percent: 2 },
+                { counts: 3, f1score: 3, percent: 3 },
+                { counts: 4, f1score: 4, percent: 4 }
+            ]
         });
 
         t.end();
@@ -219,7 +231,13 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+            ],
+            analytics: [
+                { counts: 1, f1score: 1, percent: 1 },
+                { counts: 2, f1score: 2, percent: 2 },
+                { counts: 3, f1score: 3, percent: 3 },
+                { counts: 4, f1score: 4, percent: 4 }
+            ]
         });
 
         t.end();
@@ -259,7 +277,13 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
                 { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-           ]
+            ],
+            analytics: [
+                { counts: 1, f1score: 1, percent: 1 },
+                { counts: 2, f1score: 2, percent: 2 },
+                { counts: 3, f1score: 3, percent: 3 },
+                { counts: 4, f1score: 4, percent: 4 }
+            ]
         });
 
         t.end();

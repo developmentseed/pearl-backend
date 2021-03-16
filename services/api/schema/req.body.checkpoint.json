@@ -9,6 +9,29 @@
         "name": {
             "type": "string"
         },
+        "analytics": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "counts",
+                    "percent",
+                    "f1score"
+                ],
+                "properties": {
+                    "counts": {
+                        "type": "number"
+                    },
+                    "percent": {
+                        "type": "number"
+                    },
+                    "f1score": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
         "classes": {
             "type": "array",
             "description": "Named output classes & their associated colours",

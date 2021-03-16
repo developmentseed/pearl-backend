@@ -322,6 +322,34 @@
           {
             "group": "Body",
             "type": "Object[]",
+            "optional": true,
+            "field": "analytics",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "analytics.counts",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "analytics.percent",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Number",
+            "optional": false,
+            "field": "analytics.f1score",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object[]",
             "optional": false,
             "field": "classes",
             "description": "<p>Named output classes &amp; their associated colours undefined</p>"
