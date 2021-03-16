@@ -28,6 +28,8 @@ jobs:
         python-version: '3.6'
     - name: Setup git
       run: git config --global user.email "noreply@developmentseed.org" && git config --global user.name "Github Action"
+    - name: Create more disk space
+      run: sudo rm -rf /usr/share/dotnet && sudo rm -rf /opt/ghc && sudo rm -rf "/usr/local/share/boost" && sudo rm -rf "$AGENT_TOOLSDIRECTORY"
     - name: Install Chartpress
       run: |
         pip install -v chartpress
