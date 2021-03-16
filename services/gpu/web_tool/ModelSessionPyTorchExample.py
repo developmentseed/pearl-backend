@@ -126,7 +126,7 @@ class TorchFineTuning(ModelSession):
         return output, output_features
 
     def retrain(self, classes, **kwargs):
-        print (self.classes)
+        #print (self.classes)
 
 
         names = [x['name'] for x in classes]
@@ -151,14 +151,21 @@ class TorchFineTuning(ModelSession):
 
         # update and attribute self.classes with retraining info
         for i, c in enumerate(self.classes):
-            print(c)
+            #print (c)
+            # retraing samples that are in starter model
             if c['name'] in names:
                 self.classes[i]['retraining_counts'] = counts[names.index(c['name'])]
                 self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
+            # starter model classes that are not in user specified retraining samples
             else:
                 self.classes[i]['retraining_counts'] = 0
                 self.classes[i]['retraining_counts_percent'] = 0
+        #print (self.classes)
+
+        # combine starter model classes and retrain classes
+        self.classes = self.classes + [x for x in retrain_classes if not x in self.classes]
         print(self.classes)
+
 
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
 
@@ -167,6 +174,7 @@ class TorchFineTuning(ModelSession):
              names_retrain.append(list(np.repeat(names[i], c)))
 
         names_retrain = [x for sublist in names_retrain for x in sublist]
+        print(names_retrain)
 
         ints_retrain = []
         for name in names_retrain:
@@ -251,11 +259,7 @@ class TorchFineTuning(ModelSession):
 
         # where the unique cls id exist, fill in f1 per calss
         per_class_f1_final[f1_labels] =  per_class_f1
-<<<<<<< HEAD
-        # where is the missing id, fill in np.nan
-=======
         # where is the missing id, fill in np.nan, but actually 0 for db to not break
->>>>>>> dd73f176c5dfc88ac56fafc1319850e514a78354
         per_class_f1_final[missing_labels] = 0
 
         # add  retrainingper class f1-scores counts to classes attribute
