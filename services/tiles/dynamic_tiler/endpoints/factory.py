@@ -14,10 +14,9 @@ from rio_tiler.io import BaseReader, COGReader
 from titiler import utils
 from titiler.endpoints.factory import BaseTilerFactory, img_endpoint_params
 from titiler.models.mapbox import TileJSON
-from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHeaders
+from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHeader
 from titiler.dependencies import WebMercatorTMSParams
 
-from ..dependencies import MosaicParams
 from ..cache import cached
 
 from fastapi import Depends, Path, Query
@@ -36,10 +35,10 @@ class MosaicTilerFactory(BaseTilerFactory):
     reader: Type[BaseBackend] = MosaicBackend
     dataset_reader: Type[BaseReader] = COGReader
 
-    path_dependency: Type[MosaicParams] = MosaicParams
-
     # BaseBackend does not support other TMS than WebMercator
     tms_dependency: Callable[..., TileMatrixSet] = WebMercatorTMSParams
+
+    backend_options: Dict = field(default_factory=dict)
 
     def register_routes(self):
         """Register endpoints."""
@@ -50,7 +49,7 @@ class MosaicTilerFactory(BaseTilerFactory):
         )
         def info(src_path=Depends(self.path_dependency)):
             """Return basic info."""
-            with self.reader(src_path.url) as src_dst:
+            with self.reader(src_path, **self.backend_options) as src_dst:
                 return src_dst.info()
 
         @self.router.get(r"/{layer}/tiles/{z}/{x}/{y}", **img_endpoint_params)
@@ -74,6 +73,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             layer_params=Depends(self.layer_dependency),
             dataset_params=Depends(self.dataset_dependency),
             render_params=Depends(self.render_dependency),
+            colormap=Depends(self.colormap_dependency),
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),
@@ -88,9 +88,10 @@ class MosaicTilerFactory(BaseTilerFactory):
             threads = int(os.getenv("MOSAIC_CONCURRENCY", MAX_THREADS))
             with utils.Timer() as t:
                 with self.reader(
-                    src_path.url,
+                    src_path,
                     reader=self.dataset_reader,
                     reader_options=self.reader_options,
+                    **self.backend_options,
                 ) as src_dst:
                     mosaic_read = t.from_start
                     timings.append(("mosaicread", round(mosaic_read * 1000, 2)))
@@ -100,8 +101,8 @@ class MosaicTilerFactory(BaseTilerFactory):
                         y,
                         z,
                         pixel_selection=pixel_selection.method(),
-                        threads=threads,
                         tilesize=tilesize,
+                        threads=threads,
                         **layer_params.kwargs,
                         **dataset_params.kwargs,
                         **kwargs,
@@ -122,20 +123,21 @@ class MosaicTilerFactory(BaseTilerFactory):
                 content = image.render(
                     add_mask=render_params.return_mask,
                     img_format=format.driver,
-                    colormap=render_params.colormap,
+                    colormap=colormap,
                     **format.profile,
+                    **render_params.kwargs,
                 )
             timings.append(("format", round(t.elapsed * 1000, 2)))
 
-            if OptionalHeaders.server_timing in self.optional_headers:
+            if OptionalHeader.server_timing in self.optional_headers:
                 headers["Server-Timing"] = ", ".join(
                     [f"{name};dur={time}" for (name, time) in timings]
                 )
 
-            if OptionalHeaders.x_assets in self.optional_headers:
+            if OptionalHeader.x_assets in self.optional_headers:
                 headers["X-Assets"] = ",".join(data.assets)
 
-            return Response(content, media_type=format.mimetype, headers=headers)
+            return Response(content, media_type=format.mediatype, headers=headers)
 
         @self.router.get(
             "/{layer}/tilejson.json",
@@ -145,7 +147,7 @@ class MosaicTilerFactory(BaseTilerFactory):
         )
         def tilejson(
             request: Request,
-            src_path=Depends(self.path_dependency),
+            layer: str = Query(..., description="Mosaic Layer name ('{username}.{layer}')"),
             tile_format: Optional[ImageType] = Query(
                 None, description="Output image type. Default is auto."
             ),
@@ -161,14 +163,18 @@ class MosaicTilerFactory(BaseTilerFactory):
             layer_params=Depends(self.layer_dependency),  # noqa
             dataset_params=Depends(self.dataset_dependency),  # noqa
             render_params=Depends(self.render_dependency),  # noqa
+            colormap=Depends(self.colormap_dependency),  # noqa
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),  # noqa
             kwargs: Dict = Depends(self.additional_dependency),  # noqa
         ):
-            """Return TileJSON document for a COG."""
+            """Return TileJSON document for a Mosaic."""
+            # Validate layer
+            src_path = self.path_dependency(layer)
+
             kwargs = {
-                "layer": src_path.layer,
+                "layer": layer,
                 "z": "{z}",
                 "x": "{x}",
                 "y": "{y}",
@@ -187,7 +193,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             qs = urlencode(list(q.items()))
             tiles_url += f"?{qs}"
 
-            with self.reader(src_path.url) as src_dst:
+            with self.reader(src_path, **self.backend_options) as src_dst:
                 center = list(src_dst.center)
                 if minzoom:
                     center[-1] = minzoom
@@ -196,6 +202,6 @@ class MosaicTilerFactory(BaseTilerFactory):
                     "center": tuple(center),
                     "minzoom": minzoom if minzoom is not None else src_dst.minzoom,
                     "maxzoom": maxzoom if maxzoom is not None else src_dst.maxzoom,
-                    "name": os.path.basename(src_path.layer),
+                    "name": "mosaic",
                     "tiles": [tiles_url],
                 }

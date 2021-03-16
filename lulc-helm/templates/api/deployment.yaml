@@ -61,4 +61,8 @@ spec:
               value: https://api.{{ .Values.domain }}
             - name: SocketUrl
               value: wss://socket.{{ .Values.domain }}
+            - name: nodeSelectorKey
+              value: {{ .Values.api.env.nodeSelectorKey }}
+            - name: nodeSelectorValue
+              value: {{ .Values.api.env.nodeSelectorValue }}
 {{- end }}
