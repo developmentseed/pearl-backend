@@ -9,6 +9,6 @@ WORKDIR $HOME/gpu
 
 RUN apt-get update \
     && apt-get install -y wget python3 python3-pip \
-    && pip3 install -r requirements.txt
+    && pip3 install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 
 CMD python3 worker.py
