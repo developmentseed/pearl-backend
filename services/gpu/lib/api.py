@@ -90,7 +90,6 @@ class API():
         }
 
         if analytics is not None:
-            print(analytics)
             data['analytics'] = analytics
 
         LOGGER.info("ok - POST " + url)
@@ -101,8 +100,6 @@ class API():
             },
             data = json.dumps(data)
         )
-
-        print(r.text)
 
         r.raise_for_status()
 

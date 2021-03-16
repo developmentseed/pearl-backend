@@ -24,7 +24,8 @@ class Config {
 
         this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
-        this.api = new API(args.api || process.env.API || 'http://localhost:2000', this.SigningSecret);
+        this.api_url = args.api || process.env.API || 'http://localhost:2000';
+        this.api = new API(api_url, this.SigningSecret);
 
         this.Port = args.port || 1999;
 
@@ -49,7 +50,7 @@ class Config {
                 }
 
                 retry--;
-                console.error(`not ok - unable to GET ${this.API + '/api'}`);
+                console.error(`not ok - unable to GET ${this.api_url + '/api'}`);
                 console.error(`ok - retrying... (${maxretry - retry}/${maxretry})`);
             }
         } while (!this.Timeout);
