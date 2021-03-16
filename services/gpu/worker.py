@@ -33,7 +33,6 @@ def main():
     log_path = os.path.join(os.getcwd(), "/tmp/gpu-logs/")
     setup_logging(log_path, "worker")
 
-    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = arg([args.gpu_id], "")
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
