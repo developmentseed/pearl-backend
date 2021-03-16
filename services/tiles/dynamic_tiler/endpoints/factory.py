@@ -137,7 +137,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             if OptionalHeader.x_assets in self.optional_headers:
                 headers["X-Assets"] = ",".join(data.assets)
 
-            return Response(content, media_type=format.mimetype, headers=headers)
+            return Response(content, media_type=format.mediatype, headers=headers)
 
         @self.router.get(
             "/{layer}/tilejson.json",
