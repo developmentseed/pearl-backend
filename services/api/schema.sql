@@ -57,17 +57,18 @@ CREATE TABLE IF NOT EXISTS instances (
     project_id      BIGINT NOT NULL,
     active          BOOLEAN NOT NULL DEFAULT False,
     created         TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_update     TIMESTAMP NOT NULL DEFAULT NOW(),
 
     aoi_id          BIGINT,
     checkpoint_id   BIGINT,
 
     CONSTRAINT fk_project
         FOREIGN KEY (project_id)
-        REFERENCES projects(id)
+        REFERENCES projects(id),
 
     CONSTRAINT fk_checkpoint
         FOREIGN KEY (checkpoint_id)
-        REFERENCES checkpoints(id)
+        REFERENCES checkpoints(id),
 
     CONSTRAINT fk_aoi
         FOREIGN KEY (aoi_id)
