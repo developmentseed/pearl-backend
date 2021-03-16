@@ -2,6 +2,8 @@
 
 const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
+const poly = require('@turf/bbox-polygon').default;
+const bbox = require('@turf/bbox').default;
 
 class Model {
     constructor(config) {
@@ -22,6 +24,8 @@ class Model {
      * @returns {Object}
      */
     static json(row) {
+        if (typeof row.bounds === 'string') row.bounds = JSON.parse(row.bounds)
+
         return {
             id: parseInt(row.id),
             created: row.created,
@@ -33,7 +37,8 @@ class Model {
             model_zoom: row.model_zoom,
             storage: row.storage,
             classes: row.classes,
-            meta: row.meta
+            meta: row.meta,
+            bounds: bbox(row.bounds)
         };
     }
 
@@ -46,6 +51,9 @@ class Model {
     async create(model, user) {
         let pgres;
 
+        if (!model.bounds) model.bounds = [-180, -90, 180, 90];
+        model.bounds = poly([-180, -90, 180, 90]).geometry;
+
         try {
             pgres = await this.pool.query(`
                 INSERT INTO models (
@@ -57,10 +65,23 @@ class Model {
                     model_zoom,
                     storage,
                     classes,
-                    meta
+                    meta,
+                    bounds
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9
-                ) RETURNING *
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromGeoJSON($10::JSON)
+                ) RETURNING
+                    id,
+                    created,
+                    active,
+                    uid,
+                    name,
+                    model_type,
+                    model_inputshape,
+                    model_zoom,
+                    storage,
+                    classes,
+                    meta,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds
             `, [
                 model.active,
                 user.uid,
@@ -70,12 +91,14 @@ class Model {
                 model.model_zoom,
                 model.storage,
                 JSON.stringify(model.classes),
-                model.meta
+                model.meta,
+                JSON.stringify(model.bounds)
             ]);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }
 
+        pgres.rows[0].bounds = model.bounds;
         return Model.json(pgres.rows[0]);
     }
 
@@ -109,21 +132,37 @@ class Model {
      * @param {Number} modelid - Specific Model id
      * @param {Object} model - Model Object
      * @param {Boolean} model.storage Has the storage been uploaded
+     * @param {null|Number[]} model.bounds EPSG4326 Bounds of model
      */
     async patch(modelid, model) {
         let pgres;
 
+        if (model.bounds) model.bounds = poly(model.bounds).geometry;
         try {
             pgres = await this.pool.query(`
                 UPDATE models
                     SET
-                        storage = COALESCE($2, storage)
+                        storage = COALESCE($2, storage),
+                        bounds = COALESCE(ST_GeomFromGeoJSON($3::JSON), bounds)
                     WHERE
                         id = $1
-                    RETURNING *
+                    RETURNING
+                        id,
+                        created,
+                        active,
+                        uid,
+                        name,
+                        model_type,
+                        model_inputshape,
+                        model_zoom,
+                        storage,
+                        classes,
+                        meta,
+                        ST_AsGeoJSON(bounds)::JSON AS bounds
             `, [
                 modelid,
-                model.storage
+                model.storage,
+                JSON.stringify(model.bounds)
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Model');
@@ -166,7 +205,8 @@ class Model {
                     created,
                     active,
                     uid,
-                    name
+                    name,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds
                 FROM
                     models
                 WHERE
@@ -184,7 +224,8 @@ class Model {
                     created: r.created,
                     active: r.active,
                     uid: parseInt(r.uid),
-                    name: r.name
+                    name: r.name,
+                    bounds: bbox(r.bounds)
                 };
             })
         };
@@ -211,7 +252,8 @@ class Model {
                     model_zoom,
                     storage,
                     classes,
-                    meta
+                    meta,
+                    ST_AsGeoJSON(bounds)::JSON AS bounds
                 FROM
                     models
                 WHERE
