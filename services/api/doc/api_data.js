@@ -321,10 +321,10 @@ define({ "api": [
           },
           {
             "group": "Body",
-            "type": "Object",
-            "optional": false,
+            "type": "Object[]",
+            "optional": true,
             "field": "analytics",
-            "description": "<p>undefined</p>"
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Body",

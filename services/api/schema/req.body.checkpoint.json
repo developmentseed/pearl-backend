@@ -10,22 +10,25 @@
             "type": "string"
         },
         "analytics": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-                "counts",
-                "percent",
-                "f1score"
-            ],
-            "properties": {
-                "counts": {
-                    "type": "number"
-                },
-                "percent": {
-                    "type": "number"
-                },
-                "f1score": {
-                    "type": "number"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "counts",
+                    "percent",
+                    "f1score"
+                ],
+                "properties": {
+                    "counts": {
+                        "type": "number"
+                    },
+                    "percent": {
+                        "type": "number"
+                    },
+                    "f1score": {
+                        "type": "number"
+                    }
                 }
             }
         },
