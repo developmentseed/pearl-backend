@@ -147,7 +147,7 @@ class MosaicTilerFactory(BaseTilerFactory):
         )
         def tilejson(
             request: Request,
-            src_path=Depends(self.path_dependency),
+            layer: str = Query(..., description="Mosaic Layer name ('{username}.{layer}')"),
             tile_format: Optional[ImageType] = Query(
                 None, description="Output image type. Default is auto."
             ),
@@ -170,8 +170,11 @@ class MosaicTilerFactory(BaseTilerFactory):
             kwargs: Dict = Depends(self.additional_dependency),  # noqa
         ):
             """Return TileJSON document for a Mosaic."""
+            # Validate layer
+            src_path = self.path_dependency(layer)
+
             kwargs = {
-                "layer": src_path.layer,
+                "layer": layer,
                 "z": "{z}",
                 "x": "{x}",
                 "y": "{y}",
