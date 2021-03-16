@@ -3,7 +3,7 @@
 from setuptools import find_packages, setup
 
 inst_reqs = [
-    "titiler==0.1.0",
+    "titiler==0.2.0",
     "aiocache[redis]",
     "ujson",
 ]
