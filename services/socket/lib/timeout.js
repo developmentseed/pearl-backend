@@ -28,13 +28,16 @@ class Timeout {
     timeoutBeat(self) {
         self.pool.clients.forEach((ws) => {
             if ((+new Date()) - ws.activity > self.config.Timeout) {
+                ws.send(JSON.stringify({
+                    action: 'info#timeout'
+                }));
                 ws.terminate();
             }
         });
 
         self.pool.gpus.forEach((ws) => {
             if ((+new Date()) - ws.activity > self.config.Timeout) {
-                this.pool.gpu(ws.auth.i).send(JSON.stringify({
+                ws.send(JSON.stringify({
                     action: 'instance#terminate'
                 }));
             }
