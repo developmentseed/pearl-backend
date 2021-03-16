@@ -25,7 +25,7 @@ class Config {
         this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
         this.api_url = args.api || process.env.API || 'http://localhost:2000';
-        this.api = new API(api_url, this.SigningSecret);
+        this.api = new API(this.api_url, this.SigningSecret);
 
         this.Port = args.port || 1999;
 
