@@ -214,15 +214,17 @@ class TorchFineTuning(ModelSession):
 
 
 
-        # split re-training data into test 20% and train 80%
+        # split re-training data into test 10% and train 90%
         # TO-DO confirm post split that all unqiue class labels are present in training!
         x_train, x_test, y_train, y_test = train_test_split(
-                                            x_train, y_train, test_size=0.2, random_state=0)
+                                            x_train, y_train, test_size=0.1, random_state=0)
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
 
         # Check to see if new classes are added and randomly initaalize weights/biases for new classes.
         if len(np.unique(y_train)) > len(self.augment_model.intercept_):
+            print (len(np.unique(y_train)))
+            print(len(self.augment_model.intercept_))
             for i in range(len(np.unique(y_train)) - len(self.augment_model.intercept_)):
                 b = self.augment_model.intercept_
                 w = self.augment_model.coef_
@@ -262,10 +264,13 @@ class TorchFineTuning(ModelSession):
         # where is the missing id, fill in np.nan, but actually 0 for db to not break
         per_class_f1_final[missing_labels] = 0
 
+
+        print(per_class_f1_final)
         # add  retrainingper class f1-scores counts to classes attribute
-        print(self.classes)
         for i, f1 in enumerate(per_class_f1_final):
              self.classes[i]['retraining_f1score'] = f1
+
+        print(self.classes)
 
         global_f1 = f1_score(y_test, lr_preds, average='weighted')
         print("Global f1-score: %0.4f" % (global_f1))
