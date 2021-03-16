@@ -46,6 +46,25 @@ class Kube {
         const gpuImageName = this.config.GpuImageName;
         const gpuImageTag = this.config.GpuImageTag;
 
+        let resources;
+        if (deploymentName === 'lulc-production-lulc-helm') {
+            resources = {
+                requests: {
+                    'cpu': '2',
+                    'memory': '2Gi'
+                },
+                limits: {
+                    'cpu': '4',
+                    'memory': '8Gi'
+                }
+            }
+        } else {
+            resources = {
+                    limits: {
+                        'nvidia.com/gpu': 1
+                    }
+                }
+        }
         const nodeSelector = {};
         nodeSelector[nodeSelectorKey] = nodeSelectorValue;
 
@@ -60,11 +79,7 @@ class Kube {
                     {
                         name: `gpu-${name}`,
                         image: `${gpuImageName}:${gpuImageTag}`,
-                        resources: {
-                            limits: {
-                                'nvidia.com/gpu': 1
-                            }
-                        },
+                        resources: resources,
                         env: env
                     }
                 ],
