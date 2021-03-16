@@ -126,22 +126,15 @@ class TorchFineTuning(ModelSession):
         return output, output_features
 
     def retrain(self, classes, **kwargs):
-        #print (self.classes)
-
-
         names = [x['name'] for x in classes]
-        print(names)
-
 
         retrain_classes = [{
             'name': x['name'],
             'color': x['color']
         } for x in classes ]
 
-        print(retrain_classes)
         pixels = [x['geometry'] for x in classes]
         counts = [len(x) for x in pixels]
-        print(counts)
         total = sum(counts)
 
         # add re-training counts to classes attribute
@@ -151,7 +144,6 @@ class TorchFineTuning(ModelSession):
 
         # update and attribute self.classes with retraining info
         for i, c in enumerate(self.classes):
-            #print (c)
             # retraing samples that are in starter model
             if c['name'] in names:
                 self.classes[i]['retraining_counts'] = counts[names.index(c['name'])]
@@ -160,7 +152,6 @@ class TorchFineTuning(ModelSession):
             else:
                 self.classes[i]['retraining_counts'] = 0
                 self.classes[i]['retraining_counts_percent'] = 0
-        #print (self.classes)
 
         # combine starter model classes and retrain classes
         self.classes = self.classes + [x for x in retrain_classes if not x in self.classes]
@@ -268,9 +259,8 @@ class TorchFineTuning(ModelSession):
         print(per_class_f1_final)
         # add  retrainingper class f1-scores counts to classes attribute
         for i, f1 in enumerate(per_class_f1_final):
-             self.classes[i]['retraining_f1score'] = f1
+            self.classes[i].update({'retraining_f1score': f1})
 
-        print(self.classes)
 
         global_f1 = f1_score(y_test, lr_preds, average='weighted')
         print("Global f1-score: %0.4f" % (global_f1))
