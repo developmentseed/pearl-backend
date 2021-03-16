@@ -251,7 +251,11 @@ class TorchFineTuning(ModelSession):
 
         # where the unique cls id exist, fill in f1 per calss
         per_class_f1_final[f1_labels] =  per_class_f1
+<<<<<<< HEAD
         # where is the missing id, fill in np.nan
+=======
+        # where is the missing id, fill in np.nan, but actually 0 for db to not break
+>>>>>>> dd73f176c5dfc88ac56fafc1319850e514a78354
         per_class_f1_final[missing_labels] = 0
 
         # add  retrainingper class f1-scores counts to classes attribute

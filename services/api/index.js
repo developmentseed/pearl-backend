@@ -1246,6 +1246,10 @@ async function server(config, cb) {
                     });
                 }
 
+                if (req.body.analytics && req.body.analytics.length !== req.body.analytics.length) {
+                    throw new Err(400, null, 'analytics array must be parallel with classes array');
+                }
+
                 return res.json(await checkpoint.create(req.params.projectid, req.body));
             } catch (err) {
                 return Err.respond(err, res);

@@ -103,6 +103,7 @@ test('POST /api/project/1/checkpoint', (t) => {
             storage: false,
             project_id: 1,
             name: 'Test Checkpoint',
+            analytics: null,
             bookmarked: false,
             classes: [
                 { name: 'Water', color: '#0000FF' },
