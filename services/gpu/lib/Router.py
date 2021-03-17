@@ -17,7 +17,6 @@ class Socket():
             LOGGER.warning("ok - websocket disconnected, attempting reconnection")
             await self.connect()
 
-
     async def connect(self):
         if self.terminate is True:
             return
@@ -28,7 +27,6 @@ class Socket():
             LOGGER.error("not ok - failed to connect - retrying")
             await self.connect()
 
-
     async def recv(self):
         await self.ok()
 
@@ -37,7 +35,7 @@ class Socket():
         except Exception as e:
             LOGGER.error("not ok - failed to receive message")
             LOGGER.error(e)
-            await self.recv()
+            return await self.recv()
 
         try:
             return json.loads(msg)
