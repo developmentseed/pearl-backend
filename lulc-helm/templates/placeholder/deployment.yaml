@@ -37,7 +37,7 @@ spec:
             cpu: {{ .Values.placeholder.resources.requests.cpu }}
             memory: {{ .Values.placeholder.resources.requests.memory }}
           limits:
-            cpu: {{ .Values.tiles.resources.limits.cpu }}
-            memory: {{ .Values.tiles.resources.limits.memory }}
+            cpu: {{ .Values.placeholder.resources.limits.cpu }}
+            memory: {{ .Values.placeholder.resources.limits.memory }}
         {{- end -}}
 {{- end }}
