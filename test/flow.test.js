@@ -266,7 +266,7 @@ test('new instance', (t) => {
         t.ok(parseInt(body.id), 'id: <integer>');
 
         delete body.id,
-        delete body.created;
+            delete body.created;
         delete body.last_update;
 
         instance = body.token;
