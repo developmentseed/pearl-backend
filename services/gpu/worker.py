@@ -16,6 +16,7 @@ from web_tool.ModelSessionPyTorchExample import TorchFineTuning
 from web_tool.Utils import setup_logging
 
 LOGGER = logging.getLogger("server")
+print(torch.cuda.is_avaible())
 
 def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")
@@ -32,8 +33,6 @@ def main():
     # Setup logging
     log_path = os.path.join(os.getcwd(), "/tmp/gpu-logs/")
     setup_logging(log_path, "worker")
-
-    os.environ["CUDA_VISIBLE_DEVICES"] = arg([args.gpu_id], "")
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
     # Fallback to INSTANCE_ID 1 if not set - assume local test env
