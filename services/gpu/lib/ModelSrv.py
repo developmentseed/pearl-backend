@@ -126,9 +126,9 @@ class ModelSrv():
                 'name': body['name'],
                 'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']]),
                 'analytics': [{
-                    'counts': cls['retraining_counts'],
-                    'percent': cls['retraining_counts_percent'],
-                    'f1score': cls['retraining_f1score']
+                    'counts': cls.get('retraining_counts', 0),
+                    'percent': cls.get('retraining_counts_percent', 0),
+                    'f1score': cls.get('retraining_f1score', 0)
                 } for cls in self.model.classes]
             }, websocket)
 
