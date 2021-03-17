@@ -1,3 +1,4 @@
+{{- if .Values.placeholder.enabled }}
 apiVersion: scheduling.k8s.io/v1
 kind: PriorityClass
 metadata:
@@ -15,3 +16,4 @@ value: 1
 preemptionPolicy: PreemptLowerPriority
 globalDefault: true
 description: 'normal'
+{{- end }}

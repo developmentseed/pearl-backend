@@ -22,6 +22,13 @@ tiles:
     Backends: {{STAGING_MOSAIC_BACKEND}}
     Host: {{STAGING_MOSAIC_HOST}}
     WebConcurrency: 2
+
+placeholder:
+  enabled: true
+  replicaCount: 1
+  nodeSelectorName: gpunodepool
+  isGpu: true
+
 tilesScaler:
   env:
     backendPool: pool-default-lulc-staging-lulc-helm-tiles-80-bp-8000~bp-default-lulc-staging-lulc-helm-tiles-80-8000-029e669b1fed84821a79034b9b2e4ee9
