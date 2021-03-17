@@ -11,6 +11,7 @@
 //
 
 const fs = require('fs');
+const Progress = require('cli-progress');
 const path = require('path');
 const WebSocket = require('ws');
 const test = require('tape');
@@ -259,19 +260,24 @@ test('new instance', (t) => {
         t.equals(res.statusCode, 200, '200 status code');
 
         t.deepEquals(Object.keys(body).sort(), [
-            'created', 'id', 'pod', 'token'
-        ], 'expected props');
+            'active', 'aoi_id', 'checkpoint_id', 'created', 'id', 'last_update', 'pod', 'project_id', 'token'
+        ].sort(), 'expected props');
 
         t.ok(parseInt(body.id), 'id: <integer>');
 
         delete body.id,
-            delete body.created;
+        delete body.created;
+        delete body.last_update;
 
         instance = body.token;
 
         delete body.token;
 
         t.deepEquals(body, {
+            project_id: 1,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: false,
             pod: {}
         }, 'expected body');
 
@@ -280,6 +286,12 @@ test('new instance', (t) => {
 });
 
 test('gpu connection', (t) => {
+
+    const state = {
+        task: false,
+        progress: new Progress.SingleBar({}, Progress.Presets.shades_classic)
+    }
+
     const ws = new WebSocket(SOCKET + `?token=${instance}`);
 
     ws.on('open', () => {
@@ -302,151 +314,29 @@ test('gpu connection', (t) => {
 
             ws.send(JSON.stringify({
                 action: 'model#prediction',
-                data: {
-                    name: 'Seneca Rocks, WV',
-                    polygon: {
-                        type: 'Polygon',
-                        bbox: [ -79.38355922698973, 38.830046580030306, -79.37222957611084, 38.83666569946354 ],
-                        coordinates: [[
-                            [ -79.38355922698973, 38.830046580030306 ],
-                            [ -79.37222957611084, 38.830046580030306 ],
-                            [ -79.37222957611084, 38.83666569946354 ],
-                            [ -79.38355922698973, 38.83666569946354 ],
-                            [ -79.38355922698973, 38.830046580030306 ]
-                        ]]
-                    }
-                }
+                data: require('./fixtures/pred.json')
             }));
+        } else if (msg.message === 'model#prediction') {
+            if (state.task !== msg.message) {
+                state.task = msg.message;
+
+                console.error('ok - model#prediction');
+                state.progress.start(msg.data.total, msg.data.processed);
+            } else {
+                state.progress.update(msg.data.processed);
+            }
         } else if (first && msg.message === 'model#prediction#complete') {
             first = false;
+            if (state.progress) state.progress.stop();
+
             ws.send(JSON.stringify({
                 action: 'model#retrain',
-                data: {
-                    name: 'Seneca Rocks, WV Corrected',
-                    classes: [{
-                        name: 'Structure',
-                        color: '#f76f73',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.376936712501418, 38.834394753436762],
-                                [-79.377090146278206, 38.834530999727654]
-                            ]
-                        }
-                    }, {
-                        name: 'Water',
-                        color: '#0000FF',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.37696804261671, 38.834380908318451],
-                                [-79.377184066049367, 38.834321175495617]
-                            ]
-                        }
-                    }, {
-                        name: 'No Data',
-                        color: '#62a092',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.377054334995179, 38.834430418523333]
-                            ]
-                        }
-                    }, {
-                        name: 'Impervious Road',
-                        color: '#ffb703',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.377173465020022, 38.834299523357863],
-                                [-79.376966596942438, 38.834323695161871]
-                            ]
-                        },
-                    }, {
-                        name: 'Emergent Wetlands',
-                        color: '#008000',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.37693751489175, 38.834455284388312]
-                            ]
-                        }
-                    }, {
-                        name: 'Impervious Surface',
-                        color: '#ffb703',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.376836609778778, 38.834442041615475],
-                                [-79.376948437562518, 38.834433152757917],
-                                [-79.376910948390474, 38.834417625757332]
-                            ]
-                        }
-                    }, {
-                        name: 'Tree Canopy',
-                        color: '#80FF80',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.377115299643052, 38.834525768732178],
-                                [-79.377060944876419, 38.834393055366228]
-                            ]
-                        }
-                    }, {
-                        name: 'Shrubland',
-                        color: '#806060',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.376997929836634, 38.834476753022301],
-                                [-79.376993520578864, 38.834320148825498]
-                            ],
-                        },
-                    }, {
-                        name: 'Barren',
-                        color: '#027fdc',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.376950679117911, 38.834398686286974],
-                                [-79.377184762372309, 38.834317436038809]
-                            ]
-                        },
-                    }, {
-                        name: 'Low Vegetation',
-                        color: '#07c4c5',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.376824957802995, 38.834323027184489]
-                            ]
-                        },
-                    }, {
-                        name: 'Tundra',
-                        color: '#ffffff',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.377064851017821, 38.834368202090261],
-                                [-79.37707642397551, 38.834321754940582]
-                            ]
-                        }
-                    }, {
-                        name: 'Mountain',
-                        color: '#a4afbf',
-                        geometry: {
-                            type: 'MultiPoint',
-                            coordinates: [
-                                [-79.378064851017821, 38.834368202090261],
-                                [-79.37907642397551, 38.834321754940582]
-                            ]
-                        }
-                    }
-                    ]
-                }
+                data: require('./fixtures/retrain.json')
             }));
         } else if (msg.message === 'model#retrain#complete') {
             console.error('DONE RETRAINING');
+        } else if (msg.message === 'model#checkpoint') {
+            console.error(`ok - created checkpoint #${msg.data.id}: ${msg.data.name}`);
         } else {
             console.error(JSON.stringify(msg, null, 4))
         }
