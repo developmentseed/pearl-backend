@@ -1,3 +1,4 @@
+{{- if .Values.placeholder.enabled -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -21,3 +22,4 @@ spec:
       containers:
       - name: pause
         image: gcr.io/google_containers/pause:latest
+{{- end }}

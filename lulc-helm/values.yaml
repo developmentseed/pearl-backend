@@ -62,6 +62,10 @@ gpu:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
 
+placeholder:
+  enabled: true
+  replicaCount: 3
+  
 ingress-azure:
   # This section contains the essential configs for the ingress controller helm chart
   # See: https://raw.githubusercontent.com/Azure/application-gateway-kubernetes-ingress/master/docs/examples/sample-helm-config.yaml

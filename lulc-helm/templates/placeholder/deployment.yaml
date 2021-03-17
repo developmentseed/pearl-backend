@@ -1,3 +1,4 @@
+{{- if .Values.placeholder.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +8,7 @@ metadata:
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
-  replicas: 3
+  replicas: {{ .Values.placeholder.replicaCount }}
   selector:
     matchLabels:
       app: {{ template "lulc-helm.name" . }}
@@ -30,3 +31,4 @@ spec:
             nvidia.com/gpu: 1
           limits:
             nvidia.com/gpu: 1
+{{- end }}
