@@ -120,7 +120,7 @@ async function server(config, cb) {
             limits: {
                 live_inference: 1e+7,
                 max_inference: 1e+7,
-                instance_window: 1800
+                instance_window: 600
             }
         });
     });
