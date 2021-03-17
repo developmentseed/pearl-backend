@@ -13,11 +13,7 @@ spec:
         name: {{ template "lulc-helm.fullname" . }}-prepull
     spec:
       nodeSelector:
-<<<<<<< HEAD
         agentpool: {{ .Values.placeholder.nodeSelectorName }}
-=======
-        agentpool: gpunodepool
->>>>>>> develop
       initContainers:
       - name: init-puller
         image: "{{ .Values.gpu.image.name }}:{{ .Values.gpu.image.tag }}"
