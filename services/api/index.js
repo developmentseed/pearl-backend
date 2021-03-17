@@ -108,9 +108,9 @@ async function server(config, cb) {
      *   {
      *       "version": "1.0.0"
      *       "limits": {
-     *           "live_inference": 1000 (m^2)
-     *           "max_inference": 100000 (m^2)
-     *           "instance_window": 1800 (secs)
+     *           "live_inference": 1e+7 (m^2)
+     *           "max_inference": 1e+7 (m^2)
+     *           "instance_window": 600 (m secs)
      *       }
      *   }
      */
