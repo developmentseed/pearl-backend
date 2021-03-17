@@ -48,6 +48,9 @@ class Instance {
         const inst = {
             id: parseInt(row.id),
             project_id: parseInt(row.project_id),
+            aoi_id: parseInt(row.aoi_id),
+            checkpoint_id: parseInt(row.checkpoint_id),
+            last_update: row.last_update,
             created: row.created,
             active: row.active
         };
@@ -75,7 +78,9 @@ class Instance {
 
         const WHERE = [];
 
-        if (query.status === 'active') {
+        if (query.status === 'all') {
+            query.status = null;
+        } else if (query.status === 'active') {
             WHERE.push('active IS true');
         } else if (query.status === 'inactive') {
             WHERE.push('active IS false');
@@ -163,7 +168,7 @@ class Instance {
                     aoi_id,
                     checkpoint_id
                 ) VALUES (
-                    $1
+                    $1, $2, $3
                 ) RETURNING *
             `, [
                 instance.project_id,
@@ -185,12 +190,11 @@ class Instance {
                 pod = await this.kube.createPod(podSpec);
             }
 
-            return {
-                id: parseInt(pgres.rows[0].id),
-                created: pgres.rows[0].created,
-                token: this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id),
-                pod: pod
-            };
+            const inst = Instance.json(pgres.rows[0]);
+            inst.token = this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id);
+            inst.pod = pod;
+
+            return inst;
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');
         }
@@ -211,6 +215,9 @@ class Instance {
                     id,
                     created,
                     project_id,
+                    last_update,
+                    aoi_id,
+                    checkpoint_id,
                     active
                 FROM
                     instances

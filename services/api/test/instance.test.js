@@ -87,6 +87,160 @@ test('GET /api/project/1/instance (empty)', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
+        t.deepEquals(res.body, {
+            total: 0,
+            instances: []
+        });
+
+        t.end();
+    });
+});
+
+test('POST /api/project/1/instance', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <str>');
+        delete res.body.created;
+        delete res.body.last_update;
+        delete res.body.token;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            project_id: 1,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: false,
+            pod: {}
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/instance (empty)', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
+        delete res.body.instances[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            instances: [{
+                id: 1,
+                active: false
+            }]
+        });
+
+        t.end();
+    });
+});
+
+test('PATCH /api/project/1/instance/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            active: true
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        delete res.body.created;
+        delete res.body.last_update;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            project_id: 1,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: true
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/instance', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
+        delete res.body.instances[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            instances: [{
+                id: 1,
+                active: true
+            }]
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/instance/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance/1',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <str>');
+        delete res.body.created;
+        delete res.body.last_update;
+        delete res.body.token;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            project_id: 1,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: true
+        });
+
         t.end();
     });
 });
