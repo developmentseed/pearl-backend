@@ -72,6 +72,7 @@ class TorchFineTuning(ModelSession):
     def __init__(self, gpu_id, api):
         print (torch.cuda.is_available())
 
+
         print('test new print')
         self.classes = api.model['classes']
 
