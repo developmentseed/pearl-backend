@@ -24,9 +24,7 @@ spec:
       priorityClassName: placeholder
       containers:
       - name: placeholder
-        image: {{ .Values.gpu.image.name }}:{{ .Values.gpu.image.tag }}
-        command: ['/bin/sh']
-        args: ["-c", "echo 'pulling image and preparing a new gpu node.' & tail -f /dev/null"]
+        image: gcr.io/google_containers/pause:latest
         resources:
           requests:
             nvidia.com/gpu: 1
