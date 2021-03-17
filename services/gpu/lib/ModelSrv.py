@@ -175,6 +175,8 @@ class ModelSrv():
 
         self.api.upload_checkpoint(checkpoint['id'], chdir)
 
+        self.api.instance_patch(checkpoint_id = checkpoint['id'])
+
         await websocket.send(json.dumps({
             'message': 'model#checkpoint',
             'data': {

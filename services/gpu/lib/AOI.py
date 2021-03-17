@@ -41,6 +41,7 @@ class AOI():
         self.live = AOI.area(self.bounds) > self.api.server['limits']['live_inference']
 
         self.id = self.api.create_aoi(self)["id"]
+        self.api.instance_patch(aoi_id = self.id)
 
         self.extrema, self.raw_fabric, self.fabric = AOI.gen_fabric(self.bounds, self.zoom)
 

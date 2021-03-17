@@ -23,7 +23,7 @@ class Router():
         terminate = False
 
         while not terminate:
-            self.websocket = await websockets.connect(self.uri)
+            self.websocket = await websockets.connect(self.uri, ping_interval=None)
             LOGGER.info("ok - WebSocket Connection Initialized")
 
             while not terminate:
