@@ -289,7 +289,7 @@ test('gpu connection', (t) => {
 
     const state = {
         task: false,
-        progress: new Progress.SingleBar({}, Progress.Presets.shades_classic)
+        progress: false
     }
 
     const ws = new WebSocket(SOCKET + `?token=${instance}`);
@@ -310,6 +310,7 @@ test('gpu connection', (t) => {
 
         // Messages in this IF queue are in chrono order
         if (msg.message === 'info#connected') {
+            console.error('ok - info#connected');
             first = true;
 
             ws.send(JSON.stringify({
@@ -319,26 +320,32 @@ test('gpu connection', (t) => {
         } else if (msg.message === 'model#prediction') {
             if (state.task !== msg.message) {
                 state.task = msg.message;
+                state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic)
 
                 console.error('ok - model#prediction');
                 state.progress.start(msg.data.total, msg.data.processed);
             } else {
                 state.progress.update(msg.data.processed);
             }
-        } else if (first && msg.message === 'model#prediction#complete') {
-            first = false;
+        } else if (msg.message === 'model#prediction#complete') {
             if (state.progress) state.progress.stop();
+            console.error('ok - model#prediction#complete');
 
-            ws.send(JSON.stringify({
-                action: 'model#retrain',
-                data: require('./fixtures/retrain.json')
-            }));
+            if (first) {
+                first = false;
+                ws.send(JSON.stringify({
+                    action: 'model#retrain',
+                    data: require('./fixtures/retrain.json')
+                }));
+            }
         } else if (msg.message === 'model#retrain#complete') {
-            console.error('DONE RETRAINING');
+            console.error('ok - model#retrain#complete');
         } else if (msg.message === 'model#checkpoint') {
             console.error(`ok - created checkpoint #${msg.data.id}: ${msg.data.name}`);
         } else {
             console.error(JSON.stringify(msg, null, 4))
         }
+
+        state.task = msg.message;
     });
 });
