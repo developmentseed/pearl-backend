@@ -27,8 +27,17 @@ spec:
       - name: placeholder
         image: gcr.io/google_containers/pause:latest
         resources:
+        {{- if .Values.placeholder.isGpu -}}
           requests:
             nvidia.com/gpu: 1
           limits:
             nvidia.com/gpu: 1
+        {{- else -}}
+          requests:
+            cpu: {{ .Values.placeholder.resources.requests.cpu }}
+            memory: {{ .Values.placeholder.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.tiles.resources.limits.cpu }}
+            memory: {{ .Values.tiles.resources.limits.memory }}
+        {{- end -}}
 {{- end }}

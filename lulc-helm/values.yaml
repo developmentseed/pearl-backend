@@ -65,7 +65,21 @@ gpu:
 placeholder:
   enabled: true
   replicaCount: 3
-  
+  nodeSelectorName: gpunodepool
+
+  # If isGpu is true, requests is for 1 GPU
+  # If false, uses the resource values from below.
+  isGpu: true 
+
+  resources:
+    requests:
+      cpu: 2
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 2Gi
+
+
 ingress-azure:
   # This section contains the essential configs for the ingress controller helm chart
   # See: https://raw.githubusercontent.com/Azure/application-gateway-kubernetes-ingress/master/docs/examples/sample-helm-config.yaml
