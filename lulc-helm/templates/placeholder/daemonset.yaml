@@ -1,4 +1,4 @@
-{{- if .Values.placeholder.enabled -}}
+{{- if .Values.placeholder.enabled }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -13,7 +13,7 @@ spec:
         name: {{ template "lulc-helm.fullname" . }}-prepull
     spec:
       nodeSelector:
-        agentpool: gpunodepool
+        agentpool: {{ .Values.placeholder.nodeSelectorName }}
       initContainers:
       - name: init-puller
         image: "{{ .Values.gpu.image.name }}:{{ .Values.gpu.image.tag }}"
