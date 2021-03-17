@@ -1,3 +1,4 @@
+{{- if .Values.placeholder.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +8,7 @@ metadata:
     environment: {{ .Values.environment }}
     release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.placeholder.replicaCount }}
   selector:
     matchLabels:
       app: {{ template "lulc-helm.name" . }}
@@ -22,13 +23,23 @@ spec:
     spec:
       terminationGracePeriodSeconds: 0
       priorityClassName: placeholder
+      nodeSelector:
+        agentpool: {{ .Values.placeholder.nodeSelectorName }}
       containers:
       - name: placeholder
-        image: {{ .Values.gpu.image.name }}:{{ .Values.gpu.image.tag }}
-        command: ['/bin/sh']
-        args: ["-c", "echo 'pulling image and preparing a new gpu node.' & tail -f /dev/null"]
+        image: gcr.io/google_containers/pause:latest
         resources:
+        {{- if .Values.placeholder.isGpu }}
           requests:
             nvidia.com/gpu: 1
           limits:
             nvidia.com/gpu: 1
+        {{- else }}
+          requests:
+            cpu: {{ .Values.placeholder.resources.requests.cpu }}
+            memory: {{ .Values.placeholder.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.placeholder.resources.limits.cpu }}
+            memory: {{ .Values.placeholder.resources.limits.memory }}
+        {{- end }}
+{{- end }}

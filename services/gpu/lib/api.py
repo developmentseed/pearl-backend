@@ -236,6 +236,28 @@ class API():
 
             return r.content
 
+    def instance_patch(self, aoi_id=None, checkpoint_id=None):
+        url = self.url + '/api/project/' + str(self.project_id) + '/instance/' + str(self.instance_id)
+
+        data = {}
+        if (aoi_id is not None):
+            data['aoi_id'] = aoi_id
+        if (checkpoint_id is not None):
+            data['checkpoint_id'] = checkpoint_id
+
+        LOGGER.info("ok - PATCH " + url)
+        r = self.requests.patch(url,
+            headers={
+                "authorization": "Bearer " + self.token
+            },
+            data = json.dumps(data)
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def instance_meta(self, instance_id):
         url = self.url + '/api/instance/' + str(instance_id)
 
