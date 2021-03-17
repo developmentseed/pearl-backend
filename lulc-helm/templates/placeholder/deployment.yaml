@@ -23,6 +23,8 @@ spec:
     spec:
       terminationGracePeriodSeconds: 0
       priorityClassName: placeholder
+      nodeSelector:
+        agentpool: {{ .Values.placeholder.nodeSelectorName }}
       containers:
       - name: placeholder
         image: gcr.io/google_containers/pause:latest
