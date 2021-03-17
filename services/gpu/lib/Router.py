@@ -26,7 +26,7 @@ class Socket():
             self.websocket = await websockets.connect(self.uri, ping_interval=None)
         except Exception as e:
             LOGGER.error("not ok - failed to connect - retrying")
-            self.connect()
+            await self.connect()
 
 
     async def recv(self):
@@ -37,7 +37,7 @@ class Socket():
         except Exception as e:
             LOGGER.error("not ok - failed to receive message")
             LOGGER.error(e)
-            self.recv()
+            await self.recv()
 
         try:
             return json.loads(msg)
@@ -53,7 +53,7 @@ class Socket():
         except Exception as e:
             LOGGER.error("not ok - failed to send message")
             LOGGER.error(payload)
-            self.send(payload)
+            await self.send(payload)
 
     def terminate(self):
         exit()
