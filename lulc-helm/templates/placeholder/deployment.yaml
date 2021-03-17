@@ -1,4 +1,4 @@
-{{- if .Values.placeholder.enabled -}}
+{{- if .Values.placeholder.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,17 +27,17 @@ spec:
       - name: placeholder
         image: gcr.io/google_containers/pause:latest
         resources:
-        {{- if .Values.placeholder.isGpu -}}
+        {{- if .Values.placeholder.isGpu }}
           requests:
             nvidia.com/gpu: 1
           limits:
             nvidia.com/gpu: 1
-        {{- else -}}
+        {{- else }}
           requests:
             cpu: {{ .Values.placeholder.resources.requests.cpu }}
             memory: {{ .Values.placeholder.resources.requests.memory }}
           limits:
             cpu: {{ .Values.placeholder.resources.limits.cpu }}
             memory: {{ .Values.placeholder.resources.limits.memory }}
-        {{- end -}}
+        {{- end }}
 {{- end }}
