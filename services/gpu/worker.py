@@ -16,7 +16,6 @@ from web_tool.ModelSessionPyTorchExample import TorchFineTuning
 from web_tool.Utils import setup_logging
 
 LOGGER = logging.getLogger("server")
-print(torch.cuda.is_avaible())
 
 def main():
     parser = argparse.ArgumentParser(description="AI for Earth Land Cover Worker")
