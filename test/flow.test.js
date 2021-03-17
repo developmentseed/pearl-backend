@@ -13,19 +13,15 @@
 // GPU=1 Stay running and issue webhook messages to an instance
 // DEBUG=1 Verbose logs
 
-const fs = require('fs');
 const Progress = require('cli-progress');
-const path = require('path');
 const WebSocket = require('ws');
 const test = require('tape');
 const { promisify } = require('util');
 const request = promisify(require('request'));
-const { Pool } = require('pg');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 const Knex = require('knex');
 
-const { Client } = require('pg');
 const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
@@ -44,7 +40,7 @@ test('pre-run', async (t) => {
         const auth = new (require('../services/api/lib/auth').Auth)(config);
         const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
 
-        const user = await auth.create({
+        await auth.create({
             access: 'admin',
             username: 'example',
             email: 'example@example.com',
@@ -56,7 +52,7 @@ test('pre-run', async (t) => {
             uid: 1
         }, 'API Token')).token;
 
-        await knex.destroy()
+        await knex.destroy();
         config.pool.end();
     } catch (err) {
         t.error(err, 'no errors');
@@ -253,7 +249,7 @@ test('new project', async (t) => {
             model_id: 1,
             mosaic: 'naip.latest'
         }, 'expected body');
-    } catch(err) {
+    } catch (err) {
         t.error(err, 'no error');
     }
 
@@ -308,7 +304,7 @@ test('gpu connection', (t) => {
     const state = {
         task: false,
         progress: false
-    }
+    };
 
     const ws = new WebSocket(SOCKET + `?token=${instance}`);
 
@@ -324,7 +320,7 @@ test('gpu connection', (t) => {
     let first = true;
 
     ws.on('message', (msg) => {
-        msg = JSON.parse(msg)
+        msg = JSON.parse(msg);
         if (process.env.DEBUG) console.error(JSON.stringify(msg, null, 4));
 
         // Messages in this IF queue are in chrono order
@@ -339,7 +335,7 @@ test('gpu connection', (t) => {
         } else if (msg.message === 'model#prediction') {
             if (state.task !== msg.message) {
                 state.task = msg.message;
-                state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic)
+                state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
 
                 console.error('ok - model#prediction');
                 state.progress.start(msg.data.total, msg.data.processed);
@@ -362,7 +358,7 @@ test('gpu connection', (t) => {
         } else if (msg.message === 'model#checkpoint') {
             console.error(`ok - created checkpoint #${msg.data.id}: ${msg.data.name}`);
         } else {
-            console.error(JSON.stringify(msg, null, 4))
+            console.error(JSON.stringify(msg, null, 4));
         }
 
         state.task = msg.message;
