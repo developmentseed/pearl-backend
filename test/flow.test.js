@@ -74,9 +74,9 @@ test('api running', (t) => {
         t.deepEquals(body, {
             version: '1.0.0',
             limits: {
-                live_inference: 1000,
-                max_inference: 100000,
-                instance_window: 1800
+                live_inference: 1e+7,
+                max_inference: 1e+7,
+                instance_window: 600
             }
         });
 
