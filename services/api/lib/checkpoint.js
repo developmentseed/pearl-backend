@@ -49,7 +49,8 @@ class CheckPoint {
             bookmarked: row.bookmarked,
             classes: row.classes,
             created: row.created,
-            storage: row.storage
+            storage: row.storage,
+            analytics: row.analytics
         };
 
         if (row.geoms) {
@@ -238,6 +239,7 @@ class CheckPoint {
                     checkpoints.storage,
                     checkpoints.bookmarked,
                     checkpoints.project_id,
+                    checkpoints.analytics,
                     checkpoints.geoms,
                     ST_AsText(ST_Centroid(ST_Envelope(ST_Collect(geom)))) AS center,
                     ST_Extent(geom) AS bounds
@@ -277,6 +279,7 @@ class CheckPoint {
      * @param {String} checkpoint.name - Human readable name
      * @param {Object[]} checkpoint.classes - Checkpoint Class names
      * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
+     * @param {Object} checkpoint.analytics - Checkpoint Analytics
      */
     async create(projectid, checkpoint) {
         try {
@@ -285,12 +288,14 @@ class CheckPoint {
                     project_id,
                     name,
                     classes,
-                    geoms
+                    geoms,
+                    analytics
                 ) VALUES (
                     $1,
                     $2,
                     $3::JSONB,
-                    $4::JSONB[]
+                    $4::JSONB[],
+                    $5::JSONB
                 ) RETURNING *
             `, [
                 projectid,
@@ -298,7 +303,8 @@ class CheckPoint {
                 JSON.stringify(checkpoint.classes),
                 checkpoint.geoms.map((e) => {
                     return JSON.stringify(e);
-                })
+                }),
+                JSON.stringify(checkpoint.analytics)
             ]);
 
             return CheckPoint.json(pgres.rows[0]);

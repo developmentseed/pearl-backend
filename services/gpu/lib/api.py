@@ -80,8 +80,17 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def create_checkpoint(self, name, classes, geoms):
+    def create_checkpoint(self, name, classes, geoms, analytics = None):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint'
+
+        data = {
+            'name': name,
+            'classes': classes,
+            'geoms': geoms
+        }
+
+        if analytics is not None:
+            data['analytics'] = analytics
 
         LOGGER.info("ok - POST " + url)
         r = self.requests.post(url,
@@ -89,11 +98,7 @@ class API():
                 "authorization": "Bearer " + self.token,
                 "content-type": "application/json"
             },
-            data = json.dumps({
-                'name': name,
-                'classes': classes,
-                'geoms': geoms
-            })
+            data = json.dumps(data)
         )
 
         r.raise_for_status()
