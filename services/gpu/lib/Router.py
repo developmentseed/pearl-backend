@@ -8,7 +8,6 @@ LOGGER = logging.getLogger("server")
 class Socket():
     def __init__(self, uri):
         self.uri = uri
-        self.terminate = False
         self.websocket = False
         LOGGER.info("ok - WebSocket Connection Initialized")
 
@@ -18,9 +17,6 @@ class Socket():
             await self.connect()
 
     async def connect(self):
-        if self.terminate is True:
-            return
-
         try:
             self.websocket = await websockets.connect(self.uri, ping_interval=None)
         except Exception as e:
