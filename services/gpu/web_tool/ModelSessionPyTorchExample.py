@@ -70,18 +70,10 @@ class TorchFineTuning(ModelSession):
 
 
     def __init__(self, gpu_id, api):
-        print (torch.cuda.is_available())
-
-
-        print('test new print')
         self.classes = api.model['classes']
 
         self.model_fs = api.model_fs
-        # self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-        print('# is cuda available?', torch.cuda.is_available())
-        self.device = torch.device("cuda")
-        print('# GPU or CPU?', self.device)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # will need to figure out for re-training
         self.output_channels = len(self.classes)
