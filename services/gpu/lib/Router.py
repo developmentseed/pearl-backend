@@ -19,32 +19,29 @@ class Socket():
     async def connect(self):
         try:
             self.websocket = await websockets.connect(self.uri, ping_interval=None)
-        except Exception as e:
+        except:
             LOGGER.error("not ok - failed to connect - retrying")
             await self.connect()
 
     async def recv(self):
-        await self.ok()
-
         try:
+            await self.ok()
             msg = await self.websocket.recv()
-        except Exception as e:
+        except:
             LOGGER.error("not ok - failed to receive message")
-            LOGGER.error(e)
             return await self.recv()
 
         try:
             return json.loads(msg)
-        except Exception as e:
+        except:
             LOGGER.error("not ok - failed to decode message")
             LOGGER.error(msg)
 
     async def send(self, payload):
-        await self.ok()
-
         try:
+            await self.ok()
             await self.websocket.send(payload)
-        except Exception as e:
+        except:
             LOGGER.error("not ok - failed to send message")
             LOGGER.error(payload)
             await self.send(payload)
