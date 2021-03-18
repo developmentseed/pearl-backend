@@ -180,12 +180,22 @@ class Instance {
 
             let pod = {};
             if (this.config.Environment !== 'local') {
-                const podSpec = this.kube.makePodSpec(instanceId, [
-                    { name: 'INSTANCE_ID', value: instanceId.toString() },
-                    { name: 'API', value: this.config.ApiUrl },
-                    { name: 'SOCKET', value: this.config.SocketUrl },
-                    { name: 'SigningSecret', value: this.config.SigningSecret }
-                ]);
+                const podSpec = this.kube.makePodSpec(instanceId, [{
+                    name: 'INSTANCE_ID',
+                    value: instanceId.toString()
+                },{
+                    name: 'API',
+                    value: this.config.ApiUrl
+                },{
+                    name: 'SOCKET',
+                    value: this.config.SocketUrl
+                },{
+                    name: 'SigningSecret',
+                    value: this.config.SigningSecret
+                },{
+                    name: 'NVIDIA_DRIVER_CAPABILITIES',
+                    value: 'compute,utility'
+                }]);
 
                 pod = await this.kube.createPod(podSpec);
             }

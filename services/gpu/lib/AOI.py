@@ -38,7 +38,7 @@ class AOI():
         LOGGER.info("ok - [" + ','.join(str(x) for x in self.bounds) + "] aoi bounds")
 
         # TODO Check Max size too
-        self.live = AOI.area(self.bounds) > self.api.server['limits']['live_inference']
+        self.live = AOI.area(self.bounds) < self.api.server['limits']['live_inference']
 
         self.id = self.api.create_aoi(self)["id"]
         self.api.instance_patch(aoi_id = self.id)

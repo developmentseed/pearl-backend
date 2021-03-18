@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.1-base-ubuntu20.04
+FROM mcr.microsoft.com/azureml/openmpi3.1.2-cuda10.1-cudnn7-ubuntu18.04:20210301.v1
 
 EXPOSE 2001
 

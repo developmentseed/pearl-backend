@@ -79,9 +79,9 @@ class Flight {
                     t.deepEquals(body, {
                         version: pkg.version,
                         limits: {
-                            live_inference: 1000,
-                            max_inference: 100000,
-                            instance_window: 1800
+                            live_inference: 10000000,
+                            max_inference: 10000000,
+                            instance_window: 600
                         }
                     });
 
