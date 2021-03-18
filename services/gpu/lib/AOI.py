@@ -63,18 +63,18 @@ class AOI():
         extrema = supermercado.burntiles.tile_extrema(bounds, zoom)
         transform = supermercado.burntiles.make_transform(extrema, zoom)
 
-        height = (extrema["y"]["max"] - extrema["y"]["min"]) * 256
-        width = (extrema["x"]["max"] - extrema["x"]["min"]) * 256
+        height = (extrema["y"]["max"] - extrema["y"]["min"] - 1) * 256
+        width = (extrema["x"]["max"] - extrema["x"]["min"] - 1) * 256
 
         memfile = MemoryFile()
         writer = memfile.open(
             driver='GTiff',
             count=1,
-            dtype="uint8",
-            crs="EPSG:3857",
+            dtype='uint8',
+            crs='EPSG:3857',
             transform=transform,
             height=height,
-            width=height
+            width=width
         )
 
         return (extrema, memfile, writer)
