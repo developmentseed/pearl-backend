@@ -33,11 +33,14 @@ class API():
             "i": os.environ['INSTANCE_ID']
         }, os.environ["SigningSecret"], algorithm="HS256")
 
+        # Temp Directories
         self.tmp_dir = '/tmp/gpu-api'
+        self.tmp_checkpoints = self.tmp_dir + '/checkpoints'
+        self.tmp_tiles = self.tmp_dir + '/tiles'
 
         os.makedirs(self.tmp_dir, exist_ok=True)
-        os.makedirs(self.tmp_dir + '/tiles', exist_ok=True)
-        os.makedirs(self.tmp_dir + '/checkpoints', exist_ok=True)
+        os.makedirs(self.tmp_checkpoints, exist_ok=True)
+        os.makedirs(self.tmp_tiles, exist_ok=True)
 
         self.requests = requests.Session()
         self.requests.mount(url, HTTPAdapter(max_retries = urllib3.util.Retry(
@@ -104,12 +107,19 @@ class API():
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
-        return r.json()
 
-    def upload_checkpoint(self, checkpointid, ch_dir):
+        body = r.json();
+
+        os.makedirs(self.tmp_checkpoints + '/' + str(body['id']), exist_ok=True)
+
+        return body
+
+    def upload_checkpoint(self, checkpointid):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid) + '/upload'
 
         LOGGER.info("ok - POST " + url)
+
+        ch_dir = self.tmp_checkpoints + '/' + str(checkpointid)
 
         zip_fs = self.tmp_dir + '/checkpoints/checkpoint-{}.zip'.format(checkpointid)
 
@@ -133,6 +143,36 @@ class API():
 
         LOGGER.info("ok - Received " + url)
         return r.json()
+
+    def download_checkpoint(self, checkpointid):
+        url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid) + '/download'
+
+        LOGGER.info("ok - GET " + url)
+
+        ch_dir = self.tmp_checkpoints + '/' + str(checkpointid)
+
+        r = self.requests.get(url,
+            headers={
+                "Authorization": "Bearer " + self.token,
+                'Content-Type': encoder.content_type
+            },
+            data = encoder
+        )
+
+        r.raise_for_status()
+
+        ch_zip_fs = self.tmp_dir + '/checkpoint-{}.zip'.format(checkpointid)
+        with open(ch_zip_fs, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
+                    os.fsync(f.fileno())
+
+        LOGGER.info("ok - Received " + url)
+
+        print(self.tmp_dir)
+        #return r.json()
 
     def create_aoi(self, aoi):
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'

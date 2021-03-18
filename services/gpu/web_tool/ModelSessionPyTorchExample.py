@@ -74,7 +74,6 @@ class TorchFineTuning(ModelSession):
 
         self.model_fs = api.model_fs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        print(self.device)
 
         # will need to figure out for re-training
         self.output_channels = len(self.classes)
@@ -126,7 +125,9 @@ class TorchFineTuning(ModelSession):
         return output, output_features
 
     def retrain(self, classes, **kwargs):
-        self.classes = [{
+        names = [x['name'] for x in classes]
+
+        retrain_classes = [{
             'name': x['name'],
             'color': x['color']
         } for x in classes ]
@@ -137,11 +138,23 @@ class TorchFineTuning(ModelSession):
 
         # add re-training counts to classes attribute
         for i, c in enumerate(counts):
-             self.classes[i]['retraining_counts'] = c
-             self.classes[i]['retraining_counts_percent'] = c / sum(counts)
+             retrain_classes[i]['retraining_counts'] = c
+             retrain_classes[i]['retraining_counts_percent'] = c / sum(counts)
 
+        # update and attribute self.classes with retraining info
+        for i, c in enumerate(self.classes):
+            # retraing samples that are in starter model
+            if c['name'] in names:
+                self.classes[i]['retraining_counts'] = counts[names.index(c['name'])]
+                self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
+            # starter model classes that are not in user specified retraining samples
+            else:
+                self.classes[i]['retraining_counts'] = 0
+                self.classes[i]['retraining_counts_percent'] = 0
+
+        # combine starter model classes and retrain classes
+        self.classes = self.classes + [x for x in retrain_classes if not x in self.classes]
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
-        names =  [x['name'] for x in classes]
 
         names_retrain = []
         for i, c in enumerate(counts):
@@ -159,6 +172,24 @@ class TorchFineTuning(ModelSession):
         x_train = np.array(self.augment_x_train)
         y_train = np.array(self.augment_y_train)
 
+        # Place holder to load in seed npz
+        # seed_x = np.load('_embedding.npz', allow_pickle=True)
+        # seed_x = seed_x['arr_0']
+        # seed_y = np.load('/_label.npz', allow_pickle=True)
+        # seed_y = seed_y['arr_0']
+
+
+        # Place holder to load in seed npz
+        # print (y_train.shape)
+        # print(type(y_train))
+        # print (seed_y.shape)
+
+
+        # x_train = np.vstack((x_train, seed_x))
+        # print(x_train.shape)
+        # y_train = np.hstack((y_train, seed_y))
+        # print(y_train.shape)
+
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
 
         if x_train.shape[0] == 0:
@@ -169,7 +200,7 @@ class TorchFineTuning(ModelSession):
 
 
 
-        # split re-training data into test 20% and train 80%
+        # split re-training data into test 10% and train 90%
         # TO-DO confirm post split that all unqiue class labels are present in training!
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.1, random_state=0)
@@ -192,24 +223,18 @@ class TorchFineTuning(ModelSession):
                 self.augment_model.coef_ = np.vstack((w, random_new_weights))
 
 
-        print ('y train unique')
-        print (np.unique(y_train))
         self.augment_model.fit(x_train, y_train) #figure out if this is running on GPU or CPU
 
         lr_preds = self.augment_model.predict(x_test)
-        print ('augment model classes')
-        print(self.augment_model.classes_)
 
 
         per_class_f1 = f1_score(y_test, lr_preds, average=None)
-        print ("Per Class f1-score: ")
-        print (per_class_f1)
 
         # add per class f1 to classes attribute
         f1_labels = np.unique(np.concatenate((y_test, lr_preds)))
-        per_class_f1_final = np.zeros(len(names))
+        per_class_f1_final = np.zeros(len(list(self.class_names_mapping.keys())))
 
-        missing_labels = np.setdiff1d(list(np.arange(len(names))), f1_labels)
+        missing_labels = np.setdiff1d(list(np.arange(len(list(self.class_names_mapping.keys())))), f1_labels)
 
         # where the unique cls id exist, fill in f1 per calss
         per_class_f1_final[f1_labels] =  per_class_f1
@@ -218,7 +243,8 @@ class TorchFineTuning(ModelSession):
 
         # add  retrainingper class f1-scores counts to classes attribute
         for i, f1 in enumerate(per_class_f1_final):
-             self.classes[i]['retraining_f1score'] = f1
+            self.classes[i].update({'retraining_f1score': f1})
+
 
         global_f1 = f1_score(y_test, lr_preds, average='weighted')
         print("Global f1-score: %0.4f" % (global_f1))

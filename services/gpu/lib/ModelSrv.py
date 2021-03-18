@@ -14,9 +14,6 @@ LOGGER = logging.getLogger("server")
 class ModelSrv():
     def __init__(self, model, api):
 
-        self.checkpoint_dir = '/tmp/checkpoints/'
-        os.makedirs(self.checkpoint_dir, exist_ok=True)
-
         self.aoi = None
         self.chk = None
         self.processing = False
@@ -129,9 +126,9 @@ class ModelSrv():
                 'name': body['name'],
                 'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']]),
                 'analytics': [{
-                    'counts': cls['retraining_counts'],
-                    'percent': cls['retraining_counts_percent'],
-                    'f1score': cls['retraining_f1score']
+                    'counts': cls.get('retraining_counts', 0),
+                    'percent': cls.get('retraining_counts_percent', 0),
+                    'f1score': cls.get('retraining_f1score', 0)
                 } for cls in self.model.classes]
             }, websocket)
 
@@ -169,12 +166,8 @@ class ModelSrv():
             body.get('analytics')
         )
 
-        chdir = self.checkpoint_dir + str(checkpoint['id']) + '/'
-        os.makedirs(chdir, exist_ok=True)
-        self.model.save_state_to(chdir)
-
-        self.api.upload_checkpoint(checkpoint['id'], chdir)
-
+        self.model.save_state_to(self.api.tmp_checkpoints + '/' + str(checkpoint['id']))
+        self.api.upload_checkpoint(checkpoint['id'])
         self.api.instance_patch(checkpoint_id = checkpoint['id'])
 
         await websocket.send(json.dumps({

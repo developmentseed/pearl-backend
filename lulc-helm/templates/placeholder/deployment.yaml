@@ -9,6 +9,8 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.placeholder.replicaCount }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ template "lulc-helm.name" . }}

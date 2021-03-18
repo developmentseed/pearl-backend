@@ -9,19 +9,19 @@
 // - Create new token
 // - Authenticate with WS router
 //
+//
+// GPU=1 Stay running and issue webhook messages to an instance
+// DEBUG=1 Verbose logs
 
-const fs = require('fs');
 const Progress = require('cli-progress');
-const path = require('path');
 const WebSocket = require('ws');
 const test = require('tape');
-const request = require('request');
-const { Pool } = require('pg');
+const { promisify } = require('util');
+const request = promisify(require('request'));
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 const Knex = require('knex');
 
-const { Client } = require('pg');
 const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
@@ -40,7 +40,7 @@ test('pre-run', async (t) => {
         const auth = new (require('../services/api/lib/auth').Auth)(config);
         const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
 
-        const user = await auth.create({
+        await auth.create({
             access: 'admin',
             username: 'example',
             email: 'example@example.com',
@@ -52,7 +52,7 @@ test('pre-run', async (t) => {
             uid: 1
         }, 'API Token')).token;
 
-        await knex.destroy()
+        await knex.destroy();
         config.pool.end();
     } catch (err) {
         t.error(err, 'no errors');
@@ -61,17 +61,17 @@ test('pre-run', async (t) => {
     t.end();
 });
 
-test('api running', (t) => {
-    request({
-        method: 'GET',
-        json: true,
-        url: API + '/api'
-    }, (err, res, body) => {
-        t.error(err, 'no error');
+test('api running', async (t) => {
+    try {
+        const res = await request({
+            method: 'GET',
+            json: true,
+            url: API + '/api'
+        });
 
         t.equals(res.statusCode, 200);
 
-        t.deepEquals(body, {
+        t.deepEquals(res.body, {
             version: '1.0.0',
             limits: {
                 live_inference: 1000,
@@ -80,53 +80,56 @@ test('api running', (t) => {
             }
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('new model', (t) => {
-    request({
-        method: 'POST',
-        json: true,
-        url: API + '/api/model',
-        body: {
-            name: 'NAIP Supervised',
-            active: true,
-            model_type: 'pytorch_example',
-            model_inputshape: [256, 256, 4],
-            model_zoom: 17,
-            classes: [
-                { name: 'No Data', color: '#62a092' },
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Emergent Wetlands', color: '#008000' },
-                { name: 'Tree Canopy', color: '#80FF80' },
-                { name: 'Shrubland', color: '#806060' },
-                { name: 'Low Vegetation', color: '#07c4c5' },
-                { name: 'Barren', color: '#027fdc' },
-                { name: 'Structure', color: '#f76f73' },
-                { name: 'Impervious Surface', color: '#ffb703' },
-                { name: 'Impervious Road', color: '#0218a2' }
-            ],
-            meta: {}
-        },
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res, body) => {
-        t.error(err, 'no error');
+test('new model', async (t) => {
+    try {
+        const res = await request({
+            method: 'POST',
+            json: true,
+            url: API + '/api/model',
+            body: {
+                name: 'NAIP Supervised',
+                active: true,
+                model_type: 'pytorch_example',
+                model_inputshape: [256, 256, 4],
+                model_zoom: 17,
+                classes: [
+                    { name: 'No Data', color: '#62a092' },
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Emergent Wetlands', color: '#008000' },
+                    { name: 'Tree Canopy', color: '#80FF80' },
+                    { name: 'Shrubland', color: '#806060' },
+                    { name: 'Low Vegetation', color: '#07c4c5' },
+                    { name: 'Barren', color: '#027fdc' },
+                    { name: 'Structure', color: '#f76f73' },
+                    { name: 'Impervious Surface', color: '#ffb703' },
+                    { name: 'Impervious Road', color: '#0218a2' }
+                ],
+                meta: {}
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body).sort(), [
+        t.deepEquals(Object.keys(res.body).sort(), [
             'id', 'bounds', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
         ].sort(), 'expected props');
 
-        t.ok(parseInt(body.id), 'id: <integer>');
+        t.ok(parseInt(res.body.id), 'id: <integer>');
 
-        delete body.created;
-        delete body.id;
+        delete res.body.created;
+        delete res.body.id;
 
-        t.deepEquals(body, {
+        t.deepEquals(res.body, {
             active: true,
             uid: 1,
             name: 'NAIP Supervised',
@@ -150,36 +153,39 @@ test('new model', (t) => {
             meta: {}
         }, 'expected body');
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('new model - storage: true', (t) => {
-    request({
-        method: 'PATCH',
-        json: true,
-        url: API + '/api/model/1',
-        body: {
-            storage: true
-        },
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res, body) => {
-        t.error(err, 'no error');
+test('new model - storage: true', async (t) => {
+    try {
+        const res = await request({
+            method: 'PATCH',
+            json: true,
+            url: API + '/api/model/1',
+            body: {
+                storage: true
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body).sort(), [
+        t.deepEquals(Object.keys(res.body).sort(), [
             'id', 'bounds', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
         ].sort(), 'expected props');
 
-        t.ok(parseInt(body.id), 'id: <integer>');
+        t.ok(parseInt(res.body.id), 'id: <integer>');
 
-        delete body.created;
-        delete body.id;
+        delete res.body.created;
+        delete res.body.id;
 
-        t.deepEquals(body, {
+        t.deepEquals(res.body, {
             active: true,
             uid: 1,
             name: 'NAIP Supervised',
@@ -203,77 +209,82 @@ test('new model - storage: true', (t) => {
             meta: {}
         }, 'expected body');
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('new project', (t) => {
-    request({
-        method: 'POST',
-        json: true,
-        url: API + '/api/project',
-        body: {
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
-        },
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res, body) => {
-        t.error(err, 'no error');
+test('new project', async (t) => {
+    try {
+        const res = await request({
+            method: 'POST',
+            json: true,
+            url: API + '/api/project',
+            body: {
+                name: 'Test Project',
+                model_id: 1,
+                mosaic: 'naip.latest'
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body).sort(), [
+        t.deepEquals(Object.keys(res.body).sort(), [
             'created', 'id', 'model_id', 'mosaic', 'name', 'uid'
         ], 'expected props');
 
-        t.ok(body.created, 'created: <date>');
+        t.ok(res.body.created, 'created: <date>');
 
-        delete body.created;
+        delete res.body.created;
 
-        t.deepEquals(body, {
+        t.deepEquals(res.body, {
             id: 1,
             uid: 1,
             name: 'Test Project',
             model_id: 1,
             mosaic: 'naip.latest'
         }, 'expected body');
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('new instance', (t) => {
-    request({
-        method: 'POST',
-        json: true,
-        url: API + '/api/project/1/instance',
-        body: {},
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res, body) => {
-        t.error(err, 'no error');
+test('new instance', async (t) => {
+    try {
+        const res = await request({
+            method: 'POST',
+            json: true,
+            url: API + '/api/project/1/instance',
+            body: {},
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         t.equals(res.statusCode, 200, '200 status code');
 
-        t.deepEquals(Object.keys(body).sort(), [
+        t.deepEquals(Object.keys(res.body).sort(), [
             'active', 'aoi_id', 'checkpoint_id', 'created', 'id', 'last_update', 'pod', 'project_id', 'token'
         ].sort(), 'expected props');
 
-        t.ok(parseInt(body.id), 'id: <integer>');
+        t.ok(parseInt(res.body.id), 'id: <integer>');
 
-        delete body.id,
-        delete body.created;
-        delete body.last_update;
+        delete res.body.id,
+        delete res.body.created;
+        delete res.body.last_update;
 
-        instance = body.token;
+        instance = res.body.token;
 
-        delete body.token;
+        delete res.body.token;
 
-        t.deepEquals(body, {
+        t.deepEquals(res.body, {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: null,
@@ -281,8 +292,11 @@ test('new instance', (t) => {
             pod: {}
         }, 'expected body');
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
 test('gpu connection', (t) => {
@@ -290,7 +304,7 @@ test('gpu connection', (t) => {
     const state = {
         task: false,
         progress: false
-    }
+    };
 
     const ws = new WebSocket(SOCKET + `?token=${instance}`);
 
@@ -306,8 +320,8 @@ test('gpu connection', (t) => {
     let first = true;
 
     ws.on('message', (msg) => {
-        msg = JSON.parse(msg)
-        console.error(JSON.stringify(msg, null, 4))
+        msg = JSON.parse(msg);
+        if (process.env.DEBUG) console.error(JSON.stringify(msg, null, 4));
 
         // Messages in this IF queue are in chrono order
         if (msg.message === 'info#connected') {
@@ -321,7 +335,7 @@ test('gpu connection', (t) => {
         } else if (msg.message === 'model#prediction') {
             if (state.task !== msg.message) {
                 state.task = msg.message;
-                state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic)
+                state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
 
                 console.error('ok - model#prediction');
                 state.progress.start(msg.data.total, msg.data.processed);
@@ -344,7 +358,7 @@ test('gpu connection', (t) => {
         } else if (msg.message === 'model#checkpoint') {
             console.error(`ok - created checkpoint #${msg.data.id}: ${msg.data.name}`);
         } else {
-            console.error(JSON.stringify(msg, null, 4))
+            console.error(JSON.stringify(msg, null, 4));
         }
 
         state.task = msg.message;
