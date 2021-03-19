@@ -86,4 +86,4 @@ spec:
           volumes:
             - name: {{ template "lulc-helm.fullname" . }}-volume
               configMap:
-                name: {{ template "lulc-helm.fullname" . }}
+                name: {{ template "lulc-helm.fullname" . }}-kubejanitor
