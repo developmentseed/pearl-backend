@@ -12,11 +12,14 @@ spec:
   {{- if eq .Values.environment "local" }}
   type: NodePort
   {{- else }}
-  type: LoadBalancer
+  type: ClusterIP
   {{- end }}
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 80
       targetPort: {{ .Values.tiles.containerPort }}
+      nodePort: null
+
   selector:
     app: {{ template "lulc-helm.name" . }}
     release: {{ .Release.Name }}
