@@ -18,6 +18,7 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: {{ .Values.socket.containerPort }}
+      nodePort: null
   selector:
     app: {{ template "lulc-helm.name" . }}
     release: {{ .Release.Name }}
