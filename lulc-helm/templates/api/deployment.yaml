@@ -60,7 +60,7 @@ spec:
             - name: ApiUrl
               value: https://api.{{ .Values.domain }}
             - name: SocketUrl
-              value: wss://{{ template "lulc-helm.fullname" . }}-socket
+              value: ws://{{ template "lulc-helm.fullname" . }}-socket
             - name: nodeSelectorKey
               value: {{ .Values.api.env.nodeSelectorKey }}
             - name: nodeSelectorValue
