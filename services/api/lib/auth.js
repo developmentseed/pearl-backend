@@ -246,7 +246,11 @@ class AuthToken {
         let pgres, decoded;
         try {
             decoded = jwt.verify(token, this.config.SigningSecret);
+        } catch (err) {
+            throw new Err(401, err, 'Invalid Token');
+        }
 
+        try {
             if (decoded.t === 'admin') {
                 return {
                     uid: false,
@@ -255,7 +259,6 @@ class AuthToken {
                     email: false
                 };
             }
-
             pgres = await this.pool.query(`
                 SELECT
                     users.id AS uid,
@@ -276,16 +279,16 @@ class AuthToken {
         }
 
         if (!pgres.rows.length) {
-            throw new Err(401, null, 'Invalid token');
+            throw new Err(401, null, 'Invalid Token');
         } else if (pgres.rows.length > 1) {
-            throw new Err(401, null, 'Token collision');
+            throw new Err(401, null, 'Token Collision');
         }
 
         // Token UID must equad DB UID
         if (decoded.u !== parseInt(pgres.rows[0].uid)) {
-            throw new Err(401, null, 'Invalid token');
+            throw new Err(401, null, 'Invalid Token');
         } else if (decoded.t !== 'api') {
-            throw new Err(401, null, 'Invalid token');
+            throw new Err(401, null, 'Invalid Token');
         }
 
         return {
@@ -298,7 +301,7 @@ class AuthToken {
 
     async list(auth) {
         if (!auth.uid) {
-            throw new Err(500, null, 'Server could not determine user id');
+            throw new Err(401, null, 'Not Authenticated');
         }
 
         try {
