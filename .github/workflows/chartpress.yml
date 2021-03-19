@@ -157,6 +157,7 @@ jobs:
         releaseName: lulc-test
         overrideFiles: './lulc-helm/values.dev.yaml'
         helm-version: 'latest'
+        silent: 'false'
       id: test-bake
 
     - name: Production - deploy

@@ -23,7 +23,7 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: {{ template "lulc-helm.fullname" . }}
+          serviceAccountName: {{ template "lulc-helm.fullname" . }}-kubejanitor
           restartPolicy: {{ .Values.kubejanitor.restartPolicy }}
           {{- if .Values.kubejanitor.nodeSelector }}
           nodeSelector:
@@ -38,7 +38,7 @@ spec:
 {{ toYaml .Values.kubejanitor.tolerations | indent 12 }}
           {{- end }}
           containers:
-          - name: {{ .Chart.Name }}
+          - name: {{ .Chart.Name }}-kubejanitor
             image: "{{ .Values.kubejanitor.image.repository }}:{{ .Values.kubejanitor.image.tag }}"
             imagePullPolicy: {{ .Values.kubejanitor.image.pullPolicy }}
             args:
@@ -71,7 +71,7 @@ spec:
               - "--exclude-namespaces"
               - "{{ .Values.kubejanitor.excludeNamespaces }}"
               {{- end }}
-              # - --rules-file=/config/rules.yaml
+              - --rules-file=/config/rules.yaml
             {{- if .Value.kubejanitor.resources }}
             resources:
 {{ toYaml .Values.kubejanitor.resources | indent 14 }}
