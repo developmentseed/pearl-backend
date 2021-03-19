@@ -12,7 +12,7 @@ spec:
   {{- if eq .Values.environment "local" }}
   type: NodePort
   {{- else }}
-  type: LoadBalancer
+  type: ClusterIP
   {{- end }}
   ports:
     - port: 80
