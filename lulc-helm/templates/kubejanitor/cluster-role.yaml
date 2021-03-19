@@ -1,0 +1,14 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-kubejanitor
+  labels:
+    app: {{ template "lulc-helm.name" . }}
+    release: {{ .Release.Name }}
+rules:
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["get", "watch", "list", "delete"]

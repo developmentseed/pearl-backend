@@ -1,0 +1,89 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-kubejanitor
+  labels:
+    app: {{ template "lulc-helm.name" . }}
+    release: {{ .Release.Name }}
+spec:
+  schedule: "{{ .Values.kubejanitor.cron.schedule }}"
+  {{- if .Values.kubejanitor.cron.successfulJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.kubejanitor.cron.successfulJobsHistoryLimit }}
+  {{- end }}
+  {{- if .Values.kubejanitor.cron.failedJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.kubejanitor.cron.failedJobsHistoryLimit }}
+  {{- end }}
+  {{- if .Values.kubejanitor.cron.suspend }}
+  suspend: {{ .Values.kubejanitor.cron.suspend }}
+  {{- end }}
+  {{- if .Values.kubejanitor.cron.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ .Values.kubejanitor.cron.startingDeadlineSeconds }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ template "lulc-helm.fullname" . }}
+          restartPolicy: {{ .Values.kubejanitor.restartPolicy }}
+          {{- if .Values.kubejanitor.nodeSelector }}
+          nodeSelector:
+{{ toYaml .Values.kubejanitor.nodeSelector | indent 12 }}
+          {{- end }}
+          {{- if .Values.kubejanitor.affinity }}
+          affinity:
+{{ toYaml .Values.kubejanitor.affinity | indent 12 }}
+          {{- end }}
+          {{- if .Values.kubejanitor.tolerations }}
+          tolerations:
+{{ toYaml .Values.kubejanitor.tolerations | indent 12 }}
+          {{- end }}
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.kubejanitor.image.repository }}:{{ .Values.kubejanitor.image.tag }}"
+            imagePullPolicy: {{ .Values.kubejanitor.image.pullPolicy }}
+            args:
+              {{- if .Values.kubejanitor.dryRun }}
+              - "--dry-run"
+              {{- end }}
+              {{- if .Values.kubejanitor.debug }}
+              - "--debug"
+              {{- end }}
+              {{- if .Values.kubejanitor.once }}
+              - "--once"
+              {{- end }}
+              {{- if .Values.kubejanitor.interval }}
+              - "--interval"
+              - "{{ .Values.kubejanitor.interval }}"
+              {{- end }}
+              {{- if .Values.kubejanitor.includeResources }}
+              - "--include-resources"
+              - "{{ .Values.kubejanitor.includeResources }}"
+              {{- end }}
+              {{- if .Values.kubejanitor.excludeResources }}
+              - "--exclude-resources"
+              - "{{ .Values.kubejanitor.excludeResources }}"
+              {{- end }}
+              {{- if .Values.kubejanitor.includeNamespaces }}
+              - "--include-namespaces"
+              - "{{ .Values.kubejanitor.includeNamespaces }}"
+              {{- end }}
+              {{- if .Values.kubejanitor.excludeNamespaces }}
+              - "--exclude-namespaces"
+              - "{{ .Values.kubejanitor.excludeNamespaces }}"
+              {{- end }}
+              - --rules-file=/config/rules.yaml
+            {{- if .Value.kubejanitor.resources }}
+            resources:
+{{ toYaml .Values.kubejanitor.resources | indent 14 }}
+            {{- end }}
+            securityContext:
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
+            volumeMounts:
+              - name: {{ template "lulc-helm.fullname" . }}-volume
+                mountPath: /config
+          volumes:
+            - name: {{ template "lulc-helm.fullname" . }}-volume
+              configMap:
+                name: {{ template "lulc-helm.fullname" . }}
