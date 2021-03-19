@@ -76,7 +76,10 @@ class Kube {
             apiVersion: 'v1',
             kind: 'Pod',
             metadata: {
-                name: `${deploymentName}-gpu-${name}`
+                name: `${deploymentName}-gpu-${name}`,
+                annotations: {
+                    'janitor/ttl': '1h'
+                },
             },
             spec: {
                 containers: [
