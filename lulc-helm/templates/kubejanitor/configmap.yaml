@@ -4,7 +4,4 @@ metadata:
   name: {{ template "lulc-helm.fullname" . }}-kubejanitor
 data:
   rules.yaml: |-
-    # example rules configuration to set TTL for arbitrary objects
-    # see https://github.com/hjacobs/kube-janitor for details
-    rules:
-{{ toYaml .Values.kubejanitor.rules | indent 6 }}
+    {{ toYaml .Values.kubejanitor.rules | indent 6 }}
