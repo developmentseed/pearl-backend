@@ -72,7 +72,7 @@ spec:
               - "{{ .Values.kubejanitor.excludeNamespaces }}"
               {{- end }}
               - --rules-file=/config/rules.yaml
-            {{- if .Value.kubejanitor.resources }}
+            {{- if .Value.kubejanitor.resources.enabled }}
             resources:
 {{ toYaml .Values.kubejanitor.resources | indent 14 }}
             {{- end }}

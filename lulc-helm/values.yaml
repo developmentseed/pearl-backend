@@ -143,6 +143,7 @@ kubejanitor:
     # startingDeadlineSeconds: 300
   restartPolicy: OnFailure
   resources:
+    enabled: false
     limits:
       memory: 100Mi
     requests:
