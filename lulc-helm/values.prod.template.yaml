@@ -9,7 +9,7 @@ api:
     Postgres: {{PRODUCTION_POSTGRES}}
     AZURE_STORAGE_CONNECTION_STRING: {{PRODUCTION_AZURE_STORAGE_CONNECTION_STRING}}
     nodeSelectorKey: 'agentpool'
-    nodeSelectorValue: 'tiler'
+    nodeSelectorValue: 'gpu'
 socket:
   enabled: true
   containerPort: 1999
@@ -26,8 +26,8 @@ tiles:
 placeholder:
   enabled: true
   replicaCount: 3
-  nodeSelectorName: 'tiler'
-  isGpu: false
+  nodeSelectorName: 'gpu'
+  isGpu: true
   resources:
     requests:
       cpu: 2
