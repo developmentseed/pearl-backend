@@ -276,12 +276,11 @@ test('Instance 1', async (t) => {
 
         t.ok(parseInt(res.body.id), 'id: <integer>');
 
+        instance = JSON.parse(JSON.stringify(res.body));
+
         delete res.body.id,
         delete res.body.created;
         delete res.body.last_update;
-
-        instance = res.body.token;
-
         delete res.body.token;
 
         t.deepEquals(res.body, {
@@ -324,12 +323,11 @@ test('Instance 2', async (t) => {
 
         t.ok(parseInt(res.body.id), 'id: <integer>');
 
+        instance = JSON.parse(JSON.stringify(res.body));
+
         delete res.body.id,
         delete res.body.created;
         delete res.body.last_update;
-
-        instance = res.body.token;
-
         delete res.body.token;
 
         t.deepEquals(res.body, {
@@ -357,7 +355,7 @@ function gpu() {
             progress: false
         };
 
-        const ws = new WebSocket(SOCKET + `?token=${instance}`);
+        const ws = new WebSocket(SOCKET + `?token=${instance.token}`);
 
         ws.on('open', () => {
             t.ok('connection opened');
@@ -405,11 +403,13 @@ function gpu() {
                         data: require('./fixtures/retrain.json')
                     }));
                 } else if (runs === 2) {
-                    ws.send(JSON.stringify({
-                        action: 'instance#terminate'
-                    }));
-                    ws.close();
-                    t.end();
+                    if (instance.id === 1) {
+                        ws.send(JSON.stringify({
+                            action: 'instance#terminate'
+                        }));
+                        ws.close();
+                        t.end();
+                    }
                 }
             } else if (msg.message === 'model#retrain#complete') {
                 console.error('ok - model#retrain#complete');
