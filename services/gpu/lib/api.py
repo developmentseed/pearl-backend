@@ -36,7 +36,8 @@ class API():
 
         # Temp Directories
         self.tmp_dir = '/tmp/gpu-api'
-        shutil.rmtree(self.tmp_dir)
+        if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
 
         self.tmp_checkpoints = self.tmp_dir + '/checkpoints'
         self.tmp_tiles = self.tmp_dir + '/tiles'
