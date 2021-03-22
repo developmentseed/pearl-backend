@@ -630,6 +630,26 @@ define({ "api": [
       }
     ],
     "description": "<p>Instruct the GPU pool to start a new model instance and return a time limited session token for accessing the websockets GPU API</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "aoi_id",
+            "description": "<p>The current AOI loaded on the instance</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpoint_id",
+            "description": "<p>The current checkpoint loaded on the instance</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "examples": [
         {
@@ -772,6 +792,20 @@ define({ "api": [
             "optional": true,
             "field": "active",
             "description": "<p>Is the instance currently running</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "aoi_id",
+            "description": "<p>The current AOI loaded on the instance</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpoint_id",
+            "description": "<p>The current checkpoint loaded on the instance</p>"
           }
         ]
       }
@@ -1650,7 +1684,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 1000 (m^2)\n        \"max_inference\": 100000 (m^2)\n        \"instance_window\": 1800 (secs)\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 10000000 (m^2)\n        \"max_inference\": 10000000 (m^2)\n        \"instance_window\": 600 (m secs)\n    }\n}",
           "type": "json"
         }
       ]

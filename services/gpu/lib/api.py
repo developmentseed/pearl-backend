@@ -1,6 +1,7 @@
 import os
 import jwt
 import json
+import shutil
 import requests
 import pyproj
 import numpy as np
@@ -35,6 +36,8 @@ class API():
 
         # Temp Directories
         self.tmp_dir = '/tmp/gpu-api'
+        shutil.rmtree(self.tmp_dir)
+
         self.tmp_checkpoints = self.tmp_dir + '/checkpoints'
         self.tmp_tiles = self.tmp_dir + '/tiles'
 
@@ -114,6 +117,23 @@ class API():
 
         return body
 
+    def get_checkpoint(self, checkpointid):
+        url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid)
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url,
+            headers={
+                "authorization": "Bearer " + self.token
+            }
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+
+        body = r.json();
+
+        return body
+
     def upload_checkpoint(self, checkpointid):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid) + '/upload'
 
@@ -154,9 +174,7 @@ class API():
         r = self.requests.get(url,
             headers={
                 "Authorization": "Bearer " + self.token,
-                'Content-Type': encoder.content_type
-            },
-            data = encoder
+            }
         )
 
         r.raise_for_status()
@@ -171,8 +189,13 @@ class API():
 
         LOGGER.info("ok - Received " + url)
 
-        print(self.tmp_dir)
-        #return r.json()
+        ch_dir = self.tmp_checkpoints + '/' + str(checkpointid)
+        os.makedirs(ch_dir, exist_ok=True)
+
+        with zipfile.ZipFile(ch_zip_fs, 'r') as zip_ref:
+            zip_ref.extractall(self.tmp_checkpoints)
+
+        return ch_dir
 
     def create_aoi(self, aoi):
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'

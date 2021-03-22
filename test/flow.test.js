@@ -216,7 +216,7 @@ test('new model - storage: true', async (t) => {
     t.end();
 });
 
-test('new project', async (t) => {
+test('Project 1', async (t) => {
     try {
         const res = await request({
             method: 'POST',
@@ -256,7 +256,7 @@ test('new project', async (t) => {
     t.end();
 });
 
-test('new instance', async (t) => {
+test('Instance 1', async (t) => {
     try {
         const res = await request({
             method: 'POST',
@@ -276,12 +276,11 @@ test('new instance', async (t) => {
 
         t.ok(parseInt(res.body.id), 'id: <integer>');
 
+        instance = JSON.parse(JSON.stringify(res.body));
+
         delete res.body.id,
         delete res.body.created;
         delete res.body.last_update;
-
-        instance = res.body.token;
-
         delete res.body.token;
 
         t.deepEquals(res.body, {
@@ -299,68 +298,130 @@ test('new instance', async (t) => {
     t.end();
 });
 
-test('gpu connection', (t) => {
+gpu();
 
-    const state = {
-        task: false,
-        progress: false
-    };
+if (!process.env.GPU) return;
 
-    const ws = new WebSocket(SOCKET + `?token=${instance}`);
-
-    ws.on('open', () => {
-        t.ok('connection opened');
-
-        if (!process.env.GPU) {
-            ws.close();
-            t.end();
-        }
-    });
-
-    let first = true;
-
-    ws.on('message', (msg) => {
-        msg = JSON.parse(msg);
-        if (process.env.DEBUG) console.error(JSON.stringify(msg, null, 4));
-
-        // Messages in this IF queue are in chrono order
-        if (msg.message === 'info#connected') {
-            console.error('ok - info#connected');
-            first = true;
-
-            ws.send(JSON.stringify({
-                action: 'model#prediction',
-                data: require('./fixtures/pred.json')
-            }));
-        } else if (msg.message === 'model#prediction') {
-            if (state.task !== msg.message) {
-                state.task = msg.message;
-                state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
-
-                console.error('ok - model#prediction');
-                state.progress.start(msg.data.total, msg.data.processed);
-            } else {
-                state.progress.update(msg.data.processed);
+test('Instance 2', async (t) => {
+    try {
+        const res = await request({
+            method: 'POST',
+            json: true,
+            url: API + '/api/project/1/instance',
+            body: {
+                checkpoint_id: 2,
+                aoi_id: 2
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
             }
-        } else if (msg.message === 'model#prediction#complete') {
-            if (state.progress) state.progress.stop();
-            console.error('ok - model#prediction#complete');
+        });
 
-            if (first) {
-                first = false;
-                ws.send(JSON.stringify({
-                    action: 'model#retrain',
-                    data: require('./fixtures/retrain.json')
-                }));
-            }
-        } else if (msg.message === 'model#retrain#complete') {
-            console.error('ok - model#retrain#complete');
-        } else if (msg.message === 'model#checkpoint') {
-            console.error(`ok - created checkpoint #${msg.data.id}: ${msg.data.name}`);
-        } else {
-            console.error(JSON.stringify(msg, null, 4));
-        }
+        t.equals(res.statusCode, 200, '200 status code');
 
-        state.task = msg.message;
-    });
+        t.deepEquals(Object.keys(res.body).sort(), [
+            'active', 'aoi_id', 'checkpoint_id', 'created', 'id', 'last_update', 'pod', 'project_id', 'token'
+        ].sort(), 'expected props');
+
+        t.ok(parseInt(res.body.id), 'id: <integer>');
+
+        instance = JSON.parse(JSON.stringify(res.body));
+
+        delete res.body.id,
+        delete res.body.created;
+        delete res.body.last_update;
+        delete res.body.token;
+
+        t.deepEquals(res.body, {
+            project_id: 1,
+            aoi_id: 2,
+            checkpoint_id: 2,
+            active: false,
+            pod: {}
+        }, 'expected body');
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
+
+gpu();
+
+function gpu() {
+    test('gpu connection', (t) => {
+
+        const state = {
+            task: false,
+            progress: false
+        };
+
+        const ws = new WebSocket(SOCKET + `?token=${instance.token}`);
+
+        ws.on('open', () => {
+            t.ok('connection opened');
+
+            if (!process.env.GPU) {
+                ws.close();
+                t.end();
+            }
+        });
+
+        let runs = 0;
+
+        ws.on('message', (msg) => {
+            msg = JSON.parse(msg);
+            if (process.env.DEBUG) console.error(JSON.stringify(msg, null, 4));
+
+            // Messages in this IF queue are in chrono order
+            if (msg.message === 'info#connected') {
+                console.error('ok - info#connected');
+                if (runs === 0) {
+                    ws.send(JSON.stringify({
+                        action: 'model#prediction',
+                        data: require('./fixtures/pred.json')
+                    }));
+                }
+            } else if (msg.message === 'model#prediction') {
+                if (state.task !== msg.message) {
+                    state.task = msg.message;
+                    state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
+
+                    console.error('ok - model#prediction');
+                    state.progress.start(msg.data.total, msg.data.processed);
+                } else {
+                    state.progress.update(msg.data.processed);
+                }
+            } else if (msg.message === 'model#prediction#complete') {
+                runs++;
+
+                if (state.progress) state.progress.stop();
+                console.error('ok - model#prediction#complete');
+
+                if (runs === 1) {
+                    ws.send(JSON.stringify({
+                        action: 'model#retrain',
+                        data: require('./fixtures/retrain.json')
+                    }));
+                } else if (runs === 2) {
+                    if (instance.id === 1) {
+                        ws.send(JSON.stringify({
+                            action: 'instance#terminate'
+                        }));
+                        ws.close();
+                        t.end();
+                    }
+                }
+            } else if (msg.message === 'model#retrain#complete') {
+                console.error('ok - model#retrain#complete');
+            } else if (msg.message === 'model#checkpoint') {
+                console.error(`ok - created checkpoint #${msg.data.id}: ${msg.data.name}`);
+            } else {
+                console.error(JSON.stringify(msg, null, 4));
+            }
+
+            state.task = msg.message;
+        });
+    });
+}
