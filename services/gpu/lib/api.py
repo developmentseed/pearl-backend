@@ -154,9 +154,7 @@ class API():
         r = self.requests.get(url,
             headers={
                 "Authorization": "Bearer " + self.token,
-                'Content-Type': encoder.content_type
-            },
-            data = encoder
+            }
         )
 
         r.raise_for_status()
