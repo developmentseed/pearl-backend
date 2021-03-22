@@ -117,6 +117,23 @@ class API():
 
         return body
 
+    def get_checkpoint(self, checkpointid):
+        url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid)
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url,
+            headers={
+                "authorization": "Bearer " + self.token
+            }
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+
+        body = r.json();
+
+        return body
+
     def upload_checkpoint(self, checkpointid):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint/' + str(checkpointid) + '/upload'
 
