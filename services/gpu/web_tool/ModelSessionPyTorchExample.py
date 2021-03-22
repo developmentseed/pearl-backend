@@ -69,10 +69,9 @@ class TorchFineTuning(ModelSession):
     )
 
 
-    def __init__(self, gpu_id, api):
-        self.classes = api.model['classes']
-
-        self.model_fs = api.model_fs
+    def __init__(self, gpu_id, model_fs, classes):
+        self.model_fs = model_fs
+        self.classes = classes
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         print('# is cuda available?', torch.cuda.is_available())
@@ -361,24 +360,25 @@ class TorchFineTuning(ModelSession):
             "success": True
         }
 
-    def load_state_from(self, directory):
+    def load_state_from(self, chkpt, chkpt_fs):
 
         self.augment_x_train = []
         self.augment_y_train = []
 
-        for sample in np.load(os.path.join(directory, "augment_x_train.npy")):
+        for sample in np.load(os.path.join(chkpt_fs, "augment_x_train.npy")):
             self.augment_x_train.append(sample)
-        for sample in np.load(os.path.join(directory, "augment_y_train.npy")):
+        for sample in np.load(os.path.join(chkpt_fs, "augment_y_train.npy")):
             self.augment_y_train.append(sample)
 
-        self.augment_model = joblib.load(os.path.join(directory, "augment_model.p"))
+        self.augment_model = joblib.load(os.path.join(chkpt_fs, "augment_model.p"))
         #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
         # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
         # how to we update for the correct number of classes post retraining?
-        self.model_fs = os.path.join(directory, "retraining_checkpoint.pt")
+        self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
-        self.model = FCN(num_input_channels=4, num_output_classes=len(self.classes), num_filters=64)
+        self.classes = chkpt['classes']
+        self.model = FCN(num_input_channels=4, num_output_classes=len(chkpt['classes']), num_filters=64)
         self._init_model()
 
         return {
