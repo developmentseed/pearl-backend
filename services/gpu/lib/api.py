@@ -1,6 +1,7 @@
 import os
 import jwt
 import json
+import shutil
 import requests
 import pyproj
 import numpy as np
@@ -35,6 +36,8 @@ class API():
 
         # Temp Directories
         self.tmp_dir = '/tmp/gpu-api'
+        shutil.rmtree(self.tmp_dir)
+
         self.tmp_checkpoints = self.tmp_dir + '/checkpoints'
         self.tmp_tiles = self.tmp_dir + '/tiles'
 
@@ -169,8 +172,13 @@ class API():
 
         LOGGER.info("ok - Received " + url)
 
-        print(self.tmp_dir)
-        #return r.json()
+        ch_dir = self.tmp_checkpoints + '/' + str(checkpointid)
+        os.makedirs(ch_dir, exist_ok=True)
+
+        with zipfile.ZipFile(ch_zip_fs, 'r') as zip_ref:
+            zip_ref.extractall(self.tmp_checkpoints)
+
+        return ch_dir
 
     def create_aoi(self, aoi):
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'
