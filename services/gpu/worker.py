@@ -61,6 +61,9 @@ async def connection(uri, model):
 def load(gpu_id, api):
     model_type = api.model["model_type"]
 
+    if api.instance.get('checkpoint_id') is not None:
+        api.download_checkpoint(api.instance['checkpoint_id'])
+
     if model_type == "pytorch_example":
         model = TorchFineTuning(gpu_id, api)
     else:
