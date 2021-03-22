@@ -1146,7 +1146,7 @@ async function server(config, cb) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
-            await project.get(req.auth, req.params.projectid);
+            await project.has_auth(req.auth, req.params.projectid);
 
             await checkpoint.download(req.params.checkpointid, res);
         } catch (err) {
