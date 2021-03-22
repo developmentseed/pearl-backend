@@ -300,6 +300,8 @@ test('Instance 1', async (t) => {
 
 gpu();
 
+if (!process.env.GPU) return;
+
 test('Instance 2', async (t) => {
     try {
         const res = await request({
