@@ -1,6 +1,7 @@
 """Custom Mosaic Factory."""
 
 import os
+from io import BytesIO
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Optional, Type
 from urllib.parse import urlencode
@@ -12,7 +13,7 @@ from rio_tiler.constants import MAX_THREADS
 from rio_tiler.io import BaseReader, COGReader
 
 from titiler import utils
-from titiler.endpoints.factory import BaseTilerFactory, img_endpoint_params
+from titiler.endpoints.factory import BaseTilerFactory, TilerFactory, img_endpoint_params
 from titiler.models.mapbox import TileJSON
 from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHeader
 from titiler.dependencies import WebMercatorTMSParams
@@ -22,7 +23,61 @@ from ..cache import cached
 from fastapi import Depends, Path, Query
 
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import Response, StreamingResponse
+
+from rio_cogeo import cog_translate, cog_profiles
+from rasterio.io import MemoryFile
+
+
+@dataclass
+class CustomTilerFactory(TilerFactory):
+
+    def register_routes(self):
+        """register routes."""
+        super().register_routes()
+        self.update_cog()
+
+
+    def update_cog(self):
+        """Register /update_cog endpoint."""
+
+        @self.router.get(
+            "/colorize",
+            responses={
+                200: {
+                    "content": {
+                        "image/tiff; application=geotiff; profile=cloud-optimized": {},
+                    },
+                    "description": "Return a COG.",
+                }
+            },
+            response_class=StreamingResponse
+        )
+        def colorize(
+            src_path=Depends(self.path_dependency),
+            colormap=Depends(self.colormap_dependency),
+        ):
+            """Return the bounds of the COG."""
+            config = self.gdal_config
+            config.update(
+                dict(
+                    GDAL_NUM_THREADS="ALL_CPUS",
+                    GDAL_TIFF_INTERNAL_MASK=True,
+                    GDAL_TIFF_OVR_BLOCKSIZE=512,
+                )
+            )
+            output_profile = cog_profiles.get("deflate")
+            with MemoryFile() as mem_dst:
+                cog_translate(
+                    src_path,
+                    mem_dst.name,
+                    output_profile,
+                    in_memory=True,
+                    quiet=True,
+                    colormap=colormap,
+                    config=config,
+                )
+                return StreamingResponse(BytesIO(mem_dst.read()), media_type="video/mp4")
 
 
 @dataclass
