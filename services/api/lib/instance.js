@@ -74,7 +74,6 @@ class Instance {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.status) query.status = 'active';
 
         const WHERE = [];
 
@@ -88,8 +87,7 @@ class Instance {
 
         WHERE.push(`project_id = ${projectid}`);
 
-        if (WHERE.length) WHERE.join(' AND ');
-
+        const whereClause = WHERE.length > 1 ? WHERE.join(' AND ') : WHERE[0];
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -101,7 +99,7 @@ class Instance {
                 FROM
                     instances
                 WHERE
-                    project_id = $3
+                    ${whereClause}
                 ORDER BY
                     last_update
                 LIMIT
@@ -110,9 +108,7 @@ class Instance {
                     $2
             `, [
                 query.limit,
-                query.page,
-                projectid
-
+                query.page
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list instances');
