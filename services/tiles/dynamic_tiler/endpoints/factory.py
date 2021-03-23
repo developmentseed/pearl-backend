@@ -9,7 +9,7 @@ from morecantile import TileMatrixSet
 from cogeo_mosaic.backends import BaseBackend, MosaicBackend
 from cogeo_mosaic.models import Info as mosaicInfo
 from rio_tiler.constants import MAX_THREADS
-from rio_tiler.io import BaseReader, COGReader
+from rio_tiler.io import BaseReader
 
 from titiler import utils
 from titiler.endpoints.factory import BaseTilerFactory, img_endpoint_params
@@ -18,6 +18,7 @@ from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHea
 from titiler.dependencies import WebMercatorTMSParams
 
 from ..cache import cached
+from ..custom.reader import CustomCOGReader as COGReader
 
 from fastapi import Depends, Path, Query
 
@@ -77,6 +78,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),
+            buffer: Optional[int] = Query(None, gt=0, description="tile buffer in pixel."),
             kwargs: Dict = Depends(self.additional_dependency),
         ):
             """Create map tile from a COG."""
@@ -103,6 +105,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                         pixel_selection=pixel_selection.method(),
                         tilesize=tilesize,
                         threads=threads,
+                        buffer=buffer,
                         **layer_params.kwargs,
                         **dataset_params.kwargs,
                         **kwargs,
@@ -167,6 +170,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),  # noqa
+            buffer: Optional[int] = Query(None, gt=0, description="tile buffer in pixel."),  # noqa
             kwargs: Dict = Depends(self.additional_dependency),  # noqa
         ):
             """Return TileJSON document for a Mosaic."""
