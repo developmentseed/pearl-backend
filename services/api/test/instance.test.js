@@ -155,29 +155,6 @@ test('GET /api/project/1/instance (empty)', (t) => {
     });
 });
 
-test('GET /api/project/1/instance?status=active', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance?status=active',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        // t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
-        // delete res.body.instances[0].created;
-
-        t.deepEquals(res.body, {
-            total: 0,
-            instances: []
-        });
-
-        t.end();
-    });
-});
 
 test('PATCH /api/project/1/instance/1', (t) => {
     request({
@@ -205,6 +182,30 @@ test('PATCH /api/project/1/instance/1', (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: true
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/instance?status=active', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance?status=active',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
+        delete res.body.instances[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            instances: [ { id: 1, active: true } ]
         });
 
         t.end();
