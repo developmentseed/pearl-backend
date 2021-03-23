@@ -256,8 +256,9 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tile(self, z, x, y, iformat='npy', cache=True):
-        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
+    def get_tile(self, z, x, y, iformat='npy', buffer=32, cache=True):
+        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?buffer={}&return_mask=False'.format(self.mosaic_id, z, x, y, iformat, buffer)
+        print(url)
 
         if iformat == 'npy':
             tmpfs = '{}/tiles/{}-{}-{}.{}'.format(self.tmp_dir, x, y, z, iformat)
@@ -274,9 +275,11 @@ class API():
 
                 res = np.load(BytesIO(r.content))
 
-                assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
+                print(res.shape)
+
+                assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
                 res = np.moveaxis(res, 0, -1)
-                assert res.shape == (256, 256, 4), "Failed to reshape numpy array"
+                assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
 
                 np.save('{}/tiles/{}-{}-{}.npy'.format(self.tmp_dir, x, y, z), res)
             else:
@@ -285,7 +288,8 @@ class API():
             memraster = MemRaster(
                 res,
                 "epsg:3857",
-                (x, y, z)
+                (x, y, z),
+                True  #set buffered True to retrain properties for original tile
             )
 
             return memraster
