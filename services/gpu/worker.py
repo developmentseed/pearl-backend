@@ -40,7 +40,7 @@ def main():
 
     os.environ["SOCKET"] = arg([os.environ.get("SOCKET"), args.socket], 'ws://localhost:1999')
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], 'dev-secret')
-    os.environ['TileUrl'] = arg([os.environ.get('TileUrl')], 'http://localhost:2000/api')
+    os.environ['TileUrl'] = arg([os.environ.get('TileUrl')], 'http://localhost:8000')
 
     api = API(os.environ["API"], os.environ['INSTANCE_ID'])
 
