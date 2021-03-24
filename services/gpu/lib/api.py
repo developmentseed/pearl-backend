@@ -41,10 +41,12 @@ class API():
 
         self.tmp_checkpoints = self.tmp_dir + '/checkpoints'
         self.tmp_tiles = self.tmp_dir + '/tiles'
+        self.tmp_model = self.tmp_dir + '/model'
 
         os.makedirs(self.tmp_dir, exist_ok=True)
         os.makedirs(self.tmp_checkpoints, exist_ok=True)
         os.makedirs(self.tmp_tiles, exist_ok=True)
+        os.makedirs(self.tmp_model, exist_ok=True)
 
         self.requests = requests.Session()
         self.requests.mount(url, HTTPAdapter(max_retries = urllib3.util.Retry(
@@ -71,7 +73,7 @@ class API():
         self.mosaic_id = self.project['mosaic']
 
         self.model = self.model_meta()
-        self.model_fs = self.model_download()
+        self.model_dir = self.model_download()
         self.mosaic = self.get_tilejson()
 
     def server_meta(self):
@@ -380,7 +382,10 @@ class API():
         else:
             LOGGER.info("ok - using cached model")
 
-        LOGGER.info("ok - model: " + model_fs)
+        with zipfile.ZipFile(model_fs, 'r') as zip_ref:
+            zip_ref.extractall(self.tmp_model)
 
-        return model_fs
+        LOGGER.info("ok - model: " + self.tmp_model)
+
+        return self.tmp_model
 
