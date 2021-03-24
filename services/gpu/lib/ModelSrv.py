@@ -45,9 +45,11 @@ class ModelSrv():
 
                 output, output_features = self.model.run(in_memraster.data, False)
 
-                #TO-DO assert statement for output_features dimensions?
+                # remove 32 pixel buffer on each side
+                output = output[32:288, 32:288]
+                output_features = output_features[32:288, 32:288, :]
 
-                assert in_memraster.shape[0] == output.shape[0] and in_memraster.shape[1] == output.shape[1], "ModelSession must return an np.ndarray with the same height and width as the input"
+                #TO-DO assert statement for output_features dimensions, and output?
 
                 LOGGER.info("ok - generated inference");
 
@@ -77,7 +79,7 @@ class ModelSrv():
 
                 # Push tile into geotiff fabric
                 output = np.expand_dims(output, axis=-1)
-                output = MemRaster(output, in_memraster.crs, in_memraster.tile)
+                output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
                 self.aoi.add_to_fabric(output)
 
             self.aoi.upload_fabric()
