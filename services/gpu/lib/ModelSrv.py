@@ -61,6 +61,7 @@ class ModelSrv():
                     await websocket.send(json.dumps({
                         'message': 'model#prediction',
                         'data': {
+                            'aoi': self.aoi.id,
                             'bounds': in_memraster.bounds,
                             'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
                             'image': png,
@@ -72,6 +73,7 @@ class ModelSrv():
                     await websocket.send(json.dumps({
                         'message': 'model#prediction',
                         'data': {
+                            'aoi': self.aoi.id,
                             'total': self.aoi.total,
                             'processed': len(self.aoi.tiles)
                         }
