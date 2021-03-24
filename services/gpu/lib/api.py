@@ -363,7 +363,7 @@ class API():
         return r.json()
 
     def model_download(self):
-        model_fs = self.tmp_dir + '/model-{}.pt'.format(self.model_id)
+        model_fs = self.tmp_dir + '/model-{}.zip'.format(self.model_id)
 
         if not path.exists(model_fs):
             url = self.url + '/api/model/' + str(self.model_id) + '/download'
