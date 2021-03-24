@@ -179,17 +179,8 @@ class TorchFineTuning(ModelSession):
         seed_x = seed_data['embeddings']
         seed_y = seed_data['labels']
 
-
-        # Place holder to load in seed npz
-        print (y_train.shape)
-        print(type(y_train))
-        print (seed_y.shape)
-
-
         x_train = np.vstack((x_train, seed_x))
-        print(x_train.shape)
         y_train = np.hstack((y_train, seed_y))
-        print(y_train.shape)
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
 
