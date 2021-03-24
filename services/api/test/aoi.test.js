@@ -266,8 +266,8 @@ test('GET /api/project/1/aoi', (t) => {
 // The following 2 tests are skipped as they can't run without
 // TiTiler running as well - should add something like this to flow.test.js
 
-let url;
-test('GET /api/project/1/aoi/1/tiles', (t) => {
+//let url;
+test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000/api/project/1/aoi/1/tiles',
@@ -285,7 +285,7 @@ test('GET /api/project/1/aoi/1/tiles', (t) => {
     });
 });
 
-test('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
+test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
     request({
         json: true,
         url: 'http://localhost:2000' + url.replace('{z}', 9).replace('{x}', '143').replace('{y}', '195'),
