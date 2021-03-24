@@ -735,6 +735,13 @@ async function server(config, cb) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
+            const cmap = {};
+            for (let i = i; i < a.classes.length; i++) {
+                cmap[i] = a[i].color;
+            }
+
+            req.query.colormap = encodeURIComponent(JSON.stringify(cmap));
+
             const response = await proxy.request(req);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
