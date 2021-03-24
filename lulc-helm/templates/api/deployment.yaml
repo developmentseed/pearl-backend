@@ -56,7 +56,7 @@ spec:
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
-              value: https://{{ template "lulc-helm.fullname" . }}-tiles
+              value: http://{{ template "lulc-helm.fullname" . }}-tiles
             - name: ApiUrl
               value: https://api.{{ .Values.domain }}
             - name: SocketUrl
