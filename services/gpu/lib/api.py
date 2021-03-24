@@ -244,7 +244,7 @@ class API():
         return r.json()
 
     def get_tilejson(self):
-        url = os.environ['TileUrl'] + '/mosaic' + self.mosaic_id
+        url = os.environ['TileUrl'] + '/mosaic/' + self.mosaic_id
 
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url, headers={
