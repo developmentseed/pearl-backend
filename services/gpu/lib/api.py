@@ -244,7 +244,7 @@ class API():
         return r.json()
 
     def get_tilejson(self):
-        url = self.url + '/api/mosaic/' + self.mosaic_id
+        url = os.environ['TileUrl'] + '/mosaic/' + self.mosaic_id + '/tilejson.json'
 
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url, headers={
@@ -257,8 +257,7 @@ class API():
         return r.json()
 
     def get_tile(self, z, x, y, iformat='npy', buffer=32, cache=True):
-        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?buffer={}&return_mask=False'.format(self.mosaic_id, z, x, y, iformat, buffer)
-        print(url)
+        url = os.environ['TileUrl'] + '/mosaic/{}/tiles/{}/{}/{}.{}?buffer={}&return_mask=False'.format(self.mosaic_id, z, x, y, iformat, buffer)
 
         if iformat == 'npy':
             tmpfs = '{}/tiles/{}-{}-{}.{}'.format(self.tmp_dir, x, y, z, iformat)
