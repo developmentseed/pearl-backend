@@ -46,11 +46,11 @@ class Kube {
         const gpuImageName = this.config.GpuImageName;
         const gpuImageTag = this.config.GpuImageTag;
 
-        let resources = {
+        const resources = {
             limits: {
                 'nvidia.com/gpu': 1
             }
-        }
+        };
         // if (deploymentName === 'lulc-production-lulc-helm') {
         //     resources = {
         //         requests: {
@@ -79,7 +79,7 @@ class Kube {
                 name: `${deploymentName}-gpu-${name}`,
                 annotations: {
                     'janitor/ttl': '1h'
-                },
+                }
             },
             spec: {
                 containers: [
