@@ -69,8 +69,8 @@ class TorchFineTuning(ModelSession):
     )
 
 
-    def __init__(self, gpu_id, model_fs, classes):
-        self.model_fs = model_fs
+    def __init__(self, gpu_id, model_dir, classes):
+        self.model_dir = model_dir
         self.classes = classes
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -109,7 +109,7 @@ class TorchFineTuning(ModelSession):
         return self._last_tile
 
     def _init_model(self):
-        checkpoint = torch.load(self.model_fs, map_location=self.device)
+        checkpoint = torch.load(self.model_dir + '/model.pt', map_location=self.device)
         self.model.load_state_dict(checkpoint)
         self.model.eval()
         self.model = self.model.to(self.device)
