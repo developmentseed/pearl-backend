@@ -44,16 +44,10 @@ class ModelSrv():
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
                 output, output_features = self.model.run(in_memraster.data, False)
-                print ('output shape')
-                print(output.shape)
 
                 # remove 32 pixel buffer on each side
                 output = output[32:288, 32:288]
                 output_features = output_features[32:288, 32:288, :]
-
-                print ('output shape after removing')
-                print(output.shape)
-
 
                 #TO-DO assert statement for output_features dimensions, and output?
 

@@ -2,7 +2,7 @@ import mercantile
 
 class MemRaster(object):
 
-    def __init__(self, data, crs, tile, buffered):
+    def __init__(self, data, crs, tile, buffered = False):
         """A wrapper around the four pieces of information needed to define a raster datasource.
 
         Args:

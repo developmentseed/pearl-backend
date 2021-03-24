@@ -274,8 +274,6 @@ class API():
 
                 res = np.load(BytesIO(r.content))
 
-                print(res.shape)
-
                 assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
                 res = np.moveaxis(res, 0, -1)
                 assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
@@ -288,7 +286,7 @@ class API():
                 res,
                 "epsg:3857",
                 (x, y, z),
-                True  #set buffered True to retrain properties for original tile
+                buffer #set buffered to px to retrain properties for original tile
             )
 
             return memraster
