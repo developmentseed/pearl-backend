@@ -624,8 +624,11 @@ async function server(config, cb) {
             await project.has_auth(req.auth, req.params.projectid);
 
             // TODO - Add support for paging for projects with > 100 AOIs
-            aoi.list({ checkpointid: req.params.checkpointid }).forEach(async (a) => {
+            aoi.list(req.params.projectid).forEach(async (a) => {
                 await aoi.delete(a.id);
+            });
+            checkpoint.list(req.params.projectid).forEach(async (c) => {
+                await checkpoint.delete(c.id);
             });
 
             return res.json(await project.delete(req.params.projectid));
@@ -1338,7 +1341,7 @@ async function server(config, cb) {
                 await Param.int(req, 'checkpointid');
                 await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
 
-                aoi.list({ checkpointid: req.params.checkpointid }).forEach(async (a) => {
+                aoi.list(req.params.projectid, { checkpointid: req.params.checkpointid }).forEach(async (a) => {
                     await aoi.delete(a.id);
                 });
 
