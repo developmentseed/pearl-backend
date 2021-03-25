@@ -134,12 +134,15 @@ class AOI {
      * @param {Number} aoiid - Specific AOI id
      */
     async delete(aoiid) {
+        let pgres;
         try {
-            await this.pool.query(`
-                DELETE FROM
-                    aoid
+            pgres = await this.pool.query(`
+                DELETE
+                    FROM
+                        aois
+                    WHERE
                         id = $1
-                RETURNING *
+                    RETURNING *
             `, [
                 aoiid,
             ]);

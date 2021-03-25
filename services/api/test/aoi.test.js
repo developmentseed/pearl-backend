@@ -304,4 +304,21 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
     });
 });
 
+test('DELETE /api/project/1/aoi/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.deepEquals(res.body, true);
+
+        t.end();
+    });
+});
+
 flight.landing(test);
