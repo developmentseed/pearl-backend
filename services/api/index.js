@@ -618,10 +618,16 @@ async function server(config, cb) {
      * @apiDescription
      *     Delete a project
      */
-     router.delete('/project/:projectid', requiresAuth, async (req, res) => {
+    router.delete('/project/:projectid', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
+
+            // TODO - Add support for paging for projects with > 100 AOIs
+            const aois = (await aoi.list(req.params.projectid)).aois;
+            for (const a of aois) {
+                await aoi.delete(a.id);
+            }
 
             return res.json(await project.delete(req.params.projectid));
         } catch (err) {
@@ -991,7 +997,7 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'aoiid');
-                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid)
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
 
                 return res.json(await aoi.delete(req.params.aoiid));
             } catch (err) {
@@ -1032,7 +1038,7 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'aoiid');
-                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid)
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
 
                 return res.json(await aoi.patch(req.params.aoiid, req.body));
             } catch (err) {
