@@ -57,6 +57,17 @@ class ModelSrv():
                     # Create color versions of predictions
                     png = pred2png(output, color_list) # investigate this
 
+                    # First prediction
+                    if self.aoi.total == len(self.aoi.tiles) - 1:
+                        await websocket.send(json.dumps({
+                            'message': 'model#prediction_start',
+                            'data': {
+                                'aoi': self.aoi.id,
+                                'bounds': in_memraster.bounds,
+                                'total': self.aoi.total
+                            }
+                        }))
+
                     LOGGER.info("ok - returning inference");
                     await websocket.send(json.dumps({
                         'message': 'model#prediction',
