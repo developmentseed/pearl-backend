@@ -975,6 +975,32 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {delete} /api/project/:projectid/aoi/:aoiid Delete AOI
+     * @apiVersion 1.0.0
+     * @apiName DeleteAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete an existing AOI
+     */
+    router.post(
+        '/project/:projectid/aoi/:aoiid',
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await aoi.has_auth(req.auth, req.params.projectid);
+
+                return res.json(await aoi.delete(req.params.aoiid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {patch} /api/project/:projectid/aoi/:aoiid Patch AOI
      * @apiVersion 1.0.0
      * @apiName PatchAOI
