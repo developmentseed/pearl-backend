@@ -195,18 +195,14 @@ class Project {
      *
      * @param {Number} projectid - Specific Project id
      */
-     async delete(projectid) {
-        let pgres;
-
+    async delete(projectid) {
         try {
-            const proj = await this.get(projectid);
-
-            pgres = await this.pool.query(`
+            await this.pool.query(`
                 DELETE FROM projects
                     WHERE
                         id = $1
             `, [
-                projectid,
+                projectid
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to delete Project');

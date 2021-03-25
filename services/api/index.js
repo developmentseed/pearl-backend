@@ -618,10 +618,16 @@ async function server(config, cb) {
      * @apiDescription
      *     Delete a project
      */
-     router.delete('/project/:projectid', requiresAuth, async (req, res) => {
+    router.delete('/project/:projectid', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
+
+            // TODO - Add support for paging for projects with > 100 AOIs
+            const aois = (await aoi.list(req.params.projectid)).aois;
+            for (const a of aois) {
+                await aoi.delete(a.id);
+            }
 
             return res.json(await project.delete(req.params.projectid));
         } catch (err) {
@@ -975,6 +981,32 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {delete} /api/project/:projectid/aoi/:aoiid Delete AOI
+     * @apiVersion 1.0.0
+     * @apiName DeleteAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete an existing AOI
+     */
+    router.delete(
+        '/project/:projectid/aoi/:aoiid',
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+
+                return res.json(await aoi.delete(req.params.aoiid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {patch} /api/project/:projectid/aoi/:aoiid Patch AOI
      * @apiVersion 1.0.0
      * @apiName PatchAOI
@@ -1006,7 +1038,7 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'aoiid');
-                await aoi.has_auth(req.auth, req.params.projectid);
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
 
                 return res.json(await aoi.patch(req.params.aoiid, req.body));
             } catch (err) {
