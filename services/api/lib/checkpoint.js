@@ -135,6 +135,36 @@ class CheckPoint {
     }
 
     /**
+     * Delete a Checkpoint
+     *
+     * @param {Number} checkpointid - Checkpoint ID
+     */
+    async delete(checkpointid) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                DELETE
+                    FROM
+                        checkpoints
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [ checkpointid ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to delete Checkpoint');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
+
+        if (pgres.rows[0].storage && this.config.AzureStorage) {
+            const blob_client = this.container_client.getBlockBlobClient(`checkpoint-${checkpointid}`);
+            await blob_client.delete();
+        }
+
+        return true;
+    }
+
+    /**
      * Upload a Checkpoint and mark the Checkpoint storage property as true
      *
      * @param {Number} checkpointid Checkpoint ID to upload to
