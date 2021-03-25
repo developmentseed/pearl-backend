@@ -288,7 +288,7 @@ class Instance {
      */
     async reset() {
         try {
-            const pgres = await this.pool.query(`
+            await this.pool.query(`
                 UPDATE instances
                     SET active = False
             `, []);
