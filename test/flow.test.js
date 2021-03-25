@@ -412,8 +412,6 @@ function gpu() {
                             action: 'model#retrain',
                             data: require('./fixtures/retrain.json')
                         }));
-                        ws.close();
-                        t.end();
                     }
                 }
 
