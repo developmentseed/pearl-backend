@@ -624,10 +624,9 @@ async function server(config, cb) {
             await project.has_auth(req.auth, req.params.projectid);
 
             // TODO - Add support for paging for projects with > 100 AOIs
-            const aois = (await aoi.list(req.params.projectid)).aois;
-            for (const a of aois) {
+            aoi.list({ checkpointid: req.params.checkpointid }).forEach(async (a) => {
                 await aoi.delete(a.id);
-            }
+            });
 
             return res.json(await project.delete(req.params.projectid));
         } catch (err) {
@@ -1313,6 +1312,37 @@ async function server(config, cb) {
                 }
 
                 return res.json(await checkpoint.create(req.params.projectid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {delete} /api/project/:projectid/checkpoint/:checkpointid Delete Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName DeleteCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete an existing Checkpoint
+     *     NOTE: This will also delete AOIs that depend on the given checkpoint
+     */
+    router.delete(
+        '/project/:projectid/checkpoint/:checkpointid',
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
+                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+
+                aoi.list({ checkpointid: req.params.checkpointid }).forEach(async (a) => {
+                    await aoi.delete(a.id);
+                });
+
+                return res.json(await checkpoint.delete(req.params.checkpointid));
             } catch (err) {
                 return Err.respond(err, res);
             }
