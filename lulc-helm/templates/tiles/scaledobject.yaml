@@ -6,7 +6,7 @@ metadata:
 spec:
   scaleTargetRef:
     name: {{ template "lulc-helm.fullname" . }}-tiles
-  minReplicaCount: 4
+  minReplicaCount: 6
   maxReplicaCount: 48
   cooldownPeriod: 300
   pollingInterval: 20
