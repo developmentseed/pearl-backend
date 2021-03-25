@@ -40,6 +40,7 @@ def main():
 
     os.environ["SOCKET"] = arg([os.environ.get("SOCKET"), args.socket], 'ws://localhost:1999')
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], 'dev-secret')
+    os.environ['TileUrl'] = arg([os.environ.get('TileUrl')], 'http://localhost:8000')
 
     api = API(os.environ["API"], os.environ['INSTANCE_ID'])
 
@@ -62,7 +63,7 @@ def load(gpu_id, api):
     model_type = api.model["model_type"]
 
     if model_type == "pytorch_example":
-        model = TorchFineTuning(gpu_id, api.model_fs, api.model['classes'])
+        model = TorchFineTuning(gpu_id, api.model_dir, api.model['classes'])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 

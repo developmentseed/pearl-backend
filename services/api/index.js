@@ -735,6 +735,14 @@ async function server(config, cb) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
+            const chkpt = await checkpoint.get(a.checkpoint_id);
+            const cmap = {};
+            for (let i = 0; i < chkpt.classes.length; i++) {
+                cmap[i] = chkpt.classes[i].color;
+            }
+
+            req.query.colormap = JSON.stringify(cmap);
+
             const response = await proxy.request(req);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
@@ -749,7 +757,7 @@ async function server(config, cb) {
                 version: tj.version,
                 schema: tj.scheme,
                 tiles: [
-                    `/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}`
+                    `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
                 ],
                 minzoom: tj.minzoom,
                 maxzoom: tj.maxzoom,

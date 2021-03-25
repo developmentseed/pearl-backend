@@ -1,6 +1,7 @@
 const test = require('tape');
 const request = require('request');
 const { Flight } = require('./util');
+const fs = require('fs');
 
 const flight = new Flight();
 
@@ -264,6 +265,8 @@ test('GET /api/project/1/aoi', (t) => {
 
 // The following 2 tests are skipped as they can't run without
 // TiTiler running as well - should add something like this to flow.test.js
+
+//let url;
 test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
     request({
         json: true,
@@ -276,7 +279,7 @@ test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        console.error(res.body);
+        url = res.body.tiles[0];
 
         t.end();
     });
@@ -285,7 +288,7 @@ test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
 test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/tiles/9/143/195',
+        url: 'http://localhost:2000' + url.replace('{z}', 9).replace('{x}', '143').replace('{y}', '195'),
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -294,7 +297,8 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        console.error(res.body);
+        fs.writeFileSync('/tmp/sample.png', res.body);
+        t.ok(true, 'ok - written png to /tmp/sample.png');
 
         t.end();
     });

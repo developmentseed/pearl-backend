@@ -41,10 +41,12 @@ class API():
 
         self.tmp_checkpoints = self.tmp_dir + '/checkpoints'
         self.tmp_tiles = self.tmp_dir + '/tiles'
+        self.tmp_model = self.tmp_dir + '/model'
 
         os.makedirs(self.tmp_dir, exist_ok=True)
         os.makedirs(self.tmp_checkpoints, exist_ok=True)
         os.makedirs(self.tmp_tiles, exist_ok=True)
+        os.makedirs(self.tmp_model, exist_ok=True)
 
         self.requests = requests.Session()
         self.requests.mount(url, HTTPAdapter(max_retries = urllib3.util.Retry(
@@ -71,7 +73,7 @@ class API():
         self.mosaic_id = self.project['mosaic']
 
         self.model = self.model_meta()
-        self.model_fs = self.model_download()
+        self.model_dir = self.model_download()
         self.mosaic = self.get_tilejson()
 
     def server_meta(self):
@@ -244,7 +246,7 @@ class API():
         return r.json()
 
     def get_tilejson(self):
-        url = self.url + '/api/mosaic/' + self.mosaic_id
+        url = os.environ['TileUrl'] + '/mosaic/' + self.mosaic_id + '/tilejson.json'
 
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url, headers={
@@ -256,8 +258,8 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tile(self, z, x, y, iformat='npy', cache=True):
-        url = self.url + '/api/mosaic/{}/tiles/{}/{}/{}.{}?return_mask=False'.format(self.mosaic_id, z, x, y, iformat)
+    def get_tile(self, z, x, y, iformat='npy', buffer=32, cache=True):
+        url = os.environ['TileUrl'] + '/mosaic/{}/tiles/{}/{}/{}.{}?buffer={}&return_mask=False'.format(self.mosaic_id, z, x, y, iformat, buffer)
 
         if iformat == 'npy':
             tmpfs = '{}/tiles/{}-{}-{}.{}'.format(self.tmp_dir, x, y, z, iformat)
@@ -274,9 +276,9 @@ class API():
 
                 res = np.load(BytesIO(r.content))
 
-                assert res.shape == (4, 256, 256), "Unexpeccted Raster Numpy array"
+                assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
                 res = np.moveaxis(res, 0, -1)
-                assert res.shape == (256, 256, 4), "Failed to reshape numpy array"
+                assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
 
                 np.save('{}/tiles/{}-{}-{}.npy'.format(self.tmp_dir, x, y, z), res)
             else:
@@ -285,7 +287,8 @@ class API():
             memraster = MemRaster(
                 res,
                 "epsg:3857",
-                (x, y, z)
+                (x, y, z),
+                buffer #set buffered to px to retrain properties for original tile
             )
 
             return memraster
@@ -362,7 +365,7 @@ class API():
         return r.json()
 
     def model_download(self):
-        model_fs = self.tmp_dir + '/model-{}.pt'.format(self.model_id)
+        model_fs = self.tmp_dir + '/model-{}.zip'.format(self.model_id)
 
         if not path.exists(model_fs):
             url = self.url + '/api/model/' + str(self.model_id) + '/download'
@@ -379,7 +382,10 @@ class API():
         else:
             LOGGER.info("ok - using cached model")
 
-        LOGGER.info("ok - model: " + model_fs)
+        with zipfile.ZipFile(model_fs, 'r') as zip_ref:
+            zip_ref.extractall(self.tmp_model)
 
-        return model_fs
+        LOGGER.info("ok - model: " + self.tmp_model)
+
+        return self.tmp_model
 

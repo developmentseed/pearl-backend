@@ -191,6 +191,9 @@ class Instance {
                 },{
                     name: 'NVIDIA_DRIVER_CAPABILITIES',
                     value: 'compute,utility'
+                },{
+                    name: 'TileUrl',
+                    value: this.config.TileUrl
                 }]);
 
                 pod = await this.kube.createPod(podSpec);
@@ -285,7 +288,7 @@ class Instance {
      */
     async reset() {
         try {
-            const pgres = await this.pool.query(`
+            await this.pool.query(`
                 UPDATE instances
                     SET active = False
             `, []);
