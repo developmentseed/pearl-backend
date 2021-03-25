@@ -279,7 +279,7 @@ test('Instance 1', async (t) => {
         instance = JSON.parse(JSON.stringify(res.body));
 
         delete res.body.id,
-        delete res.body.created;
+            delete res.body.created;
         delete res.body.last_update;
         delete res.body.token;
 
@@ -328,7 +328,7 @@ test('Instance 2', async (t) => {
         instance = JSON.parse(JSON.stringify(res.body));
 
         delete res.body.id,
-        delete res.body.created;
+            delete res.body.created;
         delete res.body.last_update;
         delete res.body.token;
 
@@ -404,7 +404,20 @@ function gpu() {
                         action: 'model#retrain',
                         data: require('./fixtures/retrain.json')
                     }));
-                } else if (runs === 2) {
+                }
+
+                else if (runs === 2) {
+                    if (instance.id === 1) {
+                        ws.send(JSON.stringify({
+                            action: 'model#retrain',
+                            data: require('./fixtures/retrain.json')
+                        }));
+                        ws.close();
+                        t.end();
+                    }
+                }
+
+                else if (runs === 3) {
                     if (instance.id === 1) {
                         ws.send(JSON.stringify({
                             action: 'instance#terminate'
