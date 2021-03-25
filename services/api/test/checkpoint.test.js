@@ -335,4 +335,22 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0.mvt - no geometry', (t) => {
     });
 });
 
+test('DELETE /api/project/1/checkpoint/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, true);
+
+        t.end();
+    });
+});
+
 flight.landing(test);
