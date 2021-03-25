@@ -144,7 +144,7 @@ class AOI {
                         id = $1
                     RETURNING *
             `, [
-                aoiid,
+                aoiid
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to delete AOI');
