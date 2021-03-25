@@ -417,6 +417,24 @@ define({ "api": [
     "groupTitle": "Checkpoints"
   },
   {
+    "type": "delete",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid",
+    "title": "Delete Checkpoint",
+    "version": "1.0.0",
+    "name": "DeleteCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete an existing Checkpoint NOTE: This will also delete AOIs that depend on the given checkpoint</p>",
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
     "type": "get",
     "url": "/api/project/:projectid/checkpoint/:checkpointid/download",
     "title": "Download Checkpoint",
