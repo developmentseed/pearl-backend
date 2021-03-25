@@ -166,6 +166,14 @@
             "field": "page",
             "defaultValue": "0",
             "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpointid",
+            "defaultValue": "0",
+            "description": "<p>Only return AOIs for a specific checkpoint</p>"
           }
         ]
       }
