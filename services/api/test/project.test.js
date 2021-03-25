@@ -244,4 +244,51 @@ test('GET /api/project/1', (t) => {
     });
 });
 
+test('DELETE /api/project/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, {});
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.equals(res.statusCode, 404, 'status: 404');
+
+        t.end();
+    });
+});
+
+test('DELETE /api/project/2', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/2',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.equals(res.statusCode, 404, 'status: 404');
+
+        t.end();
+    });
+});
+
 flight.landing(test);
