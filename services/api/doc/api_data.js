@@ -71,6 +71,24 @@ define({ "api": [
     "groupTitle": "AOI"
   },
   {
+    "type": "delete",
+    "url": "/api/project/:projectid/aoi/:aoiid",
+    "title": "Delete AOI",
+    "version": "1.0.0",
+    "name": "DeleteAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete an existing AOI</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
     "type": "get",
     "url": "/api/project/:projectid/aoi/:aoiid/download",
     "title": "Download AOI",
@@ -1467,6 +1485,24 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "Mosaic"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:projectid",
+    "title": "Delete Project",
+    "version": "1.0.0",
+    "name": "DeleteProject",
+    "group": "Project",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a project</p>",
+    "filename": "./index.js",
+    "groupTitle": "Project"
   },
   {
     "type": "post",
