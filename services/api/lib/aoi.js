@@ -128,6 +128,34 @@ class AOI {
         dwn.readableStreamBody.pipe(res);
     }
 
+    /**
+     * Delete an AOI
+     *
+     * @param {Number} aoiid - Specific AOI id
+     */
+    async delete(aoiid) {
+        try {
+            await this.pool.query(`
+                DELETE FROM
+                    aoid
+                        id = $1
+                RETURNING *
+            `, [
+                aoiid,
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to delete AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+
+        if (pgres.rows[0].storage && this.config.AzureStorage) {
+            const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
+            await blob_client.delete();
+        }
+
+        return true;
+    }
 
     /**
      * Update AOI properties
