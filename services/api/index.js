@@ -607,6 +607,28 @@ async function server(config, cb) {
         }
     );
 
+
+    /**
+     * @api {delete} /api/project/:projectid Delete Project
+     * @apiVersion 1.0.0
+     * @apiName DeleteProject
+     * @apiGroup Project
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete a project
+     */
+     router.delete('/project/:projectid', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await project.has_auth(req.auth, req.params.projectid);
+
+            return res.json(await project.delete(req.params.projectid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     /**
      * @api {get} /api/project/:projectid/instance List Instances
      * @apiVersion 1.0.0
