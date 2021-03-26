@@ -175,22 +175,12 @@ class TorchFineTuning(ModelSession):
         y_train = np.array(self.augment_y_train)
 
         # Place holder to load in seed npz
-        # seed_x = np.load('_embedding.npz', allow_pickle=True)
-        # seed_x = seed_x['arr_0']
-        # seed_y = np.load('/_label.npz', allow_pickle=True)
-        # seed_y = seed_y['arr_0']
+        seed_data = np.load(self.model_dir + '/model.npz', allow_pickle=True)
+        seed_x = seed_data['embeddings']
+        seed_y = seed_data['labels']
 
-
-        # Place holder to load in seed npz
-        # print (y_train.shape)
-        # print(type(y_train))
-        # print (seed_y.shape)
-
-
-        # x_train = np.vstack((x_train, seed_x))
-        # print(x_train.shape)
-        # y_train = np.hstack((y_train, seed_y))
-        # print(y_train.shape)
+        x_train = np.vstack((x_train, seed_x))
+        y_train = np.hstack((y_train, seed_y))
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
 
@@ -301,32 +291,6 @@ class TorchFineTuning(ModelSession):
                 "message": "Must run model before adding a training sample",
                 "success": False
             }
-
-    def reset(self):
-        self._init_model()
-        self.augment_x_train = []
-        self.augment_y_train = []
-        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
-
-        label_binarizer = LabelBinarizer()
-        label_binarizer.fit(range(self.output_channels))
-
-        self.augment_model.coefs_ = [self.initial_weights]
-        self.augment_model.intercepts_ = [self.initial_biases]
-
-        self.augment_model.classes_ = np.array(list(range(self.output_channels)))
-        self.augment_model.n_features_in_ = self.output_features
-        self.augment_model.n_outputs_ = self.output_channels
-        self.augment_model.n_layers_ = 2
-        self.augment_model.out_activation_ = 'softmax'
-
-        self.augment_model._label_binarizer = label_binarizer # investigate
-
-        return {
-            "message": "Model reset successfully",
-            "success": True
-        }
-
 
     def run_model_on_tile(self, tile):
         height = tile.shape[1]
