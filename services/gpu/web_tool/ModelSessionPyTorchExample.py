@@ -302,32 +302,6 @@ class TorchFineTuning(ModelSession):
                 "success": False
             }
 
-    def reset(self):
-        self._init_model()
-        self.augment_x_train = []
-        self.augment_y_train = []
-        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
-
-        label_binarizer = LabelBinarizer()
-        label_binarizer.fit(range(self.output_channels))
-
-        self.augment_model.coefs_ = [self.initial_weights]
-        self.augment_model.intercepts_ = [self.initial_biases]
-
-        self.augment_model.classes_ = np.array(list(range(self.output_channels)))
-        self.augment_model.n_features_in_ = self.output_features
-        self.augment_model.n_outputs_ = self.output_channels
-        self.augment_model.n_layers_ = 2
-        self.augment_model.out_activation_ = 'softmax'
-
-        self.augment_model._label_binarizer = label_binarizer # investigate
-
-        return {
-            "message": "Model reset successfully",
-            "success": True
-        }
-
-
     def run_model_on_tile(self, tile):
         height = tile.shape[1]
         width = tile.shape[2]
