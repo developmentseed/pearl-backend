@@ -21,9 +21,9 @@ class ModelSrv():
         self.model = model
 
     async def load_checkpoint(self, body, websocket):
-        self.chk = api.get_checkpoint(body['id'])
-        chk_fs = api.download_checkpoint(self.chk['id'])
-        self.model.load_state_from(chk, chk_fs)
+        self.chk = self.api.get_checkpoint(body['id'])
+        chk_fs = self.api.download_checkpoint(self.chk['id'])
+        self.model.load_state_from(self.chk, chk_fs)
 
     async def prediction(self, body, websocket):
         try:

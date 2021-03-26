@@ -378,6 +378,7 @@ class TorchFineTuning(ModelSession):
         self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
         self.classes = chkpt['classes']
+        print(self.classes)
         self.model = FCN(num_input_channels=4, num_output_classes=len(chkpt['classes']), num_filters=64)
         self._init_model()
 

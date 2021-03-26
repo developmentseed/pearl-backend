@@ -405,6 +405,13 @@ function gpu() {
                         data: require('./fixtures/retrain.json')
                     }));
                 } else if (runs === 2) {
+                    ws.send(JSON.stringify({
+                        action: 'model#checkpoint',
+                        data: {
+                            id: 2
+                        }
+                    }));
+                } else if (runs === 3) {
                     if (instance.id === 1) {
                         ws.send(JSON.stringify({
                             action: 'instance#terminate'
