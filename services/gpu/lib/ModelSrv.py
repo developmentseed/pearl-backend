@@ -41,6 +41,7 @@ class ModelSrv():
                 'data': {
                     'id': self.aoi.id,
                     'name': self.aoi.name,
+                    'checkpoint_id': self.chk['id'],
                     'bounds': self.aoi.bounds,
                     'total': self.aoi.total
                 }

@@ -234,11 +234,19 @@ class AOI {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
+     * @param {Number} [query.checkpointid] - Only return AOIs related to a given Checkpoint
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+
+        const where = [];
+        where.push(`project_id = ${projectid}`);
+
+        if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
+            where.push('checkpoint_id = ' + query.checkpointid);
+        }
 
         let pgres;
         try {
@@ -253,15 +261,14 @@ class AOI {
                 FROM
                     aois
                 WHERE
-                    project_id = $3
+                    ${where.join(' AND ')}
                 LIMIT
                     $1
                 OFFSET
                     $2
             `, [
                 query.limit,
-                query.page,
-                projectid
+                query.page
 
             ]);
         } catch (err) {

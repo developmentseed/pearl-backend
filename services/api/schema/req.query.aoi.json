@@ -11,6 +11,11 @@
             "type": "integer",
             "default": 0,
             "description": "The offset based on limit to return"
+        },
+        "checkpointid": {
+            "type": "integer",
+            "default": 0,
+            "description": "Only return AOIs for a specific checkpoint"
         }
     }
 }

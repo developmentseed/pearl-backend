@@ -623,11 +623,18 @@ async function server(config, cb) {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
 
-            // TODO - Add support for paging for projects with > 100 AOIs
-            const aois = (await aoi.list(req.params.projectid)).aois;
-            for (const a of aois) {
-                await aoi.delete(a.id);
+            const insts = await instance.list(req.params.projectid);
+            for (const inst of insts.instances) {
+                if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
+                await instance.delete(inst.id);
             }
+
+            // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
+            const aois = await aoi.list(req.params.projectid);
+            aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
+
+            const chkpts = await checkpoint.list(req.params.projectid);
+            chkpts.checkpoints.forEach(async (c) => { await checkpoint.delete(c.id); });
 
             return res.json(await project.delete(req.params.projectid));
         } catch (err) {
@@ -1320,7 +1327,37 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {patch} /api/model/:modelid Patch Checkpoint
+     * @api {delete} /api/project/:projectid/checkpoint/:checkpointid Delete Checkpoint
+     * @apiVersion 1.0.0
+     * @apiName DeleteCheckpoint
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete an existing Checkpoint
+     *     NOTE: This will also delete AOIs that depend on the given checkpoint
+     */
+    router.delete(
+        '/project/:projectid/checkpoint/:checkpointid',
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
+                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+
+                const aois = await aoi.list(req.params.projectid, { checkpointid: req.params.checkpointid });
+                aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
+
+                return res.json(await checkpoint.delete(req.params.checkpointid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {patch} /api/project/:projectid/checkpoint/:checkpointid Patch Checkpoint
      * @apiVersion 1.0.0
      * @apiName PatchCheckpoint
      * @apiGroup Checkpoints
