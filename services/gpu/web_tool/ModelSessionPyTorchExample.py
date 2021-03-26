@@ -154,10 +154,15 @@ class TorchFineTuning(ModelSession):
                 self.classes[i]['retraining_counts'] = 0
                 self.classes[i]['retraining_counts_percent'] = 0
 
+        print('original classes')
+        print(self.classes)
         # combine starter model classes and retrain classes
         self.classes = self.classes + [x for x in retrain_classes if not x in self.classes]
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
 
+
+        print ('modified classes:')
+        print(self.classes)
         names_retrain = []
         for i, c in enumerate(counts):
              names_retrain.append(list(np.repeat(names[i], c)))
@@ -247,6 +252,8 @@ class TorchFineTuning(ModelSession):
         for i, f1 in enumerate(per_class_f1_final):
             self.classes[i].update({'retraining_f1score': f1})
 
+        print ('final classes:')
+        print(self.classes)
 
         global_f1 = f1_score(y_test, lr_preds, average='weighted')
         print("Global f1-score: %0.4f" % (global_f1))
@@ -348,6 +355,8 @@ class TorchFineTuning(ModelSession):
 
     def save_state_to(self, directory):
 
+
+        print(directory)
 
         torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt"))
         # Do we need to save these?

@@ -181,6 +181,9 @@ class ModelSrv():
             body.get('analytics')
         )
 
+        print (checkpoint)
+        print (self.api.tmp_checkpoints)
+        print(str(checkpoint['id']))
         self.model.save_state_to(self.api.tmp_checkpoints + '/' + str(checkpoint['id']))
         self.api.upload_checkpoint(checkpoint['id'])
         self.api.instance_patch(checkpoint_id = checkpoint['id'])
