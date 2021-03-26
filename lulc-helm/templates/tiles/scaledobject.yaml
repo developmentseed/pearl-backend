@@ -14,7 +14,7 @@ spec:
   - type: cpu
     metadata:
       type: Utilization
-      value: 30
+      value: "30"
   # - type: azure-monitor
   #   metadata:
   #     resourceURI: Microsoft.Network/applicationGateways/lulcStagingApplicationGateway3
