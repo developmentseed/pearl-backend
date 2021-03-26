@@ -623,7 +623,13 @@ async function server(config, cb) {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
 
-            // TODO - Add support for paging for projects with > 100 AOIs
+            const insts = await instance.list(req.params.projectid);
+            for (const inst of insts.instances) {
+                if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
+                await instance.delete(inst.id);
+            }
+
+            // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
             const aois = await aoi.list(req.params.projectid);
             aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
 

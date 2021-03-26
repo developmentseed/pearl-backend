@@ -206,6 +206,28 @@ class Instance {
     }
 
     /**
+     * Remove an instance from the database
+     *
+     * Note: Does not check for active state - the caller should ensure the instance is not active
+     *
+     * @param {Number} instanceid Instance ID to delete
+     */
+    async delete(instanceid) {
+        try {
+            await this.pool.query(`
+                DELETE
+                    FROM
+                        instances
+                    WHERE
+                        id = $1
+            `, [instanceid]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal Instance Delete Error');
+        }
+        return true;
+    }
+
+    /**
      * Retrieve information about an instance
      *
      * @param {Object} auth - Express Request Auth object
