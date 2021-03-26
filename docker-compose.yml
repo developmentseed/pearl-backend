@@ -40,7 +40,7 @@ services:
         depends_on:
             - cache
         ports:
-            - "8000:8000"
+            - 8000:8000
         environment:
             - TITILER_API_DEBUG=TRUE
             - PORT=8000

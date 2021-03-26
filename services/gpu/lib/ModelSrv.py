@@ -36,6 +36,17 @@ class ModelSrv():
                 }, websocket)
 
             self.aoi = AOI(self.api, body, self.chk['id'])
+            await websocket.send(json.dumps({
+                'message': 'model#aoi',
+                'data': {
+                    'id': self.aoi.id,
+                    'name': self.aoi.name,
+                    'checkpoint_id': self.chk['id'],
+                    'bounds': self.aoi.bounds,
+                    'total': self.aoi.total
+                }
+            }))
+
 
             color_list = [item["color"] for item in self.model.classes]
 

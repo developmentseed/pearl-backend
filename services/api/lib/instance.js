@@ -75,19 +75,15 @@ class Instance {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
-        const WHERE = [];
+        const where = [];
+        where.push(`project_id = ${projectid}`);
 
-        if (query.status === 'all') {
-            query.status = null;
-        } else if (query.status === 'active') {
-            WHERE.push('active IS true');
+        if (query.status === 'active') {
+            where.push('active IS true');
         } else if (query.status === 'inactive') {
-            WHERE.push('active IS false');
+            where.push('active IS false');
         }
 
-        WHERE.push(`project_id = ${projectid}`);
-
-        const whereClause = WHERE.length > 1 ? WHERE.join(' AND ') : WHERE[0];
         let pgres;
         try {
             pgres = await this.pool.query(`
@@ -99,7 +95,7 @@ class Instance {
                 FROM
                     instances
                 WHERE
-                    ${whereClause}
+                    ${where.join(' AND ')}
                 ORDER BY
                     last_update
                 LIMIT
@@ -210,6 +206,28 @@ class Instance {
     }
 
     /**
+     * Remove an instance from the database
+     *
+     * Note: Does not check for active state - the caller should ensure the instance is not active
+     *
+     * @param {Number} instanceid Instance ID to delete
+     */
+    async delete(instanceid) {
+        try {
+            await this.pool.query(`
+                DELETE
+                    FROM
+                        instances
+                    WHERE
+                        id = $1
+            `, [instanceid]);
+        } catch (err) {
+            throw new Err(500, err, 'Internal Instance Delete Error');
+        }
+        return true;
+    }
+
+    /**
      * Retrieve information about an instance
      *
      * @param {Object} auth - Express Request Auth object
@@ -288,7 +306,7 @@ class Instance {
      */
     async reset() {
         try {
-            const pgres = await this.pool.query(`
+            await this.pool.query(`
                 UPDATE instances
                     SET active = False
             `, []);

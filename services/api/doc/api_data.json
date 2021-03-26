@@ -71,6 +71,24 @@
     "groupTitle": "AOI"
   },
   {
+    "type": "delete",
+    "url": "/api/project/:projectid/aoi/:aoiid",
+    "title": "Delete AOI",
+    "version": "1.0.0",
+    "name": "DeleteAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete an existing AOI</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
     "type": "get",
     "url": "/api/project/:projectid/aoi/:aoiid/download",
     "title": "Download AOI",
@@ -148,6 +166,14 @@
             "field": "page",
             "defaultValue": "0",
             "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpointid",
+            "defaultValue": "0",
+            "description": "<p>Only return AOIs for a specific checkpoint</p>"
           }
         ]
       }
@@ -387,6 +413,24 @@
         }
       ]
     },
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid",
+    "title": "Delete Checkpoint",
+    "version": "1.0.0",
+    "name": "DeleteCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete an existing Checkpoint NOTE: This will also delete AOIs that depend on the given checkpoint</p>",
     "filename": "./index.js",
     "groupTitle": "Checkpoints"
   },
@@ -1467,6 +1511,24 @@
     },
     "filename": "./index.js",
     "groupTitle": "Mosaic"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:projectid",
+    "title": "Delete Project",
+    "version": "1.0.0",
+    "name": "DeleteProject",
+    "group": "Project",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a project</p>",
+    "filename": "./index.js",
+    "groupTitle": "Project"
   },
   {
     "type": "post",

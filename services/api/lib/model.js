@@ -24,7 +24,7 @@ class Model {
      * @returns {Object}
      */
     static json(row) {
-        if (typeof row.bounds === 'string') row.bounds = JSON.parse(row.bounds)
+        if (typeof row.bounds === 'string') row.bounds = JSON.parse(row.bounds);
 
         return {
             id: parseInt(row.id),

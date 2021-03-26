@@ -189,6 +189,27 @@ class Project {
 
         return Project.json(pgres.rows[0]);
     }
+
+    /**
+     * Delete Project
+     *
+     * @param {Number} projectid - Specific Project id
+     */
+    async delete(projectid) {
+        try {
+            await this.pool.query(`
+                DELETE FROM projects
+                    WHERE
+                        id = $1
+            `, [
+                projectid
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to delete Project');
+        }
+
+        return {};
+    }
 }
 
 module.exports = {
