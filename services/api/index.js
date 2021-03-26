@@ -1357,7 +1357,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {patch} /api/model/:modelid Patch Checkpoint
+     * @api {patch} /api/project/:projectid/checkpoint/:checkpointid Patch Checkpoint
      * @apiVersion 1.0.0
      * @apiName PatchCheckpoint
      * @apiGroup Checkpoints
