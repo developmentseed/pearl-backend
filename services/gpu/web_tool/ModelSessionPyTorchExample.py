@@ -125,11 +125,7 @@ class TorchFineTuning(ModelSession):
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
         tile = tile.astype(np.float32)
-
-        #self._last_tile = output_features: is this needed?
-
         output, output_features = self.run_model_on_tile(tile)
-
         return output, output_features
 
     def retrain(self, classes, **kwargs):
@@ -155,7 +151,6 @@ class TorchFineTuning(ModelSession):
                 self.classes[i]['retraining_counts'] = counts[names.index(c['name'])] + self.classes[i]['retraining_counts']
 
         total_retrain_counts = sum(x['retraining_counts'] for x in self.classes)
-        print(total_retrain_counts)
         for i, c in enumerate(self.classes):
             self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
 
@@ -344,12 +339,7 @@ class TorchFineTuning(ModelSession):
         return  predictions, features
 
     def save_state_to(self, directory):
-
-
-        print(directory)
-
         torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt"))
-        # Do we need to save these?
         np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
         np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
@@ -360,7 +350,6 @@ class TorchFineTuning(ModelSession):
         }
 
     def load_state_from(self, chkpt, chkpt_fs):
-
         self.augment_x_train = []
         self.augment_y_train = []
 
@@ -370,15 +359,10 @@ class TorchFineTuning(ModelSession):
             self.augment_y_train.append(sample)
 
         self.augment_model = joblib.load(os.path.join(chkpt_fs, "augment_model.p"))
-        #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
-
-        # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
-        # how to we update for the correct number of classes post retraining?
         self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
         self.classes = chkpt['classes']
         self.model = FCN(num_input_channels=4, num_output_classes=len(chkpt['classes']), num_filters=64)
-        self._init_model()
 
         return {
             "message": "Loaded model state",
