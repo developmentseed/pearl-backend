@@ -72,6 +72,12 @@ class TorchFineTuning(ModelSession):
     def __init__(self, gpu_id, model_dir, classes):
         self.model_dir = model_dir
         self.classes = classes
+
+        # initalize counts to be 0
+        for i, c in enumerate(self.classes):
+            c['retraining_counts'] = 0
+
+
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         print('# is cuda available?', torch.cuda.is_available())
@@ -143,26 +149,23 @@ class TorchFineTuning(ModelSession):
              retrain_classes[i]['retraining_counts'] = c
              retrain_classes[i]['retraining_counts_percent'] = c / sum(counts)
 
-        # update and attribute self.classes with retraining info
         for i, c in enumerate(self.classes):
             # retraing samples that are in starter model
             if c['name'] in names:
-                self.classes[i]['retraining_counts'] = counts[names.index(c['name'])]
-                self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
-            # starter model classes that are not in user specified retraining samples
-            else:
-                self.classes[i]['retraining_counts'] = 0
-                self.classes[i]['retraining_counts_percent'] = 0
+                self.classes[i]['retraining_counts'] = counts[names.index(c['name'])] + self.classes[i]['retraining_counts']
 
-        print('original classes')
-        print(self.classes)
+        total_retrain_counts = sum(x['retraining_counts'] for x in self.classes)
+        print(total_retrain_counts)
+        for i, c in enumerate(self.classes):
+            self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
+
         # combine starter model classes and retrain classes
-        self.classes = self.classes + [x for x in retrain_classes if not x in self.classes]
+
+        current_class_names = [x['name'] for x in self.classes]
+
+        self.classes = self.classes + [x for x in retrain_classes if not x['name'] in current_class_names] #don't check against entire dict
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
 
-
-        print ('modified classes:')
-        print(self.classes)
         names_retrain = []
         for i, c in enumerate(counts):
              names_retrain.append(list(np.repeat(names[i], c)))
@@ -251,9 +254,6 @@ class TorchFineTuning(ModelSession):
         # add  retrainingper class f1-scores counts to classes attribute
         for i, f1 in enumerate(per_class_f1_final):
             self.classes[i].update({'retraining_f1score': f1})
-
-        print ('final classes:')
-        print(self.classes)
 
         global_f1 = f1_score(y_test, lr_preds, average='weighted')
         print("Global f1-score: %0.4f" % (global_f1))
