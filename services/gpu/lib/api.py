@@ -109,7 +109,6 @@ class API():
             },
             data = json.dumps(data)
         )
-
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)

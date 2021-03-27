@@ -72,6 +72,12 @@ class TorchFineTuning(ModelSession):
     def __init__(self, gpu_id, model_dir, classes):
         self.model_dir = model_dir
         self.classes = classes
+
+        # initalize counts to be 0
+        for i, c in enumerate(self.classes):
+            c['retraining_counts'] = 0
+
+
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         print('# is cuda available?', torch.cuda.is_available())
@@ -119,11 +125,7 @@ class TorchFineTuning(ModelSession):
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
         tile = tile.astype(np.float32)
-
-        #self._last_tile = output_features: is this needed?
-
         output, output_features = self.run_model_on_tile(tile)
-
         return output, output_features
 
     def retrain(self, classes, **kwargs):
@@ -143,19 +145,20 @@ class TorchFineTuning(ModelSession):
              retrain_classes[i]['retraining_counts'] = c
              retrain_classes[i]['retraining_counts_percent'] = c / sum(counts)
 
-        # update and attribute self.classes with retraining info
         for i, c in enumerate(self.classes):
             # retraing samples that are in starter model
             if c['name'] in names:
-                self.classes[i]['retraining_counts'] = counts[names.index(c['name'])]
-                self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
-            # starter model classes that are not in user specified retraining samples
-            else:
-                self.classes[i]['retraining_counts'] = 0
-                self.classes[i]['retraining_counts_percent'] = 0
+                self.classes[i]['retraining_counts'] = counts[names.index(c['name'])] + self.classes[i]['retraining_counts']
+
+        total_retrain_counts = sum(x['retraining_counts'] for x in self.classes)
+        for i, c in enumerate(self.classes):
+            self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
 
         # combine starter model classes and retrain classes
-        self.classes = self.classes + [x for x in retrain_classes if not x in self.classes]
+
+        current_class_names = [x['name'] for x in self.classes]
+
+        self.classes = self.classes + [x for x in retrain_classes if not x['name'] in current_class_names] #don't check against entire dict
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
 
         names_retrain = []
@@ -236,7 +239,6 @@ class TorchFineTuning(ModelSession):
         # add  retrainingper class f1-scores counts to classes attribute
         for i, f1 in enumerate(per_class_f1_final):
             self.classes[i].update({'retraining_f1score': f1})
-
 
         global_f1 = f1_score(y_test, lr_preds, average='weighted')
         print("Global f1-score: %0.4f" % (global_f1))
@@ -331,7 +333,6 @@ class TorchFineTuning(ModelSession):
             self.augment_y_train.append(sample)
 
         self.augment_model = joblib.load(os.path.join(chkpt_fs, "augment_model.p"))
-
         self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
         self.classes = chkpt['classes']
