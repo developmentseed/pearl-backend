@@ -156,6 +156,7 @@ otherwise only the `total` & `processed` tags will be returned
 | --------------------- | ----- |
 | `instance#terminate`  |       |
 | `connection#extend`   | Reset instance termination counter |
+| `model#checkpoint`    | Load a given checkpoint onto the model |
 | `model#prediction`    | Inference a GeoJSON polygon |
 | `model#reset`         |       |
 | `model#undo`          |       |
@@ -166,6 +167,21 @@ otherwise only the `total` & `processed` tags will be returned
 ```JSON
 {
     "action": "instance#terminate"
+}
+```
+
+#### model#checkpoint
+
+Load a given checkpont onto the model.
+
+Note: The checkpoint must be part of the same project
+
+```JSON
+{
+    "action": "model#checkpoint",
+    "data": {
+        "id": 123
+    }
 }
 ```
 

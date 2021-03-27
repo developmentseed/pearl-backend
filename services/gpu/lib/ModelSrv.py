@@ -20,6 +20,11 @@ class ModelSrv():
         self.api = api
         self.model = model
 
+    async def load_checkpoint(self, body, websocket):
+        self.chk = self.api.get_checkpoint(body['id'])
+        chk_fs = self.api.download_checkpoint(self.chk['id'])
+        self.model.load_state_from(self.chk, chk_fs)
+
     async def prediction(self, body, websocket):
         try:
             if self.processing is True:

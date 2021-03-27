@@ -404,18 +404,23 @@ function gpu() {
                         action: 'model#retrain',
                         data: require('./fixtures/retrain.json')
                     }));
-                }
-
-                else if (runs === 2) {
+                } else if (runs === 2) {
                     if (instance.id === 1) {
                         ws.send(JSON.stringify({
                             action: 'model#retrain',
                             data: require('./fixtures/retrain.json')
                         }));
                     }
-                }
-
-                else if (runs === 3) {
+                } else if (runs === 3) {
+                   if (instance.id === 1) {
+                      ws.send(JSON.stringify({
+                          action: 'model#checkpoint',
+                          data: {
+                              id: 2
+                          }
+                      }));
+                   }
+                } else if (runs === 4) {
                     if (instance.id === 1) {
                         ws.send(JSON.stringify({
                             action: 'instance#terminate'
