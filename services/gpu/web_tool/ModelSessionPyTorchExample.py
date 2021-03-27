@@ -292,32 +292,6 @@ class TorchFineTuning(ModelSession):
                 "success": False
             }
 
-    def reset(self):
-        self._init_model()
-        self.augment_x_train = []
-        self.augment_y_train = []
-        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
-
-        label_binarizer = LabelBinarizer()
-        label_binarizer.fit(range(self.output_channels))
-
-        self.augment_model.coefs_ = [self.initial_weights]
-        self.augment_model.intercepts_ = [self.initial_biases]
-
-        self.augment_model.classes_ = np.array(list(range(self.output_channels)))
-        self.augment_model.n_features_in_ = self.output_features
-        self.augment_model.n_outputs_ = self.output_channels
-        self.augment_model.n_layers_ = 2
-        self.augment_model.out_activation_ = 'softmax'
-
-        self.augment_model._label_binarizer = label_binarizer # investigate
-
-        return {
-            "message": "Model reset successfully",
-            "success": True
-        }
-
-
     def run_model_on_tile(self, tile):
         height = tile.shape[1]
         width = tile.shape[2]
@@ -337,10 +311,7 @@ class TorchFineTuning(ModelSession):
         return  predictions, features
 
     def save_state_to(self, directory):
-
-
         torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt"))
-        # Do we need to save these?
         np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
         np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
@@ -351,7 +322,6 @@ class TorchFineTuning(ModelSession):
         }
 
     def load_state_from(self, chkpt, chkpt_fs):
-
         self.augment_x_train = []
         self.augment_y_train = []
 
@@ -361,15 +331,11 @@ class TorchFineTuning(ModelSession):
             self.augment_y_train.append(sample)
 
         self.augment_model = joblib.load(os.path.join(chkpt_fs, "augment_model.p"))
-        #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
 
-        # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
-        # how to we update for the correct number of classes post retraining?
         self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
         self.classes = chkpt['classes']
         self.model = FCN(num_input_channels=4, num_output_classes=len(chkpt['classes']), num_filters=64)
-        self._init_model()
 
         return {
             "message": "Loaded model state",

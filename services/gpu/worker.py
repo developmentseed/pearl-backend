@@ -55,6 +55,7 @@ async def connection(uri, model):
 
     router.on_act("model#prediction", model.prediction)
     router.on_act("model#retrain", model.retrain)
+    router.on_act("model#checkpoint", model.load_checkpoint)
 
     await router.open()
 
