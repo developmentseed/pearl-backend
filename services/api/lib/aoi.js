@@ -194,7 +194,7 @@ class AOI {
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
 
-        AOI.json(pgres.rows[0]);
+        return AOI.json(pgres.rows[0]);
     }
 
     /**
