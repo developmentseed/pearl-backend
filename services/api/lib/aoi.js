@@ -69,6 +69,7 @@ class AOI {
             name: row.name,
             created: row.created,
             storage: row.storage,
+            bookmarked: row.bookmarked,
             project_id: parseInt(row.project_id),
             checkpoint_id: parseInt(row.checkpoint_id)
         };
@@ -167,6 +168,7 @@ class AOI {
      * @param {Object} aoi AOI Object
      * @param {Boolean} aoi.storage Has the storage been uploaded
      * @param {String} aoi.name - Human Readable Name
+     * @param {Boolean} aoi.bookmarked Has the aoi been bookmarked by the user
      */
     async patch(aoiid, aoi) {
         let pgres;
@@ -175,14 +177,16 @@ class AOI {
                 UPDATE aois
                     SET
                         storage = COALESCE($2, storage),
-                        name = COALESCE($3, name)
+                        name = COALESCE($3, name),
+                        bookmarked = COALESCE($4, bookmarked)
                     WHERE
                         id = $1
                     RETURNING *
             `, [
                 aoiid,
                 aoi.storage,
-                aoi.name
+                aoi.name,
+                aoi.bookmarked
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI');
@@ -207,6 +211,7 @@ class AOI {
                     name,
                     ST_AsGeoJSON(bounds)::JSON AS bounds,
                     project_id,
+                    bookmarked,
                     checkpoint_id,
                     created,
                     storage
@@ -255,6 +260,7 @@ class AOI {
                     count(*) OVER() AS count,
                     id,
                     name,
+                    bookmarked,
                     ST_AsGeoJSON(bounds)::JSON,
                     created,
                     storage

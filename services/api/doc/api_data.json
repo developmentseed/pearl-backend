@@ -214,6 +214,13 @@
             "optional": true,
             "field": "name",
             "description": "<p>The human readable name of the AOI</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "bookmarked",
+            "description": "<p>Has the checkpoint been bookmarked in the frontend</p>"
           }
         ]
       }
@@ -530,7 +537,7 @@
   },
   {
     "type": "patch",
-    "url": "/api/model/:modelid",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid",
     "title": "Patch Checkpoint",
     "version": "1.0.0",
     "name": "PatchCheckpoint",
