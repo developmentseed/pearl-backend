@@ -214,6 +214,7 @@ class CheckPoint {
      * @param {Boolean} checkpoint.storage Has the storage been uploaded
      * @param {String} checkpoint.name The name of the checkpoint
      * @param {Array} checkpoint.classes Class list to update (only name & color changes - cannot change length)
+     * @param {Boolean} checkpoint.bookmarked Has the checkpoint been bookmarked by the user
      */
     async patch(checkpointid, checkpoint) {
         let pgres;
