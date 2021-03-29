@@ -5,6 +5,10 @@
         "name": {
             "type": "string",
             "description": "The human readable name of the AOI"
+        },
+        "bookmarked": {
+            "type": "boolean",
+            "description": "Has the checkpoint been bookmarked in the frontend"
         }
     }
 }

@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS aois (
     id              BIGSERIAL PRIMARY KEY,
     name            TEXT NOT NULL,
     checkpoint_id   BIGINT NOT NULL,
+    bookmarked      BOOLEAN DEFAULT FALSE,
     project_id      BIGINT NOT NULL,
     bounds          GEOMETRY(POLYGON, 4326),
     created         TIMESTAMP NOT NULL DEFAULT NOW(),

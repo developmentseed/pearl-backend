@@ -730,6 +730,7 @@ async function server(config, cb) {
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
      *       "storage": true,
+     *       "bookmarked": false
      *       "created": "<date>",
      *       "bounds": { "GeoJSON "}
      *   }
@@ -967,6 +968,7 @@ async function server(config, cb) {
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
      *       "storage": true,
+     *       "bookmarked": false,
      *       "created": "<date>",
      *       "bounds": { "GeoJSON" }
      *   }
@@ -1032,9 +1034,9 @@ async function server(config, cb) {
      *       "project_id": 1,
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
+     *       "bookmarked": false,
      *       "storage": true,
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON" }
+     *       "created": "<date>"
      *   }
      */
     router.patch(
