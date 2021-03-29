@@ -1036,8 +1036,7 @@ async function server(config, cb) {
      *       "checkpoint_id": 1,
      *       "bookmarked": false,
      *       "storage": true,
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON" }
+     *       "created": "<date>"
      *   }
      */
     router.patch(
