@@ -487,7 +487,20 @@ async function server(config, cb) {
      *       "projects": [{
      *           "id": 1,
      *           "name": 123,
-     *           "created": "<date>"
+     *           "created": "<date>",
+     *           "aois": [{
+     *              "id": 1,
+     *              "name": "aoi name",
+     *              "created": "<date>",
+     *              "storage": false
+     *           }],
+     *          "checkpoints": [{
+     *              "id": 1,
+     *              "name": "checkpoint name",
+     *              "created": "<date>",
+     *              "storage": false,
+     *              "bookmarked": false
+     *          }]
      *       }]
      *   }
      */
@@ -496,7 +509,17 @@ async function server(config, cb) {
         validate({ query: require('./schema/req.query.project-list.json') }),
         async (req, res) => {
             try {
-                res.json(await project.list(req.auth.uid, req.query));
+                const results = await project.list(req.auth.uid, req.query);
+                if (results.projects && results.projects.length) {
+                    for (let index = 0; index < results.projects.length; index++) {
+                        const p = results.projects[index];
+                        let aois = await aoi.list(p.id)
+                        let checkpoints = await checkpoint.list(p.id)
+                        p['aois'] = aois.aois
+                        p['checkpoints'] = checkpoints.checkpoints
+                    }
+                }
+                res.json(results);
             } catch (err) {
                 return Err.respond(err, res);
             }
