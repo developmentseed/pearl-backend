@@ -173,6 +173,7 @@ test('POST /api/project/1/aoi', (t) => {
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
+            bookmarked: false,
             name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
@@ -209,6 +210,7 @@ test('GET /api/project/1/aoi/1', (t) => {
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
+            bookmarked: false,
             name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
@@ -299,6 +301,39 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
 
         fs.writeFileSync('/tmp/sample.png', res.body);
         t.ok(true, 'ok - written png to /tmp/sample.png');
+
+        t.end();
+    });
+});
+
+test('PATCH /api/project/1/aoi/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1',
+        method: 'PATCH',
+        body: {
+            bookmarked: true,
+            name: 'RENAMED'
+        },
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            storage: true,
+            project_id: 1,
+            checkpoint_id: 1,
+            bookmarked: true,
+            name: 'RENAMED',
+        });
 
         t.end();
     });
