@@ -55,6 +55,7 @@ async def connection(uri, model):
 
     router.on_act("model#prediction", model.prediction)
     router.on_act("model#retrain", model.retrain)
+    router.on_act("model#checkpoint", model.load_checkpoint)
 
     await router.open()
 
@@ -63,7 +64,7 @@ def load(gpu_id, api):
     model_type = api.model["model_type"]
 
     if model_type == "pytorch_example":
-        model = TorchFineTuning(gpu_id, api.model_fs, api.model['classes'])
+        model = TorchFineTuning(gpu_id, api.model_dir, api.model['classes'])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 

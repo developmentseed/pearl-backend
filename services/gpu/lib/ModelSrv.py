@@ -20,6 +20,11 @@ class ModelSrv():
         self.api = api
         self.model = model
 
+    async def load_checkpoint(self, body, websocket):
+        self.chk = self.api.get_checkpoint(body['id'])
+        chk_fs = self.api.download_checkpoint(self.chk['id'])
+        self.model.load_state_from(self.chk, chk_fs)
+
     async def prediction(self, body, websocket):
         try:
             if self.processing is True:
@@ -36,6 +41,17 @@ class ModelSrv():
                 }, websocket)
 
             self.aoi = AOI(self.api, body, self.chk['id'])
+            await websocket.send(json.dumps({
+                'message': 'model#aoi',
+                'data': {
+                    'id': self.aoi.id,
+                    'name': self.aoi.name,
+                    'checkpoint_id': self.chk['id'],
+                    'bounds': self.aoi.bounds,
+                    'total': self.aoi.total
+                }
+            }))
+
 
             color_list = [item["color"] for item in self.model.classes]
 
@@ -169,7 +185,6 @@ class ModelSrv():
             body['geoms'],
             body.get('analytics')
         )
-
         self.model.save_state_to(self.api.tmp_checkpoints + '/' + str(checkpoint['id']))
         self.api.upload_checkpoint(checkpoint['id'])
         self.api.instance_patch(checkpoint_id = checkpoint['id'])

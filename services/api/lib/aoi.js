@@ -128,6 +128,37 @@ class AOI {
         dwn.readableStreamBody.pipe(res);
     }
 
+    /**
+     * Delete an AOI
+     *
+     * @param {Number} aoiid - Specific AOI id
+     */
+    async delete(aoiid) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+                DELETE
+                    FROM
+                        aois
+                    WHERE
+                        id = $1
+                    RETURNING *
+            `, [
+                aoiid
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to delete AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+
+        if (pgres.rows[0].storage && this.config.AzureStorage) {
+            const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
+            await blob_client.delete();
+        }
+
+        return true;
+    }
 
     /**
      * Update AOI properties
@@ -203,11 +234,19 @@ class AOI {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
+     * @param {Number} [query.checkpointid] - Only return AOIs related to a given Checkpoint
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+
+        const where = [];
+        where.push(`project_id = ${projectid}`);
+
+        if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
+            where.push('checkpoint_id = ' + query.checkpointid);
+        }
 
         let pgres;
         try {
@@ -222,15 +261,14 @@ class AOI {
                 FROM
                     aois
                 WHERE
-                    project_id = $3
+                    ${where.join(' AND ')}
                 LIMIT
                     $1
                 OFFSET
                     $2
             `, [
                 query.limit,
-                query.page,
-                projectid
+                query.page
 
             ]);
         } catch (err) {
