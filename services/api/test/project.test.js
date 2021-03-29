@@ -215,6 +215,7 @@ test('POST /api/project/1/aoi', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             name: 'Test AOI',
+            bookmarked: false,
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
