@@ -346,6 +346,10 @@ class TorchFineTuning(ModelSession):
 
         self.classes = chkpt['classes']
         self.model = FCN(num_input_channels=4, num_output_classes=len(chkpt['classes']), num_filters=64)
+        checkpoint = torch.load(self.model_fs, map_location=self.device)
+        self.model.load_state_dict(checkpoint)
+        self.model = self.model.to(self.device)
+
 
         return {
             "message": "Loaded model state",
