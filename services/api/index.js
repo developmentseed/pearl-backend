@@ -487,7 +487,20 @@ async function server(config, cb) {
      *       "projects": [{
      *           "id": 1,
      *           "name": 123,
-     *           "created": "<date>"
+     *           "created": "<date>",
+     *           "aois": [{
+     *              "id": 1,
+     *              "name": "aoi name",
+     *              "created": "<date>",
+     *              "storage": false
+     *           }],
+     *          "checkpoints": [{
+     *              "id": 1,
+     *              "name": "checkpoint name",
+     *              "created": "<date>",
+     *              "storage": false,
+     *              "bookmarked": false
+     *          }]
      *       }]
      *   }
      */
