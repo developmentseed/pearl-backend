@@ -62,7 +62,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
           "type": "json"
         }
       ]
@@ -125,7 +125,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
           "type": "json"
         }
       ]
@@ -214,6 +214,13 @@
             "optional": true,
             "field": "name",
             "description": "<p>The human readable name of the AOI</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "bookmarked",
+            "description": "<p>Has the checkpoint been bookmarked in the frontend</p>"
           }
         ]
       }
@@ -222,7 +229,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"bookmarked\": false,\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -530,7 +537,7 @@
   },
   {
     "type": "patch",
-    "url": "/api/model/:modelid",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid",
     "title": "Patch Checkpoint",
     "version": "1.0.0",
     "name": "PatchCheckpoint",
