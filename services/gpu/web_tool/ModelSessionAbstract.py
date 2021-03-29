@@ -78,20 +78,6 @@ class ModelSession(abc.ABC):
         """
         raise NotImplementedError()
 
-    @abc.abstractmethod
-    def reset(self):
-        '''Responsible for resetting the state of the internal model back to the initial configuration
-        that it was read "from disk".
-
-        Note: This is not necessarily the original state of the model. If the (ModelSession) class was
-        serialized from disk it should be reset to that state.
-
-        Returns:
-            Dictionary in the format `{"message": str, "success": bool}` describing the result of
-            the reset operation. The "message" will be displayed as HTML on the front-end, and styled
-            according to "success".
-        '''
-        raise NotImplementedError()
 
     @abc.abstractmethod
     def undo(self):
