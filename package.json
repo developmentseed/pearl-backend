@@ -18,8 +18,11 @@
         "ws": "^7.4.2"
     },
     "dependencies": {
+        "i": "^0.3.6",
         "inquirer": "^8.0.0",
         "knex": "^0.95.1",
-        "minimist": "^1.2.5"
+        "minimist": "^1.2.5",
+        "npm": "^7.7.6",
+        "terminal-kit": "^2.0.7"
     }
 }

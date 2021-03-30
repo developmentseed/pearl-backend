@@ -33,7 +33,7 @@ if (argv.reconnect) {
 }
 
 test('gpu connection', async (t) => {
-    await gpu(t);
+    await gpu();
     t.end();
 });
 
@@ -49,7 +49,7 @@ async function gpu(t) {
         const ws = new WebSocket(SOCKET + `?token=${a.instance.token}`);
 
         ws.on('open', () => {
-            t.pass('connection opened');
+            console.log('connection opened');
 
             if (!argv.interactive) {
                 ws.close();
@@ -63,11 +63,19 @@ async function gpu(t) {
                 if (argv.debug) console.error(JSON.stringify(msg, null, 4));
 
                 if (msg.message === 'info#connected') {
-                    t.pass('GPU Connected');
+                    console.log('GPU Connected');
                     state.connected = true;
                 } else if (msg.message === 'info#disconnected') {
-                    t.pass('GPU Disconnected');
+                    console.log('GPU Disconnected');
                     state.connected = false;
+                } else if (msg.message === 'model#aoi') {
+                    console.log(`model#aoi - ${msg.data.name}`);
+                    state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
+                    state.progress.start(msg.data.total, 0);
+                } else if (msg.message === 'model#prediction') {
+                    state.progress.update(msg.data.processed);
+                } else if (msg.message === 'model#prediction#complete') {
+                    state.progress.stop();
                 }
 
                 if (state.connected && !state.task && !state.choose) {
@@ -81,6 +89,7 @@ async function gpu(t) {
 async function choose(state, ws) {
     state.choose = true;
 
+    console.log();
     let msg = await inquire.prompt([{
         name: 'type',
         message: 'Type of action to perform',
@@ -114,8 +123,10 @@ async function choose(state, ws) {
                 required: true
             }]);
 
+            console.log();
             ws.send(msg.message);
         } else {
+            console.log();
             ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'))));
         }
     } else {
