@@ -55,12 +55,12 @@ function reconnect(test, API) {
             delete res.body.created;
             delete res.body.last_update;
             delete res.body.token;
+            delete res.body.active;
 
             t.deepEquals(res.body, {
                 project_id: 1,
                 aoi_id: null,
-                checkpoint_id: null,
-                active: true,
+                checkpoint_id: null
             }, 'expected body');
 
         } catch (err) {

@@ -38,7 +38,7 @@ class Socket():
         print(error);
 
     def on_close(self, ws):
-        print('CLOSED')
+        self.connect(self.handler)
 
     def on_recv(self, ws, msg):
         try:

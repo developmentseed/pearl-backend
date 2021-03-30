@@ -74,8 +74,8 @@ async function gpu(t) {
                 } else if (msg.message === 'model#prediction') {
                     state.progress.update(msg.data.processed);
                 } else if (msg.message === 'model#prediction#complete') {
-                    console.log('ok - model#prediction#complete');
                     state.progress.stop();
+                    console.log('ok - model#prediction#complete');
                     state.progress = false;
                 }
 
@@ -124,10 +124,10 @@ async function choose(state, ws) {
                 required: true
             }]);
 
-            console.log();
+            state.progress = true;
             ws.send(msg.message);
         } else {
-            console.log();
+            state.progress = true;
             ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'))));
         }
     } else {
