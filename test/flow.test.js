@@ -56,6 +56,11 @@ async function gpu(t) {
             }
         });
 
+        ws.on('close', () => {
+            console.error('CONNECTION TERMINATED');
+            process.exit(1)
+        });
+
         if (argv.interactive) {
             ws.on('message', async (msg) => {
                 msg = JSON.parse(msg);
