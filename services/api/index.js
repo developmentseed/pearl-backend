@@ -214,7 +214,7 @@ async function server(config, cb) {
         (err, req, res, next) => {
             // Catch Auth0 errors
             if (err.name === 'UnauthorizedError') {
-                return Err.respond(err.inner, res, 'Failed to validate token');
+                return Err.respond(new Err(err.status, err.code, err.message), res);
             }
             next();
         },
