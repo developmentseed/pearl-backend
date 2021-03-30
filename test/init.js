@@ -4,17 +4,37 @@ const { promisify } = require('util');
 const request = promisify(require('request'));
 const Knex = require('knex');
 
-const drop = require('../services/api/test/drop');
+const {drop, genconfig} = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
-process.env.Postgres = process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis';
+let a = {
+    token: false,
+    instance: false
+};
 
-function init(test, API) {
-    let a = {
-        token: false,
-        instance: false
-    };
 
+function reconnect(test, API) {
+    running(test, API);
+
+    test('pre-run', async (t) => {
+        const config = await genconfig();
+        try {
+            const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
+            a.token = (await authtoken.generate({
+                type: 'auth0',
+                uid: 1
+            }, 'API Token')).token;
+        } catch (err) {
+            t.error(err, 'no errors');
+        }
+
+        t.end();
+    });
+
+    return a;
+}
+
+function connect(test, API) {
     test('pre-run', async (t) => {
         try {
             const config = await drop();
@@ -47,31 +67,7 @@ function init(test, API) {
         t.end();
     });
 
-    test('api running', async (t) => {
-        try {
-            const res = await request({
-                method: 'GET',
-                json: true,
-                url: API + '/api'
-            });
-
-            t.equals(res.statusCode, 200);
-
-            t.deepEquals(res.body, {
-                version: '1.0.0',
-                limits: {
-                    live_inference: 10000000,
-                    max_inference: 10000000,
-                    instance_window: 600
-                }
-            });
-
-        } catch (err) {
-            t.error(err, 'no error');
-        }
-
-        t.end();
-    });
+    running(test, API);
 
     test('new model', async (t) => {
         try {
@@ -287,4 +283,35 @@ function init(test, API) {
     return a;
 }
 
-module.exports = init;
+function running(test, API) {
+    test('api running', async (t) => {
+        try {
+            const res = await request({
+                method: 'GET',
+                json: true,
+                url: API + '/api'
+            });
+
+            t.equals(res.statusCode, 200);
+
+            t.deepEquals(res.body, {
+                version: '1.0.0',
+                limits: {
+                    live_inference: 10000000,
+                    max_inference: 10000000,
+                    instance_window: 600
+                }
+            });
+
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+}
+
+module.exports = {
+    connect,
+    reconnect
+};
