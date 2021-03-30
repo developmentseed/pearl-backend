@@ -7,10 +7,12 @@
  * @prop {Object} clients instance_id to websocket connection map of clients
  */
 class Pool {
-    constructor(config) {
+    constructor(config, argv) {
+        this.config = config;
+        this.argv = argv
+
         this.gpus = new Map();
         this.clients = new Map();
-        this.config = config;
     }
 
     /**
@@ -92,6 +94,8 @@ class Pool {
         ws.activity = +new Date();
 
         if (ws.auth.t === 'inst') {
+            if (this.argv.debug) console.log(`ok - Client ${ws.auth.i}: ${payload.message ? payload.message : payload.action}`);
+
             if (!this.has_gpu(ws.auth.i)) {
                 return ws.send(JSON.stringify({
                     message: 'error',
@@ -105,6 +109,8 @@ class Pool {
             this.gpu(ws.auth.i).activity = +new Date();
             this.gpu(ws.auth.i).send(payload);
         } else if (ws.auth.t === 'admin') {
+            if (this.argv.debug) console.log(`ok - GPU ${ws.auth.i}: ${payload.message ? payload.message : payload.action}`);
+
             if (!this.has_client(ws.auth.i)) {
                 return ws.send(JSON.stringify({
                     message: 'error',

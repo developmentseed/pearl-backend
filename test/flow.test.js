@@ -69,14 +69,17 @@ async function gpu(t) {
                     state.connected = false;
                 }
 
-                await choose(state);
+                if (state.connected && !state.task) {
+                    choose(state, ws);
+                }
             });
         }
     });
 }
 
-async function choose(state) {
-    let choices = ['No Choice'];
+async function choose(state, ws) {
+    let choices = ['Custom'];
+
     if (state.connected) {
         choices = choices.concat(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
             return {
@@ -86,7 +89,7 @@ async function choose(state) {
         }));
     }
 
-    const msg = await inquire.prompt([{
+    let msg = await inquire.prompt([{
         name: 'message',
         message: 'Message to run',
         type: 'list',
@@ -94,7 +97,16 @@ async function choose(state) {
         choices: choices
     }]);
 
-    if (msg.message.type === 'file') {
-        return fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message.name + '.json'));
+    if (msg.message === 'Custom') {
+        msg = await inquire.prompt([{
+            name: 'message',
+            message: 'Custom JSON Message',
+            type: 'string',
+            required: true
+        }]);
+
+        ws.send(msg.message);
+    } else if (msg.message.type === 'file') {
+        ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message.name + '.json')));
     }
 }
