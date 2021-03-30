@@ -25,7 +25,7 @@ class Pool {
      * @param {Date} ws.activity Store the timestamp of the last user defined action
      */
     connected(ws) {
-        console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: CONNECTED`);
+        console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: CONNECTED`);
 
         ws.isAlive = true;
         ws.activity = +new Date();
@@ -71,7 +71,7 @@ class Pool {
     }
 
     disconnected(ws) {
-        console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i}: DISCONNECTED`);
+        console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i}: DISCONNECTED`);
 
         if (ws.auth.t === 'admin') {
             this.gpus.delete(ws.auth.i);
@@ -97,8 +97,9 @@ class Pool {
     route(ws, payload) {
         ws.activity = +new Date();
 
+        if (this.argv.debug) console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: ${payload}`);
+
         if (ws.auth.t === 'inst') {
-            if (this.argv.debug) console.log(`ok - Client ${ws.auth.i}: ${payload.message ? payload.message : payload.action}`);
 
             if (!this.has_gpu(ws.auth.i)) {
                 return ws.send(JSON.stringify({
@@ -113,8 +114,6 @@ class Pool {
             this.gpu(ws.auth.i).activity = +new Date();
             this.gpu(ws.auth.i).send(payload);
         } else if (ws.auth.t === 'admin') {
-            if (this.argv.debug) console.log(`ok - GPU ${ws.auth.i}: ${payload.message ? payload.message : payload.action}`);
-
             if (!this.has_client(ws.auth.i)) {
                 return ws.send(JSON.stringify({
                     message: 'error',
