@@ -8,7 +8,7 @@ const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const Pool = require('./lib/pool');
 const argv = require('minimist')(process.argv, {
-    boolean: ['prod', 'help']
+    boolean: ['prod', 'help', 'debug']
 });
 
 const Timeout = require('./lib/timeout');
@@ -38,7 +38,7 @@ async function configure(argv = {}, cb) {
  * @param {function} cb
  */
 async function server(argv, config, cb) {
-    const pool = new Pool(config);
+    const pool = new Pool(config, argv);
 
     app.get('/health', (req, res) => {
         return res.json({

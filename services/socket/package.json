@@ -7,7 +7,7 @@
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
         "prod": "./index.js --prod",
-        "dev": "nodemon ./index.js",
+        "dev": "nodemon ./index.js --debug",
         "lint": "eslint index.js lib/**.js"
     },
     "dependencies": {
