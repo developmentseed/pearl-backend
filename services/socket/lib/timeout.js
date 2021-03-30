@@ -31,6 +31,7 @@ class Timeout {
                 ws.send(JSON.stringify({
                     action: 'info#timeout'
                 }));
+                console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: TIMEOUT`);
                 ws.terminate();
             }
         });
@@ -40,6 +41,7 @@ class Timeout {
                 ws.send(JSON.stringify({
                     action: 'instance#terminate'
                 }));
+                console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: TIMEOUT`);
             }
         });
     }

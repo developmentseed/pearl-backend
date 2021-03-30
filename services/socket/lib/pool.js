@@ -25,6 +25,8 @@ class Pool {
      * @param {Date} ws.activity Store the timestamp of the last user defined action
      */
     connected(ws) {
+        console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: CONNECTED`);
+
         ws.isAlive = true;
         ws.activity = +new Date();
 
@@ -69,6 +71,8 @@ class Pool {
     }
 
     disconnected(ws) {
+        console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i}: DISCONNECTED`);
+
         if (ws.auth.t === 'admin') {
             this.gpus.delete(ws.auth.i);
 
