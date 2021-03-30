@@ -116,7 +116,7 @@ async function choose(state, ws) {
 
             ws.send(msg.message);
         } else {
-            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json')));
+            ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'))));
         }
     } else {
         console.log('ok - not API actions currently set up');
