@@ -1,18 +1,5 @@
 'use strict';
 
-//
-// Note: Docker-Compose must be running
-//
-// Test the following authentication flow between services
-//
-// - Create new user
-// - Create new token
-// - Authenticate with WS router
-//
-//
-// GPU=1 Stay running and issue webhook messages to an instance
-// DEBUG=1 Verbose logs
-
 const Progress = require('cli-progress');
 const WebSocket = require('ws');
 const test = require('tape');
@@ -24,11 +11,24 @@ const Knex = require('knex');
 
 const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
-const init = require('./init');
+const {connect, reconnect} = require('./init');
 
-process.env.Postgres = process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis';
+const argv = require('minimist')(process.argv, {
+    string: ['postgres'],
+    boolean: ['gpu', 'debug', 'reconnect'],
+    default: {
+        postgres: 'postgres://docker:docker@localhost:5433/gis'
+    }
+});
 
-const a = init(test, API);
+process.env.Postgres = argv.postgres;
+
+let a;
+if (argv.reconnect) {
+    a = reconnect(test, API);
+} else {
+    a = connect(test, API);
+}
 
 gpu();
 
@@ -94,7 +94,7 @@ function gpu() {
         ws.on('open', () => {
             t.ok('connection opened');
 
-            if (!process.env.GPU) {
+            if (!argv.gpu) {
                 ws.close();
                 t.end();
             }
@@ -104,7 +104,7 @@ function gpu() {
 
         ws.on('message', (msg) => {
             msg = JSON.parse(msg);
-            if (process.env.DEBUG) console.error(JSON.stringify(msg, null, 4));
+            if (argv.debug) console.error(JSON.stringify(msg, null, 4));
 
             // Messages in this IF queue are in chrono order
             if (msg.message === 'info#connected') {
