@@ -9,15 +9,17 @@
         "lint": "eslint test/**.js"
     },
     "devDependencies": {
+        "cli-progress": "^3.9.0",
         "eslint": "^7.17.0",
         "eslint-plugin-node": "^11.1.0",
-        "cli-progress": "^3.9.0",
         "pg": "^8.5.1",
         "request": "^2.88.2",
         "tape": "^5.1.0",
         "ws": "^7.4.2"
     },
     "dependencies": {
-        "knex": "^0.95.1"
+        "inquirer": "^8.0.0",
+        "knex": "^0.95.1",
+        "minimist": "^1.2.5"
     }
 }
