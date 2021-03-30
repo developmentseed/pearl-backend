@@ -60,7 +60,6 @@ async function gpu(t) {
             console.error();
             console.error('CONNECTION TERMINATED');
             console.error();
-            process.exit(1)
         });
 
         if (argv.interactive) {
