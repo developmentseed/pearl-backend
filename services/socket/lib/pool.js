@@ -21,13 +21,10 @@ class Pool {
      * @param {Object} ws Websocket Client
      *
      * Set by the connected Function
-     * @param {boolean} ws.isAlive Store whether the connection is still alive
      * @param {Date} ws.activity Store the timestamp of the last user defined action
      */
     connected(ws) {
         console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: CONNECTED`);
-
-        ws.isAlive = true;
         ws.activity = +new Date();
 
         if (ws.auth.t === 'admin') {
