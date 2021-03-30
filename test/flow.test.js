@@ -42,7 +42,8 @@ async function gpu(t) {
         const state = {
             task: false,
             connected: false,
-            progress: false
+            progress: false,
+            choose: false
         };
 
         const ws = new WebSocket(SOCKET + `?token=${a.instance.token}`);
@@ -69,7 +70,7 @@ async function gpu(t) {
                     state.connected = false;
                 }
 
-                if (state.connected && !state.task) {
+                if (state.connected && !state.task && !state.choose) {
                     choose(state, ws);
                 }
             });
@@ -78,35 +79,48 @@ async function gpu(t) {
 }
 
 async function choose(state, ws) {
-    let choices = ['Custom'];
-
-    if (state.connected) {
-        choices = choices.concat(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
-            return {
-                type: 'file',
-                name: f.replace(/.json/, '')
-            }
-        }));
-    }
+    state.choose = true;
 
     let msg = await inquire.prompt([{
-        name: 'message',
-        message: 'Message to run',
+        name: 'type',
+        message: 'Type of action to perform',
         type: 'list',
         required: true,
-        choices: choices
+        choices: ['websocket', 'api']
     }]);
 
-    if (msg.message === 'Custom') {
+    if (msg.type === 'websocket') {
+        let choices = ['Custom'];
+
+        if (state.connected) {
+            choices = choices.concat(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
+                return f.replace(/.json/, '');
+            }));
+        }
+
         msg = await inquire.prompt([{
             name: 'message',
-            message: 'Custom JSON Message',
-            type: 'string',
-            required: true
+            message: 'Message to run',
+            type: 'list',
+            required: true,
+            choices: choices
         }]);
 
-        ws.send(msg.message);
-    } else if (msg.message.type === 'file') {
-        ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message.name + '.json')));
+        if (msg.message === 'Custom') {
+            msg = await inquire.prompt([{
+                name: 'message',
+                message: 'Custom JSON Message',
+                type: 'string',
+                required: true
+            }]);
+
+            ws.send(msg.message);
+        } else {
+            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json')));
+        }
+    } else {
+        console.log('ok - not API actions currently set up');
     }
+
+    state.choose = false;
 }
