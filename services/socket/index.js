@@ -3,7 +3,6 @@
 'use strict';
 
 const express = require('express');
-const srv = require('http').createServer();
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const Pool = require('./lib/pool');
@@ -49,6 +48,9 @@ async function server(argv, config, cb) {
 
     await config.api.deactivate();
 
+    const srv = require('http').createServer();
+    srv.timeout = 0;
+    srv.keepAliveTimeout = 0;
     srv.on('request', app);
 
     const wss = new WebSocket.Server({
