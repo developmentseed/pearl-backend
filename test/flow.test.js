@@ -19,7 +19,7 @@ const argv = require('minimist')(process.argv, {
         interactive: 'i'
     },
     default: {
-        postgres: 'postgres://docker:docker@localhost:5433/gis'
+        postgres: process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis'
     }
 });
 
@@ -57,7 +57,9 @@ async function gpu(t) {
         });
 
         ws.on('close', () => {
+            console.error();
             console.error('CONNECTION TERMINATED');
+            console.error();
             process.exit(1)
         });
 
