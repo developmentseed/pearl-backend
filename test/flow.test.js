@@ -6,6 +6,8 @@ const test = require('tape');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 const inquire = require('inquirer');
+const path = require('path');
+const fs = require('fs');
 
 const drop = require('../services/api/test/drop');
 const {connect, reconnect} = require('./init');
@@ -47,23 +49,42 @@ async function gpu(t) {
 
         ws.on('open', () => {
             t.pass('connection opened');
-            if (!argv.gpu) {
+
+            if (!argv.interactive) {
                 ws.close();
                 return resolve();
             }
         });
 
-        ws.on('message', (msg) => {
-            msg = JSON.parse(msg);
-            if (argv.debug) console.error(JSON.stringify(msg, null, 4));
+        if (argv.interactive) {
+            ws.on('message', async (msg) => {
+                msg = JSON.parse(msg);
+                if (argv.debug) console.error(JSON.stringify(msg, null, 4));
 
-            if (msg.message === 'info#connected') {
-                t.pass('GPU Connected');
-                state.connected = true;
-            } else if (msg.message === 'info#disconnected') {
-                t.pass('GPU Disconnected');
-                state.connected = false;
-            }
-        });
+                if (msg.message === 'info#connected') {
+                    t.pass('GPU Connected');
+                    state.connected = true;
+                } else if (msg.message === 'info#disconnected') {
+                    t.pass('GPU Disconnected');
+                    state.connected = false;
+                }
+
+                await choose();
+            });
+        }
     });
+}
+
+async function choose() {
+    const msg = await inquire.prompt([{
+        name: 'message',
+        message: 'Message to run',
+        type: 'list',
+        required: true,
+        choices: fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
+            return f.replace(/.json/, '');
+        })
+    }]);
+
+    return fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'));
 }
