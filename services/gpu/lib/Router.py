@@ -80,7 +80,7 @@ class Router():
                         traceback.print_exc()
 
                 else:
-                    LOGGER.info('ok - Unknown Message: {}'.format(msg.get('message')))
+                    LOGGER.info('ok - Unknown Message: {}'.format(json.dumps(msg)))
 
             elif msg.get('action') is not None:
                 action = msg.get('action')
@@ -96,5 +96,5 @@ class Router():
                 elif action == "instance#terminate":
                     self.websocket.terminate()
                 else:
-                    LOGGER.info('ok - Unknown Action: {}'.format(msg.get('action')))
+                    LOGGER.info('ok - Unknown Action: {}'.format(json.dumps(msg)))
 
