@@ -75,7 +75,7 @@ class TorchFineTuning(ModelSession):
 
         # initalize counts to be 0
         for i, c in enumerate(self.classes):
-            c['retraining_counts'] = 0
+            c['counts'] = 0
 
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -142,17 +142,17 @@ class TorchFineTuning(ModelSession):
 
         # add re-training counts to classes attribute
         for i, c in enumerate(counts):
-             retrain_classes[i]['retraining_counts'] = c
-             retrain_classes[i]['retraining_counts_percent'] = c / sum(counts)
+             retrain_classes[i]['counts'] = c
+             retrain_classes[i]['percent'] = c / sum(counts)
 
         for i, c in enumerate(self.classes):
             # retraing samples that are in starter model
             if c['name'] in names:
-                self.classes[i]['retraining_counts'] = counts[names.index(c['name'])] + self.classes[i]['retraining_counts']
+                self.classes[i]['counts'] = counts[names.index(c['name'])] + self.classes[i]['counts']
 
-        total_retrain_counts = sum(x['retraining_counts'] for x in self.classes)
+        total_retrain_counts = sum(x['counts'] for x in self.classes)
         for i, c in enumerate(self.classes):
-            self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
+            self.classes[i]['percent'] = counts[names.index(c['name'])] / sum(counts)
 
         # combine starter model classes and retrain classes
 
