@@ -908,22 +908,62 @@ async function server(config, cb) {
     });
 
     /**
-     * @api {get} /api/project/:projectid/aoi/:aoiid/download Download AOI
+     * @api {get} /api/project/:projectid/aoi/:aoiid/download/raw Download Raw AOI
      * @apiVersion 1.0.0
-     * @apiName DownloadAOI
+     * @apiName DownloadRawAOI
      * @apiGroup AOI
      * @apiPermission user
      *
      * @apiDescription
      *     Return the aoi fabric geotiff
      */
-    router.get('/project/:projectid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
+    router.get('/project/:projectid/aoi/:aoiid/download/raw', requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
-            await project.has_auth(req.auth, req.params.projectid);
+
+            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             await aoi.download(req.params.aoiid, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:projectid/aoi/:aoiid/download/color Download Color AOI
+     * @apiVersion 1.0.0
+     * @apiName DownloadColorAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return the colourized aoi fabric geotiff
+     */
+    router.get('/project/:projectid/aoi/:aoiid/download/raw', requiresAuth, async (req, res) => {
+        try {
+            await Param.int(req, 'projectid');
+            await Param.int(req, 'aoiid');
+
+            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            const tiffurl = await aoi.url(a.id);
+
+            req.url = '/colorize';
+            req.query.url = tiffurl.origin + tiffurl.pathname;
+            req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+            const chkpt = await checkpoint.get(a.checkpoint_id);
+            const cmap = {};
+            for (let i = 0; i < chkpt.classes.length; i++) {
+                cmap[i] = chkpt.classes[i].color;
+            }
+
+            req.query.colormap = JSON.stringify(cmap);
+
+            await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }

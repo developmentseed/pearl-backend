@@ -19,7 +19,7 @@ const argv = require('minimist')(process.argv, {
         interactive: 'i'
     },
     default: {
-        postgres: 'postgres://docker:docker@localhost:5433/gis'
+        postgres: process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis'
     }
 });
 
@@ -33,27 +33,33 @@ if (argv.reconnect) {
 }
 
 test('gpu connection', async (t) => {
-    await gpu(t);
+    await gpu();
     t.end();
 });
 
 async function gpu(t) {
     return new Promise((resolve, reject) => {
         const state = {
-            task: false,
             connected: false,
-            progress: false
+            progress: false,
+            choose: false
         };
 
         const ws = new WebSocket(SOCKET + `?token=${a.instance.token}`);
 
         ws.on('open', () => {
-            t.pass('connection opened');
+            console.log('connection opened');
 
             if (!argv.interactive) {
                 ws.close();
                 return resolve();
             }
+        });
+
+        ws.on('close', () => {
+            console.error();
+            console.error('CONNECTION TERMINATED');
+            console.error();
         });
 
         if (argv.interactive) {
@@ -62,29 +68,77 @@ async function gpu(t) {
                 if (argv.debug) console.error(JSON.stringify(msg, null, 4));
 
                 if (msg.message === 'info#connected') {
-                    t.pass('GPU Connected');
+                    console.log('ok - GPU Connected');
                     state.connected = true;
                 } else if (msg.message === 'info#disconnected') {
-                    t.pass('GPU Disconnected');
+                    console.log('ok - GPU Disconnected');
                     state.connected = false;
+                } else if (msg.message === 'model#aoi') {
+                    console.log(`ok - model#aoi - ${msg.data.name}`);
+                    state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
+                    state.progress.start(msg.data.total, 0);
+                } else if (msg.message === 'model#prediction') {
+                    state.progress.update(msg.data.processed);
+                } else if (msg.message === 'model#prediction#complete') {
+                    state.progress.stop();
+                    console.log('ok - model#prediction#complete');
+                    state.progress = false;
                 }
 
-                await choose();
+                if (state.connected && !state.progress && !state.choose) {
+                    choose(state, ws);
+                }
             });
         }
     });
 }
 
-async function choose() {
-    const msg = await inquire.prompt([{
-        name: 'message',
-        message: 'Message to run',
+async function choose(state, ws) {
+    state.choose = true;
+
+    console.log();
+    let msg = await inquire.prompt([{
+        name: 'type',
+        message: 'Type of action to perform',
         type: 'list',
         required: true,
-        choices: fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
-            return f.replace(/.json/, '');
-        })
+        choices: ['websocket', 'api']
     }]);
 
-    return fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'));
+    if (msg.type === 'websocket') {
+        let choices = ['Custom'];
+
+        if (state.connected) {
+            choices = choices.concat(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
+                return f.replace(/.json/, '');
+            }));
+        }
+
+        msg = await inquire.prompt([{
+            name: 'message',
+            message: 'Message to run',
+            type: 'list',
+            required: true,
+            choices: choices
+        }]);
+
+        if (msg.message === 'Custom') {
+            msg = await inquire.prompt([{
+                name: 'message',
+                message: 'Custom JSON Message',
+                type: 'string',
+                required: true
+            }]);
+
+            state.progress = true;
+            ws.send(msg.message);
+        } else {
+            state.progress = true;
+            ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'))));
+        }
+    } else {
+        console.log('ok - not API actions currently set up');
+    }
+
+    state.choose = false;
 }

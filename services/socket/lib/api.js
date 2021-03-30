@@ -66,7 +66,6 @@ class API {
                 active: active
             }
         });
-        console.error(res.body)
         console.error(`ok - RES ${url} ${res.statusCode}`);
 
         return res;

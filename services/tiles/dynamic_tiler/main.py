@@ -6,10 +6,10 @@ from starlette.middleware.cors import CORSMiddleware
 
 from titiler.errors import DEFAULT_STATUS_CODES, add_exception_handlers
 from titiler.middleware import CacheControlMiddleware, TotalTimeMiddleware
-from titiler.endpoints.factory import TilerFactory, TMSFactory
+from titiler.endpoints.factory import TMSFactory
 from titiler.resources.enums import OptionalHeader
 
-from .endpoints.factory import MosaicTilerFactory
+from .endpoints.factory import MosaicTilerFactory, CustomTilerFactory
 from .cache import setup_cache
 from .settings import ApiSettings
 from .dependencies import CustomPathParams, CustomMosaicParams
@@ -44,7 +44,7 @@ mosaic_endpoint = MosaicTilerFactory(
 )
 app.include_router(mosaic_endpoint.router, prefix="/mosaic", tags=["Mosaic"])
 
-cog_endpoints = TilerFactory(
+cog_endpoints = CustomTilerFactory(
     path_dependency=CustomPathParams,
     router_prefix="cog",
     optional_headers=optional_headers,

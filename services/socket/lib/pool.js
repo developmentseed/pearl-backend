@@ -7,10 +7,12 @@
  * @prop {Object} clients instance_id to websocket connection map of clients
  */
 class Pool {
-    constructor(config) {
+    constructor(config, argv) {
+        this.config = config;
+        this.argv = argv
+
         this.gpus = new Map();
         this.clients = new Map();
-        this.config = config;
     }
 
     /**
@@ -19,11 +21,10 @@ class Pool {
      * @param {Object} ws Websocket Client
      *
      * Set by the connected Function
-     * @param {boolean} ws.isAlive Store whether the connection is still alive
      * @param {Date} ws.activity Store the timestamp of the last user defined action
      */
     connected(ws) {
-        ws.isAlive = true;
+        console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: CONNECTED`);
         ws.activity = +new Date();
 
         if (ws.auth.t === 'admin') {
@@ -67,6 +68,8 @@ class Pool {
     }
 
     disconnected(ws) {
+        console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i}: DISCONNECTED`);
+
         if (ws.auth.t === 'admin') {
             this.gpus.delete(ws.auth.i);
 
@@ -91,7 +94,10 @@ class Pool {
     route(ws, payload) {
         ws.activity = +new Date();
 
+        if (this.argv.debug) console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: ${payload}`);
+
         if (ws.auth.t === 'inst') {
+
             if (!this.has_gpu(ws.auth.i)) {
                 return ws.send(JSON.stringify({
                     message: 'error',

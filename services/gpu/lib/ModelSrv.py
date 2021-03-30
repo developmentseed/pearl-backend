@@ -20,28 +20,28 @@ class ModelSrv():
         self.api = api
         self.model = model
 
-    async def load_checkpoint(self, body, websocket):
+    def load_checkpoint(self, body, websocket):
         self.chk = self.api.get_checkpoint(body['id'])
         chk_fs = self.api.download_checkpoint(self.chk['id'])
         self.model.load_state_from(self.chk, chk_fs)
 
-    async def prediction(self, body, websocket):
+    def prediction(self, body, websocket):
         try:
             if self.processing is True:
-                return await is_processing(websocket)
+                return is_processing(websocket)
 
             LOGGER.info("ok - starting prediction");
 
             self.processing = True
 
             if self.chk is None:
-                await self.checkpoint({
+                self.checkpoint({
                     'name': body['name'],
                     'geoms': [None] * len(self.model.classes)
                 }, websocket)
 
             self.aoi = AOI(self.api, body, self.chk['id'])
-            await websocket.send(json.dumps({
+            websocket.send(json.dumps({
                 'message': 'model#aoi',
                 'data': {
                     'id': self.aoi.id,
@@ -74,7 +74,7 @@ class ModelSrv():
                     png = pred2png(output, color_list) # investigate this
 
                     LOGGER.info("ok - returning inference");
-                    await websocket.send(json.dumps({
+                    websocket.send(json.dumps({
                         'message': 'model#prediction',
                         'data': {
                             'aoi': self.aoi.id,
@@ -86,7 +86,7 @@ class ModelSrv():
                         }
                     }))
                 else:
-                    await websocket.send(json.dumps({
+                    websocket.send(json.dumps({
                         'message': 'model#prediction',
                         'data': {
                             'aoi': self.aoi.id,
@@ -104,7 +104,7 @@ class ModelSrv():
 
             LOGGER.info("ok - done prediction");
 
-            await websocket.send(json.dumps({
+            websocket.send(json.dumps({
                 'message': 'model#prediction#complete'
             }))
 
@@ -112,7 +112,7 @@ class ModelSrv():
         except Exception as e:
             self.processing = False
 
-            await websocket.send(json.dumps({
+            websocket.send(json.dumps({
                 'message': 'error',
                 'data': {
                     'error': 'processing error',
@@ -122,10 +122,10 @@ class ModelSrv():
 
             raise e
 
-    async def retrain(self, body, websocket):
+    def retrain(self, body, websocket):
         try:
             if self.processing is True:
-                return await is_processing(websocket)
+                return is_processing(websocket)
 
             LOGGER.info("ok - starting retrain");
 
@@ -138,11 +138,11 @@ class ModelSrv():
 
             LOGGER.info("ok - done retrain");
 
-            await websocket.send(json.dumps({
+            websocket.send(json.dumps({
                 'message': 'model#retrain#complete'
             }))
 
-            await self.checkpoint({
+            self.checkpoint({
                 'name': body['name'],
                 'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']]),
                 'analytics': [{
@@ -156,7 +156,7 @@ class ModelSrv():
         except Exception as e:
             self.processing = False
 
-            await websocket.send(json.dumps({
+            websocket.send(json.dumps({
                 'message': 'error',
                 'data': {
                     'error': 'retrain error',
@@ -166,12 +166,12 @@ class ModelSrv():
 
             raise None
 
-        await self.prediction({
+        self.prediction({
             'name': body['name'],
             'polygon': self.aoi.poly
         }, websocket)
 
-    async def checkpoint(self, body, websocket):
+    def checkpoint(self, body, websocket):
         classes = []
         for cls in self.model.classes:
             classes.append({
@@ -189,7 +189,7 @@ class ModelSrv():
         self.api.upload_checkpoint(checkpoint['id'])
         self.api.instance_patch(checkpoint_id = checkpoint['id'])
 
-        await websocket.send(json.dumps({
+        websocket.send(json.dumps({
             'message': 'model#checkpoint',
             'data': {
                 'name': checkpoint['name'],
@@ -203,9 +203,9 @@ class ModelSrv():
     def load(self, directory):
         return self.model.load_state_from(directory)
 
-async def is_processing(websocket):
+def is_processing(websocket):
     LOGGER.info("not ok  - Can't process message - busy");
-    await websocket.send(json.dumps({
+    websocket.send(json.dumps({
         'message': 'error',
         'data': {
             'error': 'GPU is Busy',
