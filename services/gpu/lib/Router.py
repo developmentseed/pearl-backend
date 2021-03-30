@@ -18,7 +18,7 @@ class Socket():
 
     async def connect(self):
         try:
-            self.websocket = await websockets.connect(self.uri, ping_interval=None)
+            self.websocket = await websockets.connect(self.uri)
         except:
             LOGGER.error("not ok - failed to connect - retrying")
             await self.connect()

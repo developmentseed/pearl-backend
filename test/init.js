@@ -12,7 +12,6 @@ let a = {
     instance: false
 };
 
-
 function reconnect(test, API) {
     running(test, API);
 
@@ -26,6 +25,46 @@ function reconnect(test, API) {
             }, 'API Token')).token;
         } catch (err) {
             t.error(err, 'no errors');
+        }
+
+        t.end();
+    });
+
+    test('Instance 1', async (t) => {
+        try {
+            const res = await request({
+                method: 'GET',
+                json: true,
+                url: API + '/api/project/1/instance/1',
+                headers: {
+                    Authorization: `Bearer ${a.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'active', 'aoi_id', 'checkpoint_id', 'created', 'id', 'last_update', 'project_id', 'token'
+            ].sort(), 'expected props');
+
+            t.ok(parseInt(res.body.id), 'id: <integer>');
+
+            a.instance = JSON.parse(JSON.stringify(res.body));
+
+            delete res.body.id,
+            delete res.body.created;
+            delete res.body.last_update;
+            delete res.body.token;
+
+            t.deepEquals(res.body, {
+                project_id: 1,
+                aoi_id: null,
+                checkpoint_id: null,
+                active: true,
+            }, 'expected body');
+
+        } catch (err) {
+            t.error(err, 'no error');
         }
 
         t.end();
