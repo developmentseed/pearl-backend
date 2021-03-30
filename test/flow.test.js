@@ -69,22 +69,32 @@ async function gpu(t) {
                     state.connected = false;
                 }
 
-                await choose();
+                await choose(state);
             });
         }
     });
 }
 
-async function choose() {
+async function choose(state) {
+    let choices = ['No Choice'];
+    if (state.connected) {
+        choices = choices.concat(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
+            return {
+                type: 'file',
+                name: f.replace(/.json/, '')
+            }
+        }));
+    }
+
     const msg = await inquire.prompt([{
         name: 'message',
         message: 'Message to run',
         type: 'list',
         required: true,
-        choices: fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
-            return f.replace(/.json/, '');
-        })
+        choices: choices
     }]);
 
-    return fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'));
+    if (msg.message.type === 'file') {
+        return fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message.name + '.json'));
+    }
 }
