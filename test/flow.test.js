@@ -40,7 +40,6 @@ test('gpu connection', async (t) => {
 async function gpu(t) {
     return new Promise((resolve, reject) => {
         const state = {
-            task: false,
             connected: false,
             progress: false,
             choose: false
@@ -63,22 +62,24 @@ async function gpu(t) {
                 if (argv.debug) console.error(JSON.stringify(msg, null, 4));
 
                 if (msg.message === 'info#connected') {
-                    console.log('GPU Connected');
+                    console.log('ok - GPU Connected');
                     state.connected = true;
                 } else if (msg.message === 'info#disconnected') {
-                    console.log('GPU Disconnected');
+                    console.log('ok - GPU Disconnected');
                     state.connected = false;
                 } else if (msg.message === 'model#aoi') {
-                    console.log(`model#aoi - ${msg.data.name}`);
+                    console.log(`ok - model#aoi - ${msg.data.name}`);
                     state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
                     state.progress.start(msg.data.total, 0);
                 } else if (msg.message === 'model#prediction') {
                     state.progress.update(msg.data.processed);
                 } else if (msg.message === 'model#prediction#complete') {
+                    console.log('ok - model#prediction#complete');
                     state.progress.stop();
+                    state.progress = false;
                 }
 
-                if (state.connected && !state.task && !state.choose) {
+                if (state.connected && !state.progress && !state.choose) {
                     choose(state, ws);
                 }
             });
