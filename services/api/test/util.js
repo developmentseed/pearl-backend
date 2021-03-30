@@ -4,7 +4,7 @@ const api = require('../index');
 const request = require('request');
 const pkg = require('../package.json');
 const { Config } = require('../index');
-const drop = require('./drop');
+const {drop} = require('./drop');
 
 class Flight {
 

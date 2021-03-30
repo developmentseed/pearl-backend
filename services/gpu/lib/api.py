@@ -35,6 +35,8 @@ class API():
         }, os.environ["SigningSecret"], algorithm="HS256")
 
         # Temp Directories
+        self.dir = '/tmp/'
+
         self.tmp_dir = '/tmp/gpu-api'
         if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
@@ -364,7 +366,7 @@ class API():
         return r.json()
 
     def model_download(self):
-        model_fs = self.tmp_dir + '/model-{}.zip'.format(self.model_id)
+        model_fs = self.dir + '/model-{}.zip'.format(self.model_id)
 
         if not path.exists(model_fs):
             url = self.url + '/api/model/' + str(self.model_id) + '/download'
