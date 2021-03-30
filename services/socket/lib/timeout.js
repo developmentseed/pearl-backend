@@ -13,16 +13,6 @@ class Timeout {
         this.timeout = setInterval(() => {
             self.timeoutBeat(self);
         }, this.config.Timeout);
-
-        this.alive = setInterval(() => {
-            self.aliveBeat(self);
-        }, this.config.Alive);
-    }
-
-    static client(ws) {
-        ws.on('pong', () => {
-            ws.isAlive = true;
-        });
     }
 
     timeoutBeat(self) {
@@ -46,23 +36,8 @@ class Timeout {
         });
     }
 
-    aliveBeat(self) {
-        self.pool.clients.forEach((ws) => {
-            if (ws.isAlive === false) return ws.terminate();
-
-            ws.isAlive = false;
-        });
-
-        self.pool.gpus.forEach((ws) => {
-            if (ws.isAlive === false) return ws.terminate();
-
-            ws.isAlive = false;
-        });
-    }
-
     close() {
         clearInterval(this.timeout);
-        clearInterval(this.alive);
     }
 }
 

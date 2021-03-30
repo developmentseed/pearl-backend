@@ -53,8 +53,14 @@ async function server(argv, config, cb) {
     srv.keepAliveTimeout = 0;
     srv.on('request', app);
 
+    srv.on('upgrade', (request, socket, head) => {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            wss.emit('connection', ws, request);
+        });
+    });
+
     const wss = new WebSocket.Server({
-        server: srv,
+        noServer: true,
         verifyClient: ({ req }, cb) => {
             const url = new URL(`http://localhost:${config.Port}` + req.url);
 
@@ -75,8 +81,6 @@ async function server(argv, config, cb) {
     wss.on('connection', (ws, req) => {
         ws.auth = req.auth;
         pool.connected(ws);
-
-        Timeout.client(ws);
 
         ws.on('close', () => {
             pool.disconnected(ws);
