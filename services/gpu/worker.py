@@ -6,7 +6,6 @@ import jwt
 import json
 import os
 import argparse
-import asyncio
 import websockets
 import logging
 from lib.api import API
@@ -46,18 +45,16 @@ def main():
 
     model = load(args.gpu_id, api)
 
-    asyncio.get_event_loop().run_until_complete(
-        connection('{}?token={}'.format(os.environ["SOCKET"], api.token.replace('api.', '')), model)
-    )
+    connection('{}?token={}'.format(os.environ["SOCKET"], api.token.replace('api.', '')), model)
 
-async def connection(uri, model):
+def connection(uri, model):
     router = Router(uri)
 
     router.on_act("model#prediction", model.prediction)
     router.on_act("model#retrain", model.retrain)
     router.on_act("model#checkpoint", model.load_checkpoint)
 
-    await router.open()
+    router.open()
 
 
 def load(gpu_id, api):

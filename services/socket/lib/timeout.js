@@ -51,14 +51,12 @@ class Timeout {
             if (ws.isAlive === false) return ws.terminate();
 
             ws.isAlive = false;
-            ws.ping(() => {});
         });
 
         self.pool.gpus.forEach((ws) => {
             if (ws.isAlive === false) return ws.terminate();
 
             ws.isAlive = false;
-            ws.ping(() => {});
         });
     }
 
