@@ -24,11 +24,11 @@ const argv = require('minimist')(process.argv, {
 
 process.env.Postgres = argv.postgres;
 
-let a;
+let state;
 if (argv.reconnect) {
-    a = reconnect(test, API);
+    state = reconnect(test, API);
 } else {
-    a = connect(test, API);
+    state = connect(test, API);
 }
 
 if (argv.interactive) {
@@ -38,15 +38,11 @@ if (argv.interactive) {
     });
 }
 
-async function gpu(t) {
+async function gpu() {
     return new Promise((resolve, reject) => {
-        const state = {
-            connected: false,
-            aois: [],
-            checkpoints: []
-        };
+        state.connected = false;
 
-        const ws = new WebSocket(SOCKET + `?token=${a.instance.token}`);
+        const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
         const term = new Term(ws, state);
 
         ws.on('open', () => {
