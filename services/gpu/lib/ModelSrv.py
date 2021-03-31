@@ -5,7 +5,7 @@ import numpy as np
 from .utils import pred2png, geom2px, pxs2geojson
 from .AOI import AOI
 from .MemRaster import MemRaster
-from web_tool.Utils import serialize, deserialize
+from .utils import serialize, deserialize
 import logging
 
 LOGGER = logging.getLogger("server")
