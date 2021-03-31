@@ -2,7 +2,6 @@
 
 const Charm = require('charm');
 const readline = require('readline');
-const Progress = require('cli-progress');
 const WebSocket = require('ws');
 const test = require('tape');
 const API = process.env.API || 'http://localhost:2000';
@@ -39,16 +38,14 @@ test('gpu connection', async (t) => {
 });
 
 async function gpu(t) {
-    const term = new Term();
-
     return new Promise((resolve, reject) => {
         const state = {
             connected: false,
-            progress: false,
             choose: false
         };
 
         const ws = new WebSocket(SOCKET + `?token=${a.instance.token}`);
+        const term = new Term(ws);
 
         ws.on('open', () => {
             term.log('connection opened');
@@ -60,9 +57,7 @@ async function gpu(t) {
         });
 
         ws.on('close', () => {
-            term.log();
             term.log('CONNECTION TERMINATED');
-            term.log();
         });
 
         if (argv.interactive) {
@@ -78,14 +73,12 @@ async function gpu(t) {
                     state.connected = false;
                 } else if (msg.message === 'model#aoi') {
                     term.log(`ok - model#aoi - ${msg.data.name}`);
-                    state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
-                    state.progress.start(msg.data.total, 0);
+                    term.prog.update('model#prediction', 0);
                 } else if (msg.message === 'model#prediction') {
-                    state.progress.update(msg.data.processed);
+                    term.prog.update('model#prediction', msg.data.processed / msg.data.total);
                 } else if (msg.message === 'model#prediction#complete') {
-                    state.progress.stop();
+                    term.prog.update();
                     term.log('ok - model#prediction#complete');
-                    state.progress = false;
                 }
             });
         }
@@ -93,24 +86,7 @@ async function gpu(t) {
 }
 
 async function choose(state, ws) {
-    state.choose = true;
-
-    let msg = await inquire.prompt([{
-        name: 'type',
-        message: 'Type of action to perform',
-        type: 'list',
-        required: true,
-        choices: ['websocket', 'api']
-    }]);
-
     if (msg.type === 'websocket') {
-        let choices = ['Custom'];
-
-        if (state.connected) {
-            choices = choices.concat(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
-                return f.replace(/.json/, '');
-            }));
-        }
 
         msg = await inquire.prompt([{
             name: 'message',
@@ -132,7 +108,6 @@ async function choose(state, ws) {
             ws.send(msg.message);
         } else {
             state.progress = true;
-            ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'))));
         }
     } else {
         console.log('ok - not API actions currently set up');
@@ -142,7 +117,8 @@ async function choose(state, ws) {
 }
 
 class Term {
-    constructor() {
+    constructor(ws) {
+        this.ws = ws;
         this.max_log = process.stdout.rows - 10;
         this.buffer = new Array(this.max_log).fill('', 0, this.max_log - 1);
 
@@ -154,23 +130,16 @@ class Term {
         this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
         this.prompt = new Prompt(this.max_log + 3, 5, this);
         this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
-        this.prog();
+        this.prog = new Progress(this.max_log + 9, this)
         this.charm.write('┗' + '━'.repeat(process.stdout.columns - 2) + '┛');
     }
 
     log(line) {
         const lines = line.split('\n');
-        this.buffer.splice(0, 0, ...lines);
-        this.buffer.splice(this.max_log, lines.length);
+        this.buffer.splice(this.max_log - lines.length + 1, 0, ...lines);
+        this.buffer.splice(0, lines.length);
         this.charm.position(0, 2);
         this.line(this.max_log, this.buffer);
-    }
-
-    prog(task) {
-        task = task || 'No Ongoing Task'
-        this.line(1, [
-            ' '.repeat(Math.floor((process.stdout.columns - task.length) / 2)) + task
-        ]);
     }
 
     line(num = 1, lines = []) {
@@ -181,20 +150,49 @@ class Term {
     }
 }
 
+class Progress {
+    constructor(y, term) {
+        this.y = y;
+        this.term = term;
+        this.update();
+    }
+
+    update(task, percent) {
+        this.term.charm.position(0, this.y);
+
+        if (!task) {
+            task = 'No Ongoing Task'
+            this.term.line(1, [
+                ' '.repeat(Math.floor((process.stdout.columns - task.length) / 2)) + task
+            ]);
+            return;
+        }
+
+        let pre = task + ' ' + (Math.floor(percent * 100)) + '%: ';
+        let bar = '█'.repeat(Math.floor((process.stdout.columns - pre.length - 4) * percent));
+        this.term.line(1, [
+            pre + bar
+        ]);
+    }
+
+}
+
 class Prompt {
     constructor(y, max_prompt, term) {
         this.max_prompt = max_prompt;
         this.y = y;
         this.term = term;
-        this.shown = [];
+
+        this.base = ['websocket', 'api'];
+        this.websocket = fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
+            return f.replace(/.json/, '');
+        })//.concat(['Custom']);
 
         this.current = {
+            shown: this.base,
             screen: 'base',
             sel: 0
         };
-
-        this.base = ['websocket', 'api'];
-        this.shown = this.base;
 
         readline.emitKeypressEvents(process.stdin);
         process.stdin.setRawMode(true);
@@ -202,7 +200,7 @@ class Prompt {
             if (key.ctrl && key.name === 'c') {
                 process.exit();
             } else if (key.name === 'down') {
-                if (this.current.sel < this.shown.length - 1) {
+                if (this.current.sel < this.current.shown.length - 1) {
                     this.current.sel++;
                 }
                 this.update();
@@ -211,8 +209,28 @@ class Prompt {
                     this.current.sel--;
                 }
                 this.update();
-            } else if (key.name === 'enter') {
+            } else if (key.name === 'return') {
+                if (this.current.screen === 'base' && this.current.shown[this.current.sel] === 'websocket') {
+                    this.current.screen = 'websocket';
+                    this.current.shown = this.websocket;
+                    this.current.sel = 0;
+                } else if (this.current.screen === 'websocket' && this.current.shown[this.current.sel] !== 'Custom') {
+                    this.term.log('<INPUT>: ' + this.current.shown[this.current.sel]);
+                    this.term.ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', this.current.shown[this.current.sel] + '.json'))));
+                    this.current.screen = 'base';
+                    this.current.shown = this.base;
+                    this.current.sel = 0;
+                }
+
                 this.update();
+            } else if (key.name === 'escape') {
+                if (['api', 'websocket'].includes(this.current.screen)) {
+                    this.current.screen = 'base';
+                    this.current.shown = this.base;
+                    this.current.sel = 0;
+
+                    this.update();
+                }
             }
 
         });
@@ -222,7 +240,7 @@ class Prompt {
 
     update() {
         this.term.charm.position(0, this.y);
-        this.term.line(5, this.shown.map((s, i) => {
+        this.term.line(5, this.current.shown.map((s, i) => {
             if (this.current.sel === i) {
                 return ' '.repeat(Math.floor((process.stdout.columns - s.length - 6) / 2)) + ' > ' + s + ' < ';
             } else {
