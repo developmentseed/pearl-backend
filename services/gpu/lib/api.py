@@ -135,6 +135,8 @@ class API():
         LOGGER.info("ok - Received " + url)
 
         body = r.json();
+        for i, d2 in enumerate(body['classes']):
+            d2.update(body['analytics'][i])
 
         return body
 

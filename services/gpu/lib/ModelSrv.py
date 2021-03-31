@@ -51,7 +51,12 @@ class ModelSrv():
             if self.chk is None:
                 self.checkpoint({
                     'name': body['name'],
-                    'geoms': [None] * len(self.model.classes)
+                    'geoms': [None] * len(self.model.classes),
+                    'analytics': [{
+                    'counts': cls.get('counts', 0),
+                    'percent': cls.get('percent', 0),
+                    'f1score': cls.get('retraining_f1score', 0)
+                } for cls in self.model.classes]
                 }, websocket)
 
             self.aoi = AOI(self.api, body, self.chk['id'])
