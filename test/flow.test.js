@@ -32,10 +32,12 @@ if (argv.reconnect) {
     a = connect(test, API);
 }
 
-test('gpu connection', async (t) => {
-    await gpu();
-    t.end();
-});
+if (argv.interactive) {
+    test('gpu connection', async (t) => {
+        await gpu();
+        t.end();
+    });
+}
 
 async function gpu(t) {
     return new Promise((resolve, reject) => {
@@ -49,11 +51,6 @@ async function gpu(t) {
 
         ws.on('open', () => {
             term.log('connection opened');
-
-            if (!argv.interactive) {
-                ws.close();
-                return resolve();
-            }
         });
 
         ws.on('close', () => {
@@ -83,37 +80,6 @@ async function gpu(t) {
             });
         }
     });
-}
-
-async function choose(state, ws) {
-    if (msg.type === 'websocket') {
-
-        msg = await inquire.prompt([{
-            name: 'message',
-            message: 'Message to run',
-            type: 'list',
-            required: true,
-            choices: choices
-        }]);
-
-        if (msg.message === 'Custom') {
-            msg = await inquire.prompt([{
-                name: 'message',
-                message: 'Custom JSON Message',
-                type: 'string',
-                required: true
-            }]);
-
-            state.progress = true;
-            ws.send(msg.message);
-        } else {
-            state.progress = true;
-        }
-    } else {
-        console.log('ok - not API actions currently set up');
-    }
-
-    state.choose = false;
 }
 
 class Term {
