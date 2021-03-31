@@ -21,9 +21,23 @@ class ModelSrv():
         self.model = model
 
     def load_checkpoint(self, body, websocket):
+        websocket.send(json.dumps({
+            'message': 'model#checkpoint#progress',
+            'data': {
+                'checkpoint': body['id'],
+                'processed': 0,
+                'total': 1
+            }
+        }))
         self.chk = self.api.get_checkpoint(body['id'])
         chk_fs = self.api.download_checkpoint(self.chk['id'])
         self.model.load_state_from(self.chk, chk_fs)
+        websocket.send(json.dumps({
+            'message': 'model#checkpoint#complete',
+            'data': {
+                'checkpoint': body['id']
+            }
+        }))
 
     def prediction(self, body, websocket):
         try:
@@ -105,7 +119,10 @@ class ModelSrv():
             LOGGER.info("ok - done prediction");
 
             websocket.send(json.dumps({
-                'message': 'model#prediction#complete'
+                'message': 'model#prediction#complete',
+                'data': {
+                    'aoi': self.aoi.id,
+                }
             }))
 
             self.processing = False
