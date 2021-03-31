@@ -58,7 +58,7 @@ class CheckPoint {
 
             const counts = row.geoms.filter((geom) => {
                 if (!geom) return false;
-                if (!geom.coordinates.length) return false;
+                if (!geom.geometries.length) return false;
                 return true;
             }).length;
 
