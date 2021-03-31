@@ -1,12 +1,12 @@
 'use strict';
 
 const Charm = require('charm');
+const readline = require('readline');
 const Progress = require('cli-progress');
 const WebSocket = require('ws');
 const test = require('tape');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
-const inquire = require('inquirer');
 const path = require('path');
 const fs = require('fs');
 
@@ -87,10 +87,6 @@ async function gpu(t) {
                     term.log('ok - model#prediction#complete');
                     state.progress = false;
                 }
-
-                if (state.connected && !state.progress && !state.choose) {
-                    choose(state, ws);
-                }
             });
         }
     });
@@ -147,7 +143,6 @@ async function choose(state, ws) {
 
 class Term {
     constructor() {
-
         this.max_log = process.stdout.rows - 10;
         this.buffer = new Array(this.max_log).fill('', 0, this.max_log - 1);
 
@@ -157,9 +152,9 @@ class Term {
         this.charm.write('┏' + '━'.repeat(process.stdout.columns - 2) + '┓');
         this.line(this.max_log)
         this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
-        this.prog();
+        this.prompt = new Prompt(this.max_log + 3, 5, this);
         this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
-        this.line(5)
+        this.prog();
         this.charm.write('┗' + '━'.repeat(process.stdout.columns - 2) + '┛');
     }
 
@@ -173,7 +168,9 @@ class Term {
 
     prog(task) {
         task = task || 'No Ongoing Task'
-        this.line(1, [' '.repeat(Math.floor((process.stdout.columns - task.length) / 2)) + 'No Ongoing Task']);
+        this.line(1, [
+            ' '.repeat(Math.floor((process.stdout.columns - task.length) / 2)) + task
+        ]);
     }
 
     line(num = 1, lines = []) {
@@ -181,5 +178,56 @@ class Term {
             let line = lines[i] || '';
             this.charm.write('┃ ' + line + ' '.repeat(process.stdout.columns - 4 - line.length) + ' ┃');
         }
+    }
+}
+
+class Prompt {
+    constructor(y, max_prompt, term) {
+        this.max_prompt = max_prompt;
+        this.y = y;
+        this.term = term;
+        this.shown = [];
+
+        this.current = {
+            screen: 'base',
+            sel: 0
+        };
+
+        this.base = ['websocket', 'api'];
+        this.shown = this.base;
+
+        readline.emitKeypressEvents(process.stdin);
+        process.stdin.setRawMode(true);
+        process.stdin.on('keypress', (str, key) => {
+            if (key.ctrl && key.name === 'c') {
+                process.exit();
+            } else if (key.name === 'down') {
+                if (this.current.sel < this.shown.length - 1) {
+                    this.current.sel++;
+                }
+                this.update();
+            } else if (key.name === 'up') {
+                if (this.current.sel > 0) {
+                    this.current.sel--;
+                }
+                this.update();
+            } else if (key.name === 'enter') {
+                this.update();
+            }
+
+        });
+
+        this.update();
+    }
+
+    update() {
+        this.term.charm.position(0, this.y);
+        this.term.line(5, this.shown.map((s, i) => {
+            if (this.current.sel === i) {
+                return ' '.repeat(Math.floor((process.stdout.columns - s.length - 6) / 2)) + ' > ' + s + ' < ';
+            } else {
+                return ' '.repeat(Math.floor((process.stdout.columns - s.length) / 2)) + s;
+            }
+        }));
     }
 }
