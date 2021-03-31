@@ -157,7 +157,7 @@ class Term {
         this.charm.write('┏' + '━'.repeat(process.stdout.columns - 2) + '┓');
         this.line(this.max_log)
         this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
-        this.line(1)
+        this.prog();
         this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
         this.line(5)
         this.charm.write('┗' + '━'.repeat(process.stdout.columns - 2) + '┛');
@@ -169,6 +169,11 @@ class Term {
         this.buffer.splice(this.max_log, lines.length);
         this.charm.position(0, 2);
         this.line(this.max_log, this.buffer);
+    }
+
+    prog(task) {
+        task = task || 'No Ongoing Task'
+        this.line(1, [' '.repeat(Math.floor((process.stdout.columns - task.length) / 2)) + 'No Ongoing Task']);
     }
 
     line(num = 1, lines = []) {
