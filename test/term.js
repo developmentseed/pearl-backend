@@ -35,7 +35,10 @@ class Term {
     line(num = 1, lines = []) {
         for (let i = 0; i < num; i++) {
             let line = lines[i] || '';
-            this.charm.write('┃ ' + line + ' '.repeat(process.stdout.columns - 4 - line.length) + ' ┃');
+
+            let formattedline = line.substring(0, process.stdout.columns - 8);
+            if (line.length >= process.stdout.columns - 8) formattedline = formattedline + '...';
+            this.charm.write('┃ ' + formattedline + ' '.repeat(process.stdout.columns - 4 - line.length) + ' ┃');
         }
     }
 }
@@ -89,6 +92,8 @@ class Prompt {
         process.stdin.on('keypress', (str, key) => {
             if (key.ctrl && key.name === 'c') {
                 process.exit();
+            } else if (key.name === 'q') {
+                process.exit();
             } else if (key.name === 'down') {
                 if (this.current.sel < this.current.shown.length - 1) {
                     this.current.sel++;
@@ -107,8 +112,6 @@ class Prompt {
                     });
                     this.current.sel = 0;
                 } else if (this.current.screen === 'websocket' && this.current.shown[this.current.sel] !== 'Custom') {
-                    this.term.log('<INPUT>: ' + this.current.shown[this.current.sel]);
-
                     if (this.current.shown[this.current.sel].match(/checkpoint/)) {
                         this.current.screen = 'websocket-checkpoints';
                         this.current.shown = this.term.state.checkpoints.map((ch) => {
@@ -116,14 +119,17 @@ class Prompt {
                         });
                         this.current.sel = 0;
                     } else {
+                        this.term.log('<INPUT>: ' + this.current.shown[this.current.sel]);
                         this.term.ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', this.current.shown[this.current.sel] + '.json'))));
                         this.current.screen = 'base';
                         this.current.shown = this.base;
                         this.current.sel = 0;
                     }
-                } else if (this.current.screen === 'websocket-checkpoint') {
+                } else if (this.current.screen === 'websocket-checkpoints') {
                         const checkpoint = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/model#checkpoint.json')));
-                        checkpoint.data.id = this.current.shown[this.current.sel].match(/^\d+/);
+                        checkpoint.data.id = this.current.shown[this.current.sel].match(/^\d+/)[0];
+                        this.term.ws.send(JSON.stringify(checkpoint));
+                        this.term.log(`<INPUT>: model#checkpoint - ${checkpoint.data.id}`);
                         this.current.screen = 'base';
                         this.current.shown = this.base;
                         this.current.sel = 0;
@@ -131,13 +137,11 @@ class Prompt {
 
                 this.update();
             } else if (key.name === 'escape') {
-                if (['api', 'websocket'].includes(this.current.screen)) {
-                    this.current.screen = 'base';
-                    this.current.shown = this.base;
-                    this.current.sel = 0;
+                this.current.screen = 'base';
+                this.current.shown = this.base;
+                this.current.sel = 0;
 
-                    this.update();
-                }
+                this.update();
             }
 
         });
