@@ -6,7 +6,6 @@ import jwt
 import json
 import os
 import argparse
-import websockets
 import logging
 from lib.api import API
 from lib.ModelSrv import ModelSrv
