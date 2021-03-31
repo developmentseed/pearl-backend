@@ -1,5 +1,6 @@
 'use strict';
 
+const Charm = require('charm');
 const Progress = require('cli-progress');
 const WebSocket = require('ws');
 const test = require('tape');
@@ -38,6 +39,8 @@ test('gpu connection', async (t) => {
 });
 
 async function gpu(t) {
+    const term = new Term();
+
     return new Promise((resolve, reject) => {
         const state = {
             connected: false,
@@ -48,7 +51,7 @@ async function gpu(t) {
         const ws = new WebSocket(SOCKET + `?token=${a.instance.token}`);
 
         ws.on('open', () => {
-            console.log('connection opened');
+            term.log('connection opened');
 
             if (!argv.interactive) {
                 ws.close();
@@ -57,31 +60,31 @@ async function gpu(t) {
         });
 
         ws.on('close', () => {
-            console.error();
-            console.error('CONNECTION TERMINATED');
-            console.error();
+            term.log();
+            term.log('CONNECTION TERMINATED');
+            term.log();
         });
 
         if (argv.interactive) {
             ws.on('message', async (msg) => {
                 msg = JSON.parse(msg);
-                if (argv.debug) console.error(JSON.stringify(msg, null, 4));
+                if (argv.debug) term.log(JSON.stringify(msg, null, 4));
 
                 if (msg.message === 'info#connected') {
-                    console.log('ok - GPU Connected');
+                    term.log('ok - GPU Connected');
                     state.connected = true;
                 } else if (msg.message === 'info#disconnected') {
-                    console.log('ok - GPU Disconnected');
+                    term.log('ok - GPU Disconnected');
                     state.connected = false;
                 } else if (msg.message === 'model#aoi') {
-                    console.log(`ok - model#aoi - ${msg.data.name}`);
+                    term.log(`ok - model#aoi - ${msg.data.name}`);
                     state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
                     state.progress.start(msg.data.total, 0);
                 } else if (msg.message === 'model#prediction') {
                     state.progress.update(msg.data.processed);
                 } else if (msg.message === 'model#prediction#complete') {
                     state.progress.stop();
-                    console.log('ok - model#prediction#complete');
+                    term.log('ok - model#prediction#complete');
                     state.progress = false;
                 }
 
@@ -96,7 +99,6 @@ async function gpu(t) {
 async function choose(state, ws) {
     state.choose = true;
 
-    console.log();
     let msg = await inquire.prompt([{
         name: 'type',
         message: 'Type of action to perform',
@@ -141,4 +143,38 @@ async function choose(state, ws) {
     }
 
     state.choose = false;
+}
+
+class Term {
+    constructor() {
+
+        this.max_log = process.stdout.rows - 10;
+        this.buffer = new Array(this.max_log).fill('', 0, this.max_log - 1);
+
+        this.charm = Charm();
+        this.charm.pipe(process.stdout);
+        this.charm.reset();
+        this.charm.write('┏' + '━'.repeat(process.stdout.columns - 2) + '┓');
+        this.line(this.max_log)
+        this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
+        this.line(1)
+        this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
+        this.line(5)
+        this.charm.write('┗' + '━'.repeat(process.stdout.columns - 2) + '┛');
+    }
+
+    log(line) {
+        const lines = line.split('\n');
+        this.buffer.splice(0, 0, ...lines);
+        this.buffer.splice(this.max_log, lines.length);
+        this.charm.position(0, 2);
+        this.line(this.max_log, this.buffer);
+    }
+
+    line(num = 1, lines = []) {
+        for (let i = 0; i < num; i++) {
+            let line = lines[i] || '';
+            this.charm.write('┃ ' + line + ' '.repeat(process.stdout.columns - 4 - line.length) + ' ┃');
+        }
+    }
 }
