@@ -64,6 +64,12 @@ async function gpu() {
                 } else if (msg.message === 'info#disconnected') {
                     term.log('ok - GPU Disconnected');
                     state.connected = false;
+                } else if (msg.message === 'model#checkpoint#progress') {
+                    term.log(`ok - model#checkpoint#progress - ${msg.data.checkpoint}`);
+                    term.prog.update('model#checkpoint', 0);
+                } else if (msg.message === 'model#checkpoint#complete') {
+                    term.log(`ok - model#checkpoint#complete - ${msg.data.checkpoint}`);
+                    term.prog.update();
                 } else if (msg.message === 'model#aoi') {
                     term.log(`ok - model#aoi - ${msg.data.name}`);
                     state.aois.push(msg.data);
@@ -74,8 +80,8 @@ async function gpu() {
                 } else if (msg.message === 'model#prediction') {
                     term.prog.update('model#prediction', msg.data.processed / msg.data.total);
                 } else if (msg.message === 'model#prediction#complete') {
+                    term.log(`ok - model#prediction#complete - ${msg.data.aoi}`);
                     term.prog.update();
-                    term.log('ok - model#prediction#complete');
                 } else {
                     term.log(JSON.stringify(msg, null, 4));
                 }
