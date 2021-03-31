@@ -10,8 +10,8 @@ import logging
 from lib.api import API
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
-from web_tool.ModelSessionPyTorchExample import TorchFineTuning
-from web_tool.Utils import setup_logging
+from lib.ModelSessionPyTorchExample import TorchFineTuning
+from lib.utils import setup_logging
 
 LOGGER = logging.getLogger("server")
 
