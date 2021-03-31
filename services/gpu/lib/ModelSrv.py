@@ -2,7 +2,7 @@ import os
 import base64
 import json
 import numpy as np
-from .utils import pred2png, geom2px, pxs2geojson
+from .utils import pred2png, geom2px, pxs2geojson, generate_random_points
 from .AOI import AOI
 from .MemRaster import MemRaster
 from web_tool.Utils import serialize, deserialize
@@ -132,7 +132,14 @@ class ModelSrv():
             self.processing = True
 
             for cls in body['classes']:
-                cls['geometry'] = geom2px(cls['geometry'], self)
+                for feature in cls['geometry']['geometries']:
+                    cls['retrain_geometry'] = []
+                    if feature['type'] == 'Polygon':
+                        points = generate_random_points(10, feature, self)
+                        cls['retrain_geometry'] = cls['retrain_geometry'] + points
+
+                    if feature['type'] == 'MultiPoint':
+                        cls['retrain_geometry'] = cls['retrain_geometry'] + geom2px(feature, self)
 
             self.model.retrain(body['classes'])
 
