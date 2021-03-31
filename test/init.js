@@ -7,9 +7,12 @@ const Knex = require('knex');
 const {drop, genconfig} = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
-let a = {
+let state = {
+    project: 1,
     token: false,
-    instance: false
+    instance: false,
+    checkpoints: [],
+    aois: []
 };
 
 function reconnect(test, API) {
@@ -19,7 +22,7 @@ function reconnect(test, API) {
         const config = await genconfig();
         try {
             const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
-            a.token = (await authtoken.generate({
+            state.token = (await authtoken.generate({
                 type: 'auth0',
                 uid: 1
             }, 'API Token')).token;
@@ -37,7 +40,7 @@ function reconnect(test, API) {
                 json: true,
                 url: API + '/api/project/1/instance/1',
                 headers: {
-                    Authorization: `Bearer ${a.token}`
+                    Authorization: `Bearer ${state.token}`
                 }
             });
 
@@ -49,7 +52,7 @@ function reconnect(test, API) {
 
             t.ok(parseInt(res.body.id), 'id: <integer>');
 
-            a.instance = JSON.parse(JSON.stringify(res.body));
+            state.instance = JSON.parse(JSON.stringify(res.body));
 
             delete res.body.id,
             delete res.body.created;
@@ -70,7 +73,9 @@ function reconnect(test, API) {
         t.end();
     });
 
-    return a;
+    populate(test, API, state);
+
+    return state;
 }
 
 function connect(test, API) {
@@ -92,7 +97,7 @@ function connect(test, API) {
                 auth0Id: 0
             });
 
-            a.token = (await authtoken.generate({
+            state.token = (await authtoken.generate({
                 type: 'auth0',
                 uid: 1
             }, 'API Token')).token;
@@ -135,7 +140,7 @@ function connect(test, API) {
                     meta: {}
                 },
                 headers: {
-                    Authorization: `Bearer ${a.token}`
+                    Authorization: `Bearer ${state.token}`
                 }
             });
 
@@ -191,7 +196,7 @@ function connect(test, API) {
                     storage: true
                 },
                 headers: {
-                    Authorization: `Bearer ${a.token}`
+                    Authorization: `Bearer ${state.token}`
                 }
             });
 
@@ -249,7 +254,7 @@ function connect(test, API) {
                     mosaic: 'naip.latest'
                 },
                 headers: {
-                    Authorization: `Bearer ${a.token}`
+                    Authorization: `Bearer ${state.token}`
                 }
             });
 
@@ -285,7 +290,7 @@ function connect(test, API) {
                 url: API + '/api/project/1/instance',
                 body: {},
                 headers: {
-                    Authorization: `Bearer ${a.token}`
+                    Authorization: `Bearer ${state.token}`
                 }
             });
 
@@ -297,7 +302,7 @@ function connect(test, API) {
 
             t.ok(parseInt(res.body.id), 'id: <integer>');
 
-            a.instance = JSON.parse(JSON.stringify(res.body));
+            state.instance = JSON.parse(JSON.stringify(res.body));
 
             delete res.body.id,
             delete res.body.created;
@@ -319,7 +324,53 @@ function connect(test, API) {
         t.end();
     });
 
-    return a;
+    populate(test, API, state);
+
+    return state;
+}
+
+function populate(test, API, state) {
+    test('Checkpoints', async (t) => {
+        try {
+            const res = await request({
+                method: 'GET',
+                json: true,
+                url: API + `/api/project/${state.project}/checkpoint`,
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200);
+
+            state.checkpoints = res.body.checkpoints;
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('AOIs', async (t) => {
+        try {
+            const res = await request({
+                method: 'GET',
+                json: true,
+                url: API + `/api/project/${state.project}/aoi`,
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200);
+
+            state.aois = res.body.aois;
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
 }
 
 function running(test, API) {

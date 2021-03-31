@@ -1,11 +1,10 @@
 'use strict';
 
-const Progress = require('cli-progress');
+const { Term } = require('./term');
 const WebSocket = require('ws');
 const test = require('tape');
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
-const inquire = require('inquirer');
 const path = require('path');
 const fs = require('fs');
 
@@ -25,120 +24,68 @@ const argv = require('minimist')(process.argv, {
 
 process.env.Postgres = argv.postgres;
 
-let a;
+let state;
 if (argv.reconnect) {
-    a = reconnect(test, API);
+    state = reconnect(test, API);
 } else {
-    a = connect(test, API);
+    state = connect(test, API);
 }
 
-test('gpu connection', async (t) => {
-    await gpu();
-    t.end();
-});
+if (argv.interactive) {
+    test('gpu connection', async (t) => {
+        await gpu();
+        t.end();
+    });
+}
 
-async function gpu(t) {
+async function gpu() {
     return new Promise((resolve, reject) => {
-        const state = {
-            connected: false,
-            progress: false,
-            choose: false
-        };
+        state.connected = false;
 
-        const ws = new WebSocket(SOCKET + `?token=${a.instance.token}`);
+        const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
+        const term = new Term(ws, state);
 
         ws.on('open', () => {
-            console.log('connection opened');
-
-            if (!argv.interactive) {
-                ws.close();
-                return resolve();
-            }
+            term.log('connection opened');
         });
 
         ws.on('close', () => {
-            console.error();
-            console.error('CONNECTION TERMINATED');
-            console.error();
+            term.log('CONNECTION TERMINATED');
         });
 
         if (argv.interactive) {
             ws.on('message', async (msg) => {
                 msg = JSON.parse(msg);
-                if (argv.debug) console.error(JSON.stringify(msg, null, 4));
+                if (argv.debug) term.log(JSON.stringify(msg, null, 4));
 
                 if (msg.message === 'info#connected') {
-                    console.log('ok - GPU Connected');
+                    term.log('ok - GPU Connected');
                     state.connected = true;
                 } else if (msg.message === 'info#disconnected') {
-                    console.log('ok - GPU Disconnected');
+                    term.log('ok - GPU Disconnected');
                     state.connected = false;
+                } else if (msg.message === 'model#checkpoint#progress') {
+                    term.log(`ok - model#checkpoint#progress - ${msg.data.checkpoint}`);
+                    term.prog.update('model#checkpoint', 0);
+                } else if (msg.message === 'model#checkpoint#complete') {
+                    term.log(`ok - model#checkpoint#complete - ${msg.data.checkpoint}`);
+                    term.prog.update();
                 } else if (msg.message === 'model#aoi') {
-                    console.log(`ok - model#aoi - ${msg.data.name}`);
-                    state.progress = new Progress.SingleBar({}, Progress.Presets.shades_classic);
-                    state.progress.start(msg.data.total, 0);
+                    term.log(`ok - model#aoi - ${msg.data.name}`);
+                    state.aois.push(msg.data);
+                    term.prog.update('model#prediction', 0);
+                } else if (msg.message === 'model#checkpoint') {
+                    term.log(`ok - model#checkpoint - ${msg.data.name}`);
+                    state.checkpoints.push(msg.data);
                 } else if (msg.message === 'model#prediction') {
-                    state.progress.update(msg.data.processed);
+                    term.prog.update('model#prediction', msg.data.processed / msg.data.total);
                 } else if (msg.message === 'model#prediction#complete') {
-                    state.progress.stop();
-                    console.log('ok - model#prediction#complete');
-                    state.progress = false;
-                }
-
-                if (state.connected && !state.progress && !state.choose) {
-                    choose(state, ws);
+                    term.log(`ok - model#prediction#complete - ${msg.data.aoi}`);
+                    term.prog.update();
+                } else {
+                    term.log(JSON.stringify(msg, null, 4));
                 }
             });
         }
     });
-}
-
-async function choose(state, ws) {
-    state.choose = true;
-
-    console.log();
-    let msg = await inquire.prompt([{
-        name: 'type',
-        message: 'Type of action to perform',
-        type: 'list',
-        required: true,
-        choices: ['websocket', 'api']
-    }]);
-
-    if (msg.type === 'websocket') {
-        let choices = ['Custom'];
-
-        if (state.connected) {
-            choices = choices.concat(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
-                return f.replace(/.json/, '');
-            }));
-        }
-
-        msg = await inquire.prompt([{
-            name: 'message',
-            message: 'Message to run',
-            type: 'list',
-            required: true,
-            choices: choices
-        }]);
-
-        if (msg.message === 'Custom') {
-            msg = await inquire.prompt([{
-                name: 'message',
-                message: 'Custom JSON Message',
-                type: 'string',
-                required: true
-            }]);
-
-            state.progress = true;
-            ws.send(msg.message);
-        } else {
-            state.progress = true;
-            ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', msg.message + '.json'))));
-        }
-    } else {
-        console.log('ok - not API actions currently set up');
-    }
-
-    state.choose = false;
 }
