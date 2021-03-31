@@ -1368,12 +1368,12 @@ async function server(config, cb) {
                     throw new Err(400, null, 'geoms array must be parallel with classes array');
                 } else if (!req.body.geoms) {
                     req.body.geoms = req.body.classes.map(() => {
-                        return { type: 'MultiPoint', coordinates: [] };
+                        return { type: 'GeometryCollection', 'geometries': [] };
                     });
                 } else {
                     req.body.geoms = req.body.geoms.map((e) => {
-                        if (!e || e.type !== 'MultiPoint') {
-                            return { type: 'MultiPoint', coordinates: [] };
+                        if (!e || e.type !== 'GeometryCollection') {
+                            return { type: 'GeometryCollection', 'geometries': [] };
                         }
 
                         return e;

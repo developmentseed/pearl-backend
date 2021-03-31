@@ -173,7 +173,7 @@ class ModelSrv():
 
             self.checkpoint({
                 'name': body['name'],
-                'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']]),
+                'geoms': [cls["geometry"] for cls in body['classes']],
                 'analytics': [{
                     'counts': cls.get('counts', 0),
                     'percent': cls.get('percent', 0),

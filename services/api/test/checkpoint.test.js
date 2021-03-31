@@ -133,11 +133,11 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
-           ]
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+            ]
         });
 
         t.end();
@@ -211,10 +211,10 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
            ]
         });
 
@@ -250,10 +250,10 @@ test('GET /api/project/1/checkpoint/1', (t) => {
             ],
             storage: false,
             geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
            ]
         });
 

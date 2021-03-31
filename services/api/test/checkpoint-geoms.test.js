@@ -113,10 +113,10 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }, { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] } ] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] } ]}
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -144,10 +144,10 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }, { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] } ] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] } ]}
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -227,10 +227,10 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }, { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] } ] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] } ]}
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -273,10 +273,10 @@ test('GET /api/project/1/checkpoint/1', (t) => {
             bounds: [ -86.8359375, 34.8859309407532, -73.828125, 51.1793429792893 ],
             center: [ -80.33203125, 43.0326369600212 ],
             geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }, { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] } ] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] } ]}
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
