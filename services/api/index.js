@@ -63,12 +63,6 @@ async function server(config, cb) {
 
     const validate = validator.validate;
 
-    // try {
-    //     await config.pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
-    // } catch (err) {
-    //     throw new Error(err);
-    // }
-
     const project = new (require('./lib/project').Project)(config);
     const proxy = new (require('./lib/proxy').Proxy)(config);
     const auth = new (require('./lib/auth').Auth)(config);
