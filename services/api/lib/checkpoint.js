@@ -45,6 +45,7 @@ class CheckPoint {
         const chpt = {
             id: parseInt(row.id),
             project_id: parseInt(row.project_id),
+            parent: parseInt(row.parent),
             name: row.name,
             bookmarked: row.bookmarked,
             classes: row.classes,
@@ -99,6 +100,7 @@ class CheckPoint {
                SELECT
                     count(*) OVER() AS count,
                     id,
+                    parent,
                     name,
                     created,
                     storage,
@@ -126,6 +128,7 @@ class CheckPoint {
             checkpoints: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    parent: parseInt(row.parent),
                     name: row.name,
                     created: row.created,
                     storage: row.storage,
@@ -152,6 +155,7 @@ class CheckPoint {
                     RETURNING *
             `, [ checkpointid ]);
         } catch (err) {
+            if (err.code === '23503') throw new Err(400, new Error(err), 'Cannot delete checkpoint with dependants');
             throw new Err(500, new Error(err), 'Failed to delete Checkpoint');
         }
 
@@ -266,6 +270,7 @@ class CheckPoint {
                 SELECT
                     checkpoints.id,
                     checkpoints.name,
+                    checkpoints.parent,
                     checkpoints.classes,
                     checkpoints.created,
                     checkpoints.storage,
@@ -285,6 +290,7 @@ class CheckPoint {
                     g.id,
                     checkpoints.id,
                     checkpoints.name,
+                    checkpoints.parent,
                     checkpoints.classes,
                     checkpoints.created,
                     checkpoints.storage,
@@ -311,6 +317,7 @@ class CheckPoint {
      * @param {Number} projectid - Project ID the checkpoint is a part of
      * @param {Object} checkpoint - Checkpoint Object
      * @param {String} checkpoint.name - Human readable name
+     * @param {Number} checkpoint.parent - Parent Checkpoint ID
      * @param {Object[]} checkpoint.classes - Checkpoint Class names
      * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
      * @param {Object} checkpoint.analytics - Checkpoint Analytics
@@ -320,6 +327,7 @@ class CheckPoint {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoints (
                     project_id,
+                    parent,
                     name,
                     classes,
                     retrain_geoms,
@@ -328,13 +336,15 @@ class CheckPoint {
                 ) VALUES (
                     $1,
                     $2,
-                    $3::JSONB,
-                    $4::JSONB[],
+                    $3,
+                    $4::JSONB,
                     $5::JSONB[],
-                    $6::JSONB
+                    $6::JSONB[],
+                    $7::JSONB
                 ) RETURNING *
             `, [
                 projectid,
+                checkpoint.parent,
                 checkpoint.name,
                 JSON.stringify(checkpoint.classes),
                 checkpoint.retrain_geoms.map((e) => {
@@ -348,6 +358,7 @@ class CheckPoint {
 
             return CheckPoint.json(pgres.rows[0]);
         } catch (err) {
+            if (err.code === '23503') throw new Err(400, err, 'Parent does not exist');
             throw new Err(500, err, 'Failed to create checkpoint');
         }
     }

@@ -90,10 +90,28 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/project/:projectid/aoi/:aoiid/download",
-    "title": "Download AOI",
+    "url": "/api/project/:projectid/aoi/:aoiid/download/color",
+    "title": "Download Color AOI",
     "version": "1.0.0",
-    "name": "DownloadAOI",
+    "name": "DownloadColorAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return the colourized aoi fabric geotiff</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/aoi/:aoiid/download/raw",
+    "title": "Download Raw AOI",
+    "version": "1.0.0",
+    "name": "DownloadRawAOI",
     "group": "AOI",
     "permission": [
       {
@@ -350,7 +368,14 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>The human readable name of the checkpoint</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "parent",
+            "description": "<p>The ID of the parent checkpoint that was retrained off of</p>"
           },
           {
             "group": "Body",
@@ -405,8 +430,15 @@ define({ "api": [
             "group": "Body",
             "type": "Null/Object[]",
             "optional": true,
-            "field": "geoms",
+            "field": "retrain_geoms",
             "description": "<p>Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Null/Object[]",
+            "optional": true,
+            "field": "input_geoms",
+            "description": "<p>Array of GeoJSON GeometryCollections that were input by the user. Length of geomms array must equals classes undefined</p>"
           }
         ]
       }
@@ -415,7 +447,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"parent\": 123,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -478,7 +510,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"parent\": 123,\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -527,7 +559,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bookmarked\": false\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"parent\": 123,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bookmarked\": false\n    }]\n}",
           "type": "json"
         }
       ]
@@ -595,7 +627,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"parent\": 123,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -1659,7 +1691,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\"\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\",\n        \"aois\": [{\n           \"id\": 1,\n           \"name\": \"aoi name\",\n           \"created\": \"<date>\",\n           \"storage\": false\n        }],\n       \"checkpoints\": [{\n           \"id\": 1,\n           \"name\": \"checkpoint name\",\n           \"created\": \"<date>\",\n           \"storage\": false,\n           \"bookmarked\": false\n       }]\n    }]\n}",
           "type": "json"
         }
       ]

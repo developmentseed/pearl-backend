@@ -1128,6 +1128,7 @@ async function server(config, cb) {
      *   {
      *       "id": 1432,
      *       "name": "Checkpoint Name",
+     *       "parent": 123,
      *       "classes": [ ... ],
      *       "storage": true,
      *       "created": "<date>"
@@ -1301,6 +1302,7 @@ async function server(config, cb) {
      *       "instance_id": 123,
      *       "checkpoints": [{
      *           "id": 1432,
+     *           "parent": 123,
      *           "name": "Checkpoint Name",
      *           "storage": true,
      *           "created": "<date>",
@@ -1341,6 +1343,7 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1432,
+     *       "parent": 123,
      *       "instance_id": 124,
      *       "storage": true,
      *       "classes": [ ... ],
@@ -1441,6 +1444,7 @@ async function server(config, cb) {
      *   {
      *       "id": 1432,
      *       "instance_id": 124,
+     *       "parent": 123,
      *       "storage": true,
      *       "classes": [ ... ],
      *       "name": "Named Checkpoint",
