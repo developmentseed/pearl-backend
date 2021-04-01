@@ -53,7 +53,7 @@ class Flight {
                 KnexConfig.connection = config.Postgres;
                 const knex = Knex(KnexConfig);
                 await knex.migrate.latest();
-
+                await knex.destroy();
                 config.pool.end();
             } catch (err) {
                 t.error(err);
