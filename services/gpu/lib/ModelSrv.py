@@ -212,8 +212,8 @@ class ModelSrv():
         checkpoint = self.api.create_checkpoint(
             body['name'],
             classes,
-            body['retrain_geoms'],
-            body['input_geoms'],
+            body.get('retrain_geoms'),
+            body.get('input_geoms'),
             body.get('analytics')
         )
         self.model.save_state_to(self.api.tmp_checkpoints + '/' + str(checkpoint['id']))
