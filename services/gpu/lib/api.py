@@ -97,9 +97,13 @@ class API():
         data = {
             'name': name,
             'classes': classes,
-            'retrain_geoms': retrain_geoms,
-            'input_geoms': input_geoms
         }
+
+        if retrain_geoms is not None:
+            data['retrain_geoms'] = retrain_geoms
+
+        if input_geoms is not None:
+            data['input_geoms'] = input_geoms
 
         if analytics is not None:
             data['analytics'] = analytics
