@@ -63,11 +63,11 @@ async function server(config, cb) {
 
     const validate = validator.validate;
 
-    try {
-        await config.pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
-    } catch (err) {
-        throw new Error(err);
-    }
+    // try {
+    //     await config.pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
+    // } catch (err) {
+    //     throw new Error(err);
+    // }
 
     const project = new (require('./lib/project').Project)(config);
     const proxy = new (require('./lib/proxy').Proxy)(config);
@@ -1364,18 +1364,27 @@ async function server(config, cb) {
                 await Param.int(req, 'projectid');
                 await project.has_auth(req.auth, req.params.projectid);
 
-                if (req.body.geoms && req.body.geoms.length !== req.body.classes.length) {
-                    throw new Err(400, null, 'geoms array must be parallel with classes array');
-                } else if (!req.body.geoms) {
-                    req.body.geoms = req.body.classes.map(() => {
-                        return { type: 'GeometryCollection', 'geometries': [] };
+                if (req.body.retrain_geoms && req.body.retrain_geoms.length !== req.body.classes.length) {
+                    throw new Err(400, null, 'retrain_geoms array must be parallel with classes array');
+                } else if (!req.body.retrain_geoms) {
+                    // assuming that if retrain_geoms don't exist, input_geoms also don't exist
+                    req.body.input_geoms = [];
+                    req.body.retrain_geoms = req.body.classes.map(() => {
+                        req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] })
+                        return { type: 'MultiPoint', 'coordinates': [] };
                     });
                 } else {
-                    req.body.geoms = req.body.geoms.map((e) => {
+                    req.body.retrain_geoms = req.body.retrain_geoms.map((e) => {
+                        if (!e || e.type !== 'MultiPoint') {
+                            req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] })
+                            return { type: 'MultiPoint', 'coordinates': [] };
+                        }
+                        return e;
+                    });
+                    req.body.input_geoms = req.body.input_geoms.map((e) => {
                         if (!e || e.type !== 'GeometryCollection') {
                             return { type: 'GeometryCollection', 'geometries': [] };
                         }
-
                         return e;
                     });
                 }

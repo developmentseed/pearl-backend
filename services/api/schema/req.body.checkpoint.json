@@ -52,9 +52,16 @@
                 }
             }
         },
-        "geoms": {
+        "retrain_geoms": {
             "type": "array",
             "description": "Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes",
+            "items": {
+                "type": ["null", "object"]
+            }
+        },
+        "input_geoms": {
+            "type": "array",
+            "description": "Array of GeoJSON GeometryCollections that were input by the user. Length of geomms array must equals classes",
             "items": {
                 "type": ["null", "object"]
             }

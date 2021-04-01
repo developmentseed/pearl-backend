@@ -132,7 +132,13 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
-            geoms: [
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
@@ -210,7 +216,13 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
-            geoms: [
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
@@ -249,7 +261,13 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
-            geoms: [
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
