@@ -75,10 +75,10 @@ class ModelSrv():
                     'name': body['name'],
                     'geoms': [None] * len(self.model.classes),
                     'analytics': [{
-                    'counts': cls.get('counts', 0),
-                    'percent': cls.get('percent', 0),
-                    'f1score': cls.get('retraining_f1score', 0)
-                } for cls in self.model.classes]
+                        'counts': cls.get('counts', 0),
+                        'percent': cls.get('percent', 0),
+                        'f1score': cls.get('retraining_f1score', 0)
+                    } for cls in self.model.classes]
                 }, websocket)
 
             self.aoi = AOI(self.api, body, self.chk['id'])
@@ -193,6 +193,7 @@ class ModelSrv():
 
             self.checkpoint({
                 'name': body['name'],
+                'parent': self.chk['id'],
                 'input_geoms': [cls["geometry"] for cls in body['classes']],
                 'retrain_geoms': pxs2geojson([cls["retrain_geometry"] for cls in body['classes']]),
                 'analytics': [{
@@ -229,6 +230,7 @@ class ModelSrv():
 
         checkpoint = self.api.create_checkpoint(
             body['name'],
+            body.get('parent'),
             classes,
             body.get('retrain_geoms'),
             body.get('input_geoms'),
