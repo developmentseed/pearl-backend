@@ -10,6 +10,23 @@ from rasterio.transform import from_bounds
 from PIL import Image
 from shapely.geometry import shape, mapping, Point
 
+import os
+import threading
+
+import rasterio
+import rasterio.warp
+import rasterio.crs
+import rasterio.io
+import rasterio.mask
+import rasterio.transform
+from rasterio.transform import from_bounds
+import rasterio.merge
+
+import numpy as np
+
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
 R2D = 180 / math.pi
 RE = 6378137.0
 CE = 2 * math.pi * RE
@@ -195,3 +212,55 @@ def generate_random_points(count, feature, modelsrv):
         if polygon.contains(point):
             points['coordinates'].append(mapping(point)['coordinates'])
     return geom2px(points, modelsrv)
+
+def setup_logging(log_path, log_name, level=logging.DEBUG):
+
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+
+    print_formatter = logging.Formatter('[%(asctime)s] - %(message)s')
+    file_formatter = logging.Formatter('%(asctime)s - %(name)-8s - %(levelname)-6s - %(message)s')
+
+    logger = logging.getLogger("server")
+    logger.setLevel(level)
+
+    file_handler = TimedRotatingFileHandler(log_path + "/%s.txt" % (log_name), when='midnight', interval=1)
+    file_handler.suffix = "%Y%m%d"
+    file_handler.setFormatter(file_formatter)
+    logger.addHandler(file_handler)
+
+    print_handler = logging.StreamHandler()
+    print_handler.setFormatter(print_formatter)
+    logger.addHandler(print_handler)
+
+    return logger
+
+
+def serialize(array):
+    with io.BytesIO() as f:
+        np.save(f, array)
+        return f.getvalue()
+
+def deserialize(data):
+    with io.BytesIO(data) as f:
+        return np.load(f)
+
+class AtomicCounter:
+    ''' From https://gist.github.com/benhoyt/8c8a8d62debe8e5aa5340373f9c509c7 '''
+    def __init__(self, initial=0):
+        """Initialize a new atomic counter to given initial value (default 0)."""
+        self.value = initial
+        self._lock = threading.Lock()
+
+    def increment(self, num=1):
+        """Atomically increment the counter by num (default 1) and return the
+        new value.
+        """
+        with self._lock:
+            self.value += num
+            return self.value
+
+def get_random_string(length):
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    return "".join([alphabet[np.random.randint(0, len(alphabet))] for i in range(length)])
+
