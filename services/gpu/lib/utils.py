@@ -5,7 +5,10 @@ import io
 import math
 import mercantile
 import numpy as np
+import random
+from rasterio.transform import from_bounds
 from PIL import Image
+from shapely.geometry import shape, mapping, Point
 
 import os
 import threading
@@ -197,6 +200,18 @@ def rowcol(transform, xs, ys, op=math.floor, precision=None):
 
     return rows, cols
 
+def generate_random_points(count, feature, modelsrv):
+    polygon = shape(feature)
+    points = {
+        "type": "MultiPoint",
+        "coordinates": []
+    }
+    minx, miny, maxx, maxy = polygon.bounds
+    while len(points['coordinates']) < count:
+        point = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
+        if polygon.contains(point):
+            points['coordinates'].append(mapping(point)['coordinates'])
+    return geom2px(points, modelsrv)
 
 def setup_logging(log_path, log_name, level=logging.DEBUG):
 

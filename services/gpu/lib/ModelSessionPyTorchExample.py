@@ -136,7 +136,7 @@ class TorchFineTuning(ModelSession):
             'color': x['color']
         } for x in classes ]
 
-        pixels = [x['geometry'] for x in classes]
+        pixels = [x['retrain_geometry'] for x in classes]
         counts = [len(x) for x in pixels]
         total = sum(counts)
 

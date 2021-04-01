@@ -53,10 +53,11 @@ class CheckPoint {
             analytics: row.analytics
         };
 
-        if (row.geoms) {
-            chpt.geoms = row.geoms;
+        if (row.retrain_geoms) {
+            chpt.retrain_geoms = row.retrain_geoms;
+            chpt.input_geoms = row.input_geoms;
 
-            const counts = row.geoms.filter((geom) => {
+            const counts = row.retrain_geoms.filter((geom) => {
                 if (!geom) return false;
                 if (!geom.coordinates.length) return false;
                 return true;
@@ -271,11 +272,12 @@ class CheckPoint {
                     checkpoints.bookmarked,
                     checkpoints.project_id,
                     checkpoints.analytics,
-                    checkpoints.geoms,
+                    checkpoints.retrain_geoms,
+                    checkpoints.input_geoms,
                     ST_AsText(ST_Centroid(ST_Envelope(ST_Collect(geom)))) AS center,
                     ST_Extent(geom) AS bounds
                 FROM
-                    (SELECT id, ST_GeomFromGeoJSON(Unnest(geoms)) as geom FROM checkpoints WHERE id = $1) g,
+                    (SELECT id, ST_GeomFromGeoJSON(Unnest(retrain_geoms)) as geom FROM checkpoints WHERE id = $1) g,
                     checkpoints
                 WHERE
                     checkpoints.id = $1
@@ -288,7 +290,8 @@ class CheckPoint {
                     checkpoints.storage,
                     checkpoints.bookmarked,
                     checkpoints.project_id,
-                    checkpoints.geoms
+                    checkpoints.retrain_geoms,
+                    checkpoints.input_geoms
             `, [
                 checkpointid
             ]);
@@ -319,21 +322,26 @@ class CheckPoint {
                     project_id,
                     name,
                     classes,
-                    geoms,
+                    retrain_geoms,
+                    input_geoms,
                     analytics
                 ) VALUES (
                     $1,
                     $2,
                     $3::JSONB,
                     $4::JSONB[],
-                    $5::JSONB
+                    $5::JSONB[],
+                    $6::JSONB
                 ) RETURNING *
             `, [
                 projectid,
                 checkpoint.name,
                 JSON.stringify(checkpoint.classes),
-                checkpoint.geoms.map((e) => {
+                checkpoint.retrain_geoms.map((e) => {
                     return JSON.stringify(e);
+                }),
+                checkpoint.input_geoms.map((e) => {
+                    return JSON.stringify(e)
                 }),
                 JSON.stringify(checkpoint.analytics)
             ]);
@@ -374,7 +382,7 @@ class CheckPoint {
                         FROM (
                             SELECT
                                 id,
-                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.geoms)), 3857) AS geom
+                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.input_geoms)), 3857) AS geom
                             FROM
                                 checkpoints
                             WHERE
