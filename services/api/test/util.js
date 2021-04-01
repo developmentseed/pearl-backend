@@ -5,6 +5,8 @@ const request = require('request');
 const pkg = require('../package.json');
 const { Config } = require('../index');
 const {drop} = require('./drop');
+const Knex = require('knex');
+const KnexConfig = require('../knexfile');
 
 class Flight {
 
@@ -48,6 +50,10 @@ class Flight {
 
             try {
                 const config = await drop();
+                KnexConfig.connection = config.Postgres;
+                const knex = Knex(KnexConfig);
+                await knex.migrate.latest();
+                await knex.destroy();
                 config.pool.end();
             } catch (err) {
                 t.error(err);

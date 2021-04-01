@@ -2,7 +2,7 @@ import os
 import base64
 import json
 import numpy as np
-from .utils import pred2png, geom2px, pxs2geojson
+from .utils import pred2png, geom2px, pxs2geojson, generate_random_points
 from .AOI import AOI
 from .MemRaster import MemRaster
 from .utils import serialize, deserialize
@@ -154,7 +154,14 @@ class ModelSrv():
             self.processing = True
 
             for cls in body['classes']:
-                cls['geometry'] = geom2px(cls['geometry'], self)
+                for feature in cls['geometry']['geometries']:
+                    cls['retrain_geometry'] = []
+                    if feature['type'] == 'Polygon':
+                        points = generate_random_points(100, feature, self)
+                        cls['retrain_geometry'] = cls['retrain_geometry'] + points
+
+                    if feature['type'] == 'MultiPoint':
+                        cls['retrain_geometry'] = cls['retrain_geometry'] + geom2px(feature, self)
 
             self.model.retrain(body['classes'])
 
@@ -166,7 +173,8 @@ class ModelSrv():
 
             self.checkpoint({
                 'name': body['name'],
-                'geoms': pxs2geojson([cls["geometry"] for cls in body['classes']]),
+                'input_geoms': [cls["geometry"] for cls in body['classes']],
+                'retrain_geoms': pxs2geojson([cls["retrain_geometry"] for cls in body['classes']]),
                 'analytics': [{
                     'counts': cls.get('counts', 0),
                     'percent': cls.get('percent', 0),
@@ -204,7 +212,8 @@ class ModelSrv():
         checkpoint = self.api.create_checkpoint(
             body['name'],
             classes,
-            body['geoms'],
+            body['retrain_geoms'],
+            body['input_geoms'],
             body.get('analytics')
         )
         self.model.save_state_to(self.api.tmp_checkpoints + '/' + str(checkpoint['id']))
