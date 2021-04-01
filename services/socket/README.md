@@ -1,6 +1,6 @@
-<h1 align=center>LULC GPU Infrastructure</h1>
+<h1 align=center>LULC WebSocket Infrastructure</h1>
 
-<p align=center>GPU Infrastructure for the LULC project</p>
+<p align=center>WebSocket Infrastructure for the LULC project</p>
 
 ## Deployment
 
