@@ -91,13 +91,16 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def create_checkpoint(self, name, classes, retrain_geoms, input_geoms, analytics = None):
+    def create_checkpoint(self, name, parent, classes, retrain_geoms, input_geoms, analytics = None):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint'
 
         data = {
             'name': name,
             'classes': classes,
         }
+
+        if parent is not None:
+            data['parent'] = parent
 
         if retrain_geoms is not None:
             data['retrain_geoms'] = retrain_geoms
