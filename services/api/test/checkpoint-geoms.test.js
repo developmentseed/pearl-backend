@@ -141,6 +141,7 @@ test('POST /api/project/1/checkpoint', (t) => {
             id: 1,
             name: 'TEST',
             project_id: 1,
+            parent: null,
             storage: false,
             bookmarked: false,
             classes: [
@@ -232,6 +233,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
             project_id: 1,
             storage: false,
             bookmarked: true,
+            parent: null,
             classes: [
                 { name: 'Water', color: '#FF00FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -281,6 +283,7 @@ test('GET /api/project/1/checkpoint/1', (t) => {
             project_id: 1,
             name: 'NEW NAME',
             bookmarked: true,
+            parent: null,
             classes: [
                 { name: 'Water', color: '#FF00FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -342,6 +345,7 @@ test('GET /api/project/1/checkpoint', (t) => {
             project_id: 1,
             checkpoints: [{
                 id: 1,
+                parent: null,
                 name: 'NEW NAME',
                 storage: true,
                 bookmarked: true
