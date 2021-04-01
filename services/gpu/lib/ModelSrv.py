@@ -157,7 +157,7 @@ class ModelSrv():
                 for feature in cls['geometry']['geometries']:
                     cls['retrain_geometry'] = []
                     if feature['type'] == 'Polygon':
-                        points = generate_random_points(10, feature, self)
+                        points = generate_random_points(100, feature, self)
                         cls['retrain_geometry'] = cls['retrain_geometry'] + points
 
                     if feature['type'] == 'MultiPoint':
@@ -173,7 +173,8 @@ class ModelSrv():
 
             self.checkpoint({
                 'name': body['name'],
-                'geoms': [cls["geometry"] for cls in body['classes']],
+                'input_geoms': [cls["geometry"] for cls in body['classes']],
+                'retrain_geoms': pxs2geojson([cls["retrain_geometry"] for cls in body['classes']]),
                 'analytics': [{
                     'counts': cls.get('counts', 0),
                     'percent': cls.get('percent', 0),
@@ -211,7 +212,8 @@ class ModelSrv():
         checkpoint = self.api.create_checkpoint(
             body['name'],
             classes,
-            body['geoms'],
+            body['retrain_geoms'],
+            body['input_geoms'],
             body.get('analytics')
         )
         self.model.save_state_to(self.api.tmp_checkpoints + '/' + str(checkpoint['id']))
