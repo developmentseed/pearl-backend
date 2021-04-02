@@ -103,6 +103,7 @@ test('POST /api/project/1/checkpoint', (t) => {
             id: 1,
             storage: false,
             project_id: 1,
+            parent: null,
             name: 'Test Checkpoint',
             analytics: null,
             bookmarked: false,
