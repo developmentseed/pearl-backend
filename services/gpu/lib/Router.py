@@ -54,6 +54,15 @@ class Socket():
             LOGGER.error("not ok - failed to send message")
             LOGGER.error(payload)
 
+    def error(self, human, detailed = ''):
+        self.send(json.dumps({
+            'message': 'error',
+            'data': {
+                'error': str(human),
+                'detailed': str(detailed)
+            }
+        }));
+
     def terminate(self):
         exit()
 
@@ -87,6 +96,7 @@ class Router():
 
             else:
                 LOGGER.info('ok - Unknown Message: {}'.format(json.dumps(msg)))
+                self.websocket.error('Unknown Message')
 
         elif msg.get('action') is not None:
             action = msg.get('action')
@@ -103,4 +113,5 @@ class Router():
                 self.websocket.terminate()
             else:
                 LOGGER.info('ok - Unknown Action: {}'.format(json.dumps(msg)))
+                self.websocket.error('Unknown Action')
 

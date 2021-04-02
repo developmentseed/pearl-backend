@@ -1,16 +1,27 @@
 'use strict';
 
+const EventEmitter = require('events');
 const Charm = require('charm');
 const readline = require('readline');
 const path = require('path');
 const fs = require('fs');
 
-class Term {
-    constructor(ws, state) {
-        this.ws = ws;
-        this.state = state;
+readline.emitKeypressEvents(process.stdin);
+process.stdin.setRawMode(true);
+
+class Term extends EventEmitter {
+    constructor() {
+        super();
+
         this.max_log = process.stdout.rows - 10;
         this.buffer = new Array(this.max_log).fill('', 0, this.max_log - 1);
+
+        process.stdin.on('keypress', (str, key) => {
+            if ((key.ctrl && key.name === 'c') || key.name === 'q') {
+                process.exit();
+            }
+            this.emit('keypress', str, key)
+        });
 
         this.charm = Charm();
         this.charm.pipe(process.stdout);
@@ -75,26 +86,21 @@ class Prompt {
         this.max_prompt = max_prompt;
         this.y = y;
         this.term = term;
+        this.focus = true;
 
-        this.base = ['websocket', 'api'];
         this.websocket = fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
             return f.replace(/.json/, '');
         })//.concat(['Custom']);
 
         this.current = {
-            shown: this.base,
-            screen: 'base',
+            shown: [],
             sel: 0
         };
 
-        readline.emitKeypressEvents(process.stdin);
-        process.stdin.setRawMode(true);
         process.stdin.on('keypress', (str, key) => {
-            if (key.ctrl && key.name === 'c') {
-                process.exit();
-            } else if (key.name === 'q') {
-                process.exit();
-            } else if (key.name === 'down') {
+            if (!this.focus) return;
+
+            if (key.name === 'down') {
                 if (this.current.sel < this.current.shown.length - 1) {
                     this.current.sel++;
                 }
@@ -105,47 +111,19 @@ class Prompt {
                 }
                 this.update();
             } else if (key.name === 'return') {
-                if (this.current.screen === 'base' && this.current.shown[this.current.sel] === 'websocket') {
-                    this.current.screen = 'websocket';
-                    this.current.shown = this.websocket.filter((w) => {
-                        return !(!this.term.state.checkpoints.length && w.match(/checkpoint/));
-                    });
-                    this.current.sel = 0;
-                } else if (this.current.screen === 'websocket' && this.current.shown[this.current.sel] !== 'Custom') {
-                    if (this.current.shown[this.current.sel].match(/checkpoint/)) {
-                        this.current.screen = 'websocket-checkpoints';
-                        this.current.shown = this.term.state.checkpoints.map((ch) => {
-                            return ch.id + ': ' + ch.name;
-                        });
-                        this.current.sel = 0;
-                    } else {
-                        this.term.log('<INPUT>: ' + this.current.shown[this.current.sel]);
-                        this.term.ws.send(String(fs.readFileSync(path.resolve(__dirname, './fixtures', this.current.shown[this.current.sel] + '.json'))));
-                        this.current.screen = 'base';
-                        this.current.shown = this.base;
-                        this.current.sel = 0;
-                    }
-                } else if (this.current.screen === 'websocket-checkpoints') {
-                        const checkpoint = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/model#checkpoint.json')));
-                        checkpoint.data.id = this.current.shown[this.current.sel].match(/^\d+/)[0];
-                        this.term.ws.send(JSON.stringify(checkpoint));
-                        this.term.log(`<INPUT>: model#checkpoint - ${checkpoint.data.id}`);
-                        this.current.screen = 'base';
-                        this.current.shown = this.base;
-                        this.current.sel = 0;
-                }
-
-                this.update();
+                this.term.emit('promp#selection', this.current.shown[this.current.sel], this.current.sel);
             } else if (key.name === 'escape') {
-                this.current.screen = 'base';
-                this.current.shown = this.base;
-                this.current.sel = 0;
-
-                this.update();
+                this.term.emit('promp#escape');
             }
 
         });
 
+        this.update();
+    }
+
+    screen(options) {
+        this.current.shown = options;
+        this.current.sel = 0;
         this.update();
     }
 

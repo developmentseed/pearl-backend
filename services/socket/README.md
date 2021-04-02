@@ -191,7 +191,6 @@ otherwise only the `total` & `processed` tags will be returned
 | `model#checkpoint`    | Load a given checkpoint onto the model |
 | `model#prediction`    | Inference a GeoJSON polygon |
 | `model#reset`         |       |
-| `model#undo`          |       |
 
 
 #### instance#terminate
@@ -235,14 +234,6 @@ Submit a GeoJSON Polygon for inferencing.
 ```
 
 #### model#reset
-
-```JSON
-{
-    "action": "model#reset"
-}
-```
-
-#### model#undo
 
 ```JSON
 {

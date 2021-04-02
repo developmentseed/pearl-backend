@@ -43,7 +43,46 @@ async function gpu() {
         state.connected = false;
 
         const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
-        const term = new Term(ws, state);
+        const term = new Term();
+
+        term.prompt.screen(['websockets', 'api']);
+        term.on('promp#selection', (sel) => {
+            if (sel === 'websockets') {
+                term.prompt.screen([
+                    'model#status',
+                    'model#prediction',
+                    'model#retrain',
+                    'model#checkpoint',
+                    'instance#terminate'
+                ]);
+
+                return;
+            } else if (sel === 'model#prediction') {
+                ws.send(JSON.stringify(require('./fixtures/seneca_rocks-pred.json')));
+                term.log('SENT: model#prediction - Seneca Rocks');
+            } else if (sel === 'model#retrain') {
+                ws.send(JSON.stringify(require('./fixtures/seneca_rocks-retrain.json')));
+                term.log('SENT: model#retrain - Seneca Rocks');
+            } else if (sel === 'model#checkpoint') {
+
+            } else if (sel === 'model#status') {
+                ws.send(JSON.stringify({ action: 'model#status' }));
+                term.log('SENT: model#status');
+            } else if (sel === 'instance#terminate') {
+                ws.send(JSON.stringify({ action: 'instance#terminate' }));
+                term.log('SENT: instance#terminate');
+            } else if (sel == 'api') {
+                term.prompt.screen([
+                    'Download AOI Tiff'
+                ]);
+
+                return;
+            }
+
+            term.prompt.screen(['websockets', 'api']);
+        }).on('promp#escape', () => {
+            term.promt.screen(['websockets', 'api']);
+        });
 
         ws.on('open', () => {
             term.log('connection opened');
