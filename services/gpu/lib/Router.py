@@ -79,7 +79,7 @@ class Router():
 
             if self.msg.get(message):
                 try:
-                    self.msg[message](msg.get('data', {}), self.websocket)
+                    thread.start_new_thread(self.msg[message], (msg.get('data', {}), self.websocket))
                 except Exception as e:
                     LOGGER.error("not ok - failed to process: " + message)
                     LOGGER.error("Error: {0}".format(e))
@@ -94,7 +94,7 @@ class Router():
 
             if self.act.get(action):
                 try:
-                    self.act[action](msg.get('data', {}), self.websocket)
+                    thread.start_new_thread(self.act[action], (msg.get('data', {}), self.websocket))
                 except Exception as e:
                     LOGGER.error("not ok - failed to process: " + action)
                     LOGGER.error("Error: {0}".format(e))
