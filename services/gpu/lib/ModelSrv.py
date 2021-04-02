@@ -20,6 +20,29 @@ class ModelSrv():
         self.api = api
         self.model = model
 
+    def status(self, body, websocket):
+        try:
+            payload = {
+                'processing': self.processing,
+                'aoi': False,
+                'checkpoint': False
+            }
+
+            if self.aoi is not None:
+                payload['aoi'] = self.aoi.id,
+
+            if self.chk is not None:
+                payload['checkpoint'] = self.chk['id']
+
+            websocket.send(json.dumps({
+                'message': 'model#status',
+                'data': payload
+            }))
+
+        except Exception as e:
+            websocket.error('Model Status Error', e)
+            raise None
+
     def load_checkpoint(self, body, websocket):
         try:
             if self.processing is True:
@@ -48,15 +71,7 @@ class ModelSrv():
 
         except Exception as e:
             self.processing = False
-
-            websocket.send(json.dumps({
-                'message': 'error',
-                'data': {
-                    'error': 'checkpoint load error',
-                    'detailed': str(e)
-                }
-            }))
-
+            websocket.error('Checkpoint Load Error', e)
             raise None
 
         self.processing = False
@@ -152,14 +167,7 @@ class ModelSrv():
                 }
             }))
         except Exception as e:
-
-            websocket.send(json.dumps({
-                'message': 'error',
-                'data': {
-                    'error': 'processing error',
-                    'detailed': str(e)
-                }
-            }))
+            websocket.error('Processing Error', e)
 
             raise e
 
@@ -203,19 +211,14 @@ class ModelSrv():
                 } for cls in self.model.classes]
             }, websocket)
 
-            self.prediction({
-                'name': body['name'],
-                'polygon': self.aoi.poly
-            }, websocket)
+            if self.aoi is not None:
+                self.processing = False
+                self.prediction({
+                    'name': body['name'],
+                    'polygon': self.aoi.poly
+                }, websocket)
         except Exception as e:
-            websocket.send(json.dumps({
-                'message': 'error',
-                'data': {
-                    'error': 'retrain error',
-                    'detailed': str(e)
-                }
-            }))
-
+            websocket.error('Retrain Error', e)
             raise None
 
         self.processing = False
@@ -256,10 +259,4 @@ class ModelSrv():
 
 def is_processing(websocket):
     LOGGER.info("not ok  - Can't process message - busy");
-    websocket.send(json.dumps({
-        'message': 'error',
-        'data': {
-            'error': 'GPU is Busy',
-            'detailed': 'The API is only capable of handling a single processing command at a time. Wait until the retraining/prediction is complete and resubmit'
-        }
-    }))
+    websocket.error('GPU is Busy', 'The API is only capable of handling a single processing command at a time. Wait until the retraining/prediction is complete and resubmit')
