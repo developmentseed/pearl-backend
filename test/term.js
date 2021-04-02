@@ -38,7 +38,7 @@ class Term {
 
             let formattedline = line.substring(0, process.stdout.columns - 8);
             if (line.length >= process.stdout.columns - 8) formattedline = formattedline + '...';
-            this.charm.write('┃ ' + formattedline + ' '.repeat(process.stdout.columns - 4 - line.length) + ' ┃');
+            this.charm.write('┃ ' + formattedline + ' '.repeat(process.stdout.columns - 4 - formattedline.length) + ' ┃');
         }
     }
 }

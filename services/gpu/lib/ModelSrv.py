@@ -21,23 +21,45 @@ class ModelSrv():
         self.model = model
 
     def load_checkpoint(self, body, websocket):
-        websocket.send(json.dumps({
-            'message': 'model#checkpoint#progress',
-            'data': {
-                'checkpoint': body['id'],
-                'processed': 0,
-                'total': 1
-            }
-        }))
-        self.chk = self.api.get_checkpoint(body['id'])
-        chk_fs = self.api.download_checkpoint(self.chk['id'])
-        self.model.load_state_from(self.chk, chk_fs)
-        websocket.send(json.dumps({
-            'message': 'model#checkpoint#complete',
-            'data': {
-                'checkpoint': body['id']
-            }
-        }))
+        try:
+            if self.processing is True:
+                return is_processing(websocket)
+
+            self.processing = True
+
+            websocket.send(json.dumps({
+                'message': 'model#checkpoint#progress',
+                'data': {
+                    'checkpoint': body['id'],
+                    'processed': 0,
+                    'total': 1
+                }
+            }))
+            self.chk = self.api.get_checkpoint(body['id'])
+            chk_fs = self.api.download_checkpoint(self.chk['id'])
+            self.model.load_state_from(self.chk, chk_fs)
+
+            websocket.send(json.dumps({
+                'message': 'model#checkpoint#complete',
+                'data': {
+                    'checkpoint': body['id']
+                }
+            }))
+
+        except Exception as e:
+            self.processing = False
+
+            websocket.send(json.dumps({
+                'message': 'error',
+                'data': {
+                    'error': 'checkpoint load error',
+                    'detailed': str(e)
+                }
+            }))
+
+            raise None
+
+        self.processing = False
 
     def prediction(self, body, websocket):
         try:
@@ -129,10 +151,7 @@ class ModelSrv():
                     'aoi': self.aoi.id,
                 }
             }))
-
-            self.processing = False
         except Exception as e:
-            self.processing = False
 
             websocket.send(json.dumps({
                 'message': 'error',
@@ -144,14 +163,15 @@ class ModelSrv():
 
             raise e
 
+        self.processing = False
+
     def retrain(self, body, websocket):
         try:
             if self.processing is True:
                 return is_processing(websocket)
+            self.processing = True
 
             LOGGER.info("ok - starting retrain");
-
-            self.processing = True
 
             for cls in body['classes']:
                 for feature in cls['geometry']['geometries']:
@@ -183,10 +203,11 @@ class ModelSrv():
                 } for cls in self.model.classes]
             }, websocket)
 
-            self.processing = False
+            self.prediction({
+                'name': body['name'],
+                'polygon': self.aoi.poly
+            }, websocket)
         except Exception as e:
-            self.processing = False
-
             websocket.send(json.dumps({
                 'message': 'error',
                 'data': {
@@ -197,10 +218,7 @@ class ModelSrv():
 
             raise None
 
-        self.prediction({
-            'name': body['name'],
-            'polygon': self.aoi.poly
-        }, websocket)
+        self.processing = False
 
     def checkpoint(self, body, websocket):
         classes = []
