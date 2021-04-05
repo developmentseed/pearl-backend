@@ -49,18 +49,6 @@ class LULC {
 
         if (matches) {
             for (const match of matches) {
-                if (argv.cli && !argv.script && matches.length) {
-                    const res = await inquire.prompt([{
-                        name: match,
-                        message: `${match} to fetch`,
-                        type: 'string',
-                        required: 'true',
-                        default: payload[match]
-                    }]);
-
-                    payload[match] = res[match]
-                }
-
                 if (!payload[match]) throw new Error(`"${match}" is required in body`);
                 url = url.replace(match, payload[match]);
                 delete payload[match]
