@@ -188,6 +188,8 @@ otherwise only the `total` & `processed` tags will be returned
 | --------------------- | ----- |
 | `instance#terminate`  |       |
 | `connection#extend`   | Reset instance termination counter |
+| `model#status`        | Return the current status of the instance |
+| `model#abort`         | Abort a currently running prediction |
 | `model#checkpoint`    | Load a given checkpoint onto the model |
 | `model#prediction`    | Inference a GeoJSON polygon |
 | `model#reset`         |       |
