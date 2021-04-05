@@ -1741,6 +1741,68 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/schema",
+    "title": "List Schemas",
+    "version": "1.0.0",
+    "name": "ListSchemas",
+    "group": "Schemas",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>List all JSON Schemas in use With no parameters this API will return a list of all the endpoints that have a form of schema validation If the url/method params are used, the schemas themselves are returned</p> <pre><code>Note: If url or method params are used, they must be used together</code></pre>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"GET\"",
+              "\"HEAD\"",
+              "\"POST\"",
+              "\"PUT\"",
+              "\"DELETE\"",
+              "\"CONNECT\"",
+              "\"OPTIONS\"",
+              "\"TRACE\"",
+              "\"PATCH\""
+            ],
+            "optional": true,
+            "field": "method",
+            "description": "<p>HTTP Verb</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "url",
+            "description": "<p>URLEncoded URL that you want to fetch</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": true,
+            "field": "schemas",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Schemas"
+  },
+  {
+    "type": "get",
     "url": "/health",
     "title": "Server Healthcheck",
     "version": "1.0.0",
