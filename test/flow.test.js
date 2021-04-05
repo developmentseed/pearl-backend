@@ -91,7 +91,10 @@ async function gpu() {
                 return;
             } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 3) {
                 try {
-                    const res = await lulc.cmd(sel.value.split('#')[0], sel.value.split('#')[1]);
+                    const res = await lulc.cmd(sel.value.split('#')[1], sel.value.split('#')[2], {
+                        ':projectid': 1,
+                        ':aoiid': 1
+                    });
                     console.error(res);
                 } catch (err) {
                     term.log('ERROR: ' + err.message);
