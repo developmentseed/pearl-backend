@@ -53,6 +53,7 @@ async function gpu() {
                     'model#prediction',
                     'model#retrain',
                     'model#checkpoint',
+                    'model#abort',
                     'instance#terminate'
                 ]);
 
