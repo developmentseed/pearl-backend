@@ -10,7 +10,9 @@ import time
 import json
 
 LOGGER = logging.getLogger("server")
-websocket.enableTrace(True)
+
+# Enable this to see a full debug trace of the websockets
+#websocket.enableTrace(True)
 
 class Socket():
     def __init__(self, uri):
