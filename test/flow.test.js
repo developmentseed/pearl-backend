@@ -77,7 +77,8 @@ async function gpu() {
                 term.log('SENT: instance#terminate');
             } else if (sel == 'api') {
                 term.prompt.screen([
-                    'Download AOI Tiff'
+                    'AOI Colour Tiff',
+                    'AOI Class Tiff'
                 ]);
 
                 return;
