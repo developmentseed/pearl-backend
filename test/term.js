@@ -6,11 +6,11 @@ const readline = require('readline');
 const path = require('path');
 const fs = require('fs');
 
-readline.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
-
 class Term extends EventEmitter {
     constructor() {
+        readline.emitKeypressEvents(process.stdin);
+        process.stdin.setRawMode(true);
+
         super();
 
         this.max_log = process.stdout.rows - 10;
