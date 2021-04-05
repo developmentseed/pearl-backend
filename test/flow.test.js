@@ -50,7 +50,7 @@ async function gpu() {
         });
 
         term.prompt.screen(['websockets', 'api']);
-        term.on('promp#selection', (sel) => {
+        term.on('promp#selection', async (sel) => {
             if (sel.value === 'websockets') {
                 term.prompt.screen([
                     'model#status',
@@ -84,11 +84,18 @@ async function gpu() {
                     return { name: k, value: `api#${k}` };
                 }));
                 return;
-            } else if (sel.value.match(/api#([a-z]-_)+$/)) {
-                let match = sel.value.match(/api#(a-z]-_)+$/)[0];
-                term.prompt.screen(Object.keys(lulc.schema.cli[match]).map((k) => {
-                    return { name: k, value: `api#match#${k}` };
+            } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 2) {
+                term.prompt.screen(Object.keys(lulc.schema.cli[sel.value.split('#')[1]]).map((k) => {
+                    return { name: k, value: `api#${sel.value.split('#')[1]}#${k}` };
                 }));
+                return;
+            } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 3) {
+                try {
+                    const res = await lulc.cmd(sel.value.split('#')[0], sel.value.split('#')[1]);
+                    console.error(res);
+                } catch (err) {
+                    term.log('ERROR: ' + err.message);
+                }
             }
 
             term.prompt.screen(['websockets', 'api']);
