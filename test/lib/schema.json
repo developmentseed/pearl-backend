@@ -1,0 +1,13 @@
+{
+    "cli": {
+        "schema": {
+            "list": "GET /schema"
+        },
+        "aoi": {
+            "download-color": "GET /project/:projectid/aoi/:aoiid/download/color",
+            "download-raw": "GET /project/:projectid/aoi/:aoiid/download/raw"
+        }
+    },
+    "schema": {
+    }
+}

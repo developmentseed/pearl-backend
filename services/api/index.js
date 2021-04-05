@@ -1022,7 +1022,7 @@ async function server(config, cb) {
      *     Return the colourized aoi fabric geotiff
      */
     router.get(
-        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/download/raw'),
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/download/color'),
         requiresAuth,
         async (req, res) => {
             try {
