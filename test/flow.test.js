@@ -66,6 +66,9 @@ async function gpu() {
                 term.log('SENT: model#retrain - Seneca Rocks');
             } else if (sel === 'model#checkpoint') {
 
+            } else if (sel === 'model#abort') {
+                ws.send(JSON.stringify({ action: 'model#abort' }));
+                term.log('SENT: model#abort');
             } else if (sel === 'model#status') {
                 ws.send(JSON.stringify({ action: 'model#status' }));
                 term.log('SENT: model#status');
