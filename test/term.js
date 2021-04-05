@@ -37,7 +37,7 @@ class Term extends EventEmitter {
 
     log(line) {
         const lines = line.split('\n');
-        this.buffer.splice(this.max_log - lines.length + 1, 0, ...lines);
+        this.buffer.splice(this.buffer.length, 0, ...lines);
         this.buffer.splice(0, lines.length);
         this.charm.position(0, 2);
         this.line(this.max_log, this.buffer);

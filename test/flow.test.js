@@ -121,6 +121,8 @@ async function gpu() {
                 } else if (msg.message === 'model#prediction#complete') {
                     term.log(`ok - model#prediction#complete - ${msg.data.aoi}`);
                     term.prog.update();
+                } else if (msg.message === 'model#status') {
+                    term.log(JSON.stringify(msg.data, null, 4));
                 } else {
                     term.log(JSON.stringify(msg, null, 4));
                 }
