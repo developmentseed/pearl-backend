@@ -14,11 +14,39 @@ LOGGER = logging.getLogger("server")
 class ModelSrv():
     def __init__(self, model, api):
 
+        self.is_aborting = False
         self.aoi = None
         self.chk = None
         self.processing = False
         self.api = api
         self.model = model
+
+    def abort(self, body, websocket):
+        self.is_aborting = True
+
+    def status(self, body, websocket):
+        try:
+            payload = {
+                'is_aborting': self.is_aborting,
+                'processing': self.processing,
+                'aoi': False,
+                'checkpoint': False
+            }
+
+            if self.aoi is not None:
+                payload['aoi'] = self.aoi.id,
+
+            if self.chk is not None:
+                payload['checkpoint'] = self.chk['id']
+
+            websocket.send(json.dumps({
+                'message': 'model#status',
+                'data': payload
+            }))
+
+        except Exception as e:
+            websocket.error('Model Status Error', e)
+            raise None
 
     def load_checkpoint(self, body, websocket):
         try:
@@ -46,20 +74,12 @@ class ModelSrv():
                 }
             }))
 
+            done_processing(self)
+
         except Exception as e:
-            self.processing = False
-
-            websocket.send(json.dumps({
-                'message': 'error',
-                'data': {
-                    'error': 'checkpoint load error',
-                    'detailed': str(e)
-                }
-            }))
-
+            done_processing(self)
+            websocket.error('Checkpoint Load Error', e)
             raise None
-
-        self.processing = False
 
     def prediction(self, body, websocket):
         try:
@@ -96,7 +116,7 @@ class ModelSrv():
 
             color_list = [item["color"] for item in self.model.classes]
 
-            while len(self.aoi.tiles) > 0:
+            while len(self.aoi.tiles) > 0 and self.is_aborting is False:
                 zxy = self.aoi.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
@@ -141,29 +161,29 @@ class ModelSrv():
                 output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
                 self.aoi.add_to_fabric(output)
 
-            self.aoi.upload_fabric()
 
-            LOGGER.info("ok - done prediction");
+            if self.is_aborting is True:
+                websocket.send(json.dumps({
+                    'message': 'model#aborted',
+                }))
+            else:
+                self.aoi.upload_fabric()
 
-            websocket.send(json.dumps({
-                'message': 'model#prediction#complete',
-                'data': {
-                    'aoi': self.aoi.id,
-                }
-            }))
+                LOGGER.info("ok - done prediction");
+
+                websocket.send(json.dumps({
+                    'message': 'model#prediction#complete',
+                    'data': {
+                        'aoi': self.aoi.id,
+                    }
+                }))
+
+            done_processing(self)
         except Exception as e:
-
-            websocket.send(json.dumps({
-                'message': 'error',
-                'data': {
-                    'error': 'processing error',
-                    'detailed': str(e)
-                }
-            }))
+            done_processing(self)
+            websocket.error('Processing Error', e)
 
             raise e
-
-        self.processing = False
 
     def retrain(self, body, websocket):
         try:
@@ -203,22 +223,17 @@ class ModelSrv():
                 } for cls in self.model.classes]
             }, websocket)
 
-            self.prediction({
-                'name': body['name'],
-                'polygon': self.aoi.poly
-            }, websocket)
+            done_processing(self)
+            if self.aoi is not None:
+                self.prediction({
+                    'name': body['name'],
+                    'polygon': self.aoi.poly
+                }, websocket)
+
         except Exception as e:
-            websocket.send(json.dumps({
-                'message': 'error',
-                'data': {
-                    'error': 'retrain error',
-                    'detailed': str(e)
-                }
-            }))
-
+            done_processing(self)
+            websocket.error('Retrain Error', e)
             raise None
-
-        self.processing = False
 
     def checkpoint(self, body, websocket):
         classes = []
@@ -254,12 +269,10 @@ class ModelSrv():
     def load(self, directory):
         return self.model.load_state_from(directory)
 
+def done_processing(modelsrv):
+    modelsrv.processing = False
+    modelsrv.is_aborting = False
+
 def is_processing(websocket):
     LOGGER.info("not ok  - Can't process message - busy");
-    websocket.send(json.dumps({
-        'message': 'error',
-        'data': {
-            'error': 'GPU is Busy',
-            'detailed': 'The API is only capable of handling a single processing command at a time. Wait until the retraining/prediction is complete and resubmit'
-        }
-    }))
+    websocket.error('GPU is Busy', 'The API is only capable of handling a single processing command at a time. Wait until the retraining/prediction is complete and resubmit')
