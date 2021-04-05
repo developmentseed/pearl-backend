@@ -135,7 +135,7 @@ class Prompt {
             } else {
                 return ' '.repeat(Math.floor((process.stdout.columns - s.length) / 2)) + s;
             }
-        }));
+        }).slice(this.current.sel > 3 ? this.current.sel - 2 : 0));
     }
 }
 
