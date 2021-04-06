@@ -99,6 +99,11 @@
         "query": false,
         "res": false
     },
+    "GET /project/:projectid/aoi/:aoiid/download/color": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /project/:projectid/aoi": {
         "body": false,
         "query": true,
