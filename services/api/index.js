@@ -1034,7 +1034,7 @@ async function server(config, cb) {
 
                 const tiffurl = await aoi.url(a.id);
 
-                req.url = '/colorize';
+                req.url = '/cog/colorize';
                 req.query.url = tiffurl.origin + tiffurl.pathname;
                 req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
