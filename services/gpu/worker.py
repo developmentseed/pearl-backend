@@ -46,6 +46,9 @@ def main():
 
     connection('{}?token={}'.format(os.environ["SOCKET"], api.token.replace('api.', '')), model)
 
+def error(body, websocket):
+    LOGGER.error(json.dumps(body));
+
 def connection(uri, model):
     router = Router(uri)
 
@@ -54,6 +57,8 @@ def connection(uri, model):
     router.on_act("model#checkpoint", model.load_checkpoint)
     router.on_act("model#status", model.status)
     router.on_act("model#abort", model.abort)
+
+    router.on_msg('error', error)
 
     router.open()
 
