@@ -175,7 +175,6 @@ class ModelSrv():
                 # maks fabric to polygon bounds and upload
                 geom = transform_geom("epsg:4326", "epsg:3857", self.aoi.poly)
                 clipped_fabric_mask, clipped_transform = rasterio.mask.mask(dataset=self.aoi.fabric, shapes=[geom], nodata=255)
-                print(np.unique(clipped_fabric_mask))
 
                 self.aoi.fabric.write(clipped_fabric_mask)
                 self.aoi.upload_fabric()

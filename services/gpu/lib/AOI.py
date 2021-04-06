@@ -74,7 +74,8 @@ class AOI():
             crs='EPSG:3857',
             transform=transform,
             height=height,
-            width=width
+            width=width,
+            nodata=255
         )
 
         return (extrema, memfile, writer)
