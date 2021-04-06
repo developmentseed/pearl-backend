@@ -7,6 +7,7 @@ from .AOI import AOI
 from .MemRaster import MemRaster
 from .utils import serialize, deserialize
 import logging
+import rasterio
 
 LOGGER = logging.getLogger("server")
 
@@ -159,6 +160,7 @@ class ModelSrv():
                 # Push tile into geotiff fabric
                 output = np.expand_dims(output, axis=-1)
                 output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
+                print(output.bounds)
                 self.aoi.add_to_fabric(output)
 
 
@@ -167,6 +169,29 @@ class ModelSrv():
                     'message': 'model#aborted',
                 }))
             else:
+                print('upload fabric bounds')
+                print(self.aoi.bounds)
+                print('polygon bounds')
+                print(self.aoi.poly)
+
+                # clip fabric to polygon bounds and upload
+                poly_bounds = self.aoi.poly
+                poly_bounds.pop('bbox', None)
+                print(poly_bounds)
+                print(type(poly_bounds))
+
+                print(type(self.aoi.fabric))
+                print(type(self.aoi.raw_fabric))
+
+                clipped_fabric, clipped_transform = rasterio.mask.mask(self.aoi.fabric, [poly_bounds])
+                print(type(clipped_fabric))
+                self.aoi.fabric = clipped_fabric #FIX this needs to be some sort of `memraster`
+
+                #TODO figure out how to update self.aoi.raw_fabric in addition to self.aoi.fabric
+
+                # TODO update fabric bounds
+                #self.aoi.bounds
+
                 self.aoi.upload_fabric()
 
                 LOGGER.info("ok - done prediction");
