@@ -8,6 +8,7 @@ from .MemRaster import MemRaster
 from .utils import serialize, deserialize
 import logging
 import rasterio
+from rasterio.io import MemoryFile
 
 LOGGER = logging.getLogger("server")
 
@@ -180,17 +181,33 @@ class ModelSrv():
                 print(poly_bounds)
                 print(type(poly_bounds))
 
-                print(type(self.aoi.fabric))
-                print(type(self.aoi.raw_fabric))
+                print(type(self.aoi.fabric)) #rasterio.io.DatasetWriter'
+                print(type(self.aoi.raw_fabric)) #rasterio.io.MemoryFile'
 
                 clipped_fabric, clipped_transform = rasterio.mask.mask(self.aoi.fabric, [poly_bounds])
-                print(type(clipped_fabric))
-                self.aoi.fabric = clipped_fabric #FIX this needs to be some sort of `memraster`
+                print(type(clipped_fabric)) #numpyarray
+
+                memfile = MemoryFile()
+                writer = memfile.open(
+                    driver='GTiff',
+                    count=1,
+                    dtype='uint8',
+                    crs='EPSG:3857',
+                    transform=clipped_transform,
+                    height=clipped_fabric.shape[1],
+                    width=clipped_fabric.shape[2]
+                )
+
+
+                self.aoi.fabric = writer #FIX this needs to be some sort of `memraster`
+                self.aoi.raw_fabric = memfile
+
+                self.aoi.fabric.write(clipped_fabric)
 
                 #TODO figure out how to update self.aoi.raw_fabric in addition to self.aoi.fabric
 
                 # TODO update fabric bounds
-                #self.aoi.bounds
+                #self.aoi.bounds =
 
                 self.aoi.upload_fabric()
 
