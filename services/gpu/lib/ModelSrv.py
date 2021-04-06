@@ -9,6 +9,7 @@ from .utils import serialize, deserialize
 import logging
 import rasterio
 from rasterio.io import MemoryFile
+from rasterio.warp import transform_geom
 
 LOGGER = logging.getLogger("server")
 
@@ -170,45 +171,13 @@ class ModelSrv():
                     'message': 'model#aborted',
                 }))
             else:
-                print('upload fabric bounds')
-                print(self.aoi.bounds)
-                print('polygon bounds')
-                print(self.aoi.poly)
 
-                # clip fabric to polygon bounds and upload
-                poly_bounds = self.aoi.poly
-                poly_bounds.pop('bbox', None)
-                print(poly_bounds)
-                print(type(poly_bounds))
+                # maks fabric to polygon bounds and upload
+                geom = transform_geom("epsg:4326", "epsg:3857", self.aoi.poly)
+                clipped_fabric_mask, clipped_transform = rasterio.mask.mask(dataset=self.aoi.fabric, shapes=[geom], nodata=255)
+                print(np.unique(clipped_fabric_mask))
 
-                print(type(self.aoi.fabric)) #rasterio.io.DatasetWriter'
-                print(type(self.aoi.raw_fabric)) #rasterio.io.MemoryFile'
-
-                clipped_fabric, clipped_transform = rasterio.mask.mask(self.aoi.fabric, [poly_bounds])
-                print(type(clipped_fabric)) #numpyarray
-
-                memfile = MemoryFile()
-                writer = memfile.open(
-                    driver='GTiff',
-                    count=1,
-                    dtype='uint8',
-                    crs='EPSG:3857',
-                    transform=clipped_transform,
-                    height=clipped_fabric.shape[1],
-                    width=clipped_fabric.shape[2]
-                )
-
-
-                self.aoi.fabric = writer #FIX this needs to be some sort of `memraster`
-                self.aoi.raw_fabric = memfile
-
-                self.aoi.fabric.write(clipped_fabric)
-
-                #TODO figure out how to update self.aoi.raw_fabric in addition to self.aoi.fabric
-
-                # TODO update fabric bounds
-                #self.aoi.bounds =
-
+                self.aoi.fabric.write(clipped_fabric_mask)
                 self.aoi.upload_fabric()
 
                 LOGGER.info("ok - done prediction");
