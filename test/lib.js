@@ -37,7 +37,7 @@ class LULC {
      *
      * @param {Object} payload - Optional API Payload
      */
-    async cmd(cmd, subcmd, payload) {
+    async cmd(cmd, subcmd, payload, stream = false) {
         if (process.env.UPDATE) this.schema = await util.schema(this.url)
 
         if (!this.schema.cli[cmd]) throw new Error('Command Not Found');
@@ -57,7 +57,7 @@ class LULC {
 
         const schema = this.schema.schema[this.schema.cli[cmd][subcmd]];
         try {
-            return await run(this, schema, url, payload);
+            return await run(this, schema, url, payload, stream);
         } catch (err) {
             throw err;
         }
