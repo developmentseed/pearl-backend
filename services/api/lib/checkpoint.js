@@ -393,7 +393,7 @@ class CheckPoint {
                         FROM (
                             SELECT
                                 id,
-                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.input_geoms)), 3857) AS geom
+                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
                             FROM
                                 checkpoints
                             WHERE
