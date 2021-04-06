@@ -65,6 +65,7 @@ async function server(config, cb) {
     const instance = new (require('./lib/instance').Instance)(config);
     const checkpoint = new (require('./lib/checkpoint').CheckPoint)(config);
     const aoi = new (require('./lib/aoi').AOI)(config);
+    const aoipatch = new (require('./lib/aoi-patch').AOIPatch)(config);
     const Mosaic = require('./lib/mosaic');
     const schemas = new (require('./lib/schema'))();
 
@@ -1069,7 +1070,7 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "total": 1,
-     *       "instance_id": 123,
+     *       "project_id": 123,
      *       "aois": [{
      *           "id": 1432,
      *           "storage": true,
@@ -1200,6 +1201,46 @@ async function server(config, cb) {
                 await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
 
                 return res.json(await aoi.patch(req.params.aoiid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/patch List Patches
+     * @apiVersion 1.0.0
+     * @apiName ListPatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all patches for a given API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "project_id": 123,
+     *       "aoi_id": 123
+     *       "patches": [{
+     *           "id": 1432,
+     *           "storage": true,
+     *           "created": "<date>"
+     *       }]
+     *   }
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/patch'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+
+                return res.json(aoipatch.list(req.params.projectid, req.params.aoiid, req.query));
             } catch (err) {
                 return Err.respond(err, res);
             }
