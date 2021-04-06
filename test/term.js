@@ -122,7 +122,16 @@ class Prompt {
     }
 
     screen(options) {
-        this.current.shown = options;
+        this.current.shown = options.map((o) => {
+            if (typeof o === 'string') {
+                return {
+                    name: o,
+                    value: o
+                };
+            }
+
+            return o;
+        });
         this.current.sel = 0;
         this.update();
     }
@@ -131,9 +140,9 @@ class Prompt {
         this.term.charm.position(0, this.y);
         this.term.line(5, this.current.shown.map((s, i) => {
             if (this.current.sel === i) {
-                return ' '.repeat(Math.floor((process.stdout.columns - s.length - 6) / 2)) + ' > ' + s + ' < ';
+                return ' '.repeat(Math.floor((process.stdout.columns - s.name.length - 6) / 2)) + ' > ' + s.name + ' < ';
             } else {
-                return ' '.repeat(Math.floor((process.stdout.columns - s.length) / 2)) + s;
+                return ' '.repeat(Math.floor((process.stdout.columns - s.name.length) / 2)) + s.name;
             }
         }).slice(this.current.sel > 3 ? this.current.sel - 2 : 0));
     }

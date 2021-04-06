@@ -7,6 +7,7 @@ const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'http://localhost:1999';
 const path = require('path');
 const fs = require('fs');
+const LULC = require('./lib');
 
 const drop = require('../services/api/test/drop');
 const {connect, reconnect} = require('./init');
@@ -44,10 +45,13 @@ async function gpu() {
 
         const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
         const term = new Term();
+        const lulc = new LULC({
+            token: state.token
+        });
 
         term.prompt.screen(['websockets', 'api']);
-        term.on('promp#selection', (sel) => {
-            if (sel === 'websockets') {
+        term.on('promp#selection', async (sel) => {
+            if (sel.value === 'websockets') {
                 term.prompt.screen([
                     'model#status',
                     'model#prediction',
@@ -58,34 +62,61 @@ async function gpu() {
                 ]);
 
                 return;
-            } else if (sel === 'model#prediction') {
+            } else if (sel.value === 'model#prediction') {
                 ws.send(JSON.stringify(require('./fixtures/seneca_rocks-pred.json')));
                 term.log('SENT: model#prediction - Seneca Rocks');
-            } else if (sel === 'model#retrain') {
+            } else if (sel.value === 'model#retrain') {
                 ws.send(JSON.stringify(require('./fixtures/seneca_rocks-retrain.json')));
                 term.log('SENT: model#retrain - Seneca Rocks');
-            } else if (sel === 'model#checkpoint') {
+            } else if (sel.value === 'model#checkpoint') {
 
-            } else if (sel === 'model#abort') {
+            } else if (sel.value === 'model#abort') {
                 ws.send(JSON.stringify({ action: 'model#abort' }));
                 term.log('SENT: model#abort');
-            } else if (sel === 'model#status') {
+            } else if (sel.value === 'model#status') {
                 ws.send(JSON.stringify({ action: 'model#status' }));
                 term.log('SENT: model#status');
-            } else if (sel === 'instance#terminate') {
+            } else if (sel.value === 'instance#terminate') {
                 ws.send(JSON.stringify({ action: 'instance#terminate' }));
                 term.log('SENT: instance#terminate');
-            } else if (sel == 'api') {
-                term.prompt.screen([
-                    'Download AOI Tiff'
-                ]);
-
+            } else if (sel.value === 'api') {
+                term.prompt.screen(Object.keys(lulc.schema.cli).map((k) => {
+                    return { name: k, value: `api#${k}` };
+                }));
                 return;
+            } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 2) {
+                term.prompt.screen(Object.keys(lulc.schema.cli[sel.value.split('#')[1]]).map((k) => {
+                    return { name: k, value: `api#${sel.value.split('#')[1]}#${k}` };
+                }));
+                return;
+            } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 3) {
+                try {
+                    const inp = {
+                        ':projectid': 1,
+                        ':aoiid': 1
+                    };
+
+                    const outp = path.resolve('/tmp/', `aoi-${inp[':aoiid']}.tiff`);
+                    const out = fs.createWriteStream(outp).on('close', () => {
+                        term.log(`Downloaded: ${outp}`);
+                    });
+
+                    lulc.cmd(
+                        sel.value.split('#')[1],
+                        sel.value.split('#')[2],
+                        inp,
+                        out
+                    );
+
+                    term.log(`API: ${sel.value.split('#')[1]} ${sel.value.split('#')[2]}`);
+                } catch (err) {
+                    term.log('ERROR: ' + err.message);
+                }
             }
 
             term.prompt.screen(['websockets', 'api']);
         }).on('promp#escape', () => {
-            term.promt.screen(['websockets', 'api']);
+            term.prompt.screen(['websockets', 'api']);
         });
 
         ws.on('open', () => {
