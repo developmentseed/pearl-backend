@@ -91,11 +91,24 @@ async function gpu() {
                 return;
             } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 3) {
                 try {
-                    const res = await lulc.cmd(sel.value.split('#')[1], sel.value.split('#')[2], {
+                    const inp = {
                         ':projectid': 1,
                         ':aoiid': 1
+                    };
+
+                    const outp = path.resolve('/tmp/', `aoi-${inp[':aoiid']}.tiff`);
+                    const out = fs.createWriteStream(outp).on('close', () => {
+                        term.log(`Downloaded: ${outp}`);
                     });
-                    console.error(res);
+
+                    lulc.cmd(
+                        sel.value.split('#')[1],
+                        sel.value.split('#')[2],
+                        inp,
+                        out
+                    );
+
+                    term.log(`API: ${sel.value.split('#')[1]} ${sel.value.split('#')[2]}`);
                 } catch (err) {
                     term.log('ERROR: ' + err.message);
                 }

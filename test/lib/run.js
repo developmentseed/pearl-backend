@@ -1,7 +1,8 @@
 const { promisify } = require('util');
-const request = promisify(require('request'));
+const arequest = promisify(require('request'));
+const request = require('request');
 
-async function run(api, schema, url, payload) {
+async function run(api, schema, url, payload, stream = false) {
     const req = {
         json: true,
         url: new URL('/api' + url.split(' ')[1], api.url + '/api'),
@@ -25,21 +26,25 @@ async function run(api, schema, url, payload) {
     if (schema.body) req.body = payload;
 
     try {
-        const res = await request(req);
+        if (stream) {
+            return request(req).pipe(stream);
+        } else {
+            const res = await arequest(req);
 
-        if (res.statusCode !== 200) {
-            if (typeof res.body === 'object') {
-                if (res.body.message) {
-                    throw new Error(res.statusCode, ': ' + res.body.message);
-                } else {
-                    throw new Error(res.statusCode, ': ' + 'No .message');
+            if (res.statusCode !== 200) {
+                if (typeof res.body === 'object') {
+                    if (res.body.message) {
+                        throw new Error(res.statusCode, ': ' + res.body.message);
+                    } else {
+                        throw new Error(res.statusCode, ': ' + 'No .message');
+                    }
                 }
+
+                throw new Error(res.body)
             }
 
-            throw new Error(res.body)
+            return res.body;
         }
-
-        return res.body;
     } catch (err) {
         throw err;
     }
