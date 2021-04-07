@@ -1369,9 +1369,9 @@ async function server(config, cb) {
                 await Param.int(req, 'aoiid');
                 await Param.int(req, 'patchid');
 
-                await patch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+                await aoipatch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
-                await patch.download(req.params.aoiid, res);
+                await aoipatch.download(req.params.aoiid, res);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1417,7 +1417,7 @@ async function server(config, cb) {
 
                 busboy.on('finish', async () => {
                     try {
-                        return res.json(await patch.get(req.params.patchid));
+                        return res.json(await aoipatch.get(req.params.patchid));
                     } catch (err) {
                         Err.respond(res, err);
                     }
