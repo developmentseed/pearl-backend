@@ -356,6 +356,85 @@ test('GET /api/project/1/checkpoint', (t) => {
     });
 });
 
+test('POST /api/project/1/checkpoint', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'TEST',
+            parent: 1,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }, { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] } ] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] } ]}
+            ],
+            analytics: [
+                { counts: 1, f1score: 1, percent: 1 },
+                { counts: 2, f1score: 2, percent: 2 },
+                { counts: 3, f1score: 3, percent: 3 },
+                { counts: 4, f1score: 4, percent: 4 }
+            ]
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 2,
+            name: 'TEST',
+            project_id: 1,
+            parent: 1,
+            storage: false,
+            bookmarked: false,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
+                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }, { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] } ] },
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] } ]},
+                { type: 'GeometryCollection', 'geometries': [ { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] } ]}
+            ],
+            analytics: [
+                { counts: 1, f1score: 1, percent: 1 },
+                { counts: 2, f1score: 2, percent: 2 },
+                { counts: 3, f1score: 3, percent: 3 },
+                { counts: 4, f1score: 4, percent: 4 }
+            ]
+        });
+
+        t.end();
+    });
+});
+
 test('GET /api/project/1/checkpoint/1/tiles - geometries', (t) => {
     request({
         json: true,
@@ -394,7 +473,7 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0 - geometries', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(Buffer.from(res.body).toString('hex'), '1a250a0464617461120d1801220911efbfbd21efbfbd32efbfbd04efbfbd0712091801220509efbfbd21efbfbd3228efbfbd207802');
+        t.deepEquals(Buffer.from(res.body).toString('hex'), '1a3f0a0464617461120d1801220911efbfbd21efbfbd32efbfbd04efbfbd0712091801220509efbfbd21efbfbd32120d1801220911efbfbd21efbfbd32efbfbd04efbfbd0712091801220509efbfbd21efbfbd3228efbfbd207802');
 
         t.end();
     });
