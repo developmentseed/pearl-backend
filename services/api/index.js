@@ -1238,7 +1238,44 @@ async function server(config, cb) {
 
                 await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
 
-                return res.json(aoipatch.list(req.params.projectid, req.params.aoiid, req.query));
+                return res.json(await aoipatch.list(req.params.projectid, req.params.aoiid, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/project/:project/aoi/:aoiid/patch Create Patch
+     * @apiVersion 1.0.0
+     * @apiName CreatePatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new Patch
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>"
+     *       "project_id": 1,
+     *       "aoi_id": 1
+     *   }
+     */
+    router.post(
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/patch'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+
+                return res.json(await aoipatch.create(req.params.projectid, req.params.aoiid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1270,7 +1307,7 @@ async function server(config, cb) {
 
                 await patch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
-                return res.json(aoipatch.delete(req.params.patchid));
+                return res.json(await aoipatch.delete(req.params.patchid));
             } catch (err) {
                 return Err.respond(err, res);
             }

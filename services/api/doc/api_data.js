@@ -256,6 +256,33 @@ define({ "api": [
     "groupTitle": "AOI"
   },
   {
+    "type": "post",
+    "url": "/api/project/:project/aoi/:aoiid/patch",
+    "title": "Create Patch",
+    "version": "1.0.0",
+    "name": "CreatePatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new Patch</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"storage\": true,\n    \"created\": \"<date>\"\n    \"project_id\": 1,\n    \"aoi_id\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
     "type": "delete",
     "url": "/api/project/:project/aoi/:aoiid/patch/:patchid",
     "title": "Delete Patch",

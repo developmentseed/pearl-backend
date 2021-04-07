@@ -289,13 +289,12 @@ class AOIPatch {
                     aoi_id
                 ) VALUES (
                     $1,
-                    $2,
+                    $2
                 ) RETURNING *
             `, [
                 projectid,
                 aoiid
             ]);
-
         } catch (err) {
             throw new Err(500, err, 'Failed to create AOI Patch');
         }
