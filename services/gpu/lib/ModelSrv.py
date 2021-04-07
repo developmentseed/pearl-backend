@@ -53,6 +53,22 @@ class ModelSrv():
             if self.processing is True:
                 return is_processing(websocket)
 
+            self.processing = True
+
+            if self.aoi is None:
+                websocket.error('Cannot Patch as no AOI is loaded')
+                done_processing(self)
+                return;
+            elif self.chk is None:
+                websocket.error('Cannot Patch as no Checkpoint is loaded')
+                done_processing(self)
+                return;
+
+            current_checkpoint = self.chk['id']
+            self.meta_load_checkpoint(body['checkpoint_id'])
+
+            self.meta_load_checkpoint(current_checkpoint)
+
         except Exception as e:
             done_processing(self)
             websocket.error('AOI Patch Error', e)
@@ -73,9 +89,8 @@ class ModelSrv():
                     'total': 1
                 }
             }))
-            self.chk = self.api.get_checkpoint(body['id'])
-            chk_fs = self.api.download_checkpoint(self.chk['id'])
-            self.model.load_state_from(self.chk, chk_fs)
+
+            self.meta_load_checkpoint(body['id'])
 
             websocket.send(json.dumps({
                 'message': 'model#checkpoint#complete',
@@ -101,7 +116,7 @@ class ModelSrv():
             self.processing = True
 
             if self.chk is None:
-                self.checkpoint({
+                self.meta_save_checkpoint({
                     'name': body['name'],
                     'geoms': [None] * len(self.model.classes),
                     'analytics': [{
@@ -221,7 +236,7 @@ class ModelSrv():
                 'message': 'model#retrain#complete'
             }))
 
-            self.checkpoint({
+            self.meta_save_checkpoint({
                 'name': body['name'],
                 'parent': self.chk['id'],
                 'input_geoms': [cls["geometry"] for cls in body['classes']],
@@ -245,7 +260,12 @@ class ModelSrv():
             websocket.error('Retrain Error', e)
             raise None
 
-    def checkpoint(self, body, websocket):
+    def meta_load_checkpoint(self, load_id):
+        self.chk = self.api.get_checkpoint(load_id)
+        chk_fs = self.api.download_checkpoint(self.chk['id'])
+        self.model.load_state_from(self.chk, chk_fs)
+
+    def meta_save_checkpoint(self, body, websocket):
         classes = []
         for cls in self.model.classes:
             classes.append({
@@ -275,9 +295,6 @@ class ModelSrv():
 
         self.chk = checkpoint
         return checkpoint
-
-    def load(self, directory):
-        return self.model.load_state_from(directory)
 
 def done_processing(modelsrv):
     modelsrv.processing = False
