@@ -9,6 +9,7 @@ import rasterio
 import supermercado
 from rasterio.windows import Window
 from rasterio.io import MemoryFile
+from rasterio.warp import transform_geom
 from rasterio.crs import CRS
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import box
@@ -57,6 +58,13 @@ class AOI():
     def upload_fabric(self):
         self.fabric.close()
         self.api.upload_aoi(self.id, self.raw_fabric)
+
+    def gen_mask(self):
+        geom = transform_geom("epsg:4326", "epsg:3857", self.poly)
+        clipped_fabric_mask, clipped_transform = rasterio.mask.mask(dataset=self.fabric, shapes=[geom], nodata=255)
+        #should the writing happen here, or should just the clipped array be returned?
+        #self.aoi.fabric.write(clipped_fabric_mask)
+        return clipped_fabric_mask
 
     @staticmethod
     def gen_fabric(bounds, zoom):

@@ -9,7 +9,6 @@ from .utils import serialize, deserialize
 import logging
 import rasterio
 from rasterio.io import MemoryFile
-from rasterio.warp import transform_geom
 
 LOGGER = logging.getLogger("server")
 
@@ -171,10 +170,7 @@ class ModelSrv():
                 }))
             else:
 
-                # maks fabric to polygon bounds and upload
-                geom = transform_geom("epsg:4326", "epsg:3857", self.aoi.poly)
-                clipped_fabric_mask, clipped_transform = rasterio.mask.mask(dataset=self.aoi.fabric, shapes=[geom], nodata=255)
-
+                clipped_fabric_mask = self.aoi.gen_mask()
                 self.aoi.fabric.write(clipped_fabric_mask)
                 self.aoi.upload_fabric()
 
