@@ -103,7 +103,7 @@ class AOI {
                 blobHTTPHeaders: { blobContentType: 'image/tiff' }
             });
         } catch (err) {
-            throw new Err(500, err, 'Failed to uploda AOI');
+            throw new Err(500, err, 'Failed to upload AOI');
         }
 
         return await this.patch(aoiid, {
