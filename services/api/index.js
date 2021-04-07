@@ -4,9 +4,7 @@
 
 require('dotenv').config();
 
-const fs = require('fs');
 const Err = require('./lib/error');
-const path = require('path');
 const express = require('express');
 const Busboy = require('busboy');
 const { Param, fetchJSON } = require('./lib/util');
@@ -295,12 +293,12 @@ async function server(config, cb) {
      */
     router.get(
         ...await schemas.get('GET /token'), requiresAuth, async (req, res) => {
-        try {
-            return res.json(await authtoken.list(req.auth));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
+            try {
+                return res.json(await authtoken.list(req.auth));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        });
 
     /**
      * @api {post} /api/token Create Token
@@ -395,7 +393,7 @@ async function server(config, cb) {
      */
     router.get(
         ...await schemas.get('GET /user', {
-            query: 'req.query.user-list.json',
+            query: 'req.query.user-list.json'
         }),
         requiresAuth,
         async (req, res) => {
@@ -558,10 +556,10 @@ async function server(config, cb) {
                 if (results.projects && results.projects.length) {
                     for (let index = 0; index < results.projects.length; index++) {
                         const p = results.projects[index];
-                        let aois = await aoi.list(p.id)
-                        let checkpoints = await checkpoint.list(p.id)
-                        p['aois'] = aois.aois
-                        p['checkpoints'] = checkpoints.checkpoints
+                        const aois = await aoi.list(p.id);
+                        const checkpoints = await checkpoint.list(p.id);
+                        p['aois'] = aois.aois;
+                        p['checkpoints'] = checkpoints.checkpoints;
                     }
                 }
                 res.json(results);
@@ -1519,13 +1517,13 @@ async function server(config, cb) {
                     // assuming that if retrain_geoms don't exist, input_geoms also don't exist
                     req.body.input_geoms = [];
                     req.body.retrain_geoms = req.body.classes.map(() => {
-                        req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] })
+                        req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] });
                         return { type: 'MultiPoint', 'coordinates': [] };
                     });
                 } else {
                     req.body.retrain_geoms = req.body.retrain_geoms.map((e) => {
                         if (!e || e.type !== 'MultiPoint') {
-                            req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] })
+                            req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] });
                             return { type: 'MultiPoint', 'coordinates': [] };
                         }
                         return e;
