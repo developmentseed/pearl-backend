@@ -17,7 +17,7 @@
         "@kubernetes/client-node": "^0.14.0",
         "@turf/bbox": "^6.3.0",
         "@turf/bbox-polygon": "^6.3.0",
-        "apidoc": "^0.26.0",
+        "apidoc": "^0.27.1",
         "body-parser": "^1.19.0",
         "busboy": "^0.3.1",
         "cli-progress": "^3.9.0",

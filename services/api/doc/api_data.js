@@ -200,7 +200,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
           "type": "json"
         }
       ]
@@ -254,6 +254,132 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "AOI"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:project/aoi/:aoiid/patch",
+    "title": "Create Patch",
+    "version": "1.0.0",
+    "name": "CreatePatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new Patch</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"storage\": true,\n    \"created\": \"<date>\"\n    \"project_id\": 1,\n    \"aoi_id\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid",
+    "title": "Delete Patch",
+    "version": "1.0.0",
+    "name": "DeletePatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a given patch</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\ntrue",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid/download",
+    "title": "Download Patch",
+    "version": "1.0.0",
+    "name": "DownloadPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Download a Tiff Patch</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid",
+    "title": "Get Patch",
+    "version": "1.0.0",
+    "name": "GetPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get a specific patch</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch",
+    "title": "List Patches",
+    "version": "1.0.0",
+    "name": "ListPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all patches for a given API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aoi_id\": 123\n    \"patches\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
   },
   {
     "type": "get",
@@ -668,6 +794,33 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given Checkpoint</p>",
+    "filename": "./index.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:projectid/aoi/:aoiid/patch/:patchid/upload",
+    "title": "Upload Patch",
+    "version": "1.0.0",
+    "name": "UploadCheckpoint",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upload a new checkpoint asset to the API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "./index.js",
     "groupTitle": "Checkpoints"
   },

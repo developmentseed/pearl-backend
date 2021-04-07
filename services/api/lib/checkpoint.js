@@ -153,7 +153,7 @@ class CheckPoint {
                     WHERE
                         id = $1
                     RETURNING *
-            `, [ checkpointid ]);
+            `, [checkpointid]);
         } catch (err) {
             if (err.code === '23503') throw new Err(400, new Error(err), 'Cannot delete checkpoint with dependants');
             throw new Err(500, new Error(err), 'Failed to delete Checkpoint');
@@ -351,7 +351,7 @@ class CheckPoint {
                     return JSON.stringify(e);
                 }),
                 checkpoint.input_geoms.map((e) => {
-                    return JSON.stringify(e)
+                    return JSON.stringify(e);
                 }),
                 JSON.stringify(checkpoint.analytics)
             ]);

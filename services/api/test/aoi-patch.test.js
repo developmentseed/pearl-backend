@@ -44,6 +44,25 @@ test('POST /api/model', (t) => {
     });
 });
 
+test('POST /api/project/1/aoi/1/patch - no project', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 404, 'status: 404');
+        t.deepEquals(res.body, {
+            status: 404, message: 'No project found', messages: []
+        });
+
+        t.end();
+    });
+});
+
 test('POST /api/project', (t) => {
     request({
         json: true,
@@ -131,21 +150,19 @@ test('POST /api/project/1/checkpoint', (t) => {
     });
 });
 
-test('GET /api/project/1/aoi (empty)', (t) => {
+test('POST /api/project/1/aoi/1/patch - no aoi', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
-        method: 'GET',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+        method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+        t.equals(res.statusCode, 404, 'status: 404');
         t.deepEquals(res.body, {
-            total: 0,
-            project_id: 1,
-            aois: []
+            status: 404, message: 'AOI not found', messages: []
         });
 
         t.end();
@@ -203,11 +220,28 @@ test('POST /api/project/1/aoi', (t) => {
     });
 });
 
-test('GET /api/project/1/aoi/1', (t) => {
+test('GET /api/project/1/aoi/1/patch', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.deepEquals(res.body, { total: 0, project_id: 1, aoi_id: 1, patches: [] });
+        t.end();
+    });
+});
+
+test('POST /api/project/1/aoi/1/patch', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+        method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -221,24 +255,46 @@ test('GET /api/project/1/aoi/1', (t) => {
             id: 1,
             storage: false,
             project_id: 1,
-            checkpoint_id: 1,
-            bookmarked: false,
-            name: 'Test AOI',
-            bounds: {
-                type: 'Polygon',
-                coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
-            }
+            aoi_id: 1
         });
 
         t.end();
     });
 });
 
-test('[meta] Set aoi.storage: true', async (t) => {
+test('GET /api/project/1/aoi/1/patch', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.patches[0].created, '.patches[0].created: <date>');
+        delete res.body.patches[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            project_id: 1,
+            aoi_id: 1,
+            patches: [{
+                id: 1,
+                storage: false
+            }]
+        });
+        t.end();
+    });
+});
+
+test('[meta] Set aoi-patch.storage: true', async (t) => {
     try {
         await flight.pool.query(`
             UPDATE
-                aois
+                aoi_patch
             SET
                 storage = true
         `, []);
@@ -249,112 +305,31 @@ test('[meta] Set aoi.storage: true', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi', (t) => {
+test('GET /api/project/1/aoi/1/patch/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.ok(res.body.aois[0].created, '.aois[0].created: <date>');
-        delete res.body.aois[0].created;
-
-        t.deepEquals(res.body, {
-            total: 1,
-            project_id: 1,
-            aois: [{
-                id: 1,
-                name: 'Test AOI',
-                storage: true
-            }]
-        });
-
-        t.end();
-    });
-});
-
-// The following 2 tests are skipped as they can't run without
-// TiTiler running as well - should add something like this to flow.test.js
-
-//let url;
-test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/tiles',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        url = res.body.tiles[0];
-
-        t.end();
-    });
-});
-
-test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000' + url.replace('{z}', 9).replace('{x}', '143').replace('{y}', '195'),
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        fs.writeFileSync('/tmp/sample.png', res.body);
-        t.ok(true, 'ok - written png to /tmp/sample.png');
-
-        t.end();
-    });
-});
-
-test('PATCH /api/project/1/aoi/1', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1',
-        method: 'PATCH',
-        body: {
-            bookmarked: true,
-            name: 'RENAMED'
-        },
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
 
         t.equals(res.statusCode, 200, 'status: 200');
-
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
-
         t.deepEquals(res.body, {
-            id: 1,
-            storage: true,
-            project_id: 1,
-            checkpoint_id: 1,
-            bookmarked: true,
-            name: 'RENAMED',
+            id: 1, storage: true, project_id: 1, aoi_id: 1 
         });
-
         t.end();
     });
 });
 
-test('DELETE /api/project/1/aoi/1', (t) => {
+test('DELETE /api/project/1/aoi/1/patch/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`
@@ -362,8 +337,28 @@ test('DELETE /api/project/1/aoi/1', (t) => {
     }, (err, res) => {
         t.error(err, 'no errors');
 
+        t.equals(res.statusCode, 200, 'status: 200');
         t.deepEquals(res.body, true);
 
+        t.end();
+    });
+});
+
+test('GET /api/project/1/aoi/1/patch/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.equals(res.statusCode, 404, 'status: 404');
+        t.deepEquals(res.body, {
+            status: 404, message: 'AOI Patch not found', messages: []    
+        });
         t.end();
     });
 });
