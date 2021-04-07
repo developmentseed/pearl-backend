@@ -49,6 +49,9 @@ def main():
 def error(body, websocket):
     LOGGER.error(json.dumps(body));
 
+def placeholder(body, websocket):
+    LOGGER.info('Known but unprocessed message')
+
 def connection(uri, model):
     router = Router(uri)
 
@@ -57,6 +60,9 @@ def connection(uri, model):
     router.on_act("model#checkpoint", model.load_checkpoint)
     router.on_act("model#status", model.status)
     router.on_act("model#abort", model.abort)
+
+    router.on_msg("info#connected", placeholder)
+    router.on_msg("info#disconnected", placeholder)
 
     router.on_msg('error', error)
 
