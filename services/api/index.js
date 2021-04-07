@@ -1399,7 +1399,7 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        ...await schemas.get('POST /project/:projectid/checkpoint/:checkpointid/upload'),
+        ...await schemas.get('POST /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload'),
         requiresAuth,
         async (req, res) => {
             try {
