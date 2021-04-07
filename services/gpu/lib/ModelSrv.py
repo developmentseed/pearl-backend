@@ -48,6 +48,16 @@ class ModelSrv():
             websocket.error('Model Status Error', e)
             raise None
 
+    def patch(self, body, websocket):
+        try:
+            if self.processing is True:
+                return is_processing(websocket)
+
+        except Exception as e:
+            done_processing(self)
+            websocket.error('AOI Patch Error', e)
+            raise None
+
     def load_checkpoint(self, body, websocket):
         try:
             if self.processing is True:
