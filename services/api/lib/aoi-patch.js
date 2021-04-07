@@ -123,7 +123,7 @@ class AOIPatch {
     }
 
     /**
-     * Delete an AOI
+     * Delete an AOI Patch
      *
      * @param {Number} aoiid - Specific AOI id
      * @param {Number} patchid - Specific AOI Patch id
@@ -244,7 +244,7 @@ class AOIPatch {
                     created,
                     storage
                 FROM
-                    aois
+                    aoi_patch
                 WHERE
                     ${where.join(' AND ')}
                 LIMIT

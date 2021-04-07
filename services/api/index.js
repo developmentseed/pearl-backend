@@ -1305,9 +1305,9 @@ async function server(config, cb) {
                 await Param.int(req, 'aoiid');
                 await Param.int(req, 'patchid');
 
-                await patch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+                await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
-                return res.json(await aoipatch.delete(req.params.patchid));
+                return res.json(await aoipatch.delete(req.params.aoiid, req.params.patchid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1343,7 +1343,7 @@ async function server(config, cb) {
                 await Param.int(req, 'aoiid');
                 await Param.int(req, 'patchid');
 
-                return res.json(await patch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+                return res.json(await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
             } catch (err) {
                 return Err.respond(err, res);
             }
