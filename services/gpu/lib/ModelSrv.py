@@ -162,7 +162,6 @@ class ModelSrv():
                 # Push tile into geotiff fabric
                 output = np.expand_dims(output, axis=-1)
                 output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                print(output.bounds)
                 self.aoi.add_to_fabric(output)
 
 
