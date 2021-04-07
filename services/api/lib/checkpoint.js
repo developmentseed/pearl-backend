@@ -375,41 +375,48 @@ class CheckPoint {
         let pgres;
         try {
             pgres = await this.pool.query(`
-                SELECT
-                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
-                FROM (
-                    SELECT
-                        ST_AsMVTGeom(
-                            geom,
-                            ST_TileEnvelope($2, $3, $4),
-                            4096,
-                            256,
-                            false
-                        ) AS geom
+            SELECT
+                ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+            FROM (
+                SELECT ST_AsMVTGeom(
+                    geom,
+                    ST_TileEnvelope($2, $3, $4),
+                    4096,
+                    256,
+                    false
+                ) AS geom
                     FROM (
                         SELECT
-                            id,
-                            r.geom
+                            r.id as id,
+                            r.geom as geom
                         FROM (
+                            WITH RECURSIVE parents (id, geom) AS (
+                                SELECT id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
+                            FROM checkpoints
+                            WHERE id = $1
+
+                            UNION ALL
+
+                            SELECT
+                                checkpoints.id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
+                            FROM checkpoints
+                            JOIN parents ON checkpoints.parent = parents.id
+                            )
                             SELECT
                                 id,
-                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
-                            FROM
-                                checkpoints
-                            WHERE
-                                checkpoints.id = $1
+                                geom
+                            FROM parents
                         ) r
-                        WHERE
-                            ST_Intersects(
-                                geom,
-                                ST_TileEnvelope($2, $3, $4)
-                            )
-                    ) n
-                    GROUP BY
-                        id,
-                        geom
-                ) q
-
+                WHERE
+                    ST_Intersects(
+                        geom,
+                        ST_TileEnvelope($2, $3, $4)
+                    )
+            ) n
+            GROUP BY
+                id,
+                geom
+        ) q
             `, [
                 checkpointid,
                 z, x, y
