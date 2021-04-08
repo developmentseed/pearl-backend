@@ -390,9 +390,9 @@ define({ "api": [
     "group": "AOI",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return a Tile for a given AOI</p>",
@@ -408,9 +408,9 @@ define({ "api": [
     "group": "AOI",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return tilejson for a given AOI</p>",
@@ -811,7 +811,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
-    "description": "<p>Upload a new checkpoint asset to the API</p>",
+    "description": "<p>Upload a new AOI Patch asset to the API</p>",
     "success": {
       "examples": [
         {

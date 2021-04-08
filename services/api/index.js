@@ -1389,7 +1389,7 @@ async function server(config, cb) {
      * @apiPermission admin
      *
      * @apiDescription
-     *     Upload a new checkpoint asset to the API
+     *     Upload a new AOI Patch asset to the API
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -1402,7 +1402,7 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        ...await schemas.get('POST /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload'),
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload'),
         requiresAuth,
         async (req, res) => {
             try {
