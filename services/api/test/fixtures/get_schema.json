@@ -149,7 +149,7 @@
         "query": false,
         "res": false
     },
-    "POST /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
+    "POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
         "body": false,
         "query": false,
         "res": false

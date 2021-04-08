@@ -52,33 +52,13 @@ async function gpu() {
         term.prompt.screen(['websockets', 'api']);
         term.on('promp#selection', async (sel) => {
             if (sel.value === 'websockets') {
-                term.prompt.screen([
-                    'model#status',
-                    'model#prediction',
-                    'model#retrain',
-                    'model#checkpoint',
-                    'model#abort',
-                    'instance#terminate'
-                ]);
-
+                term.prompt.screen(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
+                    return path.parse(f).name;
+                }));
                 return;
-            } else if (sel.value === 'model#prediction') {
-                ws.send(JSON.stringify(require('./fixtures/seneca_rocks-pred.json')));
-                term.log('SENT: model#prediction - Seneca Rocks');
-            } else if (sel.value === 'model#retrain') {
-                ws.send(JSON.stringify(require('./fixtures/seneca_rocks-retrain.json')));
-                term.log('SENT: model#retrain - Seneca Rocks');
-            } else if (sel.value === 'model#checkpoint') {
-
-            } else if (sel.value === 'model#abort') {
-                ws.send(JSON.stringify({ action: 'model#abort' }));
-                term.log('SENT: model#abort');
-            } else if (sel.value === 'model#status') {
-                ws.send(JSON.stringify({ action: 'model#status' }));
-                term.log('SENT: model#status');
-            } else if (sel.value === 'instance#terminate') {
-                ws.send(JSON.stringify({ action: 'instance#terminate' }));
-                term.log('SENT: instance#terminate');
+            } else if (sel.value.split('#')[0] === 'model' && sel.value.split('#').length === 2) {
+                ws.send(JSON.stringify(require(`./fixtures/${sel.value}.json`)));
+                term.log(`SENT: ${sel.value}`);
             } else if (sel.value === 'api') {
                 term.prompt.screen(Object.keys(lulc.schema.cli).map((k) => {
                     return { name: k, value: `api#${k}` };
@@ -148,6 +128,14 @@ async function gpu() {
                     term.log(`ok - model#aoi - ${msg.data.name}`);
                     state.aois.push(msg.data);
                     term.prog.update('model#prediction', 0);
+                } else if (msg.message === 'model#patch') {
+                    term.log(`ok - model#patch - ${msg.data.id}`);
+                    term.prog.update('model#patch', 0);
+                } else if (msg.message === 'model#patch#progress') {
+                    term.prog.update('model#patch', msg.data.processed / msg.data.total);
+                } else if (msg.message === 'model#patch#complete') {
+                    term.log(`ok - model#patch#complete`);
+                    term.prog.update();
                 } else if (msg.message === 'model#checkpoint') {
                     term.log(`ok - model#checkpoint - ${msg.data.name}`);
                     state.checkpoints.push(msg.data);

@@ -46,7 +46,103 @@ class ModelSrv():
 
         except Exception as e:
             websocket.error('Model Status Error', e)
-            raise None
+            raise e
+
+    def patch(self, body, websocket):
+        try:
+            if self.processing is True:
+                return is_processing(websocket)
+
+            self.processing = True
+
+            if self.aoi is None:
+                websocket.error('Cannot Patch as no AOI is loaded')
+                done_processing(self)
+                return;
+            elif self.chk is None:
+                websocket.error('Cannot Patch as no Checkpoint is loaded')
+                done_processing(self)
+                return;
+
+            current_checkpoint = self.chk['id']
+            self.meta_load_checkpoint(body['checkpoint_id'])
+
+            patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
+            websocket.send(json.dumps({
+                'message': 'model#patch',
+                'data': {
+                    'id': patch.id,
+                    'checkpoint_id': self.chk['id'],
+                    'bounds': patch.bounds,
+                    'total': patch.total
+                }
+            }))
+
+            color_list = [item["color"] for item in self.model.classes]
+
+            while len(patch.tiles) > 0 and self.is_aborting is False:
+                zxy = patch.tiles.pop()
+                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+
+                output, _ = self.model.run(in_memraster.data, False)
+
+                # remove 32 pixel buffer on each side
+                output = output[32:288, 32:288]
+
+                if patch.live:
+                    # Create color versions of predictions
+                    png = pred2png(output, color_list)
+
+                    LOGGER.info("ok - returning patch inference");
+                    websocket.send(json.dumps({
+                        'message': 'model#patch#progress',
+                        'data': {
+                            'patch': patch.id,
+                            'bounds': in_memraster.bounds,
+                            'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
+                            'image': png,
+                            'total': patch.total,
+                            'processed': patch.total - len(patch.tiles)
+                        }
+                    }))
+                else:
+                    websocket.send(json.dumps({
+                        'message': 'model#patch#progress',
+                        'data': {
+                            'patch': patch.id,
+                            'total': patch.total,
+                            'processed': len(patch.tiles)
+                        }
+                    }))
+
+                # Push tile into geotiff fabric
+                output = np.expand_dims(output, axis=-1)
+                output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
+                patch.add_to_fabric(output)
+
+            if self.is_aborting is True:
+                websocket.send(json.dumps({
+                    'message': 'model#aborted',
+                }))
+            else:
+                patch.upload_fabric()
+
+                LOGGER.info("ok - done patch prediction");
+
+            self.meta_load_checkpoint(current_checkpoint)
+
+            websocket.send(json.dumps({
+                'message': 'model#patch#complete',
+                'data': {
+                    'patch': patch.id,
+                }
+            }))
+
+            done_processing(self)
+        except Exception as e:
+            done_processing(self)
+            websocket.error('AOI Patch Error', e)
+            raise e
 
     def load_checkpoint(self, body, websocket):
         try:
@@ -63,9 +159,8 @@ class ModelSrv():
                     'total': 1
                 }
             }))
-            self.chk = self.api.get_checkpoint(body['id'])
-            chk_fs = self.api.download_checkpoint(self.chk['id'])
-            self.model.load_state_from(self.chk, chk_fs)
+
+            self.meta_load_checkpoint(body['id'])
 
             websocket.send(json.dumps({
                 'message': 'model#checkpoint#complete',
@@ -79,7 +174,7 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('Checkpoint Load Error', e)
-            raise None
+            raise e
 
     def prediction(self, body, websocket):
         try:
@@ -91,7 +186,7 @@ class ModelSrv():
             self.processing = True
 
             if self.chk is None:
-                self.checkpoint({
+                self.meta_save_checkpoint({
                     'name': body['name'],
                     'geoms': [None] * len(self.model.classes),
                     'analytics': [{
@@ -113,26 +208,22 @@ class ModelSrv():
                 }
             }))
 
-
             color_list = [item["color"] for item in self.model.classes]
 
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
                 zxy = self.aoi.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
-                output, output_features = self.model.run(in_memraster.data, False)
+                output, _ = self.model.run(in_memraster.data, False)
 
                 # remove 32 pixel buffer on each side
                 output = output[32:288, 32:288]
-                output_features = output_features[32:288, 32:288, :]
-
-                #TO-DO assert statement for output_features dimensions, and output?
 
                 LOGGER.info("ok - generated inference");
 
                 if self.aoi.live:
                     # Create color versions of predictions
-                    png = pred2png(output, color_list) # investigate this
+                    png = pred2png(output, color_list)
 
                     LOGGER.info("ok - returning inference");
                     websocket.send(json.dumps({
@@ -182,7 +273,6 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('Processing Error', e)
-
             raise e
 
     def retrain(self, body, websocket):
@@ -211,7 +301,7 @@ class ModelSrv():
                 'message': 'model#retrain#complete'
             }))
 
-            self.checkpoint({
+            self.meta_save_checkpoint({
                 'name': body['name'],
                 'parent': self.chk['id'],
                 'input_geoms': [cls["geometry"] for cls in body['classes']],
@@ -233,9 +323,14 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('Retrain Error', e)
-            raise None
+            raise e
 
-    def checkpoint(self, body, websocket):
+    def meta_load_checkpoint(self, load_id):
+        self.chk = self.api.get_checkpoint(load_id)
+        chk_fs = self.api.download_checkpoint(self.chk['id'])
+        self.model.load_state_from(self.chk, chk_fs)
+
+    def meta_save_checkpoint(self, body, websocket):
         classes = []
         for cls in self.model.classes:
             classes.append({
@@ -265,9 +360,6 @@ class ModelSrv():
 
         self.chk = checkpoint
         return checkpoint
-
-    def load(self, directory):
-        return self.model.load_state_from(directory)
 
 def done_processing(modelsrv):
     modelsrv.processing = False

@@ -152,6 +152,33 @@ define({ "api": [
     "groupTitle": "AOI"
   },
   {
+    "type": "post",
+    "url": "/api/project/:projectid/aoi/:aoiid/patch/:patchid/upload",
+    "title": "Upload Patch",
+    "version": "1.0.0",
+    "name": "UploadPatch",
+    "group": "AOIGroup",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upload a new AOI Patch asset to the API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIGroup"
+  },
+  {
     "type": "get",
     "url": "/api/project/:projectid/aoi",
     "title": "List AOIs",
@@ -390,9 +417,9 @@ define({ "api": [
     "group": "AOI",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return a Tile for a given AOI</p>",
@@ -408,9 +435,9 @@ define({ "api": [
     "group": "AOI",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return tilejson for a given AOI</p>",
@@ -794,33 +821,6 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given Checkpoint</p>",
-    "filename": "./index.js",
-    "groupTitle": "Checkpoints"
-  },
-  {
-    "type": "post",
-    "url": "/api/project/:projectid/aoi/:aoiid/patch/:patchid/upload",
-    "title": "Upload Patch",
-    "version": "1.0.0",
-    "name": "UploadCheckpoint",
-    "group": "Checkpoints",
-    "permission": [
-      {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be an admin to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Upload a new checkpoint asset to the API</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
-    },
     "filename": "./index.js",
     "groupTitle": "Checkpoints"
   },
