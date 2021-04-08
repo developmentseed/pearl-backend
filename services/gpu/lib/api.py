@@ -212,7 +212,7 @@ class API():
         return ch_dir
 
     def create_patch(self, aoi_id):
-        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoi_id)
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoi_id) + '/patch'
 
         LOGGER.info("ok - POST " + url)
         r = self.requests.post(url,
