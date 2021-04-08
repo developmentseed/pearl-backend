@@ -1384,8 +1384,8 @@ async function server(config, cb) {
     /**
      * @api {post} /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload Upload Patch
      * @apiVersion 1.0.0
-     * @apiName UploadCheckpoint
-     * @apiGroup Checkpoints
+     * @apiName UploadPatch
+     * @apiGroup AOIGroup
      * @apiPermission admin
      *
      * @apiDescription
@@ -1395,11 +1395,11 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1432,
-     *       "name": "Checkpoint Name",
-     *       "classes": [ ... ],
      *       "storage": true,
      *       "created": "<date>"
-     *   }
+     *       "project_id": 1,
+     *       "aoi": 1
+     *  }
      */
     router.post(
         ...await schemas.get('POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload'),
@@ -1407,7 +1407,8 @@ async function server(config, cb) {
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
-                await Param.int(req, 'checkpointid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'patchid');
                 await auth.is_admin(req);
 
                 const busboy = new Busboy({ headers: req.headers });
