@@ -67,13 +67,6 @@ class AOI():
         else:
             self.api.upload_aoi(self.id, self.raw_fabric)
 
-    def gen_mask(self):
-        geom = transform_geom("epsg:4326", "epsg:3857", self.poly)
-        clipped_fabric_mask, clipped_transform = rasterio.mask.mask(dataset=self.fabric, shapes=[geom], nodata=255)
-        #should the writing happen here, or should just the clipped array be returned?
-        #self.aoi.fabric.write(clipped_fabric_mask)
-        return clipped_fabric_mask
-
     @staticmethod
     def gen_fabric(bounds, zoom):
         extrema = supermercado.burntiles.tile_extrema(bounds, zoom)
