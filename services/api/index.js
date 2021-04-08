@@ -560,6 +560,11 @@ async function server(config, cb) {
                         const checkpoints = await checkpoint.list(p.id);
                         p['aois'] = aois.aois;
                         p['checkpoints'] = checkpoints.checkpoints;
+                        p['model'] = {}
+                        if (p.model_id) {
+                            p['model'] = await model.get(p.model_id);
+                            delete p.model_id;
+                        }
                     }
                 }
                 res.json(results);
