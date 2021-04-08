@@ -102,8 +102,6 @@ def pred2png(output, color_list):
     newdata = []
     for x in range(output.shape[0]):
         for y in range(output.shape[1]):
-            print(output[x][y])
-
             #full transperancy for maksed out areas
             if output[x][y] == 255:
                 newdata.append((255,255,255,0))

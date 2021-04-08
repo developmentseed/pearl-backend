@@ -219,27 +219,16 @@ class ModelSrv():
 
                 output, _ = self.model.run(in_memraster.data, False)
 
-                print(output.shape)
                 output = MemRaster(
                 output,
                 "epsg:4326",
                 (in_memraster.x, in_memraster.y, in_memraster.z),
                 True
             )
-
                 output = output.remove_buffer()
-
-                print(output.data.shape)
 
                 #clip output
                 output.clip(self.aoi.poly)
-
-                print(type(output))
-
-                print(output.data.shape)
-
-                #print(output_clipped.data[0].shape)
-
 
                 LOGGER.info("ok - generated inference");
 
@@ -280,9 +269,6 @@ class ModelSrv():
                     'message': 'model#aborted',
                 }))
             else:
-
-                #clipped_fabric_mask = self.aoi.gen_mask()
-                #self.aoi.fabric.write(clipped_fabric_mask)
                 self.aoi.upload_fabric()
 
                 LOGGER.info("ok - done prediction");
