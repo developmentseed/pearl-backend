@@ -91,17 +91,23 @@ def geom2px(geom, modelsrv):
 
 
 def pred2png(output, color_list):
-    print(output.shape)
     rgb_list = []
     for color in color_list:
         rgb_list.append(hex2rgb(color))
-
-    rgb = Image.new('RGB', (output.shape[0], output.shape[1]))
+    #add alpah channel with no transperency
+    rgba_lst = [x + (255,) for x in rgb_list]
+    rgb = Image.new('RGBA', (output.shape[0], output.shape[1]))
 
     newdata = []
     for x in range(output.shape[0]):
         for y in range(output.shape[1]):
-            newdata.append(rgb_list[output[x][y]])
+            print(output[x][y])
+
+            #full transperancy for maksed out areas
+            if output[x][y] == 255:
+                newdata.append((255,255,255,0))
+            else:
+                newdata.append(rgba_lst[output[x][y]])
     rgb.putdata(newdata)
 
     with io.BytesIO() as output:
