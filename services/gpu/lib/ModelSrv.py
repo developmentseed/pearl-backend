@@ -84,11 +84,10 @@ class ModelSrv():
                 zxy = patch.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
-                output, output_features = self.model.run(in_memraster.data, False)
+                output, _ = self.model.run(in_memraster.data, False)
 
                 # remove 32 pixel buffer on each side
                 output = output[32:288, 32:288]
-                output_features = output_features[32:288, 32:288, :]
 
                 if patch.live:
                     # Create color versions of predictions
@@ -215,13 +214,10 @@ class ModelSrv():
                 zxy = self.aoi.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
-                output, output_features = self.model.run(in_memraster.data, False)
+                output, _ = self.model.run(in_memraster.data, False)
 
                 # remove 32 pixel buffer on each side
                 output = output[32:288, 32:288]
-                output_features = output_features[32:288, 32:288, :]
-
-                #TO-DO assert statement for output_features dimensions, and output?
 
                 LOGGER.info("ok - generated inference");
 
