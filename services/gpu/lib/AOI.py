@@ -24,7 +24,7 @@ class AOI():
     def __init__(self, api, body, checkpointid, is_patch=False):
         self.api = api
         self.poly = body['polygon']
-        self.name = body['name']
+        self.name = body.get('name', '')
         self.checkpointid = checkpointid
         self.is_patch = is_patch
 
