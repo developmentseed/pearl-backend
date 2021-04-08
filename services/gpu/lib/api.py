@@ -211,6 +211,46 @@ class API():
 
         return ch_dir
 
+    def create_patch(self, aoi_id):
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoi_id)
+
+        LOGGER.info("ok - POST " + url)
+        r = self.requests.post(url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
+            }
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def upload_patch(self, aoiid, patchid, geotiff):
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoiid) + '/patch/' + str(patchid) + '/upload'
+
+        LOGGER.info("ok - POST " + url)
+
+        geo_path = self.tmp_dir + '/aoi-{}-patch-{}.tiff'.format(aoiid, patchid)
+        with open(geo_path, 'wb') as filehandle:
+            filehandle.write(geotiff.read())
+
+        encoder = MultipartEncoder([('file', ('filename', open(geo_path, 'rb'), 'image/tiff'))])
+
+        r = self.requests.post(url,
+            headers={
+                "Authorization": "Bearer " + self.token,
+                'Content-Type': encoder.content_type
+            },
+            data = encoder
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_aoi(self, aoi):
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'
 
@@ -237,7 +277,7 @@ class API():
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = self.tmp_dir + '/aoi-{}.geotiff'.format(aoiid)
+        geo_path = self.tmp_dir + '/aoi-{}.tiff'.format(aoiid)
         with open(geo_path, 'wb') as filehandle:
             filehandle.write(geotiff.read())
 

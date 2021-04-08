@@ -41,8 +41,8 @@ class AOI():
         # TODO Check Max size too
         self.live = AOI.area(self.bounds) < self.api.server['limits']['live_inference']
 
-        if self.is_patch:
-            print("NOT IMPLEMENTED");
+        if self.is_patch is not False:
+            self.id = self.api.create_patch(is_patch)["id"]
         else:
             self.id = self.api.create_aoi(self)["id"]
             self.api.instance_patch(aoi_id = self.id)
@@ -61,8 +61,8 @@ class AOI():
     def upload_fabric(self):
         self.fabric.close()
 
-        if self.is_patch:
-            print("NOT IMPLEMENTED");
+        if self.is_patch is not False:
+            self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
         else:
             self.api.upload_aoi(self.id, self.raw_fabric)
 
