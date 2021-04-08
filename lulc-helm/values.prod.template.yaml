@@ -29,6 +29,7 @@ placeholder:
   replicaCount: 1
   nodeSelectorName: 'gpu'
   isGpu: true
+  numGPUs: 4
   resources:
     requests:
       cpu: 2

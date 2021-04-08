@@ -33,9 +33,9 @@ spec:
         resources:
         {{- if .Values.placeholder.isGpu }}
           requests:
-            nvidia.com/gpu: 4
+            nvidia.com/gpu: {{ .Values.placeholder.numGPUs }}
           limits:
-            nvidia.com/gpu: 4
+            nvidia.com/gpu: {{ .Values.placeholder.numGPUs }}
         {{- else }}
           requests:
             cpu: {{ .Values.placeholder.resources.requests.cpu }}
