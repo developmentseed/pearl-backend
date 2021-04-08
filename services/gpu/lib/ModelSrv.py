@@ -67,11 +67,21 @@ class ModelSrv():
             current_checkpoint = self.chk['id']
             self.meta_load_checkpoint(body['checkpoint_id'])
 
-            self.aoi = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
+            patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
+            websocket.send(json.dumps({
+                'message': 'model#patch',
+                'data': {
+                    'id': patch.id,
+                    'checkpoint_id': self.chk['id'],
+                    'bounds': patch.bounds,
+                    'total': patch.total
+                }
+            }))
+
             color_list = [item["color"] for item in self.model.classes]
 
-            while len(self.aoi.tiles) > 0 and self.is_aborting is False:
-                zxy = self.aoi.tiles.pop()
+            while len(patch.tiles) > 0 and self.is_aborting is False:
+                zxy = patch.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
                 output, output_features = self.model.run(in_memraster.data, False)
@@ -80,7 +90,7 @@ class ModelSrv():
                 output = output[32:288, 32:288]
                 output_features = output_features[32:288, 32:288, :]
 
-                if self.aoi.live:
+                if patch.live:
                     # Create color versions of predictions
                     png = pred2png(output, color_list)
 
@@ -88,35 +98,35 @@ class ModelSrv():
                     websocket.send(json.dumps({
                         'message': 'model#patch#progress',
                         'data': {
-                            'patch': self.aoi.id,
+                            'patch': patch.id,
                             'bounds': in_memraster.bounds,
                             'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
                             'image': png,
-                            'total': self.aoi.total,
-                            'processed': self.aoi.total - len(self.aoi.tiles)
+                            'total': patch.total,
+                            'processed': patch.total - len(patch.tiles)
                         }
                     }))
                 else:
                     websocket.send(json.dumps({
                         'message': 'model#patch#progress',
                         'data': {
-                            'patch': self.aoi.id,
-                            'total': self.aoi.total,
-                            'processed': len(self.aoi.tiles)
+                            'patch': patch.id,
+                            'total': patch.total,
+                            'processed': len(patch.tiles)
                         }
                     }))
 
                 # Push tile into geotiff fabric
                 output = np.expand_dims(output, axis=-1)
                 output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                self.aoi.add_to_fabric(output)
+                patch.add_to_fabric(output)
 
             if self.is_aborting is True:
                 websocket.send(json.dumps({
                     'message': 'model#aborted',
                 }))
             else:
-                self.aoi.upload_fabric()
+                patch.upload_fabric()
 
                 LOGGER.info("ok - done patch prediction");
 
@@ -125,7 +135,7 @@ class ModelSrv():
             websocket.send(json.dumps({
                 'message': 'model#patch#complete',
                 'data': {
-                    'aoi': self.aoi.id,
+                    'patch': patch.id,
                 }
             }))
 
