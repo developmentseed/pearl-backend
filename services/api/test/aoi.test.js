@@ -234,7 +234,7 @@ test('GET /api/project/1/aoi/1', (t) => {
     });
 });
 
-test('[meta] Set model.storage: true', async (t) => {
+test('[meta] Set aoi.storage: true', async (t) => {
     try {
         await flight.pool.query(`
             UPDATE

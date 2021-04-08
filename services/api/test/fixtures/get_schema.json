@@ -124,6 +124,36 @@
         "query": false,
         "res": false
     },
+    "GET /project/:projectid/aoi/:aoiid/patch": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /project/:projectid/aoi/:aoiid/patch": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "DELETE /project/:projectid/aoi/:aoiid/patch/:patchid": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/download": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /project/:projectid/checkpoint/:checkpointid": {
         "body": false,
         "query": false,

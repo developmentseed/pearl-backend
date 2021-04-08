@@ -1,6 +1,7 @@
 const test = require('tape');
 const request = require('request');
 const { Flight } = require('./util');
+const fs = require('fs');
 
 const flight = new Flight();
 
@@ -12,42 +13,6 @@ test('user', async (t) => {
         access: 'admin'
     })).token;
     t.end();
-});
-
-test('GET /api/project (empty)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        t.deepEquals(res.body, {
-            total: 0,
-            projects: []
-        });
-
-        t.end();
-    });
-});
-
-test('GET /api/project/1 (empty)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 404, 'status: 404');
-        t.end();
-    });
 });
 
 test('POST /api/model', (t) => {
@@ -79,27 +44,19 @@ test('POST /api/model', (t) => {
     });
 });
 
-test('POST /api/project (Invalid Mosaic)', (t) => {
+test('POST /api/project/1/aoi/1/patch - no project', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`
-        },
-        body: {
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.fake'
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 400, 'status: 400');
-
+        t.equals(res.statusCode, 404, 'status: 404');
         t.deepEquals(res.body, {
-            status: 400,
-            message: 'Invalid Mosaic',
-            messages: []
+            status: 404, message: 'No project found', messages: []
         });
 
         t.end();
@@ -193,6 +150,25 @@ test('POST /api/project/1/checkpoint', (t) => {
     });
 });
 
+test('POST /api/project/1/aoi/1/patch - no aoi', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 404, 'status: 404');
+        t.deepEquals(res.body, {
+            status: 404, message: 'AOI not found', messages: []
+        });
+
+        t.end();
+    });
+});
+
 test('POST /api/project/1/aoi', (t) => {
     request({
         json: true,
@@ -226,8 +202,8 @@ test('POST /api/project/1/aoi', (t) => {
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
-            name: 'Test AOI',
             bookmarked: false,
+            name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
@@ -244,233 +220,145 @@ test('POST /api/project/1/aoi', (t) => {
     });
 });
 
-test('GET /api/project', (t) => {
+test('GET /api/project/1/aoi/1/patch', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
 
-        t.ok(res.body.projects[0].created, '.created: <date>');
-        delete res.body.projects[0].created;
-        delete res.body.projects[0].aois[0].created
-        delete res.body.projects[0].checkpoints[0].created
-        delete res.body.projects[0].model.created
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.deepEquals(res.body, { total: 0, project_id: 1, aoi_id: 1, patches: [] });
+        t.end();
+    });
+});
+
+test('POST /api/project/1/aoi/1/patch', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
 
         t.deepEquals(res.body, {
-            "total": 1,
-            "projects": [
-                {
-                    "id": 1,
-                    "name": "Test Project",
-                    "aois": [
-                        {
-                            "id": 1,
-                            "name": "Test AOI",
-                            "storage": false
-                        }
-                    ],
-                    "checkpoints": [
-                        {
-                            "id": 1,
-                            "parent": null,
-                            "name": "Test Checkpoint",
-                            "storage": false,
-                            "bookmarked": false
-                        }
-                    ],
-                    "model": {
-                        "id": 1,
-                        "active": true,
-                        "uid": 1,
-                        "name": "NAIP Supervised",
-                        "model_type": "pytorch_example",
-                        "model_inputshape": [
-                            240,
-                            240,
-                            4
-                        ],
-                        "model_zoom": 17,
-                        "storage": null,
-                        "classes": [
-                            {
-                                "name": "Water",
-                                "color": "#0000FF"
-                            },
-                            {
-                                "name": "Tree Canopy",
-                                "color": "#008000"
-                            },
-                            {
-                                "name": "Field",
-                                "color": "#80FF80"
-                            },
-                            {
-                                "name": "Built",
-                                "color": "#806060"
-                            }
-                        ],
-                        "meta": {},
-                        "bounds": [
-                            -180,
-                            -90,
-                            180,
-                            90
-                        ]
-                    }
-                }
-            ]
+            id: 1,
+            storage: false,
+            project_id: 1,
+            aoi_id: 1
         });
 
         t.end();
     });
 });
 
-test('GET /api/project/1', (t) => {
+test('GET /api/project/1/aoi/1/patch', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
-        t.equals(res.statusCode, 200, 'status: 200');
+        t.error(err, 'no errors');
 
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.patches[0].created, '.patches[0].created: <date>');
+        delete res.body.patches[0].created;
 
         t.deepEquals(res.body, {
-            id: 1,
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
+            total: 1,
+            project_id: 1,
+            aoi_id: 1,
+            patches: [{
+                id: 1,
+                storage: false
+            }]
         });
-
         t.end();
     });
 });
 
-test('PATCH /api/project/1', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1',
-        method: 'PATCH',
-        headers: {
-            Authorization: `Bearer ${token}`
-        },
-        body: {
-            name: 'Renamed Test Project'
-        }
-    }, (err, res) => {
-        t.equals(res.statusCode, 200, 'status: 200');
+test('[meta] Set aoi-patch.storage: true', async (t) => {
+    try {
+        await flight.pool.query(`
+            UPDATE
+                aoi_patch
+            SET
+                storage = true
+        `, []);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
 
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            uid: 1,
-            name: 'Renamed Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
-        });
-
-        t.end();
-    });
+    t.end();
 });
 
-test('GET /api/project/1', (t) => {
+test('GET /api/project/1/aoi/1/patch/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
-        t.equals(res.statusCode, 200, 'status: 200');
+        t.error(err, 'no errors');
 
+        t.equals(res.statusCode, 200, 'status: 200');
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
-
         t.deepEquals(res.body, {
-            id: 1,
-            name: 'Renamed Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
+            id: 1, storage: true, project_id: 1, aoi_id: 1 
         });
-
         t.end();
     });
 });
 
-test('DELETE /api/project/1/checkpoint/1', (t) => {
+test('DELETE /api/project/1/aoi/1/patch/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
 
+        t.equals(res.statusCode, 200, 'status: 200');
         t.deepEquals(res.body, true);
 
         t.end();
     });
 });
 
-test('DELETE /api/project/1', (t) => {
+test('GET /api/project/1/aoi/1/patch/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        t.deepEquals(res.body, {});
-
-        t.end();
-    });
-});
-
-test('GET /api/project/1', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
+        t.error(err, 'no errors');
+
         t.equals(res.statusCode, 404, 'status: 404');
-
-        t.end();
-    });
-});
-
-test('DELETE /api/project/2', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/2',
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.equals(res.statusCode, 404, 'status: 404');
-
+        t.deepEquals(res.body, {
+            status: 404, message: 'AOI Patch not found', messages: []    
+        });
         t.end();
     });
 });
