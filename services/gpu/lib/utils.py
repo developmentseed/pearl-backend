@@ -91,6 +91,7 @@ def geom2px(geom, modelsrv):
 
 
 def pred2png(output, color_list):
+    print(output.shape)
     rgb_list = []
     for color in color_list:
         rgb_list.append(hex2rgb(color))

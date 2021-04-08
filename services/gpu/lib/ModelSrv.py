@@ -122,19 +122,35 @@ class ModelSrv():
                 zxy = self.aoi.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
-                output, output_features = self.model.run(in_memraster.data, False)
+                output, _ = self.model.run(in_memraster.data, False)
 
-                # remove 32 pixel buffer on each side
-                output = output[32:288, 32:288]
-                output_features = output_features[32:288, 32:288, :]
+                print(output.shape)
+                output = MemRaster(
+                output,
+                "epsg:4326",
+                (in_memraster.x, in_memraster.y, in_memraster.z),
+                True
+            )
 
-                #TO-DO assert statement for output_features dimensions, and output?
+                output = output.remove_buffer()
+
+                print(output.data.shape)
+
+                #clip output
+                output.clip(self.aoi.poly)
+
+                print(type(output))
+
+                print(output.data.shape)
+
+                #print(output_clipped.data[0].shape)
+
 
                 LOGGER.info("ok - generated inference");
 
                 if self.aoi.live:
                     # Create color versions of predictions
-                    png = pred2png(output, color_list) # investigate this
+                    png = pred2png(output.data, color_list) # investigate this
 
                     LOGGER.info("ok - returning inference");
                     websocket.send(json.dumps({
@@ -170,8 +186,8 @@ class ModelSrv():
                 }))
             else:
 
-                clipped_fabric_mask = self.aoi.gen_mask()
-                self.aoi.fabric.write(clipped_fabric_mask)
+                #clipped_fabric_mask = self.aoi.gen_mask()
+                #self.aoi.fabric.write(clipped_fabric_mask)
                 self.aoi.upload_fabric()
 
                 LOGGER.info("ok - done prediction");
