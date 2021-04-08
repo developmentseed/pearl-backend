@@ -1,4 +1,7 @@
 import mercantile
+import rasterio
+from rasterio.warp import transform_geom
+
 
 class MemRaster(object):
 
@@ -26,3 +29,11 @@ class MemRaster(object):
         self.xy_bounds = mercantile.xy_bounds(self.x, self.y, self.z)
         self.bounds = mercantile.bounds(self.x, self.y, self.z)
         self.shape = data.shape
+
+    def remove_buffer(self):
+        self.data = self.data[32:288, 32:288]
+
+    def clip(self, polygon):
+        geom = transform_geom("epsg:4326", "epsg:3857", polygon)
+        clipped_output, clipped_transform = rasterio.mask.mask(dataset=self.data, shapes=[geom], nodata=255)
+        return clipped_output
