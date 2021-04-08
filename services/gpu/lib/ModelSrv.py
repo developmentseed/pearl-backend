@@ -46,7 +46,7 @@ class ModelSrv():
 
         except Exception as e:
             websocket.error('Model Status Error', e)
-            raise None
+            raise e
 
     def patch(self, body, websocket):
         try:
@@ -133,7 +133,7 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('AOI Patch Error', e)
-            raise None
+            raise e
 
     def load_checkpoint(self, body, websocket):
         try:
@@ -165,7 +165,7 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('Checkpoint Load Error', e)
-            raise None
+            raise e
 
     def prediction(self, body, websocket):
         try:
@@ -267,7 +267,6 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('Processing Error', e)
-
             raise e
 
     def retrain(self, body, websocket):
@@ -318,7 +317,7 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('Retrain Error', e)
-            raise None
+            raise e
 
     def meta_load_checkpoint(self, load_id):
         self.chk = self.api.get_checkpoint(load_id)
