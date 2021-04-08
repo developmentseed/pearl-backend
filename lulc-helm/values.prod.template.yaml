@@ -26,7 +26,7 @@ tiles:
 
 placeholder:
   enabled: true
-  replicaCount: 3
+  replicaCount: 1
   nodeSelectorName: 'gpu'
   isGpu: true
   resources:
