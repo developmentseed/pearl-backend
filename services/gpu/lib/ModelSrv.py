@@ -67,8 +67,69 @@ class ModelSrv():
             current_checkpoint = self.chk['id']
             self.meta_load_checkpoint(body['checkpoint_id'])
 
+            self.aoi = AOI(self.api, body, self.chk['id'])
+            color_list = [item["color"] for item in self.model.classes]
+
+            while len(self.aoi.tiles) > 0 and self.is_aborting is False:
+                zxy = self.aoi.tiles.pop()
+                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+
+                output, output_features = self.model.run(in_memraster.data, False)
+
+                # remove 32 pixel buffer on each side
+                output = output[32:288, 32:288]
+                output_features = output_features[32:288, 32:288, :]
+
+                if self.aoi.live:
+                    # Create color versions of predictions
+                    png = pred2png(output, color_list)
+
+                    LOGGER.info("ok - returning patch inference");
+                    websocket.send(json.dumps({
+                        'message': 'model#patch#progress',
+                        'data': {
+                            'patch': self.aoi.id,
+                            'bounds': in_memraster.bounds,
+                            'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
+                            'image': png,
+                            'total': self.aoi.total,
+                            'processed': self.aoi.total - len(self.aoi.tiles)
+                        }
+                    }))
+                else:
+                    websocket.send(json.dumps({
+                        'message': 'model#patch#progress',
+                        'data': {
+                            'patch': self.aoi.id,
+                            'total': self.aoi.total,
+                            'processed': len(self.aoi.tiles)
+                        }
+                    }))
+
+                # Push tile into geotiff fabric
+                output = np.expand_dims(output, axis=-1)
+                output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
+                self.aoi.add_to_fabric(output)
+
+            if self.is_aborting is True:
+                websocket.send(json.dumps({
+                    'message': 'model#aborted',
+                }))
+            else:
+                self.aoi.upload_fabric()
+
+                LOGGER.info("ok - done patch prediction");
+
             self.meta_load_checkpoint(current_checkpoint)
 
+            websocket.send(json.dumps({
+                'message': 'model#patch#complete',
+                'data': {
+                    'aoi': self.aoi.id,
+                }
+            }))
+
+            done_processing(self)
         except Exception as e:
             done_processing(self)
             websocket.error('AOI Patch Error', e)
@@ -138,7 +199,6 @@ class ModelSrv():
                 }
             }))
 
-
             color_list = [item["color"] for item in self.model.classes]
 
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
@@ -157,7 +217,7 @@ class ModelSrv():
 
                 if self.aoi.live:
                     # Create color versions of predictions
-                    png = pred2png(output, color_list) # investigate this
+                    png = pred2png(output, color_list)
 
                     LOGGER.info("ok - returning inference");
                     websocket.send(json.dumps({

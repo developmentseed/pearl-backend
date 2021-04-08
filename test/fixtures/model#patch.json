@@ -1,5 +1,5 @@
 {
-    "action": "model#aoi-patch",
+    "action": "model#patch",
     "data": {
         "type": "brush",
         "checkpoint_id": 1,
