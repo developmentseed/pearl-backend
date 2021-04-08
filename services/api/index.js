@@ -841,14 +841,13 @@ async function server(config, cb) {
      * @apiVersion 1.0.0
      * @apiName TileJSONAOI
      * @apiGroup AOI
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return tilejson for a given AOI
      */
     router.get(
         ...await schemas.get('GET /project/:projectid/aoi/:aoiid/tiles'),
-        requiresAuth,
         async (req, res) => {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
@@ -856,7 +855,7 @@ async function server(config, cb) {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'aoiid');
 
-                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+                const a = await aoi.get(req.params.aoiid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 const tiffurl = await aoi.url(a.id);
