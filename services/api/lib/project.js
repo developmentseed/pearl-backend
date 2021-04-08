@@ -61,6 +61,7 @@ class Project {
                     count(*) OVER() AS count,
                     id,
                     name,
+                    model_id,
                     created
                 FROM
                     projects
@@ -85,7 +86,8 @@ class Project {
                 return {
                     id: parseInt(row.id),
                     name: row.name,
-                    created: row.created
+                    created: row.created,
+                    model_id: row.model_id
                 };
             })
         };

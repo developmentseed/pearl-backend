@@ -260,29 +260,71 @@ test('GET /api/project', (t) => {
         delete res.body.projects[0].created;
         delete res.body.projects[0].aois[0].created
         delete res.body.projects[0].checkpoints[0].created
+        delete res.body.projects[0].model.created
 
         t.deepEquals(res.body, {
-            total: 1,
-            projects: [{
-                id: 1,
-                name: 'Test Project',
-                aois: [
-                    {
-                        id: 1,
-                        name: 'Test AOI',
-                        storage: false
+            "total": 1,
+            "projects": [
+                {
+                    "id": 1,
+                    "name": "Test Project",
+                    "aois": [
+                        {
+                            "id": 1,
+                            "name": "Test AOI",
+                            "storage": false
+                        }
+                    ],
+                    "checkpoints": [
+                        {
+                            "id": 1,
+                            "parent": null,
+                            "name": "Test Checkpoint",
+                            "storage": false,
+                            "bookmarked": false
+                        }
+                    ],
+                    "model": {
+                        "id": 1,
+                        "active": true,
+                        "uid": 1,
+                        "name": "NAIP Supervised",
+                        "model_type": "pytorch_example",
+                        "model_inputshape": [
+                            240,
+                            240,
+                            4
+                        ],
+                        "model_zoom": 17,
+                        "storage": null,
+                        "classes": [
+                            {
+                                "name": "Water",
+                                "color": "#0000FF"
+                            },
+                            {
+                                "name": "Tree Canopy",
+                                "color": "#008000"
+                            },
+                            {
+                                "name": "Field",
+                                "color": "#80FF80"
+                            },
+                            {
+                                "name": "Built",
+                                "color": "#806060"
+                            }
+                        ],
+                        "meta": {},
+                        "bounds": [
+                            -180,
+                            -90,
+                            180,
+                            90
+                        ]
                     }
-                ],
-                checkpoints: [
-                    {
-                        id: 1,
-                        parent: null,
-                        name: 'Test Checkpoint',
-                        storage: false,
-                        bookmarked: false
-                    }
-                ]
-            }]
+                }
+            ]
         });
 
         t.end();
