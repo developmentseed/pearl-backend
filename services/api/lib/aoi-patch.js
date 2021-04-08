@@ -168,7 +168,7 @@ class AOIPatch {
             pgres = await this.pool.query(`
                 UPDATE aoi_patch
                     SET
-                        storage = COALESCE($2, storage),
+                        storage = COALESCE($2, storage)
                     WHERE
                         id = $1
                     RETURNING *
