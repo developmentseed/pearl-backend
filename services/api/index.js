@@ -920,7 +920,7 @@ async function server(config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                const a = await aoi.get(re.params.aoiid);
+                const a = await aoi.get(req.params.aoiid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 const tiffurl = await aoi.url(a.id);
