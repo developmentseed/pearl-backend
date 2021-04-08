@@ -1416,7 +1416,7 @@ async function server(config, cb) {
                 const files = [];
 
                 busboy.on('file', (fieldname, file) => {
-                    files.push(checkpoint.upload(req.params.checkpointid, file));
+                    files.push(aoipatch.upload(req.params.aoiid, req.params.patchid, file));
                 });
 
                 busboy.on('finish', async () => {
