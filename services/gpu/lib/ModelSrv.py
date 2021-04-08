@@ -67,7 +67,7 @@ class ModelSrv():
             current_checkpoint = self.chk['id']
             self.meta_load_checkpoint(body['checkpoint_id'])
 
-            self.aoi = AOI(self.api, body, self.chk['id'])
+            self.aoi = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
             color_list = [item["color"] for item in self.model.classes]
 
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
