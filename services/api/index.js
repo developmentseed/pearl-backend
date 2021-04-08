@@ -900,14 +900,13 @@ async function server(config, cb) {
      * @apiVersion 1.0.0
      * @apiName TileAOI
      * @apiGroup AOI
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return a Tile for a given AOI
      */
     router.get(
         ...await schemas.get('GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y'),
-        requiresAuth,
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
