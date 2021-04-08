@@ -149,7 +149,7 @@
         "query": false,
         "res": false
     },
-    "POST /project/:projectid/checkpoint/:checkpointid/upload": {
+    "POST /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
         "body": false,
         "query": false,
         "res": false
@@ -165,6 +165,11 @@
         "res": false
     },
     "GET /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /project/:projectid/checkpoint/:checkpointid/upload": {
         "body": false,
         "query": false,
         "res": false
