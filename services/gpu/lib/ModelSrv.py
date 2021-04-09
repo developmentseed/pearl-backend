@@ -218,15 +218,19 @@ class ModelSrv():
                 output, _ = self.model.run(in_memraster.data, False)
 
                 output = MemRaster(
-                output,
-                "epsg:4326",
-                (in_memraster.x, in_memraster.y, in_memraster.z),
-                True
-            )
+                        output,
+                        "epsg:3857",
+                        (in_memraster.x, in_memraster.y, in_memraster.z),
+                        True)
                 output = output.remove_buffer()
+                print('pre clip output')
+                print(np.unique(output.data))
 
                 #clip output
                 output.clip(self.aoi.poly)
+
+                print('post clip output')
+                print(np.unique(output.data))
                 LOGGER.info("ok - generated inference");
 
                 if self.aoi.live:
