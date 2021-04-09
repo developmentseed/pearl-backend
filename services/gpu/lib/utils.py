@@ -264,4 +264,3 @@ class AtomicCounter:
 def get_random_string(length):
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     return "".join([alphabet[np.random.randint(0, len(alphabet))] for i in range(length)])
-
