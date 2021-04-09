@@ -16,9 +16,6 @@ class MemRaster(object):
             crs (str): The EPSG code describing the coordinate system of this raster (e.g. "epsg:4326")
             bounds (tuple): A tuple in the format (left, bottom, right, top) / (xmin, ymin, xmax, ymax) describing the boundary of the raster data in the units of `crs`
         """
-        #assert len(data.shape) == 3
-        #assert data.shape[2] < data.shape[1] and data.shape[2] < data.shape[0], "We assume that rasters should have larger height/width then number of channels"
-
         self.tile = tile
         self.data = data
         self.crs = crs
@@ -38,6 +35,7 @@ class MemRaster(object):
         return self
 
     def clip(self, polygon):
+        print(self.crs)
         geom = transform_geom("epsg:4326", "epsg:3857", polygon)
 
 
@@ -47,7 +45,7 @@ class MemRaster(object):
         with MemoryFile() as memfile:
             with memfile.open(driver='GTiff',
                 dtype='uint8',
-                crs='EPSG:3857',
+                crs=self.crs,
                 count=1,
                 transform=transform,
                 height=256,

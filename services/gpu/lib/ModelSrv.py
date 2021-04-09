@@ -85,15 +85,14 @@ class ModelSrv():
             while len(patch.tiles) > 0 and self.is_aborting is False:
                 zxy = patch.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
-
                 output, _ = self.model.run(in_memraster.data, False)
 
                 # remove 32 pixel buffer on each side
-                output = output[32:288, 32:288]
+                output = output.remove_buffer()
 
                 if patch.live:
                     # Create color versions of predictions
-                    png = pred2png(output, color_list)
+                    png = pred2png(output.data, color_list)
 
                     LOGGER.info("ok - returning patch inference");
                     websocket.send(json.dumps({
@@ -211,7 +210,6 @@ class ModelSrv():
             }))
 
             color_list = [item["color"] for item in self.model.classes]
-            print(color_list)
 
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
                 zxy = self.aoi.tiles.pop()
@@ -229,7 +227,6 @@ class ModelSrv():
 
                 #clip output
                 output.clip(self.aoi.poly)
-
                 LOGGER.info("ok - generated inference");
 
                 if self.aoi.live:
