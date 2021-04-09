@@ -2,6 +2,7 @@ import mercantile
 import rasterio
 import supermercado
 from rasterio.warp import transform_geom
+from rasterio.transform import from_bounds
 from rasterio.io import MemoryFile
 import numpy as np
 
@@ -37,15 +38,12 @@ class MemRaster(object):
     def clip(self, polygon):
         print(self.crs)
         geom = transform_geom("epsg:4326", "epsg:3857", polygon)
-
-
-        extrema = supermercado.burntiles.tile_extrema(self.bounds, self.z)
-        transform = supermercado.burntiles.make_transform(extrema, self.z)
+        transform = from_bounds(*self.xy_bounds, 256, 256)
 
         with MemoryFile() as memfile:
             with memfile.open(driver='GTiff',
                 dtype='uint8',
-                crs=self.crs,
+                crs='EPSG:3857',
                 count=1,
                 transform=transform,
                 height=256,
