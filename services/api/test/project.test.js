@@ -138,6 +138,112 @@ test('POST /api/project', (t) => {
     });
 });
 
+test('POST /api/project/1/checkpoint', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'Test Checkpoint',
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            storage: false,
+            project_id: 1,
+            parent: null,
+            name: 'Test Checkpoint',
+            analytics: null,
+            bookmarked: false,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+           ]
+        });
+
+        t.end();
+    });
+});
+
+test('POST /api/project/1/aoi', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'Test AOI',
+            checkpoint_id: 1,
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
+            }
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            storage: false,
+            project_id: 1,
+            checkpoint_id: 1,
+            name: 'Test AOI',
+            bookmarked: false,
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
+            }
+        });
+
+        t.end();
+    });
+});
+
 test('GET /api/project', (t) => {
     request({
         json: true,
@@ -152,13 +258,73 @@ test('GET /api/project', (t) => {
 
         t.ok(res.body.projects[0].created, '.created: <date>');
         delete res.body.projects[0].created;
+        delete res.body.projects[0].aois[0].created
+        delete res.body.projects[0].checkpoints[0].created
+        delete res.body.projects[0].model.created
 
         t.deepEquals(res.body, {
-            total: 1,
-            projects: [{
-                id: 1,
-                name: 'Test Project'
-            }]
+            "total": 1,
+            "projects": [
+                {
+                    "id": 1,
+                    "name": "Test Project",
+                    "aois": [
+                        {
+                            "id": 1,
+                            "name": "Test AOI",
+                            "storage": false
+                        }
+                    ],
+                    "checkpoints": [
+                        {
+                            "id": 1,
+                            "parent": null,
+                            "name": "Test Checkpoint",
+                            "storage": false,
+                            "bookmarked": false
+                        }
+                    ],
+                    "model": {
+                        "id": 1,
+                        "active": true,
+                        "uid": 1,
+                        "name": "NAIP Supervised",
+                        "model_type": "pytorch_example",
+                        "model_inputshape": [
+                            240,
+                            240,
+                            4
+                        ],
+                        "model_zoom": 17,
+                        "storage": null,
+                        "classes": [
+                            {
+                                "name": "Water",
+                                "color": "#0000FF"
+                            },
+                            {
+                                "name": "Tree Canopy",
+                                "color": "#008000"
+                            },
+                            {
+                                "name": "Field",
+                                "color": "#80FF80"
+                            },
+                            {
+                                "name": "Built",
+                                "color": "#806060"
+                            }
+                        ],
+                        "meta": {},
+                        "bounds": [
+                            -180,
+                            -90,
+                            180,
+                            90
+                        ]
+                    }
+                }
+            ]
         });
 
         t.end();
@@ -239,6 +405,24 @@ test('GET /api/project/1', (t) => {
             model_id: 1,
             mosaic: 'naip.latest'
         });
+
+        t.end();
+    });
+});
+
+test('DELETE /api/project/1/checkpoint/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, true);
 
         t.end();
     });

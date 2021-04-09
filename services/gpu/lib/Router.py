@@ -1,9 +1,18 @@
-import websockets
+import websocket
+try:
+    import thread
+except ImportError:
+    import _thread as thread
+
 import traceback
 import logging
+import time
 import json
 
 LOGGER = logging.getLogger("server")
+
+# Enable this to see a full debug trace of the websockets
+#websocket.enableTrace(True)
 
 class Socket():
     def __init__(self, uri):
@@ -11,40 +20,50 @@ class Socket():
         self.websocket = False
         LOGGER.info("ok - WebSocket Connection Initialized")
 
-    async def ok(self):
-        if not self.websocket.open:
-            LOGGER.warning("ok - websocket disconnected, attempting reconnection")
-            await self.connect()
+    def connect(self, handler):
+        self.handler = handler
 
-    async def connect(self):
         try:
-            self.websocket = await websockets.connect(self.uri, ping_interval=None)
+            self.websocket = websocket.WebSocketApp(self.uri,
+                on_message = self.on_recv,
+                on_error = self.on_error,
+                on_close = self.on_close
+            )
+
+            self.websocket.run_forever()
         except:
             LOGGER.error("not ok - failed to connect - retrying")
-            await self.connect()
+            time.sleep(1)
+            self.connect()
 
-    async def recv(self):
-        try:
-            await self.ok()
-            msg = await self.websocket.recv()
-        except:
-            LOGGER.error("not ok - failed to receive message")
-            return await self.recv()
+    def on_error(self, ws, error):
+        print(error);
 
+    def on_close(self, ws):
+        self.connect(self.handler)
+
+    def on_recv(self, ws, msg):
         try:
-            return json.loads(msg)
+            self.handler(json.loads(msg))
         except:
             LOGGER.error("not ok - failed to decode message")
             LOGGER.error(msg)
 
-    async def send(self, payload):
+    def send(self, payload):
         try:
-            await self.ok()
-            await self.websocket.send(payload)
+            self.websocket.send(payload)
         except:
             LOGGER.error("not ok - failed to send message")
             LOGGER.error(payload)
-            await self.send(payload)
+
+    def error(self, human, detailed = ''):
+        self.send(json.dumps({
+            'message': 'error',
+            'data': {
+                'error': str(human),
+                'detailed': str(detailed)
+            }
+        }));
 
     def terminate(self):
         exit()
@@ -61,40 +80,40 @@ class Router():
     def on_act(self, path, fn):
         self.act[path] = fn
 
-    async def open(self):
-        await self.websocket.connect()
+    def open(self):
+        self.websocket.connect(self.message)
 
-        while True:
-            msg = await self.websocket.recv()
+    def message(self, msg):
+        if msg.get('message') is not None:
+            message = msg.get('message')
+            LOGGER.info('ok - message: ' + str(message))
 
-            if msg.get('message') is not None:
-                message = msg.get('message')
-                LOGGER.info('ok - message: ' + str(message))
+            if self.msg.get(message):
+                try:
+                    thread.start_new_thread(self.msg[message], (msg.get('data', {}), self.websocket))
+                except Exception as e:
+                    LOGGER.error("not ok - failed to process: " + message)
+                    LOGGER.error("Error: {0}".format(e))
+                    traceback.print_exc()
 
-                if self.msg.get(message):
-                    try:
-                        await self.msg[message](msg.get('data', {}), self.websocket)
-                    except Exception as e:
-                        LOGGER.error("not ok - failed to process: " + message)
-                        LOGGER.error("Error: {0}".format(e))
-                        traceback.print_exc()
+            else:
+                LOGGER.info('ok - Unknown Message: {}'.format(json.dumps(msg)))
+                self.websocket.error('Unknown Message')
 
-                else:
-                    LOGGER.info('ok - Unknown Message: {}'.format(msg.get('message')))
+        elif msg.get('action') is not None:
+            action = msg.get('action')
+            LOGGER.info('ok - action: ' + str(action))
 
-            elif msg.get('action') is not None:
-                action = msg.get('action')
-                LOGGER.info('ok - action: ' + str(action))
-
-                if self.act.get(action):
-                    try:
-                        await self.act[action](msg.get('data', {}), self.websocket)
-                    except Exception as e:
-                        LOGGER.error("not ok - failed to process: " + action)
-                        LOGGER.error("Error: {0}".format(e))
-                        traceback.print_exc()
-                elif action == "instance#terminate":
-                    self.websocket.terminate()
-                else:
-                    LOGGER.info('ok - Unknown Action: {}'.format(msg.get('action')))
+            if self.act.get(action):
+                try:
+                    thread.start_new_thread(self.act[action], (msg.get('data', {}), self.websocket))
+                except Exception as e:
+                    LOGGER.error("not ok - failed to process: " + action)
+                    LOGGER.error("Error: {0}".format(e))
+                    traceback.print_exc()
+            elif action == "instance#terminate":
+                self.websocket.terminate()
+            else:
+                LOGGER.info('ok - Unknown Action: {}'.format(json.dumps(msg)))
+                self.websocket.error('Unknown Action')
 

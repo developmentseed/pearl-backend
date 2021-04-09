@@ -1,9 +1,15 @@
 'use strict';
 
-async function drop() {
-    const config = await require('../lib/config').env();
+async function genconfig() {
+    return await require('../lib/config').env();
 
+}
+
+async function drop() {
+    let config;
     try {
+        config = await genconfig();
+
         const pgres = await config.pool.query(`
             SELECT
                 'drop table "' || tablename || '" cascade;' AS drop
@@ -24,4 +30,7 @@ async function drop() {
     return config;
 }
 
-module.exports = drop;
+module.exports = {
+    drop,
+    genconfig
+};

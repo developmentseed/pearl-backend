@@ -1,6 +1,6 @@
-<h1 align=center>LULC GPU Infrastructure</h1>
+<h1 align=center>LULC WebSocket Infrastructure</h1>
 
-<p align=center>GPU Infrastructure for the LULC project</p>
+<p align=center>WebSocket Infrastructure for the LULC project</p>
 
 ## Deployment
 
@@ -123,10 +123,42 @@ otherwise only the `total` & `processed` tags will be returned
             "name": "Structure",
             "color": "#f76f73",
             "geometry": {
-                "type": "MultiPoint",
-                "coordinates": [
-                    [-79.376936712501418, 38.834394753436762],
-                    [-79.377090146278206, 38.834530999727654]
+                "type": "GeometryCollection",
+                "geometries": [
+                    {
+                        "type": "MultiPoint",
+                        "coordinates": [
+                            [-79.376936712501418, 38.834394753436762],
+                            [-79.377090146278206, 38.834530999727654]
+                        ]
+                    },
+                    {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                            [
+                                -79.38049077987671,
+                                38.83848752076715
+                            ],
+                            [
+                                -79.37873125076294,
+                                38.83848752076715
+                            ],
+                            [
+                                -79.37873125076294,
+                                38.8397243269996
+                            ],
+                            [
+                                -79.38049077987671,
+                                38.8397243269996
+                            ],
+                            [
+                                -79.38049077987671,
+                                38.83848752076715
+                            ]
+                            ]
+                        ]
+                    }
                 ]
             }
         }]
@@ -156,9 +188,11 @@ otherwise only the `total` & `processed` tags will be returned
 | --------------------- | ----- |
 | `instance#terminate`  |       |
 | `connection#extend`   | Reset instance termination counter |
+| `model#status`        | Return the current status of the instance |
+| `model#abort`         | Abort a currently running prediction |
+| `model#checkpoint`    | Load a given checkpoint onto the model |
 | `model#prediction`    | Inference a GeoJSON polygon |
 | `model#reset`         |       |
-| `model#undo`          |       |
 
 
 #### instance#terminate
@@ -166,6 +200,21 @@ otherwise only the `total` & `processed` tags will be returned
 ```JSON
 {
     "action": "instance#terminate"
+}
+```
+
+#### model#checkpoint
+
+Load a given checkpont onto the model.
+
+Note: The checkpoint must be part of the same project
+
+```JSON
+{
+    "action": "model#checkpoint",
+    "data": {
+        "id": 123
+    }
 }
 ```
 
@@ -187,14 +236,6 @@ Submit a GeoJSON Polygon for inferencing.
 ```
 
 #### model#reset
-
-```JSON
-{
-    "action": "model#reset"
-}
-```
-
-#### model#undo
 
 ```JSON
 {

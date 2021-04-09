@@ -4,9 +4,7 @@
 
 require('dotenv').config();
 
-const fs = require('fs');
 const Err = require('./lib/error');
-const path = require('path');
 const express = require('express');
 const Busboy = require('busboy');
 const { Param, fetchJSON } = require('./lib/util');
@@ -16,7 +14,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
-const { Validator, ValidationError } = require('express-json-validator-middleware');
+const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
@@ -57,18 +55,6 @@ async function server(config, cb) {
     const app = express();
     const router = express.Router();
 
-    const validator = new Validator({
-        allErrors: true
-    });
-
-    const validate = validator.validate;
-
-    try {
-        await config.pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
-    } catch (err) {
-        throw new Error(err);
-    }
-
     const project = new (require('./lib/project').Project)(config);
     const proxy = new (require('./lib/proxy').Proxy)(config);
     const auth = new (require('./lib/auth').Auth)(config);
@@ -77,7 +63,9 @@ async function server(config, cb) {
     const instance = new (require('./lib/instance').Instance)(config);
     const checkpoint = new (require('./lib/checkpoint').CheckPoint)(config);
     const aoi = new (require('./lib/aoi').AOI)(config);
+    const aoipatch = new (require('./lib/aoi-patch').AOIPatch)(config);
     const Mosaic = require('./lib/mosaic');
+    const schemas = new (require('./lib/schema'))();
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -214,7 +202,7 @@ async function server(config, cb) {
         (err, req, res, next) => {
             // Catch Auth0 errors
             if (err.name === 'UnauthorizedError') {
-                return Err.respond(err.inner, res, 'Failed to validate token');
+                return Err.respond(new Err(err.status, err.code, err.message), res);
             }
             next();
         },
@@ -251,6 +239,44 @@ async function server(config, cb) {
     ];
 
     /**
+     * @api {get} /api/schema List Schemas
+     * @apiVersion 1.0.0
+     * @apiName ListSchemas
+     * @apiGroup Schemas
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     List all JSON Schemas in use
+     *     With no parameters this API will return a list of all the endpoints that have a form of schema validation
+     *     If the url/method params are used, the schemas themselves are returned
+     *
+     *     Note: If url or method params are used, they must be used together
+     *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.ListSchema.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ListSchema.json} apiSuccess
+     */
+    router.get(
+        ...await schemas.get('GET /schema', {
+            query: 'req.query.ListSchema.json',
+            body: 'res.ListSchema.json'
+        }),
+        async (req, res) => {
+            try {
+                if (req.query.url && req.query.method) {
+                    res.json(schemas.query(req.query.method, req.query.url));
+                } else if (req.query.url || req.query.method) {
+                    throw new Err(400, null, 'url & method params must be used together');
+                } else {
+                    return res.json(schemas.list());
+                }
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+
+    /**
      * @api {get} /api/token List Tokens
      * @apiVersion 1.0.0
      * @apiName ListTokens
@@ -265,13 +291,14 @@ async function server(config, cb) {
      *       "name": "Token Name"
      *   }]
      */
-    router.get('/token', requiresAuth, async (req, res) => {
-        try {
-            return res.json(await authtoken.list(req.auth));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
+    router.get(
+        ...await schemas.get('GET /token'), requiresAuth, async (req, res) => {
+            try {
+                return res.json(await authtoken.list(req.auth));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        });
 
     /**
      * @api {post} /api/token Create Token
@@ -294,9 +321,11 @@ async function server(config, cb) {
      *       "flags": {}
      *   }
      */
-    router.post('/token',
+    router.post(
+        ...await schemas.get('POST /token', {
+            body: './req.body.token.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.token.json') }),
         async (req, res) => {
             try {
                 return res.json(await authtoken.generate(req.auth, req.body.name));
@@ -323,15 +352,19 @@ async function server(config, cb) {
      *       "message": "Token Deleted"
      *   }
      */
-    router.delete('/token/:tokenid', requiresAuth, async (req, res) => {
-        try {
-            await await Param.int(req, 'tokenid');
+    router.delete(
+        ...await schemas.get('DELETE /token/:tokenid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'tokenid');
 
-            return res.json(await authtoken.delete(req.auth, req.params.tokenid));
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(await authtoken.delete(req.auth, req.params.tokenid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/user List Users
@@ -359,9 +392,10 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        '/user',
+        ...await schemas.get('GET /user', {
+            query: 'req.query.user-list.json'
+        }),
         requiresAuth,
-        validate({ query: require('./schema/req.query.user-list.json') }),
         async (req, res) => {
             try {
                 const users = await auth.list(req.query);
@@ -392,14 +426,18 @@ async function server(config, cb) {
      *       "flags": {}
      *   }
      */
-    router.get('/user/me', requiresAuth, async (req, res) => {
-        return res.json({
-            username: req.auth.username,
-            email: req.auth.email,
-            access: req.auth.access,
-            flags: req.auth.flags
-        });
-    });
+    router.get(
+        ...await schemas.get('GET /user/me'),
+        requiresAuth,
+        async (req, res) => {
+            return res.json({
+                username: req.auth.username,
+                email: req.auth.email,
+                access: req.auth.access,
+                flags: req.auth.flags
+            });
+        }
+    );
 
     /**
      * @api {get} /api/project/:project/instance Create Instance
@@ -424,9 +462,11 @@ async function server(config, cb) {
      *       "token": "websocket auth token"
      *   }
      */
-    router.post('/project/:projectid/instance',
+    router.post(
+        ...await schemas.get('POST /project/:projectid/instance', {
+            body: 'req.body.instance.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.instance.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -452,9 +492,10 @@ async function server(config, cb) {
      * @apiSchema (Body) {jsonschema=./schema/req.body.instance-patch.json} apiParam
      */
     router.patch(
-        '/project/:projectid/instance/:instanceid',
+        ...await schemas.get('PATCH /project/:projectid/instance/:instanceid', {
+            body: 'req.body.instance-patch.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.instance-patch.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -487,16 +528,46 @@ async function server(config, cb) {
      *       "projects": [{
      *           "id": 1,
      *           "name": 123,
-     *           "created": "<date>"
+     *           "created": "<date>",
+     *           "aois": [{
+     *              "id": 1,
+     *              "name": "aoi name",
+     *              "created": "<date>",
+     *              "storage": false
+     *           }],
+     *          "checkpoints": [{
+     *              "id": 1,
+     *              "name": "checkpoint name",
+     *              "created": "<date>",
+     *              "storage": false,
+     *              "bookmarked": false
+     *          }]
      *       }]
      *   }
      */
-    router.get('/project',
+    router.get(
+        ...await schemas.get('GET /project', {
+            query: 'req.query.project-list.json'
+        }),
         requiresAuth,
-        validate({ query: require('./schema/req.query.project-list.json') }),
         async (req, res) => {
             try {
-                res.json(await project.list(req.auth.uid, req.query));
+                const results = await project.list(req.auth.uid, req.query);
+                if (results.projects && results.projects.length) {
+                    for (let index = 0; index < results.projects.length; index++) {
+                        const p = results.projects[index];
+                        const aois = await aoi.list(p.id);
+                        const checkpoints = await checkpoint.list(p.id);
+                        p['aois'] = aois.aois;
+                        p['checkpoints'] = checkpoints.checkpoints;
+                        p['model'] = {}
+                        if (p.model_id) {
+                            p['model'] = await model.get(p.model_id);
+                            delete p.model_id;
+                        }
+                    }
+                }
+                res.json(results);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -523,18 +594,22 @@ async function server(config, cb) {
      *       "mosaic": "naip.latest"
      *   }
      */
-    router.get('/project/:projectid', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
+    router.get(
+        ...await schemas.get('GET /project/:projectid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
 
-            const proj = await project.has_auth(req.auth, req.params.projectid);
-            delete proj.uid;
+                const proj = await project.has_auth(req.auth, req.params.projectid);
+                delete proj.uid;
 
-            return res.json(proj);
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(proj);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/project Create Project
@@ -557,9 +632,10 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        '/project',
+        ...await schemas.get('POST /project', {
+            body: 'req.body.project.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.project.json') }),
         async (req, res) => {
             try {
                 if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
@@ -592,9 +668,10 @@ async function server(config, cb) {
      *   }
      */
     router.patch(
-        '/project/:projectid',
+        ...await schemas.get('PATCH /project/:projectid', {
+            body: 'req.body.project-patch.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.project-patch.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -618,29 +695,33 @@ async function server(config, cb) {
      * @apiDescription
      *     Delete a project
      */
-    router.delete('/project/:projectid', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await project.has_auth(req.auth, req.params.projectid);
+    router.delete(
+        ...await schemas.get('DELETE /project/:projectid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await project.has_auth(req.auth, req.params.projectid);
 
-            const insts = await instance.list(req.params.projectid);
-            for (const inst of insts.instances) {
-                if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
-                await instance.delete(inst.id);
+                const insts = await instance.list(req.params.projectid);
+                for (const inst of insts.instances) {
+                    if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
+                    await instance.delete(inst.id);
+                }
+
+                // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
+                const aois = await aoi.list(req.params.projectid);
+                aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
+
+                const chkpts = await checkpoint.list(req.params.projectid);
+                chkpts.checkpoints.forEach(async (c) => { await checkpoint.delete(c.id); });
+
+                return res.json(await project.delete(req.params.projectid));
+            } catch (err) {
+                return Err.respond(err, res);
             }
-
-            // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
-            const aois = await aoi.list(req.params.projectid);
-            aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
-
-            const chkpts = await checkpoint.list(req.params.projectid);
-            chkpts.checkpoints.forEach(async (c) => { await checkpoint.delete(c.id); });
-
-            return res.json(await project.delete(req.params.projectid));
-        } catch (err) {
-            return Err.respond(err, res);
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:projectid/instance List Instances
@@ -667,9 +748,11 @@ async function server(config, cb) {
      *       }]
      *   }
      */
-    router.get('/project/:projectid/instance',
+    router.get(
+        ...await schemas.get('GET /project/:projectid/instance', {
+            query: 'req.query.instance-list.json'
+        }),
         requiresAuth,
-        validate({ query: require('./schema/req.query.instance-list.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -702,16 +785,20 @@ async function server(config, cb) {
      *       "token": "<instance token>"
      *   }
      */
-    router.get('/project/:projectid/instance/:instanceid', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'instanceid');
+    router.get(
+        ...await schemas.get('GET /project/:projectid/instance/:instanceid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'instanceid');
 
-            res.json(await instance.has_auth(project, req.auth, req.params.projectid, req.params.instanceid));
-        } catch (err) {
-            return Err.respond(err, res);
+                res.json(await instance.has_auth(project, req.auth, req.params.projectid, req.params.instanceid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid Get AOI
@@ -730,111 +817,122 @@ async function server(config, cb) {
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
      *       "storage": true,
+     *       "bookmarked": false
      *       "created": "<date>",
      *       "bounds": { "GeoJSON "}
      *   }
      */
-    router.get('/project/:projectid/aoi/:aoiid', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            return res.json(await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid));
-        } catch (err) {
-            return Err.respond(err, res);
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                return res.json(await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
      * @apiVersion 1.0.0
      * @apiName TileJSONAOI
      * @apiGroup AOI
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return tilejson for a given AOI
      */
-    router.get('/project/:projectid/aoi/:aoiid/tiles', requiresAuth, async (req, res) => {
-        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/tiles'),
+        async (req, res) => {
+            if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
 
-            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+                const a = await aoi.get(req.params.aoiid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const tiffurl = await aoi.url(a.id);
+                const tiffurl = await aoi.url(a.id);
 
-            req.url = '/cog/tilejson.json';
-            req.query.url = tiffurl.origin + tiffurl.pathname;
-            req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+                req.url = '/cog/tilejson.json';
+                req.query.url = tiffurl.origin + tiffurl.pathname;
+                req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-            const chkpt = await checkpoint.get(a.checkpoint_id);
-            const cmap = {};
-            for (let i = 0; i < chkpt.classes.length; i++) {
-                cmap[i] = chkpt.classes[i].color;
+                const chkpt = await checkpoint.get(a.checkpoint_id);
+                const cmap = {};
+                for (let i = 0; i < chkpt.classes.length; i++) {
+                    cmap[i] = chkpt.classes[i].color;
+                }
+
+                req.query.colormap = JSON.stringify(cmap);
+
+                const response = await proxy.request(req);
+
+                if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
+
+                const tj = JSON.parse(response.body);
+
+                // This is verbose as if the upstream JSON response changes
+                // and includes the URL in another place, we leak an access cred
+                res.json({
+                    tilejson: tj.tilejson,
+                    name: `aoi-${req.params.aoiid}`,
+                    version: tj.version,
+                    schema: tj.scheme,
+                    tiles: [
+                        `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+                    ],
+                    minzoom: tj.minzoom,
+                    maxzoom: tj.maxzoom,
+                    bounds: tj.bounds,
+                    center: tj.center
+                });
+            } catch (err) {
+                return Err.respond(err, res);
             }
-
-            req.query.colormap = JSON.stringify(cmap);
-
-            const response = await proxy.request(req);
-
-            if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
-
-            const tj = JSON.parse(response.body);
-
-            // This is verbose as if the upstream JSON response changes
-            // and includes the URL in another place, we leak an access cred
-            res.json({
-                tilejson: tj.tilejson,
-                name: `aoi-${req.params.aoiid}`,
-                version: tj.version,
-                schema: tj.scheme,
-                tiles: [
-                    `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-                ],
-                minzoom: tj.minzoom,
-                maxzoom: tj.maxzoom,
-                bounds: tj.bounds,
-                center: tj.center
-            });
-        } catch (err) {
-            return Err.respond(err, res);
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid/tiles/:z/:x/:y Tile AOI
      * @apiVersion 1.0.0
      * @apiName TileAOI
      * @apiGroup AOI
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return a Tile for a given AOI
      */
-    router.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
 
-            const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+                const a = await aoi.get(req.params.aoiid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const tiffurl = await aoi.url(a.id);
-            req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
-            req.query.url = tiffurl.origin + tiffurl.pathname;
-            req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+                const tiffurl = await aoi.url(a.id);
+                req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
+                req.query.url = tiffurl.origin + tiffurl.pathname;
+                req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-            await proxy.request(req, res);
-        } catch (err) {
-            return Err.respond(err, res);
+                await proxy.request(req, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/project/:projectid/aoi/:aoiid/upload Upload AOI
@@ -855,55 +953,107 @@ async function server(config, cb) {
      *       "bounds": { "GeoJSON "}
      *   }
      */
-    router.post('/project/:projectid/aoi/:aoiid/upload', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await auth.is_admin(req);
+    router.post(
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/upload'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await auth.is_admin(req);
 
-            const busboy = new Busboy({ headers: req.headers });
+                const busboy = new Busboy({ headers: req.headers });
 
-            const files = [];
+                const files = [];
 
-            busboy.on('file', (fieldname, file) => {
-                files.push(aoi.upload(req.params.aoiid, file));
-            });
+                busboy.on('file', (fieldname, file) => {
+                    files.push(aoi.upload(req.params.aoiid, file));
+                });
 
-            busboy.on('finish', async () => {
-                try {
-                    return res.json(await aoi.get(req.params.aoiid));
-                } catch (err) {
-                    Err.respond(res, err);
-                }
-            });
+                busboy.on('finish', async () => {
+                    try {
+                        return res.json(await aoi.get(req.params.aoiid));
+                    } catch (err) {
+                        Err.respond(res, err);
+                    }
+                });
 
-            return req.pipe(busboy);
-        } catch (err) {
-            return Err.respond(err, res);
+                return req.pipe(busboy);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
-     * @api {get} /api/project/:projectid/aoi/:aoiid/download Download AOI
+     * @api {get} /api/project/:projectid/aoi/:aoiid/download/raw Download Raw AOI
      * @apiVersion 1.0.0
-     * @apiName DownloadAOI
+     * @apiName DownloadRawAOI
      * @apiGroup AOI
      * @apiPermission user
      *
      * @apiDescription
      *     Return the aoi fabric geotiff
      */
-    router.get('/project/:projectid/aoi/:aoiid/download', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await project.has_auth(req.auth, req.params.projectid);
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/download/raw'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
 
-            await aoi.download(req.params.aoiid, res);
-        } catch (err) {
-            return Err.respond(err, res);
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+                await aoi.download(req.params.aoiid, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
+
+    /**
+     * @api {get} /api/project/:projectid/aoi/:aoiid/download/color Download Color AOI
+     * @apiVersion 1.0.0
+     * @apiName DownloadColorAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return the colourized aoi fabric geotiff
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/download/color'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+                const tiffurl = await aoi.url(a.id);
+
+                req.url = '/cog/colorize';
+                req.query.url = tiffurl.origin + tiffurl.pathname;
+                req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+                const chkpt = await checkpoint.get(a.checkpoint_id);
+                const cmap = {};
+                for (let i = 0; i < chkpt.classes.length; i++) {
+                    cmap[i] = chkpt.classes[i].color;
+                }
+
+                req.query.colormap = JSON.stringify(cmap);
+
+                await proxy.request(req, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
 
     /**
      * @api {get} /api/project/:projectid/aoi List AOIs
@@ -921,7 +1071,7 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "total": 1,
-     *       "instance_id": 123,
+     *       "project_id": 123,
      *       "aois": [{
      *           "id": 1432,
      *           "storage": true,
@@ -931,9 +1081,10 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        '/project/:projectid/aoi',
+        ...await schemas.get('GET /project/:projectid/aoi', {
+            query: 'req.query.aoi.json'
+        }),
         requiresAuth,
-        validate({ query: require('./schema/req.query.aoi.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -967,14 +1118,16 @@ async function server(config, cb) {
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
      *       "storage": true,
+     *       "bookmarked": false,
      *       "created": "<date>",
      *       "bounds": { "GeoJSON" }
      *   }
      */
     router.post(
-        '/project/:projectid/aoi',
+        ...await schemas.get('POST /project/:projectid/aoi', {
+            body: 'req.body.aoi.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.aoi.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -998,7 +1151,7 @@ async function server(config, cb) {
      *     Delete an existing AOI
      */
     router.delete(
-        '/project/:projectid/aoi/:aoiid',
+        ...await schemas.get('DELETE /project/:projectid/aoi/:aoiid'),
         requiresAuth,
         async (req, res) => {
             try {
@@ -1032,15 +1185,16 @@ async function server(config, cb) {
      *       "project_id": 1,
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
+     *       "bookmarked": false,
      *       "storage": true,
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON" }
+     *       "created": "<date>"
      *   }
      */
     router.patch(
-        '/project/:projectid/aoi/:aoiid',
+        ...await schemas.get('PATCH /project/:projectid/aoi/:aoiid', {
+            body: 'req.body.aoi-patch.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.aoi-patch.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -1048,6 +1202,232 @@ async function server(config, cb) {
                 await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
 
                 return res.json(await aoi.patch(req.params.aoiid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/patch List Patches
+     * @apiVersion 1.0.0
+     * @apiName ListPatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all patches for a given API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "project_id": 123,
+     *       "aoi_id": 123
+     *       "patches": [{
+     *           "id": 1432,
+     *           "storage": true,
+     *           "created": "<date>"
+     *       }]
+     *   }
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/patch'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+
+                return res.json(await aoipatch.list(req.params.projectid, req.params.aoiid, req.query));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/project/:project/aoi/:aoiid/patch Create Patch
+     * @apiVersion 1.0.0
+     * @apiName CreatePatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new Patch
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>"
+     *       "project_id": 1,
+     *       "aoi_id": 1
+     *   }
+     */
+    router.post(
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/patch'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+
+                await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+
+                return res.json(await aoipatch.create(req.params.projectid, req.params.aoiid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {delete} /api/project/:project/aoi/:aoiid/patch/:patchid Delete Patch
+     * @apiVersion 1.0.0
+     * @apiName DeletePatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete a given patch
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   true
+     */
+    router.delete(
+        ...await schemas.get('DELETE /project/:projectid/aoi/:aoiid/patch/:patchid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'patchid');
+
+                await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+
+                return res.json(await aoipatch.delete(req.params.aoiid, req.params.patchid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid Get Patch
+     * @apiVersion 1.0.0
+     * @apiName GetPatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Get a specific patch
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>"
+     *       "project_id": 1,
+     *       "aoi": 1
+     *  }
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/patch/:patchid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'patchid');
+
+                return res.json(await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid/download Download Patch
+     * @apiVersion 1.0.0
+     * @apiName DownloadPatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Download a Tiff Patch
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/patch/:patchid/download'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'patchid');
+
+                await aoipatch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+
+                await aoipatch.download(req.params.aoiid, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload Upload Patch
+     * @apiVersion 1.0.0
+     * @apiName UploadPatch
+     * @apiGroup AOIGroup
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Upload a new AOI Patch asset to the API
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "storage": true,
+     *       "created": "<date>"
+     *       "project_id": 1,
+     *       "aoi": 1
+     *  }
+     */
+    router.post(
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'patchid');
+                await auth.is_admin(req);
+
+                const busboy = new Busboy({ headers: req.headers });
+
+                const files = [];
+
+                busboy.on('file', (fieldname, file) => {
+                    files.push(aoipatch.upload(req.params.aoiid, req.params.patchid, file));
+                });
+
+                busboy.on('finish', async () => {
+                    try {
+                        return res.json(await aoipatch.get(req.params.patchid));
+                    } catch (err) {
+                        Err.respond(res, err);
+                    }
+                });
+
+                return req.pipe(busboy);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1069,13 +1449,14 @@ async function server(config, cb) {
      *   {
      *       "id": 1432,
      *       "name": "Checkpoint Name",
+     *       "parent": 123,
      *       "classes": [ ... ],
      *       "storage": true,
      *       "created": "<date>"
      *   }
      */
     router.get(
-        '/project/:projectid/checkpoint/:checkpointid',
+        ...await schemas.get('GET /project/:projectid/checkpoint/:checkpointid'),
         requiresAuth,
         async (req, res) => {
             try {
@@ -1099,30 +1480,34 @@ async function server(config, cb) {
      * @apiDescription
      *     Return tilejson for a given Checkpoint
      */
-    router.get('/project/:projectid/checkpoint/:checkpointid/tiles', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'checkpointid');
+    router.get(
+        ...await schemas.get('GET /project/:projectid/checkpoint/:checkpointid/tiles'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
 
-            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
-            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
-            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
+                const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+                if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+                if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
-            res.json({
-                tilejson: '2.2.0',
-                name: `checkpoint-${req.params.checkpointid}`,
-                version: '1.0.0',
-                schema: 'xyz',
-                tiles: [
-                    `/project/${req.params.projectid}/checkpoint/${req.params.checkpointid}/tiles/{z}/{x}/{y}.mvt`
-                ],
-                bounds: c.bounds,
-                center: c.center
-            });
-        } catch (err) {
-            return Err.respond(err, res);
+                res.json({
+                    tilejson: '2.2.0',
+                    name: `checkpoint-${req.params.checkpointid}`,
+                    version: '1.0.0',
+                    schema: 'xyz',
+                    tiles: [
+                        `/project/${req.params.projectid}/checkpoint/${req.params.checkpointid}/tiles/{z}/{x}/{y}.mvt`
+                    ],
+                    bounds: c.bounds,
+                    center: c.center
+                });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt Tile Checkpoint
@@ -1134,24 +1519,28 @@ async function server(config, cb) {
      * @apiDescription
      *     Return a Tile for a given AOI
      */
-    router.get('/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'checkpointid');
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
+    router.get(
+        ...await schemas.get('GET /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
 
-            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
-            if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
-            if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
+                const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+                if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+                if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
-            return res.send(await checkpoint.mvt(req.params.checkpointid, req.params.z, req.params.x, req.params.y));
+                return res.send(await checkpoint.mvt(req.params.checkpointid, req.params.z, req.params.x, req.params.y));
 
-        } catch (err) {
-            return Err.respond(err, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {post} /api/project/:projectid/checkpoint/:checkpointid/upload Upload Checkpoint
@@ -1173,33 +1562,37 @@ async function server(config, cb) {
      *       "created": "<date>"
      *   }
      */
-    router.post('/project/:projectid/checkpoint/:checkpointid/upload', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'checkpointid');
-            await auth.is_admin(req);
+    router.post(
+        ...await schemas.get('POST /project/:projectid/checkpoint/:checkpointid/upload'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
+                await auth.is_admin(req);
 
-            const busboy = new Busboy({ headers: req.headers });
+                const busboy = new Busboy({ headers: req.headers });
 
-            const files = [];
+                const files = [];
 
-            busboy.on('file', (fieldname, file) => {
-                files.push(checkpoint.upload(req.params.checkpointid, file));
-            });
+                busboy.on('file', (fieldname, file) => {
+                    files.push(checkpoint.upload(req.params.checkpointid, file));
+                });
 
-            busboy.on('finish', async () => {
-                try {
-                    return res.json(await checkpoint.get(req.params.checkpointid));
-                } catch (err) {
-                    Err.respond(res, err);
-                }
-            });
+                busboy.on('finish', async () => {
+                    try {
+                        return res.json(await checkpoint.get(req.params.checkpointid));
+                    } catch (err) {
+                        Err.respond(res, err);
+                    }
+                });
 
-            return req.pipe(busboy);
-        } catch (err) {
-            return Err.respond(err, res);
+                return req.pipe(busboy);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:projectid/checkpoint/:checkpointid/download Download Checkpoint
@@ -1211,17 +1604,21 @@ async function server(config, cb) {
      * @apiDescription
      *     Download a checkpoint asset from the API
      */
-    router.get('/project/:projectid/checkpoint/:checkpointid/download', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'checkpointid');
-            await project.has_auth(req.auth, req.params.projectid);
+    router.get(
+        ...await schemas.get('GET /project/:projectid/checkpoint/:checkpointid/download'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'checkpointid');
+                await project.has_auth(req.auth, req.params.projectid);
 
-            await checkpoint.download(req.params.checkpointid, res);
-        } catch (err) {
-            return Err.respond(err, res);
+                await checkpoint.download(req.params.checkpointid, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/project/:projectid/checkpoint List Checkpoints
@@ -1242,6 +1639,7 @@ async function server(config, cb) {
      *       "instance_id": 123,
      *       "checkpoints": [{
      *           "id": 1432,
+     *           "parent": 123,
      *           "name": "Checkpoint Name",
      *           "storage": true,
      *           "created": "<date>",
@@ -1250,9 +1648,10 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        '/project/:projectid/checkpoint',
+        ...await schemas.get('GET /project/:projectid/checkpoint', {
+            query: 'req.query.checkpoint.json'
+        }),
         requiresAuth,
-        validate({ query: require('./schema/req.query.checkpoint.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -1282,6 +1681,7 @@ async function server(config, cb) {
      *   HTTP/1.1 200 OK
      *   {
      *       "id": 1432,
+     *       "parent": 123,
      *       "instance_id": 124,
      *       "storage": true,
      *       "classes": [ ... ],
@@ -1291,26 +1691,36 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        '/project/:projectid/checkpoint',
+        ...await schemas.get('POST /project/:projectid/checkpoint', {
+            body: 'req.body.checkpoint.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.checkpoint.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
                 await project.has_auth(req.auth, req.params.projectid);
 
-                if (req.body.geoms && req.body.geoms.length !== req.body.classes.length) {
-                    throw new Err(400, null, 'geoms array must be parallel with classes array');
-                } else if (!req.body.geoms) {
-                    req.body.geoms = req.body.classes.map(() => {
-                        return { type: 'MultiPoint', coordinates: [] };
+                if (req.body.retrain_geoms && req.body.retrain_geoms.length !== req.body.classes.length) {
+                    throw new Err(400, null, 'retrain_geoms array must be parallel with classes array');
+                } else if (!req.body.retrain_geoms) {
+                    // assuming that if retrain_geoms don't exist, input_geoms also don't exist
+                    req.body.input_geoms = [];
+                    req.body.retrain_geoms = req.body.classes.map(() => {
+                        req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] });
+                        return { type: 'MultiPoint', 'coordinates': [] };
                     });
                 } else {
-                    req.body.geoms = req.body.geoms.map((e) => {
+                    req.body.retrain_geoms = req.body.retrain_geoms.map((e) => {
                         if (!e || e.type !== 'MultiPoint') {
-                            return { type: 'MultiPoint', coordinates: [] };
+                            req.body.input_geoms.push({ type: 'GeometryCollection', 'geometries': [] });
+                            return { type: 'MultiPoint', 'coordinates': [] };
                         }
-
+                        return e;
+                    });
+                    req.body.input_geoms = req.body.input_geoms.map((e) => {
+                        if (!e || e.type !== 'GeometryCollection') {
+                            return { type: 'GeometryCollection', 'geometries': [] };
+                        }
                         return e;
                     });
                 }
@@ -1338,7 +1748,7 @@ async function server(config, cb) {
      *     NOTE: This will also delete AOIs that depend on the given checkpoint
      */
     router.delete(
-        '/project/:projectid/checkpoint/:checkpointid',
+        ...await schemas.get('DELETE /project/:projectid/checkpoint/:checkpointid'),
         requiresAuth,
         async (req, res) => {
             try {
@@ -1357,7 +1767,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {patch} /api/model/:modelid Patch Checkpoint
+     * @api {patch} /api/project/:projectid/checkpoint/:checkpointid Patch Checkpoint
      * @apiVersion 1.0.0
      * @apiName PatchCheckpoint
      * @apiGroup Checkpoints
@@ -1373,6 +1783,7 @@ async function server(config, cb) {
      *   {
      *       "id": 1432,
      *       "instance_id": 124,
+     *       "parent": 123,
      *       "storage": true,
      *       "classes": [ ... ],
      *       "name": "Named Checkpoint",
@@ -1381,9 +1792,10 @@ async function server(config, cb) {
      *   }
      */
     router.patch(
-        '/project/:projectid/checkpoint/:checkpointid',
+        ...await schemas.get('PATCH /project/:projectid/checkpoint/:checkpointid', {
+            body: 'req.body.checkpoint-patch.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.checkpoint-patch.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -1428,9 +1840,10 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        '/model',
+        ...await schemas.get('POST /model', {
+            body: 'req.body.model.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.model.json') }),
         async (req, res) => {
             try {
                 await auth.is_admin(req);
@@ -1455,9 +1868,10 @@ async function server(config, cb) {
      *     Update a model
      */
     router.patch(
-        '/model/:modelid',
+        ...await schemas.get('PATCH /model/:modelid', {
+            body: 'req.body.model-patch.json'
+        }),
         requiresAuth,
-        validate({ body: require('./schema/req.body.model-patch.json') }),
         async (req, res) => {
             try {
                 await Param.int(req, 'modelid');
@@ -1500,34 +1914,38 @@ async function server(config, cb) {
      *       "meta": {}
      *   }
      */
-    router.post('/model/:modelid/upload', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'modelid');
-            await auth.is_admin(req);
+    router.post(
+        ...await schemas.get('POST /model/:modelid/upload'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'modelid');
+                await auth.is_admin(req);
 
-            await model.get(req.params.modelid);
+                await model.get(req.params.modelid);
 
-            const busboy = new Busboy({ headers: req.headers });
+                const busboy = new Busboy({ headers: req.headers });
 
-            const files = [];
+                const files = [];
 
-            busboy.on('file', (fieldname, file) => {
-                files.push(model.upload(req.params.modelid, file));
-            });
+                busboy.on('file', (fieldname, file) => {
+                    files.push(model.upload(req.params.modelid, file));
+                });
 
-            busboy.on('finish', async () => {
-                try {
-                    return res.json(await model.get(req.params.modelid));
-                } catch (err) {
-                    Err.respond(res, err);
-                }
-            });
+                busboy.on('finish', async () => {
+                    try {
+                        return res.json(await model.get(req.params.modelid));
+                    } catch (err) {
+                        Err.respond(res, err);
+                    }
+                });
 
-            return req.pipe(busboy);
-        } catch (err) {
-            return Err.respond(err, res);
+                return req.pipe(busboy);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/model List Models
@@ -1551,7 +1969,7 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        '/model',
+        ...await schemas.get('GET /model'),
         requiresAuth,
         async (req, res) => {
             try {
@@ -1580,21 +1998,25 @@ async function server(config, cb) {
      *       "message": "Model deleted"
      *   }
      */
-    router.delete('/model/:modelid', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'modelid');
-            await auth.is_admin(req);
+    router.delete(
+        ...await schemas.get('DELETE /model/:modelid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'modelid');
+                await auth.is_admin(req);
 
-            await model.delete(req.params.modelid);
+                await model.delete(req.params.modelid);
 
-            return res.status(200).json({
-                status: 200,
-                message: 'Model deleted'
-            });
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.status(200).json({
+                    status: 200,
+                    message: 'Model deleted'
+                });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/model/:modelid Get Model
@@ -1624,15 +2046,19 @@ async function server(config, cb) {
      *       "meta": {}
      *   }
      */
-    router.get('/model/:modelid', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'modelid');
+    router.get(
+        ...await schemas.get('GET /model/:modelid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'modelid');
 
-            res.json(await model.get(req.params.modelid));
-        } catch (err) {
-            return Err.respond(err, res);
+                res.json(await model.get(req.params.modelid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/model/:modelid/download Download Model
@@ -1644,15 +2070,19 @@ async function server(config, cb) {
      * @apiDescription
      *     Return the model itself
      */
-    router.get('/model/:modelid/download', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'modelid');
+    router.get(
+        ...await schemas.get('GET /model/:modelid/download'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'modelid');
 
-            await model.download(req.params.modelid, res);
-        } catch (err) {
-            return Err.respond(err, res);
+                await model.download(req.params.modelid, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/mosaic List Mosaics
@@ -1672,13 +2102,16 @@ async function server(config, cb) {
      *       ]
      *   }
      */
-    router.get('/mosaic', async (req, res) => {
-        try {
-            return res.json(Mosaic.list());
-        } catch (err) {
-            return Err.respond(err, res);
+    router.get(
+        ...await schemas.get('GET /mosaic'),
+        async (req, res) => {
+            try {
+                return res.json(Mosaic.list());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/mosaic/:layer Get TileJson
@@ -1709,17 +2142,20 @@ async function server(config, cb) {
      *       "center": [ -95.87494149186512, 36.9693324794906, 12 ]
      *   }
      */
-    router.get('/mosaic/:layer', async (req, res) => {
-        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+    router.get(
+        ...await schemas.get('GET /mosaic/:layer'),
+        async (req, res) => {
+            if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        try {
-            req.url = req.url + '/tilejson.json';
+            try {
+                req.url = req.url + '/tilejson.json';
 
-            await proxy.request(req, res);
-        } catch (err) {
-            return Err.respond(err, res);
+                await proxy.request(req, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /mosaic/:layer/tiles/:z/:x/:y.:format Get Tile
@@ -1739,19 +2175,22 @@ async function server(config, cb) {
      *     Return an aerial imagery tile for a given set of mercator coordinates
      *
      */
-    router.get('/mosaic/:layer/tiles/:z/:x/:y.:format', async (req, res) => {
-        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+    router.get(
+        ...await schemas.get('GET /mosaic/:layer/tiles/:z/:x/:y.:format'),
+        async (req, res) => {
+            if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        try {
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
+            try {
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
 
-            await proxy.request(req, res);
-        } catch (err) {
-            return Err.respond(err, res);
+                await proxy.request(req, res);
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {get} /api/instance/:instanceid Self Instance
@@ -1774,16 +2213,20 @@ async function server(config, cb) {
      *       "pod": { ... }
      *   }
      */
-    router.get('/instance/:instanceid', requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'instanceid');
-            await auth.is_admin(req);
+    router.get(
+        ...await schemas.get('GET /instance/:instanceid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'instanceid');
+                await auth.is_admin(req);
 
-            return res.json(await instance.get(req.auth, req.params.instanceid));
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(await instance.get(req.auth, req.params.instanceid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     /**
      * @api {delete} /api/instance Deactivate Instances
@@ -1795,15 +2238,19 @@ async function server(config, cb) {
      * @apiDescription
      *     Set all instances to active: false - used by the socket server upon initial api connection
      */
-    router.delete('/instance', requiresAuth, async (req, res) => {
-        try {
-            await auth.is_admin(req);
+    router.delete(
+        ...await schemas.get('DELETE /instance'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await auth.is_admin(req);
 
-            return res.json(await instance.reset());
-        } catch (err) {
-            return Err.respond(err, res);
+                return res.json(await instance.reset());
+            } catch (err) {
+                return Err.respond(err, res);
+            }
         }
-    });
+    );
 
     router.all('*', (req, res) => {
         return res.status(404).json({

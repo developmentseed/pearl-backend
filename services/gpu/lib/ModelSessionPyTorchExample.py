@@ -72,6 +72,12 @@ class TorchFineTuning(ModelSession):
     def __init__(self, gpu_id, model_dir, classes):
         self.model_dir = model_dir
         self.classes = classes
+
+        # initalize counts to be 0
+        for i, c in enumerate(self.classes):
+            c['counts'] = 0
+
+
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         print('# is cuda available?', torch.cuda.is_available())
@@ -119,11 +125,7 @@ class TorchFineTuning(ModelSession):
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
         tile = tile.astype(np.float32)
-
-        #self._last_tile = output_features: is this needed?
-
         output, output_features = self.run_model_on_tile(tile)
-
         return output, output_features
 
     def retrain(self, classes, **kwargs):
@@ -134,28 +136,29 @@ class TorchFineTuning(ModelSession):
             'color': x['color']
         } for x in classes ]
 
-        pixels = [x['geometry'] for x in classes]
+        pixels = [x['retrain_geometry'] for x in classes]
         counts = [len(x) for x in pixels]
         total = sum(counts)
 
         # add re-training counts to classes attribute
         for i, c in enumerate(counts):
-             retrain_classes[i]['retraining_counts'] = c
-             retrain_classes[i]['retraining_counts_percent'] = c / sum(counts)
+             retrain_classes[i]['counts'] = c
+             retrain_classes[i]['percent'] = c / sum(counts)
 
-        # update and attribute self.classes with retraining info
         for i, c in enumerate(self.classes):
             # retraing samples that are in starter model
             if c['name'] in names:
-                self.classes[i]['retraining_counts'] = counts[names.index(c['name'])]
-                self.classes[i]['retraining_counts_percent'] = counts[names.index(c['name'])] / sum(counts)
-            # starter model classes that are not in user specified retraining samples
-            else:
-                self.classes[i]['retraining_counts'] = 0
-                self.classes[i]['retraining_counts_percent'] = 0
+                self.classes[i]['counts'] = counts[names.index(c['name'])] + self.classes[i]['counts']
+
+        total_retrain_counts = sum(x['counts'] for x in self.classes)
+        for i, c in enumerate(self.classes):
+            self.classes[i]['percent'] = counts[names.index(c['name'])] / sum(counts)
 
         # combine starter model classes and retrain classes
-        self.classes = self.classes + [x for x in retrain_classes if not x in self.classes]
+
+        current_class_names = [x['name'] for x in self.classes]
+
+        self.classes = self.classes + [x for x in retrain_classes if not x['name'] in current_class_names] #don't check against entire dict
         self.augment_x_train = [item.value  for sublist in pixels for item in sublist]  # get pixel values
 
         names_retrain = []
@@ -175,22 +178,12 @@ class TorchFineTuning(ModelSession):
         y_train = np.array(self.augment_y_train)
 
         # Place holder to load in seed npz
-        # seed_x = np.load('_embedding.npz', allow_pickle=True)
-        # seed_x = seed_x['arr_0']
-        # seed_y = np.load('/_label.npz', allow_pickle=True)
-        # seed_y = seed_y['arr_0']
+        seed_data = np.load(self.model_dir + '/model.npz', allow_pickle=True)
+        seed_x = seed_data['embeddings']
+        seed_y = seed_data['labels']
 
-
-        # Place holder to load in seed npz
-        # print (y_train.shape)
-        # print(type(y_train))
-        # print (seed_y.shape)
-
-
-        # x_train = np.vstack((x_train, seed_x))
-        # print(x_train.shape)
-        # y_train = np.hstack((y_train, seed_y))
-        # print(y_train.shape)
+        x_train = np.vstack((x_train, seed_x))
+        y_train = np.hstack((y_train, seed_y))
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
 
@@ -247,7 +240,6 @@ class TorchFineTuning(ModelSession):
         for i, f1 in enumerate(per_class_f1_final):
             self.classes[i].update({'retraining_f1score': f1})
 
-
         global_f1 = f1_score(y_test, lr_preds, average='weighted')
         print("Global f1-score: %0.4f" % (global_f1))
 
@@ -302,32 +294,6 @@ class TorchFineTuning(ModelSession):
                 "success": False
             }
 
-    def reset(self):
-        self._init_model()
-        self.augment_x_train = []
-        self.augment_y_train = []
-        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
-
-        label_binarizer = LabelBinarizer()
-        label_binarizer.fit(range(self.output_channels))
-
-        self.augment_model.coefs_ = [self.initial_weights]
-        self.augment_model.intercepts_ = [self.initial_biases]
-
-        self.augment_model.classes_ = np.array(list(range(self.output_channels)))
-        self.augment_model.n_features_in_ = self.output_features
-        self.augment_model.n_outputs_ = self.output_channels
-        self.augment_model.n_layers_ = 2
-        self.augment_model.out_activation_ = 'softmax'
-
-        self.augment_model._label_binarizer = label_binarizer # investigate
-
-        return {
-            "message": "Model reset successfully",
-            "success": True
-        }
-
-
     def run_model_on_tile(self, tile):
         height = tile.shape[1]
         width = tile.shape[2]
@@ -347,10 +313,7 @@ class TorchFineTuning(ModelSession):
         return  predictions, features
 
     def save_state_to(self, directory):
-
-
         torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt"))
-        # Do we need to save these?
         np.save(os.path.join(directory, "augment_x_train.npy"), np.array(self.augment_x_train))
         np.save(os.path.join(directory, "augment_y_train.npy"), np.array(self.augment_y_train))
 
@@ -361,7 +324,6 @@ class TorchFineTuning(ModelSession):
         }
 
     def load_state_from(self, chkpt, chkpt_fs):
-
         self.augment_x_train = []
         self.augment_y_train = []
 
@@ -371,15 +333,14 @@ class TorchFineTuning(ModelSession):
             self.augment_y_train.append(sample)
 
         self.augment_model = joblib.load(os.path.join(chkpt_fs, "augment_model.p"))
-        #self.augment_model_trained = os.path.exists(os.path.join(directory, "trained.txt"))
-
-        # do we need to re-initalize the pytorch model with the new retraining_checkpoint.pt?
-        # how to we update for the correct number of classes post retraining?
         self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
         self.classes = chkpt['classes']
         self.model = FCN(num_input_channels=4, num_output_classes=len(chkpt['classes']), num_filters=64)
-        self._init_model()
+        checkpoint = torch.load(self.model_fs, map_location=self.device)
+        self.model.load_state_dict(checkpoint)
+        self.model = self.model.to(self.device)
+
 
         return {
             "message": "Loaded model state",

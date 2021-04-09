@@ -5,8 +5,10 @@ import io
 import math
 import mercantile
 import numpy as np
+import random
 from rasterio.transform import from_bounds
 from PIL import Image
+from shapely.geometry import shape, mapping, Point
 
 R2D = 180 / math.pi
 RE = 6378137.0
@@ -63,6 +65,7 @@ def geom2px(geom, modelsrv):
 
         in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat='npy')
         _, retrain = modelsrv.model.run(in_memraster.data, False)
+        retrain = retrain[32:288, 32:288, :]
 
         value = retrain[pixels[0], pixels[1]]
 
@@ -180,3 +183,16 @@ def rowcol(transform, xs, ys, op=math.floor, precision=None):
         rows = rows[0]
 
     return rows, cols
+
+def generate_random_points(count, feature, modelsrv):
+    polygon = shape(feature)
+    points = {
+        "type": "MultiPoint",
+        "coordinates": []
+    }
+    minx, miny, maxx, maxy = polygon.bounds
+    while len(points['coordinates']) < count:
+        point = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
+        if polygon.contains(point):
+            points['coordinates'].append(mapping(point)['coordinates'])
+    return geom2px(points, modelsrv)

@@ -122,6 +122,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         t.deepEquals(res.body, {
             id: 1,
             name: 'TEST',
+            parent: null,
             project_id: 1,
             storage: false,
             analytics: null,
@@ -132,12 +133,18 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
-            geoms: [
+            retrain_geoms: [
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] }
-           ]
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+            ]
         });
 
         t.end();
@@ -200,6 +207,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
         t.deepEquals(res.body, {
             id: 1,
             name: 'NEW NAME',
+            parent: null,
             project_id: 1,
             storage: false,
             analytics: null,
@@ -210,11 +218,17 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
-            geoms: [
+            retrain_geoms: [
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
            ]
         });
 
@@ -239,6 +253,7 @@ test('GET /api/project/1/checkpoint/1', (t) => {
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
+            parent: null,
             name: 'NEW NAME',
             bookmarked: true,
             analytics: null,
@@ -249,11 +264,17 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
-            geoms: [
+            retrain_geoms: [
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] },
                 { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
            ]
         });
 
@@ -289,6 +310,7 @@ test('GET /api/project/1/checkpoint', (t) => {
             project_id: 1,
             checkpoints: [{
                 id: 1,
+                parent: null,
                 name: 'NEW NAME',
                 storage: true,
                 bookmarked: true
@@ -335,6 +357,131 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0.mvt - no geometry', (t) => {
     });
 });
 
+test('POST /api/project/1/checkpoint - wrong parent', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'TEST',
+            parent: 100,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 400, 'status: 400');
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'Parent does not exist',
+            messages: []
+        });
+
+        t.end();
+    });
+});
+
+test('POST /api/project/1/checkpoint - parent', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'TEST',
+            parent: 1,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 3,
+            name: 'TEST',
+            parent: 1,
+            project_id: 1,
+            storage: false,
+            analytics: null,
+            bookmarked: false,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', geometries: [] },
+                { type: 'GeometryCollection', geometries: [] },
+                { type: 'GeometryCollection', geometries: [] },
+                { type: 'GeometryCollection', geometries: [] }
+            ]
+        });
+
+        t.end();
+    });
+});
+
+test('DELETE /api/project/1/checkpoint/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 400, 'status: 400');
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'Cannot delete checkpoint with dependants',
+            messages: []
+        });
+
+        t.end();
+    });
+});
+
+test('DELETE /api/project/1/checkpoint/3', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint/3',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.deepEquals(res.body, true);
+        t.end();
+    });
+});
+
 test('DELETE /api/project/1/checkpoint/1', (t) => {
     request({
         json: true,
@@ -346,9 +493,7 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
     }, (err, res) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
-
         t.deepEquals(res.body, true);
-
         t.end();
     });
 });

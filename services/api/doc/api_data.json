@@ -62,7 +62,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
           "type": "json"
         }
       ]
@@ -90,10 +90,28 @@
   },
   {
     "type": "get",
-    "url": "/api/project/:projectid/aoi/:aoiid/download",
-    "title": "Download AOI",
+    "url": "/api/project/:projectid/aoi/:aoiid/download/color",
+    "title": "Download Color AOI",
     "version": "1.0.0",
-    "name": "DownloadAOI",
+    "name": "DownloadColorAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return the colourized aoi fabric geotiff</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/aoi/:aoiid/download/raw",
+    "title": "Download Raw AOI",
+    "version": "1.0.0",
+    "name": "DownloadRawAOI",
     "group": "AOI",
     "permission": [
       {
@@ -125,13 +143,40 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
           "type": "json"
         }
       ]
     },
     "filename": "./index.js",
     "groupTitle": "AOI"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:projectid/aoi/:aoiid/patch/:patchid/upload",
+    "title": "Upload Patch",
+    "version": "1.0.0",
+    "name": "UploadPatch",
+    "group": "AOIGroup",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upload a new AOI Patch asset to the API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIGroup"
   },
   {
     "type": "get",
@@ -182,7 +227,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
           "type": "json"
         }
       ]
@@ -214,6 +259,13 @@
             "optional": true,
             "field": "name",
             "description": "<p>The human readable name of the AOI</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "bookmarked",
+            "description": "<p>Has the checkpoint been bookmarked in the frontend</p>"
           }
         ]
       }
@@ -222,13 +274,139 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"bookmarked\": false,\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "./index.js",
     "groupTitle": "AOI"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:project/aoi/:aoiid/patch",
+    "title": "Create Patch",
+    "version": "1.0.0",
+    "name": "CreatePatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new Patch</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"storage\": true,\n    \"created\": \"<date>\"\n    \"project_id\": 1,\n    \"aoi_id\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid",
+    "title": "Delete Patch",
+    "version": "1.0.0",
+    "name": "DeletePatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a given patch</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\ntrue",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid/download",
+    "title": "Download Patch",
+    "version": "1.0.0",
+    "name": "DownloadPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Download a Tiff Patch</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid",
+    "title": "Get Patch",
+    "version": "1.0.0",
+    "name": "GetPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get a specific patch</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch",
+    "title": "List Patches",
+    "version": "1.0.0",
+    "name": "ListPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all patches for a given API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aoi_id\": 123\n    \"patches\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
   },
   {
     "type": "get",
@@ -239,9 +417,9 @@
     "group": "AOI",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return a Tile for a given AOI</p>",
@@ -257,9 +435,9 @@
     "group": "AOI",
     "permission": [
       {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
     "description": "<p>Return tilejson for a given AOI</p>",
@@ -343,7 +521,14 @@
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>The human readable name of the checkpoint</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "parent",
+            "description": "<p>The ID of the parent checkpoint that was retrained off of</p>"
           },
           {
             "group": "Body",
@@ -398,8 +583,15 @@
             "group": "Body",
             "type": "Null/Object[]",
             "optional": true,
-            "field": "geoms",
+            "field": "retrain_geoms",
             "description": "<p>Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Null/Object[]",
+            "optional": true,
+            "field": "input_geoms",
+            "description": "<p>Array of GeoJSON GeometryCollections that were input by the user. Length of geomms array must equals classes undefined</p>"
           }
         ]
       }
@@ -408,7 +600,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"parent\": 123,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -471,7 +663,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"parent\": 123,\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -520,7 +712,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bookmarked\": false\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"parent\": 123,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bookmarked\": false\n    }]\n}",
           "type": "json"
         }
       ]
@@ -530,7 +722,7 @@
   },
   {
     "type": "patch",
-    "url": "/api/model/:modelid",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid",
     "title": "Patch Checkpoint",
     "version": "1.0.0",
     "name": "PatchCheckpoint",
@@ -588,7 +780,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"parent\": 123,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
           "type": "json"
         }
       ]
@@ -1652,7 +1844,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\"\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\",\n        \"aois\": [{\n           \"id\": 1,\n           \"name\": \"aoi name\",\n           \"created\": \"<date>\",\n           \"storage\": false\n        }],\n       \"checkpoints\": [{\n           \"id\": 1,\n           \"name\": \"checkpoint name\",\n           \"created\": \"<date>\",\n           \"storage\": false,\n           \"bookmarked\": false\n       }]\n    }]\n}",
           "type": "json"
         }
       ]
@@ -1699,6 +1891,68 @@
     },
     "filename": "./index.js",
     "groupTitle": "Projects"
+  },
+  {
+    "type": "get",
+    "url": "/api/schema",
+    "title": "List Schemas",
+    "version": "1.0.0",
+    "name": "ListSchemas",
+    "group": "Schemas",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>List all JSON Schemas in use With no parameters this API will return a list of all the endpoints that have a form of schema validation If the url/method params are used, the schemas themselves are returned</p> <pre><code>Note: If url or method params are used, they must be used together</code></pre>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"GET\"",
+              "\"HEAD\"",
+              "\"POST\"",
+              "\"PUT\"",
+              "\"DELETE\"",
+              "\"CONNECT\"",
+              "\"OPTIONS\"",
+              "\"TRACE\"",
+              "\"PATCH\""
+            ],
+            "optional": true,
+            "field": "method",
+            "description": "<p>HTTP Verb</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "url",
+            "description": "<p>URLEncoded URL that you want to fetch</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": true,
+            "field": "schemas",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Schemas"
   },
   {
     "type": "get",

@@ -21,11 +21,12 @@ LOGGER = logging.getLogger("server")
 
 
 class AOI():
-    def __init__(self, api, body, checkpointid):
+    def __init__(self, api, body, checkpointid, is_patch=False):
         self.api = api
         self.poly = body['polygon']
-        self.name = body['name']
+        self.name = body.get('name', '')
         self.checkpointid = checkpointid
+        self.is_patch = is_patch
 
         self.zoom = self.api.model['model_zoom']
 
@@ -40,8 +41,11 @@ class AOI():
         # TODO Check Max size too
         self.live = AOI.area(self.bounds) < self.api.server['limits']['live_inference']
 
-        self.id = self.api.create_aoi(self)["id"]
-        self.api.instance_patch(aoi_id = self.id)
+        if self.is_patch is not False:
+            self.id = self.api.create_patch(is_patch)["id"]
+        else:
+            self.id = self.api.create_aoi(self)["id"]
+            self.api.instance_patch(aoi_id = self.id)
 
         self.extrema, self.raw_fabric, self.fabric = AOI.gen_fabric(self.bounds, self.zoom)
 
@@ -56,7 +60,11 @@ class AOI():
 
     def upload_fabric(self):
         self.fabric.close()
-        self.api.upload_aoi(self.id, self.raw_fabric)
+
+        if self.is_patch is not False:
+            self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
+        else:
+            self.api.upload_aoi(self.id, self.raw_fabric)
 
     @staticmethod
     def gen_fabric(bounds, zoom):

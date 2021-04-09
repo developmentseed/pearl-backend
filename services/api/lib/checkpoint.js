@@ -45,6 +45,7 @@ class CheckPoint {
         const chpt = {
             id: parseInt(row.id),
             project_id: parseInt(row.project_id),
+            parent: parseInt(row.parent),
             name: row.name,
             bookmarked: row.bookmarked,
             classes: row.classes,
@@ -53,10 +54,11 @@ class CheckPoint {
             analytics: row.analytics
         };
 
-        if (row.geoms) {
-            chpt.geoms = row.geoms;
+        if (row.retrain_geoms) {
+            chpt.retrain_geoms = row.retrain_geoms;
+            chpt.input_geoms = row.input_geoms;
 
-            const counts = row.geoms.filter((geom) => {
+            const counts = row.retrain_geoms.filter((geom) => {
                 if (!geom) return false;
                 if (!geom.coordinates.length) return false;
                 return true;
@@ -98,6 +100,7 @@ class CheckPoint {
                SELECT
                     count(*) OVER() AS count,
                     id,
+                    parent,
                     name,
                     created,
                     storage,
@@ -125,6 +128,7 @@ class CheckPoint {
             checkpoints: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    parent: parseInt(row.parent),
                     name: row.name,
                     created: row.created,
                     storage: row.storage,
@@ -149,8 +153,9 @@ class CheckPoint {
                     WHERE
                         id = $1
                     RETURNING *
-            `, [ checkpointid ]);
+            `, [checkpointid]);
         } catch (err) {
+            if (err.code === '23503') throw new Err(400, new Error(err), 'Cannot delete checkpoint with dependants');
             throw new Err(500, new Error(err), 'Failed to delete Checkpoint');
         }
 
@@ -214,6 +219,7 @@ class CheckPoint {
      * @param {Boolean} checkpoint.storage Has the storage been uploaded
      * @param {String} checkpoint.name The name of the checkpoint
      * @param {Array} checkpoint.classes Class list to update (only name & color changes - cannot change length)
+     * @param {Boolean} checkpoint.bookmarked Has the checkpoint been bookmarked by the user
      */
     async patch(checkpointid, checkpoint) {
         let pgres;
@@ -264,17 +270,19 @@ class CheckPoint {
                 SELECT
                     checkpoints.id,
                     checkpoints.name,
+                    checkpoints.parent,
                     checkpoints.classes,
                     checkpoints.created,
                     checkpoints.storage,
                     checkpoints.bookmarked,
                     checkpoints.project_id,
                     checkpoints.analytics,
-                    checkpoints.geoms,
+                    checkpoints.retrain_geoms,
+                    checkpoints.input_geoms,
                     ST_AsText(ST_Centroid(ST_Envelope(ST_Collect(geom)))) AS center,
                     ST_Extent(geom) AS bounds
                 FROM
-                    (SELECT id, ST_GeomFromGeoJSON(Unnest(geoms)) as geom FROM checkpoints WHERE id = $1) g,
+                    (SELECT id, ST_GeomFromGeoJSON(Unnest(retrain_geoms)) as geom FROM checkpoints WHERE id = $1) g,
                     checkpoints
                 WHERE
                     checkpoints.id = $1
@@ -282,12 +290,14 @@ class CheckPoint {
                     g.id,
                     checkpoints.id,
                     checkpoints.name,
+                    checkpoints.parent,
                     checkpoints.classes,
                     checkpoints.created,
                     checkpoints.storage,
                     checkpoints.bookmarked,
                     checkpoints.project_id,
-                    checkpoints.geoms
+                    checkpoints.retrain_geoms,
+                    checkpoints.input_geoms
             `, [
                 checkpointid
             ]);
@@ -307,6 +317,7 @@ class CheckPoint {
      * @param {Number} projectid - Project ID the checkpoint is a part of
      * @param {Object} checkpoint - Checkpoint Object
      * @param {String} checkpoint.name - Human readable name
+     * @param {Number} checkpoint.parent - Parent Checkpoint ID
      * @param {Object[]} checkpoint.classes - Checkpoint Class names
      * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
      * @param {Object} checkpoint.analytics - Checkpoint Analytics
@@ -316,22 +327,30 @@ class CheckPoint {
             const pgres = await this.pool.query(`
                 INSERT INTO checkpoints (
                     project_id,
+                    parent,
                     name,
                     classes,
-                    geoms,
+                    retrain_geoms,
+                    input_geoms,
                     analytics
                 ) VALUES (
                     $1,
                     $2,
-                    $3::JSONB,
-                    $4::JSONB[],
-                    $5::JSONB
+                    $3,
+                    $4::JSONB,
+                    $5::JSONB[],
+                    $6::JSONB[],
+                    $7::JSONB
                 ) RETURNING *
             `, [
                 projectid,
+                checkpoint.parent,
                 checkpoint.name,
                 JSON.stringify(checkpoint.classes),
-                checkpoint.geoms.map((e) => {
+                checkpoint.retrain_geoms.map((e) => {
+                    return JSON.stringify(e);
+                }),
+                checkpoint.input_geoms.map((e) => {
                     return JSON.stringify(e);
                 }),
                 JSON.stringify(checkpoint.analytics)
@@ -339,6 +358,7 @@ class CheckPoint {
 
             return CheckPoint.json(pgres.rows[0]);
         } catch (err) {
+            if (err.code === '23503') throw new Err(400, err, 'Parent does not exist');
             throw new Err(500, err, 'Failed to create checkpoint');
         }
     }
@@ -355,41 +375,48 @@ class CheckPoint {
         let pgres;
         try {
             pgres = await this.pool.query(`
-                SELECT
-                    ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
-                FROM (
-                    SELECT
-                        ST_AsMVTGeom(
-                            geom,
-                            ST_TileEnvelope($2, $3, $4),
-                            4096,
-                            256,
-                            false
-                        ) AS geom
+            SELECT
+                ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+            FROM (
+                SELECT ST_AsMVTGeom(
+                    geom,
+                    ST_TileEnvelope($2, $3, $4),
+                    4096,
+                    256,
+                    false
+                ) AS geom
                     FROM (
                         SELECT
-                            id,
-                            r.geom
+                            r.id as id,
+                            r.geom as geom
                         FROM (
+                            WITH RECURSIVE parents (id, geom) AS (
+                                SELECT id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
+                            FROM checkpoints
+                            WHERE id = $1
+
+                            UNION ALL
+
+                            SELECT
+                                checkpoints.id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
+                            FROM checkpoints
+                            JOIN parents ON checkpoints.parent = parents.id
+                            )
                             SELECT
                                 id,
-                                ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.geoms)), 3857) AS geom
-                            FROM
-                                checkpoints
-                            WHERE
-                                checkpoints.id = $1
+                                geom
+                            FROM parents
                         ) r
-                        WHERE
-                            ST_Intersects(
-                                geom,
-                                ST_TileEnvelope($2, $3, $4)
-                            )
-                    ) n
-                    GROUP BY
-                        id,
-                        geom
-                ) q
-
+                WHERE
+                    ST_Intersects(
+                        geom,
+                        ST_TileEnvelope($2, $3, $4)
+                    )
+            ) n
+            GROUP BY
+                id,
+                geom
+        ) q
             `, [
                 checkpointid,
                 z, x, y

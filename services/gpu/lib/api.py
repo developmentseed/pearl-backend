@@ -35,6 +35,8 @@ class API():
         }, os.environ["SigningSecret"], algorithm="HS256")
 
         # Temp Directories
+        self.dir = '/tmp/'
+
         self.tmp_dir = '/tmp/gpu-api'
         if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
@@ -89,14 +91,22 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def create_checkpoint(self, name, classes, geoms, analytics = None):
+    def create_checkpoint(self, name, parent, classes, retrain_geoms, input_geoms, analytics = None):
         url = self.url + '/api/project/' + str(self.project_id) + '/checkpoint'
 
         data = {
             'name': name,
             'classes': classes,
-            'geoms': geoms
         }
+
+        if parent is not None:
+            data['parent'] = parent
+
+        if retrain_geoms is not None:
+            data['retrain_geoms'] = retrain_geoms
+
+        if input_geoms is not None:
+            data['input_geoms'] = input_geoms
 
         if analytics is not None:
             data['analytics'] = analytics
@@ -109,7 +119,6 @@ class API():
             },
             data = json.dumps(data)
         )
-
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
@@ -134,6 +143,8 @@ class API():
         LOGGER.info("ok - Received " + url)
 
         body = r.json();
+        for i, d2 in enumerate(body['classes']):
+            d2.update(body['analytics'][i])
 
         return body
 
@@ -200,6 +211,46 @@ class API():
 
         return ch_dir
 
+    def create_patch(self, aoi_id):
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoi_id) + '/patch'
+
+        LOGGER.info("ok - POST " + url)
+        r = self.requests.post(url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
+            }
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def upload_patch(self, aoiid, patchid, geotiff):
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoiid) + '/patch/' + str(patchid) + '/upload'
+
+        LOGGER.info("ok - POST " + url)
+
+        geo_path = self.tmp_dir + '/aoi-{}-patch-{}.tiff'.format(aoiid, patchid)
+        with open(geo_path, 'wb') as filehandle:
+            filehandle.write(geotiff.read())
+
+        encoder = MultipartEncoder([('file', ('filename', open(geo_path, 'rb'), 'image/tiff'))])
+
+        r = self.requests.post(url,
+            headers={
+                "Authorization": "Bearer " + self.token,
+                'Content-Type': encoder.content_type
+            },
+            data = encoder
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_aoi(self, aoi):
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'
 
@@ -226,7 +277,7 @@ class API():
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = self.tmp_dir + '/aoi-{}.geotiff'.format(aoiid)
+        geo_path = self.tmp_dir + '/aoi-{}.tiff'.format(aoiid)
         with open(geo_path, 'wb') as filehandle:
             filehandle.write(geotiff.read())
 
@@ -365,7 +416,7 @@ class API():
         return r.json()
 
     def model_download(self):
-        model_fs = self.tmp_dir + '/model-{}.zip'.format(self.model_id)
+        model_fs = self.dir + '/model-{}.zip'.format(self.model_id)
 
         if not path.exists(model_fs):
             url = self.url + '/api/model/' + str(self.model_id) + '/download'

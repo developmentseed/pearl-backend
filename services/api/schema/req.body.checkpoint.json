@@ -7,7 +7,12 @@
     "additionalProperties": false,
     "properties": {
         "name": {
-            "type": "string"
+            "type": "string",
+            "description": "The human readable name of the checkpoint"
+        },
+        "parent": {
+            "type": "integer",
+            "description": "The ID of the parent checkpoint that was retrained off of"
         },
         "analytics": {
             "type": "array",
@@ -52,9 +57,16 @@
                 }
             }
         },
-        "geoms": {
+        "retrain_geoms": {
             "type": "array",
             "description": "Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes",
+            "items": {
+                "type": ["null", "object"]
+            }
+        },
+        "input_geoms": {
+            "type": "array",
+            "description": "Array of GeoJSON GeometryCollections that were input by the user. Length of geomms array must equals classes",
             "items": {
                 "type": ["null", "object"]
             }

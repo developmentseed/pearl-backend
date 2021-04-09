@@ -6,7 +6,7 @@ tiletanic==1.1.0
 geojson==2.5.0
 requests==2.25.1
 requests-toolbelt==0.9.1
-websockets==8.1
+websocket-client==0.58.0
 rasterio==1.2.0
 shapely==1.7.1
 mercantile==1.1.6

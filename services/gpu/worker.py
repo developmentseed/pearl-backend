@@ -6,14 +6,12 @@ import jwt
 import json
 import os
 import argparse
-import asyncio
-import websockets
 import logging
 from lib.api import API
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
-from web_tool.ModelSessionPyTorchExample import TorchFineTuning
-from web_tool.Utils import setup_logging
+from lib.ModelSessionPyTorchExample import TorchFineTuning
+from lib.utils import setup_logging
 
 LOGGER = logging.getLogger("server")
 
@@ -46,17 +44,30 @@ def main():
 
     model = load(args.gpu_id, api)
 
-    asyncio.get_event_loop().run_until_complete(
-        connection('{}?token={}'.format(os.environ["SOCKET"], api.token.replace('api.', '')), model)
-    )
+    connection('{}?token={}'.format(os.environ["SOCKET"], api.token.replace('api.', '')), model)
 
-async def connection(uri, model):
+def error(body, websocket):
+    LOGGER.error(json.dumps(body));
+
+def placeholder(body, websocket):
+    LOGGER.info('Known but unprocessed message')
+
+def connection(uri, model):
     router = Router(uri)
 
     router.on_act("model#prediction", model.prediction)
+    router.on_act("model#patch", model.patch)
     router.on_act("model#retrain", model.retrain)
+    router.on_act("model#checkpoint", model.load_checkpoint)
+    router.on_act("model#status", model.status)
+    router.on_act("model#abort", model.abort)
 
-    await router.open()
+    router.on_msg("info#connected", placeholder)
+    router.on_msg("info#disconnected", placeholder)
+
+    router.on_msg('error', error)
+
+    router.open()
 
 
 def load(gpu_id, api):

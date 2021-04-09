@@ -3,12 +3,11 @@
 'use strict';
 
 const express = require('express');
-const srv = require('http').createServer();
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const Pool = require('./lib/pool');
 const argv = require('minimist')(process.argv, {
-    boolean: ['prod', 'help']
+    boolean: ['prod', 'help', 'debug']
 });
 
 const Timeout = require('./lib/timeout');
@@ -38,7 +37,7 @@ async function configure(argv = {}, cb) {
  * @param {function} cb
  */
 async function server(argv, config, cb) {
-    const pool = new Pool(config);
+    const pool = new Pool(config, argv);
 
     app.get('/health', (req, res) => {
         return res.json({
@@ -49,10 +48,19 @@ async function server(argv, config, cb) {
 
     await config.api.deactivate();
 
+    const srv = require('http').createServer();
+    srv.timeout = 0;
+    srv.keepAliveTimeout = 0;
     srv.on('request', app);
 
+    srv.on('upgrade', (request, socket, head) => {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            wss.emit('connection', ws, request);
+        });
+    });
+
     const wss = new WebSocket.Server({
-        server: srv,
+        noServer: true,
         verifyClient: ({ req }, cb) => {
             const url = new URL(`http://localhost:${config.Port}` + req.url);
 
@@ -72,14 +80,9 @@ async function server(argv, config, cb) {
 
     wss.on('connection', (ws, req) => {
         ws.auth = req.auth;
-
         pool.connected(ws);
-        console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i} connected`);
-
-        Timeout.client(ws);
 
         ws.on('close', () => {
-            console.error(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} instance #${ws.auth.i} disconnected`);
             pool.disconnected(ws);
         });
 
