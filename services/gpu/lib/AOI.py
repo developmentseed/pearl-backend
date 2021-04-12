@@ -50,8 +50,7 @@ class AOI():
         self.extrema, self.raw_fabric, self.fabric = AOI.gen_fabric(self.bounds, self.zoom)
 
     def add_to_fabric(self, fragment):
-        data = fragment.data.argmax(axis=-1).astype(np.uint8)
-        data = np.expand_dims(data, axis=0)
+        data = np.moveaxis(fragment.data, -1, 0)
 
         col_off = (fragment.x - self.extrema["x"]["min"]) * 256
         row_off = (fragment.y - self.extrema["y"]["min"]) * 256
