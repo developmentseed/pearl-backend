@@ -70,6 +70,71 @@ class ModelSrv():
                 return;
 
             if body.get('type') == 'class':
+                patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
+
+                websocket.send(json.dumps({
+                    'message': 'model#patch',
+                    'data': {
+                        'id': patch.id,
+                        'checkpoint_id': self.chk['id'],
+                        'bounds': patch.bounds,
+                        'total': patch.total
+                    }
+                }))
+
+                color_list = [item["color"] for item in self.model.classes]
+
+                while len(patch.tiles) > 0 and self.is_aborting is False:
+                    zxy = patch.tiles.pop()
+                    in_memraster = MemRaster(
+                        np.ones([256,256]) * body['class'],
+                        "epsg:3857",
+                        (zxy.x, zxy.y, zxy.z)
+                    )
+
+                    output.clip(self.aoi.poly)
+
+                    if patch.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
+
+                        LOGGER.info("ok - returning patch inference");
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'bounds': in_memraster.bounds,
+                                'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
+                                'image': png,
+                                'total': patch.total,
+                                'processed': patch.total - len(patch.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'total': patch.total,
+                                'processed': len(patch.tiles)
+                            }
+                        }))
+
+                    # Push tile into geotiff fabric
+                    output = np.expand_dims(output, axis=-1)
+                    output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
+                    patch.add_to_fabric(output)
+
+                if self.is_aborting is True:
+                    websocket.send(json.dumps({
+                        'message': 'model#aborted',
+                    }))
+                else:
+                    patch.upload_fabric()
+
+                    LOGGER.info("ok - done patch prediction");
+
+                self.meta_load_checkpoint(current_checkpoint)
 
             elif body.get('type') == 'brush':
                 current_checkpoint = self.chk['id']
