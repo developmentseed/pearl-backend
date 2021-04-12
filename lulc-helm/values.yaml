@@ -43,8 +43,8 @@ tiles:
       cpu: 400m
       memory: 1Gi
     limits:
-      cpu: 1000m
-      memory: 3Gi
+      cpu: 800m
+      memory: 2Gi
 
 tilesScaler:
   env:
