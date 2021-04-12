@@ -32,11 +32,12 @@ class MemRaster(object):
         self.shape = data.shape
 
     def remove_buffer(self):
-        self.data = self.data[32:288, 32:288]
+        if self.buffered:
+            self.data = self.data[32:288, 32:288]
+            self.buffered = False
         return self
 
     def clip(self, polygon):
-        print(self.crs)
         geom = transform_geom("epsg:4326", "epsg:3857", polygon)
         transform = from_bounds(*self.xy_bounds, 256, 256)
 
