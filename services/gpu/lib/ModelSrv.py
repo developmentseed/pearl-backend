@@ -69,71 +69,136 @@ class ModelSrv():
                 done_processing(self)
                 return;
 
-            current_checkpoint = self.chk['id']
-            self.meta_load_checkpoint(body['checkpoint_id'])
+            if body.get('type') == 'class':
+                patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
 
-            patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
-            websocket.send(json.dumps({
-                'message': 'model#patch',
-                'data': {
-                    'id': patch.id,
-                    'checkpoint_id': self.chk['id'],
-                    'bounds': patch.bounds,
-                    'total': patch.total
-                }
-            }))
+                websocket.send(json.dumps({
+                    'message': 'model#patch',
+                    'data': {
+                        'id': patch.id,
+                        'checkpoint_id': self.chk['id'],
+                        'bounds': patch.bounds,
+                        'total': patch.total
+                    }
+                }))
 
-            color_list = [item["color"] for item in self.model.classes]
+                color_list = [item["color"] for item in self.model.classes]
 
-            while len(patch.tiles) > 0 and self.is_aborting is False:
-                zxy = patch.tiles.pop()
-                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
-                output, _ = self.model.run(in_memraster.data, False)
+                while len(patch.tiles) > 0 and self.is_aborting is False:
+                    zxy = patch.tiles.pop()
+                    output = MemRaster(
+                        np.ones([256,256], dtype=np.uint8) * body['class'],
+                        "epsg:3857",
+                        (zxy.x, zxy.y, zxy.z)
+                    )
 
-                # remove 32 pixel buffer on each side
-                output = output.remove_buffer()
+                    output.clip(patch.poly)
 
-                if patch.live:
-                    # Create color versions of predictions
-                    png = pred2png(output.data, color_list)
+                    if patch.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
 
-                    LOGGER.info("ok - returning patch inference");
+                        LOGGER.info("ok - returning patch inference");
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'bounds': output.bounds,
+                                'x': output.x, 'y': output.y, 'z': output.z,
+                                'image': png,
+                                'total': patch.total,
+                                'processed': patch.total - len(patch.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'total': patch.total,
+                                'processed': len(patch.tiles)
+                            }
+                        }))
+
+                    # Push tile into geotiff fabric
+                    output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
+                    patch.add_to_fabric(output)
+
+                if self.is_aborting is True:
                     websocket.send(json.dumps({
-                        'message': 'model#patch#progress',
-                        'data': {
-                            'patch': patch.id,
-                            'bounds': in_memraster.bounds,
-                            'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
-                            'image': png,
-                            'total': patch.total,
-                            'processed': patch.total - len(patch.tiles)
-                        }
+                        'message': 'model#aborted',
                     }))
                 else:
-                    websocket.send(json.dumps({
-                        'message': 'model#patch#progress',
-                        'data': {
-                            'patch': patch.id,
-                            'total': patch.total,
-                            'processed': len(patch.tiles)
-                        }
-                    }))
+                    patch.upload_fabric()
 
-                # Push tile into geotiff fabric
-                output = np.expand_dims(output, axis=-1)
-                output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                patch.add_to_fabric(output)
+                    LOGGER.info("ok - done patch prediction");
+            elif body.get('type') == 'brush':
+                current_checkpoint = self.chk['id']
+                self.meta_load_checkpoint(body['checkpoint_id'])
 
-            if self.is_aborting is True:
+                patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
                 websocket.send(json.dumps({
-                    'message': 'model#aborted',
+                    'message': 'model#patch',
+                    'data': {
+                        'id': patch.id,
+                        'checkpoint_id': self.chk['id'],
+                        'bounds': patch.bounds,
+                        'total': patch.total
+                    }
                 }))
-            else:
-                patch.upload_fabric()
 
-                LOGGER.info("ok - done patch prediction");
+                color_list = [item["color"] for item in self.model.classes]
 
-            self.meta_load_checkpoint(current_checkpoint)
+                while len(patch.tiles) > 0 and self.is_aborting is False:
+                    zxy = patch.tiles.pop()
+                    in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+                    output, _ = self.model.run(in_memraster.data, False)
+
+                    print(output.shape)
+                    output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
+                    output = output.remove_buffer()
+                    output = output.clip(self.aoi.poly)
+
+                    if patch.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
+
+                        LOGGER.info("ok - returning patch inference");
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'bounds': output.bounds,
+                                'x': output.x, 'y': output.y, 'z': output.z,
+                                'image': png,
+                                'total': patch.total,
+                                'processed': patch.total - len(patch.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'total': patch.total,
+                                'processed': len(patch.tiles)
+                            }
+                        }))
+
+                    # Push tile into geotiff fabric
+                    output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
+                    patch.add_to_fabric(output)
+
+                if self.is_aborting is True:
+                    websocket.send(json.dumps({
+                        'message': 'model#aborted',
+                    }))
+                else:
+                    patch.upload_fabric()
+
+                    LOGGER.info("ok - done patch prediction");
+
+                self.meta_load_checkpoint(current_checkpoint)
 
             websocket.send(json.dumps({
                 'message': 'model#patch#complete',
@@ -221,10 +286,11 @@ class ModelSrv():
                 output, _ = self.model.run(in_memraster.data, False)
 
                 output = MemRaster(
-                        output,
-                        "epsg:3857",
-                        (in_memraster.x, in_memraster.y, in_memraster.z),
-                        True)
+                    output,
+                    "epsg:3857",
+                    (in_memraster.x, in_memraster.y, in_memraster.z),
+                    True
+                )
 
                 output = output.remove_buffer()
 
@@ -234,15 +300,15 @@ class ModelSrv():
 
                 if self.aoi.live:
                     # Create color versions of predictions
-                    png = pred2png(output.data, color_list) # investigate this
+                    png = pred2png(output.data, color_list)
 
-                    LOGGER.info("ok - returning inference");
+                    LOGGER.info("ok - returning inference")
                     websocket.send(json.dumps({
                         'message': 'model#prediction',
                         'data': {
                             'aoi': self.aoi.id,
-                            'bounds': in_memraster.bounds,
-                            'x': in_memraster.x, 'y': in_memraster.y, 'z': in_memraster.z,
+                            'bounds': output.bounds,
+                            'x': output.x, 'y': output.y, 'z': output.z,
                             'image': png,
                             'total': self.aoi.total,
                             'processed': self.aoi.total - len(self.aoi.tiles)
@@ -259,8 +325,7 @@ class ModelSrv():
                     }))
 
                 # Push tile into geotiff fabric
-                output = np.expand_dims(output.data, axis=-1)
-                output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
+                output = MemRaster(np.expand_dims(output.data, axis=-1), in_memraster.crs, in_memraster.tile, in_memraster.buffered)
                 self.aoi.add_to_fabric(output)
 
 
