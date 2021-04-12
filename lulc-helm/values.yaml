@@ -41,9 +41,9 @@ tiles:
   resources:
     requests:
       cpu: 400m
-      memory: 2Gi
+      memory: 1Gi
     limits:
-      cpu: 1000m
+      cpu: 800m
       memory: 2Gi
 
 tilesScaler:
