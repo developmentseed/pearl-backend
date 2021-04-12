@@ -22,7 +22,10 @@ class ModelSrv():
         self.model = model
 
     def abort(self, body, websocket):
-        self.is_aborting = True
+        if self.processing is False:
+            websocket.error('Nothing to abort', 'The GPU is not currently processing and has nothing to abort')
+        else:
+            self.is_aborting = True
 
     def status(self, body, websocket):
         try:

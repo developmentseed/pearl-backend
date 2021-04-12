@@ -7,11 +7,13 @@ const path = require('path');
 const fs = require('fs');
 
 class Term extends EventEmitter {
-    constructor() {
+    constructor(debug = false) {
         readline.emitKeypressEvents(process.stdin);
         process.stdin.setRawMode(true);
 
         super();
+
+        this.debug = debug ? fs.createWriteStream('/tmp/lulc-flow-debug.log') : false;
 
         this.max_log = process.stdout.rows - 10;
         this.buffer = new Array(this.max_log).fill('', 0, this.max_log - 1);
@@ -33,9 +35,15 @@ class Term extends EventEmitter {
         this.charm.write('┣' + '━'.repeat(process.stdout.columns - 2) + '┫');
         this.prog = new Progress(this.max_log + 9, this)
         this.charm.write('┗' + '━'.repeat(process.stdout.columns - 2) + '┛');
+
+        if (this.debug) {
+            this.log('DEBUG: /tmp/lulc-flow-debug.log');
+        }
     }
 
     log(line) {
+        if (this.debug) this.debug.write(line + '\n');
+
         const lines = line.split('\n');
         this.buffer.splice(this.buffer.length, 0, ...lines);
         this.buffer.splice(0, lines.length);

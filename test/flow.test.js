@@ -44,7 +44,7 @@ async function gpu() {
         state.connected = false;
 
         const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
-        const term = new Term();
+        const term = new Term(argv.debug);
         const lulc = new LULC({
             token: state.token
         });
