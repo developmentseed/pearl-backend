@@ -75,6 +75,10 @@ class AOI {
             patches: row.patches.map((patch) => { return parseInt(patch); })
         };
 
+        if (row.hasOwnProperty('classes')) {
+            def['classes'] = row.classes
+        }
+
         if (typeof row.bounds === 'object') {
             def.bounds = row.bounds;
         } else {
@@ -211,19 +215,23 @@ class AOI {
         try {
             pgres = await this.pool.query(`
                SELECT
-                    id,
-                    name,
-                    ST_AsGeoJSON(bounds)::JSON AS bounds,
-                    project_id,
-                    bookmarked,
-                    checkpoint_id,
-                    created,
-                    storage,
-                    patches
+                    a.id AS id,
+                    a.name AS name,
+                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
+                    a.project_id AS project_id,
+                    a.bookmarked AS bookmarked,
+                    a.checkpoint_id AS checkpoint_id,
+                    a.created AS created,
+                    a.storage AS storage,
+                    c.classes as classes,
+                    c.patches AS patches
                 FROM
-                    aois
+                    aois a,
+                    checkpoints c
                 WHERE
-                    aois.id = $1
+                    a.id = $1
+                AND
+                    a.checkpoint_id = c.id
             `, [
                 aoiid
 

@@ -229,7 +229,10 @@ test('GET /api/project/1/aoi/1', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
-            }
+            },
+            classes: [
+                { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }
+            ]
         });
 
         t.end();
