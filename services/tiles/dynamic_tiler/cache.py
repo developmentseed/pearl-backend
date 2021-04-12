@@ -26,9 +26,7 @@ class cached(aiocache.cached):
                 value.headers["X-Cache"] = "HIT"
             return value
         except Exception:
-            aiocache.logger.exception(
-                "Couldn't retrieve %s, unexpected error", key
-            )
+            aiocache.logger.exception("Couldn't retrieve %s, unexpected error", key)
 
     async def decorator(
         self,
@@ -63,10 +61,8 @@ class cached(aiocache.cached):
 def setup_cache():
     """Setup aiocache."""
     config: Dict[str, Any] = {
-        'cache': "aiocache.SimpleMemoryCache",
-        'serializer': {
-            'class': "aiocache.serializers.PickleSerializer"
-        }
+        "cache": "aiocache.SimpleMemoryCache",
+        "serializer": {"class": "aiocache.serializers.PickleSerializer"},
     }
     if cache_settings.ttl is not None:
         config["ttl"] = cache_settings.ttl

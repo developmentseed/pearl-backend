@@ -52,7 +52,7 @@ cog_endpoints = CustomTilerFactory(
 app.include_router(cog_endpoints.router, prefix="/cog", tags=["COG"])
 
 tms_endpoint = TMSFactory()
-app.include_router(tms_endpoint.router,  tags=["TileMatrixSets"])
+app.include_router(tms_endpoint.router, tags=["TileMatrixSets"])
 
 
 @app.get("/healthz", description="Health Check", tags=["Health Check"])

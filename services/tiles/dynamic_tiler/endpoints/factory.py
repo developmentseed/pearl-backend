@@ -13,7 +13,11 @@ from rio_tiler.constants import MAX_THREADS
 from rio_tiler.io import BaseReader
 
 from titiler import utils
-from titiler.endpoints.factory import BaseTilerFactory, TilerFactory, img_endpoint_params
+from titiler.endpoints.factory import (
+    BaseTilerFactory,
+    TilerFactory,
+    img_endpoint_params,
+)
 from titiler.models.mapbox import TileJSON
 from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHeader
 from titiler.dependencies import WebMercatorTMSParams
@@ -42,20 +46,19 @@ class CogCreationModel(BaseModel):
     patches: List[str] = Field(default_factory=list)
     colormap: Optional[Dict]
 
-    @validator('colormap')
+    @validator("colormap")
     def validate_colormap(cls, v):
         if v:
             return {int(key): parse_color(val) for key, val in v.items()}
         return v
 
+
 @dataclass
 class CustomTilerFactory(TilerFactory):
-
     def register_routes(self):
         """register routes."""
         super().register_routes()
         self.update_cog()
-
 
     def update_cog(self):
         """Register /update_cog endpoint."""
@@ -70,7 +73,7 @@ class CustomTilerFactory(TilerFactory):
                     "description": "Return a COG.",
                 }
             },
-            response_class=StreamingResponse
+            response_class=StreamingResponse,
         )
         def cogify(body: CogCreationModel):
             """Create a COG."""
@@ -101,8 +104,14 @@ class CustomTilerFactory(TilerFactory):
                             # Get dataset window for each patch bounds
                             wind = in_mem_dst.window(*patch_dst.bounds)
                             in_mem_dst.write(
-                                patch_dst.read(out_shape=(patch_dst.count, int(wind.height), int(wind.width))),
-                                window=wind
+                                patch_dst.read(
+                                    out_shape=(
+                                        patch_dst.count,
+                                        int(wind.height),
+                                        int(wind.width),
+                                    )
+                                ),
+                                window=wind,
                             )
 
                     with MemoryFile() as out_mem:
@@ -119,6 +128,7 @@ class CustomTilerFactory(TilerFactory):
                             BytesIO(out_mem.read()),
                             media_type="image/tiff; application=geotiff; profile=cloud-optimized",
                         )
+
 
 @dataclass
 class MosaicTilerFactory(BaseTilerFactory):
@@ -137,6 +147,7 @@ class MosaicTilerFactory(BaseTilerFactory):
 
     def register_routes(self):
         """Register endpoints."""
+
         @self.router.get(
             r"/{layer}/info",
             response_model=mosaicInfo,
@@ -172,7 +183,9 @@ class MosaicTilerFactory(BaseTilerFactory):
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),
-            buffer: Optional[int] = Query(None, gt=0, description="tile buffer in pixel."),
+            buffer: Optional[int] = Query(
+                None, gt=0, description="tile buffer in pixel."
+            ),
             kwargs: Dict = Depends(self.additional_dependency),
         ):
             """Create map tile from a COG."""
@@ -244,7 +257,9 @@ class MosaicTilerFactory(BaseTilerFactory):
         )
         def tilejson(
             request: Request,
-            layer: str = Query(..., description="Mosaic Layer name ('{username}.{layer}')"),
+            layer: str = Query(
+                ..., description="Mosaic Layer name ('{username}.{layer}')"
+            ),
             tile_format: Optional[ImageType] = Query(
                 None, description="Output image type. Default is auto."
             ),
@@ -264,7 +279,9 @@ class MosaicTilerFactory(BaseTilerFactory):
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),  # noqa
-            buffer: Optional[int] = Query(None, gt=0, description="tile buffer in pixel."),  # noqa
+            buffer: Optional[int] = Query(
+                None, gt=0, description="tile buffer in pixel."
+            ),  # noqa
             kwargs: Dict = Depends(self.additional_dependency),  # noqa
         ):
             """Return TileJSON document for a Mosaic."""
