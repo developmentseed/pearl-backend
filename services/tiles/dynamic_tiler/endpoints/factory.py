@@ -3,7 +3,7 @@
 import os
 from io import BytesIO
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Optional, Type
+from typing import Callable, Dict, Optional, Type, List, Tuple
 from urllib.parse import urlencode
 
 from morecantile import TileMatrixSet
@@ -26,9 +26,27 @@ from fastapi import Depends, Path, Query
 from starlette.requests import Request
 from starlette.responses import Response, StreamingResponse
 
+from rio_tiler.colormap import parse_color
 from rio_cogeo import cog_translate, cog_profiles
+import rasterio
 from rasterio.io import MemoryFile
 
+from pydantic import BaseModel, Field, validator
+
+
+# Models from POST/PUT Body
+class CogCreationModel(BaseModel):
+    """Request body the `COG` endpoint."""
+
+    input: str
+    patches: List[str] = Field(default_factory=list)
+    colormap: Optional[Dict]
+
+    @validator('colormap')
+    def validate_colormap(cls, v):
+        if v:
+            return {int(key): parse_color(val) for key, val in v.items()}
+        return v
 
 @dataclass
 class CustomTilerFactory(TilerFactory):
@@ -42,8 +60,8 @@ class CustomTilerFactory(TilerFactory):
     def update_cog(self):
         """Register /update_cog endpoint."""
 
-        @self.router.get(
-            "/colorize",
+        @self.router.post(
+            "/cogify",
             responses={
                 200: {
                     "content": {
@@ -54,11 +72,8 @@ class CustomTilerFactory(TilerFactory):
             },
             response_class=StreamingResponse
         )
-        def colorize(
-            src_path=Depends(self.path_dependency),
-            colormap=Depends(self.colormap_dependency),
-        ):
-            """Return the bounds of the COG."""
+        def cogify(body: CogCreationModel):
+            """Create a COG."""
             config = self.gdal_config
             config.update(
                 dict(
@@ -68,18 +83,42 @@ class CustomTilerFactory(TilerFactory):
                 )
             )
             output_profile = cog_profiles.get("deflate")
-            with MemoryFile() as mem_dst:
-                cog_translate(
-                    src_path,
-                    mem_dst.name,
-                    output_profile,
-                    in_memory=True,
-                    quiet=True,
-                    colormap=colormap,
-                    config=config,
-                )
-                return StreamingResponse(BytesIO(mem_dst.read()), media_type="video/mp4")
 
+            with rasterio.open(body.input) as src_dst, MemoryFile() as in_mem:
+
+                try:
+                    colormap = src_dst.colormap(1)
+                except ValueError:
+                    colormap = None
+
+                with in_mem.open(**src_dst.profile) as in_mem_dst:
+                    # Read input data and create a new InMemory dataset
+                    in_mem_dst.write(src_dst.read())
+
+                    # Burn each patch to the input dataset
+                    for patch in body.patches:
+                        with rasterio.open(patch) as patch_dst:
+                            # Get dataset window for each patch bounds
+                            wind = in_mem_dst.window(*patch_dst.bounds)
+                            in_mem_dst.write(
+                                patch_dst.read(out_shape=(patch_dst.count, int(wind.height), int(wind.width))),
+                                window=wind
+                            )
+
+                    with MemoryFile() as out_mem:
+                        cog_translate(
+                            in_mem_dst,
+                            out_mem.name,
+                            output_profile,
+                            in_memory=True,
+                            quiet=True,
+                            colormap=body.colormap or colormap,
+                            config=config,
+                        )
+                        return StreamingResponse(
+                            BytesIO(out_mem.read()),
+                            media_type="image/tiff; application=geotiff; profile=cloud-optimized",
+                        )
 
 @dataclass
 class MosaicTilerFactory(BaseTilerFactory):
