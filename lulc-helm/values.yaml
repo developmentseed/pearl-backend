@@ -41,10 +41,10 @@ tiles:
   resources:
     requests:
       cpu: 400m
-      memory: 1Gi
+      memory: 2Gi
     limits:
       cpu: 1000m
-      memory: 3Gi
+      memory: 2Gi
 
 tilesScaler:
   env:
