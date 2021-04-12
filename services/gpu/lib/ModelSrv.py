@@ -7,6 +7,8 @@ from .AOI import AOI
 from .MemRaster import MemRaster
 from .utils import serialize, deserialize
 import logging
+import rasterio
+from rasterio.io import MemoryFile
 
 LOGGER = logging.getLogger("server")
 
@@ -89,15 +91,15 @@ class ModelSrv():
                 while len(patch.tiles) > 0 and self.is_aborting is False:
                     zxy = patch.tiles.pop()
                     in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
-
                     output, _ = self.model.run(in_memraster.data, False)
 
                     # remove 32 pixel buffer on each side
-                    output = output[32:288, 32:288]
+                    output = output.remove_buffer()
+                    output.clip(self.aoi.poly)
 
                     if patch.live:
                         # Create color versions of predictions
-                        png = pred2png(output, color_list)
+                        png = pred2png(output.data, color_list)
 
                         LOGGER.info("ok - returning patch inference");
                         websocket.send(json.dumps({
@@ -222,14 +224,21 @@ class ModelSrv():
 
                 output, _ = self.model.run(in_memraster.data, False)
 
-                # remove 32 pixel buffer on each side
-                output = output[32:288, 32:288]
+                output = MemRaster(
+                        output,
+                        "epsg:3857",
+                        (in_memraster.x, in_memraster.y, in_memraster.z),
+                        True)
 
+                output = output.remove_buffer()
+
+                #clip output
+                output.clip(self.aoi.poly)
                 LOGGER.info("ok - generated inference");
 
                 if self.aoi.live:
                     # Create color versions of predictions
-                    png = pred2png(output, color_list)
+                    png = pred2png(output.data, color_list) # investigate this
 
                     LOGGER.info("ok - returning inference");
                     websocket.send(json.dumps({
@@ -254,7 +263,7 @@ class ModelSrv():
                     }))
 
                 # Push tile into geotiff fabric
-                output = np.expand_dims(output, axis=-1)
+                output = np.expand_dims(output.data, axis=-1)
                 output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
                 self.aoi.add_to_fabric(output)
 

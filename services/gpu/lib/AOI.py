@@ -9,6 +9,7 @@ import rasterio
 import supermercado
 from rasterio.windows import Window
 from rasterio.io import MemoryFile
+from rasterio.warp import transform_geom
 from rasterio.crs import CRS
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import box
@@ -81,7 +82,8 @@ class AOI():
             crs='EPSG:3857',
             transform=transform,
             height=height,
-            width=width
+            width=width,
+            nodata=255
         )
 
         return (extrema, memfile, writer)
