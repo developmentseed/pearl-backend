@@ -1036,17 +1036,22 @@ async function server(config, cb) {
 
                 const tiffurl = await aoi.url(a.id);
 
-                req.url = '/cog/colorize';
-                req.query.url = tiffurl.origin + tiffurl.pathname;
-                req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
-
                 const chkpt = await checkpoint.get(a.checkpoint_id);
                 const cmap = {};
                 for (let i = 0; i < chkpt.classes.length; i++) {
                     cmap[i] = chkpt.classes[i].color;
                 }
 
-                req.query.colormap = JSON.stringify(cmap);
+                req.method = 'POST';
+                req.url = '/cog/colorize';
+                req.body = {
+                    input: tiffurl,
+                    patches: aoi.patches.map((patchid) => {
+                        patch = await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                        return await aoipatch.url(req.params.aoiid, patchid);
+                    }),
+                    colormap: cmap
+                }
 
                 await proxy.request(req, res);
             } catch (err) {
