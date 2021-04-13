@@ -417,6 +417,42 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid/tiles",
+    "title": "TileJSON Patch",
+    "version": "1.0.0",
+    "name": "TileJSONPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get the TileJSON for a given AOI Patch</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y",
+    "title": "Tile Patch",
+    "version": "1.0.0",
+    "name": "TilePatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a Tile for a given AOI Patch</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
     "url": "/api/project/:project/aoi/:aoiid/tiles/:z/:x/:y",
     "title": "Tile AOI",
     "version": "1.0.0",

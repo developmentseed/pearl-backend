@@ -144,6 +144,11 @@
         "query": false,
         "res": false
     },
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /project/:projectid/aoi/:aoiid/patch/:patchid/download": {
         "body": false,
         "query": false,
