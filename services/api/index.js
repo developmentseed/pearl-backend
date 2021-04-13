@@ -1042,14 +1042,17 @@ async function server(config, cb) {
                     cmap[i] = chkpt.classes[i].color;
                 }
 
+                let patchurls = [];
+                for (const patchid of aoi.patches) {
+                    patch = await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                    patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
+                }
+
                 req.method = 'POST';
                 req.url = '/cog/cogify';
                 req.body = {
                     input: tiffurl,
-                    patches: aoi.patches.map((patchid) => {
-                        patch = await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
-                        return await aoipatch.url(req.params.aoiid, patchid);
-                    }),
+                    patches: patchurls,
                     colormap: cmap
                 }
 
