@@ -11,8 +11,11 @@
             "description": "Has the checkpoint been bookmarked in the frontend"
         },
         "patches": {
-            "type": "integer[]",
-            "description": "List of patch ids to apply on export"
+            "type": "array",
+            "description": "List of patch ids to apply on export",
+            "items": {
+                "type": "integer"
+            }
         }
     }
 }

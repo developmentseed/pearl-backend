@@ -71,7 +71,8 @@ class AOI {
             storage: row.storage,
             bookmarked: row.bookmarked,
             project_id: parseInt(row.project_id),
-            checkpoint_id: parseInt(row.checkpoint_id)
+            checkpoint_id: parseInt(row.checkpoint_id),
+            patches: row.patches.map((patch) => { return parseInt(patch); })
         };
 
         if (typeof row.bounds === 'object') {
@@ -169,6 +170,7 @@ class AOI {
      * @param {Boolean} aoi.storage Has the storage been uploaded
      * @param {String} aoi.name - Human Readable Name
      * @param {Boolean} aoi.bookmarked Has the aoi been bookmarked by the user
+     * @param {Number[]} aoi.patches List of patches in order of application on export
      */
     async patch(aoiid, aoi) {
         let pgres;
@@ -178,7 +180,8 @@ class AOI {
                     SET
                         storage = COALESCE($2, storage),
                         name = COALESCE($3, name),
-                        bookmarked = COALESCE($4, bookmarked)
+                        bookmarked = COALESCE($4, bookmarked),
+                        patches = COALESCE($5, patches)
                     WHERE
                         id = $1
                     RETURNING *
@@ -186,7 +189,8 @@ class AOI {
                 aoiid,
                 aoi.storage,
                 aoi.name,
-                aoi.bookmarked
+                aoi.bookmarked,
+                aoi.patches
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI');
@@ -214,7 +218,8 @@ class AOI {
                     bookmarked,
                     checkpoint_id,
                     created,
-                    storage
+                    storage,
+                    patches
                 FROM
                     aois
                 WHERE

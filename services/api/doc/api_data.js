@@ -272,7 +272,7 @@ define({ "api": [
             "type": "Integer[]",
             "optional": true,
             "field": "patches",
-            "description": "<p>List of patch ids to apply on export</p>"
+            "description": "<p>List of patch ids to apply on export undefined</p>"
           }
         ]
       }

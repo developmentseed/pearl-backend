@@ -186,6 +186,7 @@ test('POST /api/project/1/aoi', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            patches: [],
             name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
@@ -223,6 +224,7 @@ test('GET /api/project/1/aoi/1', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            patches: [],
             name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
@@ -342,6 +344,7 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             id: 1,
             storage: true,
             project_id: 1,
+            patches: [],
             checkpoint_id: 1,
             bookmarked: true,
             name: 'RENAMED',
