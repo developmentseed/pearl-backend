@@ -266,6 +266,13 @@ define({ "api": [
             "optional": true,
             "field": "bookmarked",
             "description": "<p>Has the checkpoint been bookmarked in the frontend</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer[]",
+            "optional": true,
+            "field": "patches",
+            "description": "<p>List of patch ids to apply on export undefined</p>"
           }
         ]
       }
@@ -405,6 +412,42 @@ define({ "api": [
         }
       ]
     },
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid/tiles",
+    "title": "TileJSON Patch",
+    "version": "1.0.0",
+    "name": "TileJSONPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get the TileJSON for a given AOI Patch</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:project/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y",
+    "title": "Tile Patch",
+    "version": "1.0.0",
+    "name": "TilePatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a Tile for a given AOI Patch</p>",
     "filename": "./index.js",
     "groupTitle": "AOIPatch"
   },

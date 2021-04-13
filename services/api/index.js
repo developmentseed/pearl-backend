@@ -560,7 +560,7 @@ async function server(config, cb) {
                         const checkpoints = await checkpoint.list(p.id);
                         p['aois'] = aois.aois;
                         p['checkpoints'] = checkpoints.checkpoints;
-                        p['model'] = {}
+                        p['model'] = {};
                         if (p.model_id) {
                             p['model'] = await model.get(p.model_id);
                             delete p.model_id;
@@ -1355,6 +1355,99 @@ async function server(config, cb) {
                 await Param.int(req, 'patchid');
 
                 return res.json(await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid/tiles TileJSON Patch
+     * @apiVersion 1.0.0
+     * @apiName TileJSONPatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Get the TileJSON for a given AOI Patch
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles'),
+        requiresAuth,
+        async (req, res) => {
+            if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'patchid');
+
+                const a = await aoipatch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+                if (!a.storage) throw new Err(404, null, 'Patch has not been uploaded');
+
+                const tiffurl = await aoipatch.url(req.params.aoiid, req.params.patchid);
+
+                req.url = '/cog/tilejson.json';
+                req.query.url = tiffurl.origin + tiffurl.pathname;
+                req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+                const response = await proxy.request(req);
+
+                if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
+
+                const tj = JSON.parse(response.body);
+
+                // This is verbose as if the upstream JSON response changes
+                // and includes the URL in another place, we leak an access cred
+                res.json({
+                    tilejson: tj.tilejson,
+                    name: `aoi-${req.params.aoiid}-patch-${req.params.patchid}`,
+                    version: tj.version,
+                    schema: tj.scheme,
+                    tiles: [
+                        `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/patch/${req.params.patchid}/tiles/{z}/{x}/{y}`
+                    ],
+                    minzoom: tj.minzoom,
+                    maxzoom: tj.maxzoom,
+                    bounds: tj.bounds,
+                    center: tj.center
+                });
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y Tile Patch
+     * @apiVersion 1.0.0
+     * @apiName TilePatch
+     * @apiGroup AOIPatch
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a Tile for a given AOI Patch
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await Param.int(req, 'patchid');
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
+
+                const a = await aoipatch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+                if (!a.storage) throw new Err(404, null, 'Patch has not been uploaded');
+
+                const tiffurl = await aoipatch.url(req.params.aoiid, req.params.patchid);
+                req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
+                req.query.url = tiffurl.origin + tiffurl.pathname;
+                req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+                await proxy.request(req, res);
             } catch (err) {
                 return Err.respond(err, res);
             }
