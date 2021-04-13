@@ -1043,7 +1043,7 @@ async function server(config, cb) {
                 }
 
                 req.method = 'POST';
-                req.url = '/cog/colorize';
+                req.url = '/cog/cogify';
                 req.body = {
                     input: tiffurl,
                     patches: aoi.patches.map((patchid) => {
