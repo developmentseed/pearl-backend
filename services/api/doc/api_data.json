@@ -219,6 +219,13 @@
             "field": "checkpointid",
             "defaultValue": "0",
             "description": "<p>Only return AOIs for a specific checkpoint</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "bookmarked",
+            "description": "<p>Only return AOIs that have been bookmarked</p>"
           }
         ]
       }
@@ -227,7 +234,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"bookmarked\": false,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
           "type": "json"
         }
       ]

@@ -1086,6 +1086,7 @@ async function server(config, cb) {
      *       "aois": [{
      *           "id": 1432,
      *           "storage": true,
+     *           "bookmarked": false,
      *           "created": "<date>",
      *           "bounds": { "GeoJSON "}
      *       }]
