@@ -89,6 +89,16 @@
         "query": false,
         "res": false
     },
+    "GET /aoi/:aoiuuid/tiles": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /aoi/:aoiuuid/tiles/:z/:x/:y": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
