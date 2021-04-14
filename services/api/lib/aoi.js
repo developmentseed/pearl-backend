@@ -300,20 +300,24 @@ class AOI {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      * @param {Number} [query.checkpointid] - Only return AOIs related to a given Checkpoint
-     * @param {Boolean} query.bookmarked - Only return AOIs that have been bookmarked
+     * @param {String} [query.bookmarked] - Only return AOIs of this bookmarked state. Allowed true or false. By default returns all.
+     * @param {String} [query.sort] - Sort AOI list by ascending or descending order of the created timestamp. Allowed asc or desc. Default desc.
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.sort) query.sort = 'desc';
 
         const where = [];
         where.push(`project_id = ${projectid}`);
 
-        if (query.bookmarked) where.push('bookmarked = true');
-
         if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
             where.push('checkpoint_id = ' + query.checkpointid);
+        }
+
+        if (query.bookmarked) {
+            where.push('bookmarked = ' + query.bookmarked);
         }
 
         let pgres;
@@ -331,6 +335,7 @@ class AOI {
                     aois
                 WHERE
                     ${where.join(' AND ')}
+                ORDER BY created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
@@ -338,7 +343,6 @@ class AOI {
             `, [
                 query.limit,
                 query.page
-
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list aois');

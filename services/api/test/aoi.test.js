@@ -274,7 +274,6 @@ test('GET /api/project/1/aoi', (t) => {
             aois: [{
                 id: 1,
                 name: 'Test AOI',
-                bookmarked: false,
                 storage: true
             }]
         });
@@ -282,6 +281,25 @@ test('GET /api/project/1/aoi', (t) => {
         t.end();
     });
 });
+
+test('GET /api/project/1/aoi?bookmarked=false', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi?bookmarked=false',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body.total, 1);
+
+        t.end();
+    });
+});
+
 
 // The following 2 tests are skipped as they can't run without
 // TiTiler running as well - should add something like this to flow.test.js
@@ -319,28 +337,6 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
 
         fs.writeFileSync('/tmp/sample.png', res.body);
         t.ok(true, 'ok - written png to /tmp/sample.png');
-
-        t.end();
-    });
-});
-
-test('GET /api/project/1/aoi?bookmarked=true', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi?bookmarked=true',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        t.deepEquals(res.body, {
-            total: 0,
-            project_id: 1,
-            aois: []
-        });
 
         t.end();
     });
@@ -394,18 +390,59 @@ test('GET /api/project/1/aoi?bookmarked=true', (t) => {
     }, (err, res) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
-        t.ok(res.body.aois[0].created, '.aois[0].created: <date>');
-        delete res.body.aois[0].created;
+
+        t.deepEquals(res.body.total, 1);
+
+        t.end();
+    });
+});
+
+test('POST /api/project/1/aoi', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'Test AOI 2',
+            checkpoint_id: 1,
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
+            }
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
 
         t.deepEquals(res.body, {
-            total: 1,
+            id: 2,
+            storage: false,
             project_id: 1,
-            aois: [{
-                id: 1,
-                name: 'RENAMED',
-                bookmarked: true,
-                storage: true
-            }]
+            checkpoint_id: 1,
+            bookmarked: false,
+            patches: [],
+            name: 'Test AOI 2',
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
+            }
         });
 
         t.end();
@@ -496,6 +533,23 @@ test('GET /aoi/uuid', (t) => {
                 t.end();
             }
         );
+    });
+});
+
+test('GET /api/project/1/aoi?sort=asc', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi?sort=asc',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.true(new Date(res.body.aois[1].created) > new Date(res.body.aois[0].created));
+        t.end();
     });
 });
 

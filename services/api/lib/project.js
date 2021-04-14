@@ -53,6 +53,14 @@ class Project {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.sort) query.sort = 'desc';
+
+        const where = [];
+        where.push(`uid = ${uid}`)
+
+        if (query.name) {
+            where.push(`name ILIKE '${query.name}%'`)
+        }
 
         let pgres;
         try {
@@ -66,7 +74,8 @@ class Project {
                 FROM
                     projects
                 WHERE
-                    uid = $3
+                    ${where.join(' AND ')}
+                ORDER BY created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
@@ -74,7 +83,6 @@ class Project {
             `, [
                 query.limit,
                 query.page,
-                uid
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list projects');
