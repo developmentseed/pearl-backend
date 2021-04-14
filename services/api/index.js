@@ -837,6 +837,40 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {get} /api/aoi/:aoiuuid Get AOI
+     * @apiVersion 1.0.0
+     * @apiName GetAOI UUID
+     * @apiGroup AOI
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Return all information about a given AOI using the UUID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "name": "I'm an AOI",
+     *       "checkpoint_id": 1,
+     *       "storage": true,
+     *       "bookmarked": false
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON "},
+     *       "classes": []
+     *   }
+     */
+     router.get(
+        ...await schemas.get('GET /aoi/:aoiuuid'),
+        async (req, res) => {
+            try {
+                return res.json(await aoi.getuuid(req.params.aoiuuid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
      * @apiVersion 1.0.0
      * @apiName TileJSONAOI
