@@ -229,7 +229,10 @@ test('GET /api/project/1/aoi/1', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
-            }
+            },
+            classes: [
+                { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }
+            ]
         });
 
         t.end();
@@ -363,6 +366,9 @@ test('PATCH /api/project/1/aoi/1', (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
+        t.ok(res.body.uuid, '.uuid: <string>');
+        delete res.body.uuid;
+
         t.deepEquals(res.body, {
             id: 1,
             storage: true,
@@ -403,6 +409,93 @@ test('GET /api/project/1/aoi?bookmarked=true', (t) => {
         });
 
         t.end();
+    });
+});
+
+test('GET /aoi/uuid', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1',
+        method: 'PATCH',
+        body: {
+            bookmarked: true,
+            name: 'RENAMED'
+        },
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+            request({
+                json: true,
+                url: `http://localhost:2000/api/aoi/${res.body.uuid}`,
+                method: 'GET',
+            }, (err, res) => {
+                t.error(err, 'no errors');
+                t.equals(res.statusCode, 200, 'status: 200');
+
+                t.ok(res.body.created, '.created: <date>');
+                delete res.body.created;
+                t.ok(res.body.uuid, '.uuid: <string>')
+                delete res.body.uuid
+
+                t.deepEqual(res.body, {
+                    "id": 1,
+                    "name": "RENAMED",
+                    "storage": true,
+                    "bookmarked": true,
+                    "project_id": 1,
+                    "checkpoint_id": 1,
+                    "patches": [],
+                    "classes": [
+                        {
+                            "name": "Water",
+                            "color": "#0000FF"
+                        },
+                        {
+                            "name": "Tree Canopy",
+                            "color": "#008000"
+                        },
+                        {
+                            "name": "Field",
+                            "color": "#80FF80"
+                        },
+                        {
+                            "name": "Built",
+                            "color": "#806060"
+                        }
+                    ],
+                    "bounds": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    -79.377245307,
+                                    38.834281801
+                                ],
+                                [
+                                    -79.37677592,
+                                    38.834281801
+                                ],
+                                [
+                                    -79.37677592,
+                                    38.834555504
+                                ],
+                                [
+                                    -79.377245307,
+                                    38.834555504
+                                ],
+                                [
+                                    -79.377245307,
+                                    38.834281801
+                                ]
+                            ]
+                        ]
+                    }
+                });
+
+                t.end();
+            }
+        );
     });
 });
 

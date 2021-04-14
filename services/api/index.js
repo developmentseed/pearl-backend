@@ -837,17 +837,92 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {get} /api/aoi/:aoiuuid Get AOI
+     * @apiVersion 1.0.0
+     * @apiName GetAOI UUID
+     * @apiGroup AOI
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Return all information about a given AOI using the UUID
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "name": "I'm an AOI",
+     *       "checkpoint_id": 1,
+     *       "storage": true,
+     *       "bookmarked": false
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON "},
+     *       "classes": []
+     *   }
+     */
+     router.get(
+        ...await schemas.get('GET /aoi/:aoiuuid'),
+        async (req, res) => {
+            try {
+                return res.json(await aoi.getuuid(req.params.aoiuuid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    const getAoiTileJSON = async (theAoi, req) => {
+        const tiffurl = await aoi.url(theAoi.id);
+
+        req.url = '/cog/tilejson.json';
+        req.query.url = tiffurl.origin + tiffurl.pathname;
+        req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+        const chkpt = await checkpoint.get(theAoi.checkpoint_id);
+        const cmap = {};
+        for (let i = 0; i < chkpt.classes.length; i++) {
+            cmap[i] = chkpt.classes[i].color;
+        }
+
+        req.query.colormap = JSON.stringify(cmap);
+
+        const response = await proxy.request(req);
+
+        if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
+
+        const tj = JSON.parse(response.body);
+        // This is verbose as if the upstream JSON response changes
+        // and includes the URL in another place, we leak an access cred
+        const tiles = req.params.projectid && req.params.aoiid ? [
+            `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+        ] : [
+            `/api/aoi/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+        ]
+        return {
+            tilejson: tj.tilejson,
+            name: `aoi-${theAoi.aoiid}`,
+            version: tj.version,
+            schema: tj.scheme,
+            tiles: tiles,
+            minzoom: tj.minzoom,
+            maxzoom: tj.maxzoom,
+            bounds: tj.bounds,
+            center: tj.center
+        }
+    }
+
+    /**
      * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
      * @apiVersion 1.0.0
      * @apiName TileJSONAOI
      * @apiGroup AOI
-     * @apiPermission public
+     * @apiPermission user
      *
      * @apiDescription
      *     Return tilejson for a given AOI
      */
     router.get(
         ...await schemas.get('GET /project/:projectid/aoi/:aoiid/tiles'),
+        requiresAuth,
         async (req, res) => {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
@@ -855,44 +930,69 @@ async function server(config, cb) {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'aoiid');
 
-                const a = await aoi.get(req.params.aoiid);
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+                res.json(await getAoiTileJSON(a, req));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/aoi/:aoiuuid/tiles TileJSON AOI
+     * @apiVersion 1.0.0
+     * @apiName TileJSONAOI
+     * @apiGroup AOI
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Return tilejson for a given AOI using uuid
+     */
+     router.get(
+        ...await schemas.get('GET /aoi/:aoiuuid/tiles'),
+        async (req, res) => {
+            if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
+
+            try {
+                const a = await aoi.getuuid(req.params.aoiuuid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+                res.json(await getAoiTileJSON(a, req));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/aoi/:aoiuuid/tiles/:z/:x/:y Tile AOI
+     * @apiVersion 1.0.0
+     * @apiName TileAOI
+     * @apiGroup AOI
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Return a Tile for a given AOI using uuid
+     */
+     router.get(
+        ...await schemas.get('GET /aoi/:aoiuuid/tiles/:z/:x/:y'),
+        async (req, res) => {
+            try {
+                await Param.int(req, 'z');
+                await Param.int(req, 'x');
+                await Param.int(req, 'y');
+
+                const a = await aoi.getuuid(req.params.aoiuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 const tiffurl = await aoi.url(a.id);
-
-                req.url = '/cog/tilejson.json';
+                req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
                 req.query.url = tiffurl.origin + tiffurl.pathname;
                 req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-                const chkpt = await checkpoint.get(a.checkpoint_id);
-                const cmap = {};
-                for (let i = 0; i < chkpt.classes.length; i++) {
-                    cmap[i] = chkpt.classes[i].color;
-                }
-
-                req.query.colormap = JSON.stringify(cmap);
-
-                const response = await proxy.request(req);
-
-                if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
-
-                const tj = JSON.parse(response.body);
-
-                // This is verbose as if the upstream JSON response changes
-                // and includes the URL in another place, we leak an access cred
-                res.json({
-                    tilejson: tj.tilejson,
-                    name: `aoi-${req.params.aoiid}`,
-                    version: tj.version,
-                    schema: tj.scheme,
-                    tiles: [
-                        `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-                    ],
-                    minzoom: tj.minzoom,
-                    maxzoom: tj.maxzoom,
-                    bounds: tj.bounds,
-                    center: tj.center
-                });
+                await proxy.request(req, res);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -904,13 +1004,14 @@ async function server(config, cb) {
      * @apiVersion 1.0.0
      * @apiName TileAOI
      * @apiGroup AOI
-     * @apiPermission public
+     * @apiPermission user
      *
      * @apiDescription
      *     Return a Tile for a given AOI
      */
     router.get(
         ...await schemas.get('GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y'),
+        requiresAuth,
         async (req, res) => {
             try {
                 await Param.int(req, 'projectid');
@@ -919,7 +1020,7 @@ async function server(config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                const a = await aoi.get(req.params.aoiid);
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 const tiffurl = await aoi.url(a.id);
