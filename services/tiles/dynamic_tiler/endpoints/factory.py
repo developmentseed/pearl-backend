@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Optional, Type, List, Tuple
 from urllib.parse import urlencode
 
+import numpy
 from morecantile import TileMatrixSet
 from cogeo_mosaic.backends import BaseBackend, MosaicBackend
 from cogeo_mosaic.models import Info as mosaicInfo
@@ -103,17 +104,16 @@ class CustomTilerFactory(TilerFactory):
                         with rasterio.open(patch) as patch_dst:
                             # Get dataset window for each patch bounds
                             wind = in_mem_dst.window(*patch_dst.bounds)
-                            in_mem_dst.write(
-                                patch_dst.read(
-                                    out_shape=(
-                                        patch_dst.count,
-                                        int(wind.height),
-                                        int(wind.width),
-                                    ),
-                                    masked=True,
-                                ),
-                                window=wind,
+
+                            out_shape = (
+                                patch_dst.count,
+                                int(wind.height),
+                                int(wind.width),
                             )
+                            arr_in = in_mem_dst.read(window=wind, out_shape=out_shape)
+                            arr_out = patch_dst.read(out_shape=out_shape)
+                            arr = numpy.where(arr_out != patch_dst.nodata, arr_out, arr_in)
+                            in_mem_dst.write(arr, window=wind)
 
                     with MemoryFile() as out_mem:
                         cog_translate(
