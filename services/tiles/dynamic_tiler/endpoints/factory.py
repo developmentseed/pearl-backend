@@ -109,7 +109,8 @@ class CustomTilerFactory(TilerFactory):
                                         patch_dst.count,
                                         int(wind.height),
                                         int(wind.width),
-                                    )
+                                    ),
+                                    masked=True,
                                 ),
                                 window=wind,
                             )
