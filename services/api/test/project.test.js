@@ -273,7 +273,8 @@ test('GET /api/project', (t) => {
                         {
                             "id": 1,
                             "name": "Test AOI",
-                            "storage": false
+                            "storage": false,
+                            bookmarked: false
                         }
                     ],
                     "checkpoints": [
