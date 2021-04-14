@@ -1043,18 +1043,21 @@ async function server(config, cb) {
                 }
 
                 let patchurls = [];
-                for (const patchid of aoi.patches) {
-                    patch = await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                for (const patchid of a.patches) {
+                    await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
                     patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
                 }
 
                 req.method = 'POST';
                 req.url = '/cog/cogify';
+
                 req.body = {
                     input: tiffurl,
                     patches: patchurls,
                     colormap: cmap
                 }
+
+                console.error(JSON.stringify(req.body));
 
                 await proxy.request(req, res);
             } catch (err) {
