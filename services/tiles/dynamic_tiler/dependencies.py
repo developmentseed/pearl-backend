@@ -15,13 +15,12 @@ def CustomMosaicParams(
     layer: str = Query(..., description="Mosaic Layer name ('{username}.{layer}')"),
 ):
     """Create mosaic path from args."""
-    pattern = (
-        r"^(?P<username>[a-zA-Z0-9-_]{1,32})\.(?P<layername>[a-zA-Z0-9-_]{1,32})$"
-    )
+    pattern = r"^(?P<username>[a-zA-Z0-9-_]{1,32})\.(?P<layername>[a-zA-Z0-9-_]{1,32})$"
     match = re.match(pattern, layer)
     if not match:
         raise HTTPException(
-            status_code=400, detail=f"Invalid layer name: `{layer}`",
+            status_code=400,
+            detail=f"Invalid layer name: `{layer}`",
         )
 
     meta = match.groupdict()
@@ -33,7 +32,9 @@ def CustomMosaicParams(
 
 def CustomPathParams(
     url: str = Query(..., description="Dataset URL"),
-    url_params: str = Query(None, description="Base64 encoded Query parameters to add to the dataset URL."),
+    url_params: str = Query(
+        None, description="Base64 encoded Query parameters to add to the dataset URL."
+    ),
 ) -> str:
     """DatasetPath Params."""
     if url_params:
