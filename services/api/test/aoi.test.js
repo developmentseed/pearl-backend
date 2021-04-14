@@ -274,7 +274,8 @@ test('GET /api/project/1/aoi', (t) => {
             aois: [{
                 id: 1,
                 name: 'Test AOI',
-                storage: true
+                storage: true,
+                bookmarked: false
             }]
         });
 
