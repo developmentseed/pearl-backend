@@ -16,6 +16,10 @@
             "type": "integer",
             "default": 0,
             "description": "Only return AOIs for a specific checkpoint"
+        },
+        "bookmarked": {
+            "type": "boolean",
+            "description": "Only return AOIs that have been bookmarked"
         }
     }
 }

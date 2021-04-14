@@ -245,6 +245,7 @@ class AOI {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      * @param {Number} [query.checkpointid] - Only return AOIs related to a given Checkpoint
+     * @param {Boolean} query.bookmarked - Only return AOIs that have been bookmarked
      */
     async list(projectid, query) {
         if (!query) query = {};
@@ -253,6 +254,8 @@ class AOI {
 
         const where = [];
         where.push(`project_id = ${projectid}`);
+
+        if (query.bookmarked) where.push('bookmarked = true');
 
         if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
             where.push('checkpoint_id = ' + query.checkpointid);
@@ -293,6 +296,7 @@ class AOI {
                 return {
                     id: parseInt(row.id),
                     name: row.name,
+                    bookmarked: row.bookmarked,
                     bounds: row.bounds,
                     created: row.created,
                     storage: row.storage

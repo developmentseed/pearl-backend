@@ -271,6 +271,7 @@ test('GET /api/project/1/aoi', (t) => {
             aois: [{
                 id: 1,
                 name: 'Test AOI',
+                bookmarked: false,
                 storage: true
             }]
         });
@@ -320,6 +321,28 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
     });
 });
 
+test('GET /api/project/1/aoi?bookmarked=true', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi?bookmarked=true',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, {
+            total: 0,
+            project_id: 1,
+            aois: []
+        });
+
+        t.end();
+    });
+});
+
 test('PATCH /api/project/1/aoi/1', (t) => {
     request({
         json: true,
@@ -348,6 +371,35 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             checkpoint_id: 1,
             bookmarked: true,
             name: 'RENAMED',
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/aoi?bookmarked=true', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi?bookmarked=true',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.aois[0].created, '.aois[0].created: <date>');
+        delete res.body.aois[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            project_id: 1,
+            aois: [{
+                id: 1,
+                name: 'RENAMED',
+                bookmarked: true,
+                storage: true
+            }]
         });
 
         t.end();
