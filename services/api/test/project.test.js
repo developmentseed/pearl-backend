@@ -225,6 +225,7 @@ test('POST /api/project/1/aoi', (t) => {
             id: 1,
             storage: false,
             project_id: 1,
+            patches: [],
             checkpoint_id: 1,
             name: 'Test AOI',
             bookmarked: false,
@@ -272,7 +273,8 @@ test('GET /api/project', (t) => {
                         {
                             "id": 1,
                             "name": "Test AOI",
-                            "storage": false
+                            "storage": false,
+                            bookmarked: false
                         }
                     ],
                     "checkpoints": [

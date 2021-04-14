@@ -71,8 +71,18 @@ class AOI {
             storage: row.storage,
             bookmarked: row.bookmarked,
             project_id: parseInt(row.project_id),
-            checkpoint_id: parseInt(row.checkpoint_id)
+            checkpoint_id: parseInt(row.checkpoint_id),
+            patches: row.patches.map((patch) => { return parseInt(patch); })
         };
+
+        // only return uuid for bookmarked aois
+        if (row.hasOwnProperty('uuid') && row.bookmarked) {
+            def['uuid'] = row.uuid;
+        }
+
+        if (row.hasOwnProperty('classes')) {
+            def['classes'] = row.classes
+        }
 
         if (typeof row.bounds === 'object') {
             def.bounds = row.bounds;
@@ -169,6 +179,7 @@ class AOI {
      * @param {Boolean} aoi.storage Has the storage been uploaded
      * @param {String} aoi.name - Human Readable Name
      * @param {Boolean} aoi.bookmarked Has the aoi been bookmarked by the user
+     * @param {Number[]} aoi.patches List of patches in order of application on export
      */
     async patch(aoiid, aoi) {
         let pgres;
@@ -178,7 +189,8 @@ class AOI {
                     SET
                         storage = COALESCE($2, storage),
                         name = COALESCE($3, name),
-                        bookmarked = COALESCE($4, bookmarked)
+                        bookmarked = COALESCE($4, bookmarked),
+                        patches = COALESCE($5, patches)
                     WHERE
                         id = $1
                     RETURNING *
@@ -186,10 +198,53 @@ class AOI {
                 aoiid,
                 aoi.storage,
                 aoi.name,
-                aoi.bookmarked
+                aoi.bookmarked,
+                aoi.patches
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+
+        return AOI.json(pgres.rows[0]);
+    }
+
+    /**
+     * Return a single bookmarked AOI using uuid
+     * @param {String} aoiuuid
+     */
+
+    async getuuid(aoiuuid) {
+        let pgres;
+        try {
+            pgres = await this.pool.query(`
+               SELECT
+                    a.id AS id,
+                    a.uuid AS uuid,
+                    a.name AS name,
+                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
+                    a.project_id AS project_id,
+                    a.bookmarked AS bookmarked,
+                    a.checkpoint_id AS checkpoint_id,
+                    a.created AS created,
+                    a.storage AS storage,
+                    a.patches AS patches,
+                    c.classes as classes
+                FROM
+                    aois a,
+                    checkpoints c
+                WHERE
+                    a.uuid = $1
+                AND
+                    a.bookmarked=true
+                AND
+                    a.checkpoint_id = c.id
+            `, [
+                aoiuuid
+            ]);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to get AOI');
         }
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
@@ -207,21 +262,26 @@ class AOI {
         try {
             pgres = await this.pool.query(`
                SELECT
-                    id,
-                    name,
-                    ST_AsGeoJSON(bounds)::JSON AS bounds,
-                    project_id,
-                    bookmarked,
-                    checkpoint_id,
-                    created,
-                    storage
+                    a.id AS id,
+                    a.uuid AS uuid,
+                    a.name AS name,
+                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
+                    a.project_id AS project_id,
+                    a.bookmarked AS bookmarked,
+                    a.checkpoint_id AS checkpoint_id,
+                    a.created AS created,
+                    a.storage AS storage,
+                    a.patches AS patches,
+                    c.classes as classes
                 FROM
-                    aois
+                    aois a,
+                    checkpoints c
                 WHERE
-                    aois.id = $1
+                    a.id = $1
+                AND
+                    a.checkpoint_id = c.id
             `, [
                 aoiid
-
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get AOI');
@@ -240,6 +300,7 @@ class AOI {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      * @param {Number} [query.checkpointid] - Only return AOIs related to a given Checkpoint
+     * @param {Boolean} query.bookmarked - Only return AOIs that have been bookmarked
      */
     async list(projectid, query) {
         if (!query) query = {};
@@ -248,6 +309,8 @@ class AOI {
 
         const where = [];
         where.push(`project_id = ${projectid}`);
+
+        if (query.bookmarked) where.push('bookmarked = true');
 
         if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
             where.push('checkpoint_id = ' + query.checkpointid);
@@ -288,6 +351,7 @@ class AOI {
                 return {
                     id: parseInt(row.id),
                     name: row.name,
+                    bookmarked: row.bookmarked,
                     bounds: row.bounds,
                     created: row.created,
                     storage: row.storage
