@@ -897,7 +897,7 @@ async function server(config, cb) {
 
         if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
-        const tj = JSON.parse(response.body);
+        const tj = response.body;
         // This is verbose as if the upstream JSON response changes
         // and includes the URL in another place, we leak an access cred
         const tiles = req.params.projectid && req.params.aoiid ? [
@@ -907,7 +907,7 @@ async function server(config, cb) {
         ]
         return {
             tilejson: tj.tilejson,
-            name: `aoi-${theAoi.aoiid}`,
+            name: `aoi-${theAoi.id}`,
             version: tj.version,
             schema: tj.scheme,
             tiles: tiles,
