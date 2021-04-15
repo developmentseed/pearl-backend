@@ -464,6 +464,7 @@ test('GET /api/project/1', (t) => {
             id: 1,
             name: 'Test Project',
             model_id: 1,
+            model_name: 'NAIP Supervised',
             mosaic: 'naip.latest',
             checkpoints: {
                 total: 0,
@@ -522,6 +523,7 @@ test('GET /api/project/1', (t) => {
             id: 1,
             name: 'Renamed Test Project',
             model_id: 1,
+            model_name: 'NAIP Supervised',
             mosaic: 'naip.latest',
             checkpoints: {
                 total: 0,
