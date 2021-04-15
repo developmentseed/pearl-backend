@@ -154,10 +154,9 @@ class ModelSrv():
                     in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
                     output, _ = self.model.run(in_memraster.data, False)
 
-                    print(output.shape)
                     output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
                     output = output.remove_buffer()
-                    output = output.clip(self.aoi.poly)
+                    output = output.clip(patch.poly)
 
                     if patch.live:
                         # Create color versions of predictions

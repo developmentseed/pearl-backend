@@ -88,11 +88,20 @@ class CheckPoint {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of checkpoints to return
      * @param {Number} [query.page=0] - Page to return
+     * @param {String} [query.bookmarked] - Optional. Allowed true or false
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.sort) query.sort = 'desc';
+
+        const where = [];
+        where.push(`project_id = ${projectid}`);
+
+        if (query.bookmarked) {
+            where.push('bookmarked = ' + query.bookmarked);
+        }
 
         let pgres;
         try {
@@ -108,15 +117,15 @@ class CheckPoint {
                 FROM
                     checkpoints
                 WHERE
-                    project_id = $3
+                    ${where.join(' AND ')}
+                ORDER BY created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
                     $2
             `, [
                 query.limit,
-                query.page,
-                projectid
+                query.page
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list checkpoints');

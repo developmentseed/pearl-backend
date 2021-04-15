@@ -11,6 +11,16 @@
             "type": "integer",
             "default": 0,
             "description": "The offset based on limit to return"
+        },
+        "sort": {
+            "type": "string",
+            "default": "desc",
+            "description": "Sorting order for listing projects based on created timestamp. Allowed 'desc' and 'asc'. Default desc."
+        },
+        "name": {
+            "type": "string",
+            "default": "",
+            "description": "Filter projects that matches the name."
         }
     }
 }

@@ -20,6 +20,7 @@ class Project {
             uid: parseInt(row.uid),
             name: row.name,
             model_id: parseInt(row.model_id),
+            model_name: row.model_name,
             mosaic: row.mosaic,
             created: row.created
         };
@@ -53,6 +54,14 @@ class Project {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.sort) query.sort = 'desc';
+
+        const where = [];
+        where.push(`uid = ${uid}`)
+
+        if (query.name) {
+            where.push(`name ILIKE '${query.name}%'`)
+        }
 
         let pgres;
         try {
@@ -66,7 +75,8 @@ class Project {
                 FROM
                     projects
                 WHERE
-                    uid = $3
+                    ${where.join(' AND ')}
+                ORDER BY created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
@@ -74,7 +84,6 @@ class Project {
             `, [
                 query.limit,
                 query.page,
-                uid
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list projects');
@@ -139,16 +148,20 @@ class Project {
         try {
             pgres = await this.pool.query(`
                 SELECT
-                    id,
-                    uid,
-                    name,
-                    model_id,
-                    mosaic,
-                    created
+                    p.id AS id,
+                    p.uid AS uid,
+                    p.name AS name,
+                    p.model_id AS model_id,
+                    p.mosaic AS mosaic,
+                    p.created AS created,
+                    m.name AS model_name
                 FROM
-                    projects
+                    projects p,
+                    models m
                 WHERE
-                    id = $1
+                    p.id = $1
+                AND
+                    p.model_id = m.id
             `, [
                 projectid
             ]);

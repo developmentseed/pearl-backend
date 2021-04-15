@@ -321,6 +321,133 @@ test('GET /api/project/1/checkpoint', (t) => {
     });
 });
 
+test('GET /api/project/1/checkpoint?bookmarked=true', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint?bookmarked=true',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.checkpoints[0].created, '.checkpoints[0].created: <date');
+        delete res.body.checkpoints[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            project_id: 1,
+            checkpoints: [{
+                id: 1,
+                parent: null,
+                name: 'NEW NAME',
+                storage: true,
+                bookmarked: true
+            }]
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/checkpoint?bookmarked=false', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint?bookmarked=false',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, {
+            total: 0,
+            project_id: 1,
+            checkpoints: []
+        });
+
+        t.end();
+    });
+});
+
+test('POST /api/project/1/checkpoint (sort)', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'TEST 2',
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 2,
+            name: 'TEST 2',
+            parent: null,
+            project_id: 1,
+            storage: false,
+            analytics: null,
+            bookmarked: false,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] },
+            ]
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/checkpoint?sort=asc', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint?sort=asc',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.true(new Date(res.body.checkpoints[1].created) > new Date(res.body.checkpoints[0].created));
+
+        t.end();
+    });
+});
+
+
 test('GET /api/project/1/checkpoint/1/tiles - no geometry', (t) => {
     request({
         json: true,
@@ -413,7 +540,7 @@ test('POST /api/project/1/checkpoint - parent', (t) => {
         delete res.body.created;
 
         t.deepEquals(res.body, {
-            id: 3,
+            id: 4,
             name: 'TEST',
             parent: 1,
             project_id: 1,
@@ -466,10 +593,10 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
     });
 });
 
-test('DELETE /api/project/1/checkpoint/3', (t) => {
+test('DELETE /api/project/1/checkpoint/4', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint/3',
+        url: 'http://localhost:2000/api/project/1/checkpoint/4',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`

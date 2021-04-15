@@ -300,20 +300,25 @@ class AOI {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      * @param {Number} [query.checkpointid] - Only return AOIs related to a given Checkpoint
-     * @param {Boolean} query.bookmarked - Only return AOIs that have been bookmarked
+     * @param {String} [query.bookmarked] - Only return AOIs of this bookmarked state. Allowed true or false. By default returns all.
+     * @param {String} [query.sort] - Sort AOI list by ascending or descending order of the created timestamp. Allowed asc or desc. Default desc.
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.sort) query.sort = 'desc';
 
         const where = [];
-        where.push(`project_id = ${projectid}`);
-
-        if (query.bookmarked) where.push('bookmarked = true');
+        where.push(`a.project_id = ${projectid}`);
+        where.push('a.checkpoint_id = c.id');
 
         if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
             where.push('checkpoint_id = ' + query.checkpointid);
+        }
+
+        if (query.bookmarked) {
+            where.push('a.bookmarked = ' + query.bookmarked);
         }
 
         let pgres;
@@ -321,16 +326,21 @@ class AOI {
             pgres = await this.pool.query(`
                SELECT
                     count(*) OVER() AS count,
-                    id,
-                    name,
-                    bookmarked,
-                    ST_AsGeoJSON(bounds)::JSON,
-                    created,
-                    storage
+                    a.id AS id,
+                    a.uuid AS uuid,
+                    a.name AS name,
+                    a.bookmarked AS bookmarked,
+                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
+                    a.created AS created,
+                    a.storage AS storage,
+                    a.checkpoint_id AS checkpoint_id,
+                    c.name AS checkpoint_name
                 FROM
-                    aois
+                    aois a,
+                    checkpoints c
                 WHERE
                     ${where.join(' AND ')}
+                ORDER BY a.created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
@@ -338,7 +348,6 @@ class AOI {
             `, [
                 query.limit,
                 query.page
-
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list aois');
@@ -350,11 +359,14 @@ class AOI {
             aois: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    uuid: row.uuid,
                     name: row.name,
                     bookmarked: row.bookmarked,
                     bounds: row.bounds,
                     created: row.created,
-                    storage: row.storage
+                    storage: row.storage,
+                    checkpoint_id: row.checkpoint_id,
+                    checkpoint_name: row.checkpoint_name
                 };
             })
         };

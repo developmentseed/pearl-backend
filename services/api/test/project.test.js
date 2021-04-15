@@ -259,8 +259,6 @@ test('GET /api/project', (t) => {
 
         t.ok(res.body.projects[0].created, '.created: <date>');
         delete res.body.projects[0].created;
-        delete res.body.projects[0].aois[0].created
-        delete res.body.projects[0].checkpoints[0].created
         delete res.body.projects[0].model.created
 
         t.deepEquals(res.body, {
@@ -269,23 +267,8 @@ test('GET /api/project', (t) => {
                 {
                     "id": 1,
                     "name": "Test Project",
-                    "aois": [
-                        {
-                            "id": 1,
-                            "name": "Test AOI",
-                            "storage": false,
-                            bookmarked: false
-                        }
-                    ],
-                    "checkpoints": [
-                        {
-                            "id": 1,
-                            "parent": null,
-                            "name": "Test Checkpoint",
-                            "storage": false,
-                            "bookmarked": false
-                        }
-                    ],
+                    "aois": [],
+                    "checkpoints": [],
                     "model": {
                         "id": 1,
                         "active": true,
@@ -333,6 +316,124 @@ test('GET /api/project', (t) => {
     });
 });
 
+test('POST /api/project (sort)', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'LULC Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 2,
+            uid: 1,
+            name: 'LULC Test Project',
+            model_id: 1,
+            mosaic: 'naip.latest'
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project?sort=asc', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project?sort=asc',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.true(new Date(res.body.projects[1].created) > new Date(res.body.projects[0].created));
+
+        t.end();
+    });
+});
+
+test('GET /api/project?name=lulc', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project?name=lulc',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        delete res.body.projects[0].created;
+        delete res.body.projects[0].model.created;
+
+        t.deepEqual(res.body, {
+            "total": 1,
+            "projects": [
+                {
+                    "id": 2,
+                    "name": "LULC Test Project",
+                    "aois": [],
+                    "checkpoints": [],
+                    "model": {
+                        "id": 1,
+                        "active": true,
+                        "uid": 1,
+                        "name": "NAIP Supervised",
+                        "model_type": "pytorch_example",
+                        "model_inputshape": [
+                            240,
+                            240,
+                            4
+                        ],
+                        "model_zoom": 17,
+                        "storage": null,
+                        "classes": [
+                            {
+                                "name": "Water",
+                                "color": "#0000FF"
+                            },
+                            {
+                                "name": "Tree Canopy",
+                                "color": "#008000"
+                            },
+                            {
+                                "name": "Field",
+                                "color": "#80FF80"
+                            },
+                            {
+                                "name": "Built",
+                                "color": "#806060"
+                            }
+                        ],
+                        "meta": {},
+                        "bounds": [
+                            -180,
+                            -90,
+                            180,
+                            90
+                        ]
+                    }
+                }
+            ]
+        });
+        t.end();
+    });
+});
+
 test('GET /api/project/1', (t) => {
     request({
         json: true,
@@ -351,7 +452,9 @@ test('GET /api/project/1', (t) => {
             id: 1,
             name: 'Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            model_name: 'NAIP Supervised',
+            mosaic: 'naip.latest',
+            checkpoints: []
         });
 
         t.end();
@@ -405,7 +508,9 @@ test('GET /api/project/1', (t) => {
             id: 1,
             name: 'Renamed Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            model_name: 'NAIP Supervised',
+            mosaic: 'naip.latest',
+            checkpoints: []
         });
 
         t.end();
@@ -462,10 +567,10 @@ test('GET /api/project/1', (t) => {
     });
 });
 
-test('DELETE /api/project/2', (t) => {
+test('DELETE /api/project/3', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/2',
+        url: 'http://localhost:2000/api/project/3',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`

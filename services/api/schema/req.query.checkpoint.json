@@ -11,6 +11,16 @@
             "type": "integer",
             "default": 0,
             "description": "The offset based on limit to return"
+        },
+        "bookmarked": {
+            "type": "string",
+            "default": "",
+            "description": "Only return bookmarked checkpoints. true or false."
+        },
+        "sort": {
+            "type": "string",
+            "default": "desc",
+            "description": "Sorting order for listing checkpoints based on created timestamp. Allowed 'desc' and 'asc'"
         }
     }
 }

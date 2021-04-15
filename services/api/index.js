@@ -534,14 +534,8 @@ async function server(config, cb) {
      *              "name": "aoi name",
      *              "created": "<date>",
      *              "storage": false
-     *           }],
-     *          "checkpoints": [{
-     *              "id": 1,
-     *              "name": "checkpoint name",
-     *              "created": "<date>",
-     *              "storage": false,
-     *              "bookmarked": false
-     *          }]
+     *            }],
+     *            "checkpoints": []
      *       }]
      *   }
      */
@@ -556,8 +550,11 @@ async function server(config, cb) {
                 if (results.projects && results.projects.length) {
                     for (let index = 0; index < results.projects.length; index++) {
                         const p = results.projects[index];
-                        const aois = await aoi.list(p.id);
-                        const checkpoints = await checkpoint.list(p.id);
+                        const aois = await aoi.list(p.id, { bookmarked: 'true' });
+                        const checkpoints = await checkpoint.list(p.id, { bookmarked: 'true' });
+                        // remove reduntant project id
+                        delete aois.project_id
+                        delete checkpoints.project_id;
                         p['aois'] = aois.aois;
                         p['checkpoints'] = checkpoints.checkpoints;
                         p['model'] = {};
@@ -603,6 +600,11 @@ async function server(config, cb) {
 
                 const proj = await project.has_auth(req.auth, req.params.projectid);
                 delete proj.uid;
+
+                const checkpoints = await checkpoint.list(req.params.projectid, { bookmarked: 'true' });
+                // remove reduntant project id
+                delete checkpoints.project_id;
+                proj['checkpoints'] = checkpoints.checkpoints;
 
                 return res.json(proj);
             } catch (err) {
@@ -889,7 +891,7 @@ async function server(config, cb) {
 
         if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
-        const tj = JSON.parse(response.body);
+        const tj = response.body;
         // This is verbose as if the upstream JSON response changes
         // and includes the URL in another place, we leak an access cred
         const tiles = req.params.projectid && req.params.aoiid ? [
@@ -899,7 +901,7 @@ async function server(config, cb) {
         ]
         return {
             tilejson: tj.tilejson,
-            name: `aoi-${theAoi.aoiid}`,
+            name: `aoi-${theAoi.id}`,
             version: tj.version,
             schema: tj.scheme,
             tiles: tiles,
