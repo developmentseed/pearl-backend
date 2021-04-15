@@ -529,19 +529,13 @@ async function server(config, cb) {
      *           "id": 1,
      *           "name": 123,
      *           "created": "<date>",
-     *           "aois": {
-     *              "total": 1,
-     *              "aois": [{
-     *                  "id": 1,
-     *                  "name": "aoi name",
-     *                  "created": "<date>",
-     *                  "storage": false
-     *              }],
-     *           },
-     *           "checkpoints": {
-     *              "total": 0,
-     *              "checkpoints": []
-     *           }
+     *           "aois": [{
+     *              "id": 1,
+     *              "name": "aoi name",
+     *              "created": "<date>",
+     *              "storage": false
+     *            }],
+     *            "checkpoints": []
      *       }]
      *   }
      */
@@ -561,8 +555,8 @@ async function server(config, cb) {
                         // remove reduntant project id
                         delete aois.project_id
                         delete checkpoints.project_id;
-                        p['aois'] = aois;
-                        p['checkpoints'] = checkpoints;
+                        p['aois'] = aois.aois;
+                        p['checkpoints'] = checkpoints.checkpoints;
                         p['model'] = {};
                         if (p.model_id) {
                             p['model'] = await model.get(p.model_id);
@@ -610,7 +604,7 @@ async function server(config, cb) {
                 const checkpoints = await checkpoint.list(req.params.projectid, { bookmarked: 'true' });
                 // remove reduntant project id
                 delete checkpoints.project_id;
-                proj['checkpoints'] = checkpoints;
+                proj['checkpoints'] = checkpoints.checkpoints;
 
                 return res.json(proj);
             } catch (err) {

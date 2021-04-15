@@ -266,7 +266,10 @@ test('GET /api/project/1/aoi', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
         t.ok(res.body.aois[0].created, '.aois[0].created: <date>');
+        t.ok(res.body.aois[0].uuid, '.aois[0].uuid: <string>');
+
         delete res.body.aois[0].created;
+        delete res.body.aois[0].uuid;
 
         t.deepEquals(res.body, {
             total: 1,
