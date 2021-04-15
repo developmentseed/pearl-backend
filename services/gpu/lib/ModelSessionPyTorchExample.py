@@ -314,7 +314,7 @@ class TorchFineTuning(ModelSession):
         newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
         newmodel.eval()
         with torch.no_grad():
-            features = newmodel(tile_img[None, ...])
+            features = newmodel(data[None, ...])
             features = features.cpu().numpy()
             features = np.moveaxis(features[0], 0, -1)
         print((features.shape))
