@@ -529,19 +529,19 @@ async function server(config, cb) {
      *           "id": 1,
      *           "name": 123,
      *           "created": "<date>",
-     *           "aois": [{
-     *              "id": 1,
-     *              "name": "aoi name",
-     *              "created": "<date>",
-     *              "storage": false
-     *           }],
-     *          "checkpoints": [{
-     *              "id": 1,
-     *              "name": "checkpoint name",
-     *              "created": "<date>",
-     *              "storage": false,
-     *              "bookmarked": false
-     *          }]
+     *           "aois": {
+     *              "total": 1,
+     *              "aois": [{
+     *                  "id": 1,
+     *                  "name": "aoi name",
+     *                  "created": "<date>",
+     *                  "storage": false
+     *              }],
+     *           },
+     *           "checkpoints": {
+     *              "total": 0,
+     *              "checkpoints": []
+     *           }
      *       }]
      *   }
      */
@@ -556,10 +556,13 @@ async function server(config, cb) {
                 if (results.projects && results.projects.length) {
                     for (let index = 0; index < results.projects.length; index++) {
                         const p = results.projects[index];
-                        const aois = await aoi.list(p.id);
-                        const checkpoints = await checkpoint.list(p.id);
-                        p['aois'] = aois.aois;
-                        p['checkpoints'] = checkpoints.checkpoints;
+                        const aois = await aoi.list(p.id, { bookmarked: 'true' });
+                        const checkpoints = await checkpoint.list(p.id, { bookmarked: 'true' });
+                        // remove reduntant project id
+                        delete aois.project_id
+                        delete checkpoints.project_id;
+                        p['aois'] = aois;
+                        p['checkpoints'] = checkpoints;
                         p['model'] = {};
                         if (p.model_id) {
                             p['model'] = await model.get(p.model_id);
