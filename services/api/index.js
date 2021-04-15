@@ -607,6 +607,11 @@ async function server(config, cb) {
                 const proj = await project.has_auth(req.auth, req.params.projectid);
                 delete proj.uid;
 
+                const checkpoints = await checkpoint.list(req.params.projectid, { bookmarked: 'true' });
+                // remove reduntant project id
+                delete checkpoints.project_id;
+                proj['checkpoints'] = checkpoints;
+
                 return res.json(proj);
             } catch (err) {
                 return Err.respond(err, res);
