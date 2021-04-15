@@ -82,10 +82,9 @@ def geom2px(geom, modelsrv):
 
         in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat='npy')
 
-        modelsrv.model.run(in_memraster.data, False)
-        retrain = modelsrv.model.run(in_memraster.data, True)
-
+        _, retrain = modelsrv.model.run(in_memraster.data)
         retrain = retrain[32:288, 32:288, :]
+
         value = retrain[pixels[0], pixels[1]]
 
         pxs.append(PX(coord, xy, xyz, pixels, value))
