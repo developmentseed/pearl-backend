@@ -20,6 +20,7 @@ class Project {
             uid: parseInt(row.uid),
             name: row.name,
             model_id: parseInt(row.model_id),
+            model_name: row.model_name,
             mosaic: row.mosaic,
             created: row.created
         };
@@ -147,16 +148,20 @@ class Project {
         try {
             pgres = await this.pool.query(`
                 SELECT
-                    id,
-                    uid,
-                    name,
-                    model_id,
-                    mosaic,
-                    created
+                    p.id AS id,
+                    p.uid AS uid,
+                    p.name AS name,
+                    p.model_id AS model_id,
+                    p.mosaic AS mosaic,
+                    p.created AS created,
+                    m.name AS model_name
                 FROM
-                    projects
+                    projects p,
+                    models m
                 WHERE
-                    id = $1
+                    p.id = $1
+                AND
+                    p.model_id = m.id
             `, [
                 projectid
             ]);
