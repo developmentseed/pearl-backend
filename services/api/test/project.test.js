@@ -267,14 +267,8 @@ test('GET /api/project', (t) => {
                 {
                     "id": 1,
                     "name": "Test Project",
-                    "aois": {
-                        "total": 0,
-                        "aois": []
-                    },
-                    "checkpoints": {
-                        "total": 0,
-                        "checkpoints": [],
-                    },
+                    "aois": [],
+                    "checkpoints": [],
                     "model": {
                         "id": 1,
                         "active": true,
@@ -392,14 +386,8 @@ test('GET /api/project?name=lulc', (t) => {
                 {
                     "id": 2,
                     "name": "LULC Test Project",
-                    "aois": {
-                        "total": 0,
-                        "aois": []
-                    },
-                    "checkpoints": {
-                        "total": 0,
-                        "checkpoints": []
-                    },
+                    "aois": [],
+                    "checkpoints": [],
                     "model": {
                         "id": 1,
                         "active": true,
@@ -466,10 +454,7 @@ test('GET /api/project/1', (t) => {
             model_id: 1,
             model_name: 'NAIP Supervised',
             mosaic: 'naip.latest',
-            checkpoints: {
-                total: 0,
-                checkpoints: []
-            }
+            checkpoints: []
         });
 
         t.end();
@@ -525,10 +510,7 @@ test('GET /api/project/1', (t) => {
             model_id: 1,
             model_name: 'NAIP Supervised',
             mosaic: 'naip.latest',
-            checkpoints: {
-                total: 0,
-                checkpoints: []
-            }
+            checkpoints: []
         });
 
         t.end();
