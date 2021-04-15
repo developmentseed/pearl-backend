@@ -81,10 +81,13 @@ def geom2px(geom, modelsrv):
         pixels = rowcol(transform, *xy)
 
         in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat='npy')
-        _, retrain = modelsrv.model.run(in_memraster.data, False)
-        retrain = retrain[32:288, 32:288, :]
 
-        value = retrain[pixels[0], pixels[1]]
+        modelsrv.model.run(in_memraster.data, False)
+        #_, retrain = modelsrv.model.run(in_memraster.data, False)
+
+        #retrain = retrain[32:288, 32:288, :]
+        #value = retrain[pixels[0], pixels[1]]
+        value = np.random.rand(64,)
 
         pxs.append(PX(coord, xy, xyz, pixels, value))
 

@@ -125,8 +125,7 @@ class TorchFineTuning(ModelSession):
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
         tile = tile.astype(np.float32)
-        output, output_features = self.run_model_on_tile(tile)
-        return output, output_features
+        return self.run_model_on_tile(tile)
 
     def retrain(self, classes, **kwargs):
         names = [x['name'] for x in classes]
@@ -297,20 +296,15 @@ class TorchFineTuning(ModelSession):
     def run_model_on_tile(self, tile):
         height = tile.shape[1]
         width = tile.shape[2]
-
         output = np.zeros((len(self.classes), height, width), dtype=np.float32)
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
+        self.model.eval()
         with torch.no_grad():
-            predictions, features = self.model.forward_features(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
             predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
-            features = features.cpu().numpy() #embeddings per pixel for the image
 
-
-        predictions = predictions[0].argmax(axis=0).astype(np.uint8)  #using [0] because using a "fake batch" of 1 tile
-        features = np.moveaxis(features[0], 0, -1)  #using [0] because using a "fake batch" of 1 tile (shape should be 256, 256, 64)
-
-        return  predictions, features
+        return predictions
 
     def save_state_to(self, directory):
         torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt"))
