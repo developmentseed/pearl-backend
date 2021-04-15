@@ -385,15 +385,17 @@ class CheckPoint {
         try {
             pgres = await this.pool.query(`
             SELECT
-                ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
             FROM (
-                SELECT ST_AsMVTGeom(
-                    geom,
-                    ST_TileEnvelope($2, $3, $4),
-                    4096,
-                    256,
-                    false
-                ) AS geom
+                SELECT
+                    id,
+                    class,
+                    ST_AsMVTGeom(geom, ST_TileEnvelope($2, $3, $4), 4096, 256, false) AS geom
+                FROM (
+                    SELECT
+                        id,
+                        class,
+                        geom
                     FROM (
                         SELECT
                             r.id,
@@ -423,14 +425,13 @@ class CheckPoint {
                             FROM
                                 parents
                         ) r, Unnest(r.geom) WITH ORDINALITY AS t (geom, class)
+                    ) u
                 WHERE
-                    ST_Intersects(
-                        geom,
-                        ST_TileEnvelope($2, $3, $4)
-                    )
+                    ST_Intersects(geom, ST_TileEnvelope($2, $3, $4))
             ) n
             GROUP BY
                 id,
+                class,
                 geom
         ) q
             `, [
