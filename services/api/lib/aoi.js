@@ -310,14 +310,15 @@ class AOI {
         if (!query.sort) query.sort = 'desc';
 
         const where = [];
-        where.push(`project_id = ${projectid}`);
+        where.push(`a.project_id = ${projectid}`);
+        where.push('a.checkpoint_id = c.id');
 
         if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
             where.push('checkpoint_id = ' + query.checkpointid);
         }
 
         if (query.bookmarked) {
-            where.push('bookmarked = ' + query.bookmarked);
+            where.push('a.bookmarked = ' + query.bookmarked);
         }
 
         let pgres;
@@ -325,17 +326,20 @@ class AOI {
             pgres = await this.pool.query(`
                SELECT
                     count(*) OVER() AS count,
-                    id,
-                    name,
-                    bookmarked,
-                    ST_AsGeoJSON(bounds)::JSON,
-                    created,
-                    storage
+                    a.id AS id,
+                    a.name AS name,
+                    a.bookmarked AS bookmarked,
+                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
+                    a.created AS created,
+                    a.storage AS storage,
+                    a.checkpoint_id AS checkpoint_id,
+                    c.name AS checkpoint_name
                 FROM
-                    aois
+                    aois a,
+                    checkpoints c
                 WHERE
                     ${where.join(' AND ')}
-                ORDER BY created ${query.sort}
+                ORDER BY a.created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
@@ -358,7 +362,9 @@ class AOI {
                     bookmarked: row.bookmarked,
                     bounds: row.bounds,
                     created: row.created,
-                    storage: row.storage
+                    storage: row.storage,
+                    checkpoint_id: row.checkpoint_id,
+                    checkpoint_name: row.checkpoint_name
                 };
             })
         };
