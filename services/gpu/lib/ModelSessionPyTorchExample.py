@@ -53,8 +53,9 @@ class FCN(nn.Module):
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
         z = F.relu(self.conv5(x))
+        y = self.last(z)
 
-        return z
+        return y, z
 
 class TorchFineTuning(ModelSession):
 
@@ -298,20 +299,19 @@ class TorchFineTuning(ModelSession):
             }
 
 
-    def run_model_on_tile_embedding(self, tile):
+    def run_model_on_tile_embeddings(self, tile):
         height = tile.shape[1]
         width = tile.shape[2]
         output = np.zeros((len(self.classes), height, width), dtype=np.float32)
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
-
         with torch.no_grad():
-            features = self.model.forward_features(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions, features = self.model.forward_features(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
             features = features.cpu().numpy() #embeddings per pixel for the image
-
+        predictions = predictions[0].argmax(axis=0).astype(np.uint8)  #using [0] because using a "fake batch" of 1 tile
         features = np.moveaxis(features[0], 0, -1)  #using [0] because using a "fake batch" of 1 tile (shape should be 256, 256, 64)
-        return features
-
+        return  predictions, features
 
     def run_model_on_tile(self, tile):
         height = tile.shape[1]
