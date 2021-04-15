@@ -327,6 +327,7 @@ class AOI {
                SELECT
                     count(*) OVER() AS count,
                     a.id AS id,
+                    a.uuid AS uuid,
                     a.name AS name,
                     a.bookmarked AS bookmarked,
                     ST_AsGeoJSON(a.bounds)::JSON AS bounds,
@@ -358,6 +359,7 @@ class AOI {
             aois: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    uuid: row.uuid,
                     name: row.name,
                     bookmarked: row.bookmarked,
                     bounds: row.bounds,
