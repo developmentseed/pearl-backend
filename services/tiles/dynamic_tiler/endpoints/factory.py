@@ -5,6 +5,7 @@ from io import BytesIO
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Optional, Type, List, Tuple
 from urllib.parse import urlencode
+from contextlib import ExitStack
 
 import numpy
 from morecantile import TileMatrixSet
@@ -34,6 +35,7 @@ from starlette.responses import Response, StreamingResponse
 from rio_tiler.colormap import parse_color
 from rio_cogeo import cog_translate, cog_profiles
 import rasterio
+from rasterio.merge import merge
 from rasterio.io import MemoryFile
 
 from pydantic import BaseModel, Field, validator
@@ -88,47 +90,47 @@ class CustomTilerFactory(TilerFactory):
             )
             output_profile = cog_profiles.get("deflate")
 
-            with rasterio.open(body.input) as src_dst, MemoryFile() as in_mem:
+            with ExitStack() as stack:
+                sources = [
+                    stack.enter_context(rasterio.open(source))
+                    for source in [body.input, *body.patches]
+                ]
+                dest, output_transform = merge(sources)
 
                 try:
-                    colormap = src_dst.colormap(1)
+                    colormap = sources[0].colormap(1)
                 except ValueError:
                     colormap = None
 
-                with in_mem.open(**src_dst.profile) as in_mem_dst:
-                    # Read input data and create a new InMemory dataset
-                    in_mem_dst.write(src_dst.read())
-
-                    # Burn each patch to the input dataset
-                    for patch in body.patches:
-                        with rasterio.open(patch) as patch_dst:
-                            # Get dataset window for each patch bounds
-                            wind = in_mem_dst.window(*patch_dst.bounds)
-
-                            out_shape = (
-                                patch_dst.count,
-                                int(wind.height),
-                                int(wind.width),
+                count, height, width = dest.shape
+                profile = {
+                    "driver": "GTiff",
+                    "count": count,
+                    "dtype": dest.dtype,
+                    "nodata": 0,
+                    "height": height,
+                    "width": width,
+                    "crs": sources[0].crs,
+                    "transform": output_transform,
+                }
+                with MemoryFile() as in_mem:
+                    with in_mem.open(**profile) as in_mem_dst:
+                        in_mem_dst.write(dest)
+                        del dest
+                        with MemoryFile() as out_mem:
+                            cog_translate(
+                                in_mem_dst,
+                                out_mem.name,
+                                output_profile,
+                                in_memory=True,
+                                quiet=True,
+                                colormap=body.colormap or colormap,
+                                config=config,
                             )
-                            arr_in = in_mem_dst.read(window=wind, out_shape=out_shape)
-                            arr_out = patch_dst.read(out_shape=out_shape)
-                            arr = numpy.where(arr_out != patch_dst.nodata, arr_out, arr_in)
-                            in_mem_dst.write(arr, window=wind)
-
-                    with MemoryFile() as out_mem:
-                        cog_translate(
-                            in_mem_dst,
-                            out_mem.name,
-                            output_profile,
-                            in_memory=True,
-                            quiet=True,
-                            colormap=body.colormap or colormap,
-                            config=config,
-                        )
-                        return StreamingResponse(
-                            BytesIO(out_mem.read()),
-                            media_type="image/tiff; application=geotiff; profile=cloud-optimized",
-                        )
+                            return StreamingResponse(
+                                BytesIO(out_mem.read()),
+                                media_type="image/tiff; application=geotiff; profile=cloud-optimized",
+                            )
 
 
 @dataclass
