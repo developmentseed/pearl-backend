@@ -396,26 +396,33 @@ class CheckPoint {
                 ) AS geom
                     FROM (
                         SELECT
-                            r.id as id,
-                            r.geom as geom
+                            r.id,
+                            t.class,
+                            ST_Transform(ST_GeomFromGeoJSON(t.geom), 3857) AS geom
                         FROM (
                             WITH RECURSIVE parents (id, geom) AS (
-                                SELECT id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
-                            FROM checkpoints
-                            WHERE id = $1
-
+                                SELECT
+                                    id,
+                                    checkpoints.retrain_geoms AS geom
+                                FROM
+                                    checkpoints
+                                WHERE
+                                    id = $1
                             UNION ALL
-
-                            SELECT
-                                checkpoints.id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
-                            FROM checkpoints
-                            JOIN parents ON checkpoints.parent = parents.id
+                                SELECT
+                                    checkpoints.id,
+                                    checkpoints.retrain_geoms AS geom
+                                FROM
+                                    checkpoints
+                                JOIN
+                                    parents ON checkpoints.parent = parents.id
                             )
                             SELECT
                                 id,
                                 geom
-                            FROM parents
-                        ) r
+                            FROM
+                                parents
+                        ) r, Unnest(r.geom) WITH ORDINALITY AS t (geom, class)
                 WHERE
                     ST_Intersects(
                         geom,
