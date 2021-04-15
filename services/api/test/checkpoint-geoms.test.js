@@ -473,7 +473,7 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0 - geometries', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(Buffer.from(res.body).toString('hex'), '1a3f0a0464617461120d1801220911efbfbd21efbfbd32efbfbd04efbfbd0712091801220509efbfbd21efbfbd32120d1801220911efbfbd21efbfbd32efbfbd04efbfbd0712091801220509efbfbd21efbfbd3228efbfbd207802');
+        t.deepEquals(Buffer.from(res.body).toString('hex'), '1aefbfbd010a0464617461120f0801120200001801220509efbfbd21efbfbd3212130801120200011801220911efbfbd21efbfbd32efbfbd04efbfbd0712130801120200021801220911efbfbd21efbfbd32efbfbd04efbfbd07120f0801120200031801220509efbfbd21efbfbd32120f0802120200001801220509efbfbd21efbfbd3212130802120200011801220911efbfbd21efbfbd32efbfbd04efbfbd0712130802120200021801220911efbfbd21efbfbd32efbfbd04efbfbd07120f0802120200031801220509efbfbd21efbfbd321a05636c6173732202280122022802220228032202280428efbfbd207802');
 
         t.end();
     });
