@@ -329,7 +329,7 @@ class TorchFineTuning(ModelSession):
         with torch.no_grad():
             features = newmodel(tile_img[None, ...])
             features = features.cpu().numpy()
-        features = np.moveaxis(features[0], 0, -1)
+            features = np.moveaxis(features[0], 0, -1)
         print((features.shape))
         predictions = predictions[0].argmax(axis=0).astype(np.uint8)
         return predictions, features
