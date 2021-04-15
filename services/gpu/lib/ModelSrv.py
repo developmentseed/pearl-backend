@@ -152,7 +152,7 @@ class ModelSrv():
                 while len(patch.tiles) > 0 and self.is_aborting is False:
                     zxy = patch.tiles.pop()
                     in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
-                    output, _ = self.model.run(in_memraster.data, False)
+                    output = self.model.run(in_memraster.data, True)
 
                     output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
                     output = output.remove_buffer()
@@ -282,7 +282,7 @@ class ModelSrv():
                 zxy = self.aoi.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
-                output, _ = self.model.run(in_memraster.data, False)
+                output = self.model.run(in_memraster.data, True)
 
                 output = MemRaster(
                     output,
