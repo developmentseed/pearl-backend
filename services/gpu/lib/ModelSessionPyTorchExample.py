@@ -299,7 +299,7 @@ class TorchFineTuning(ModelSession):
             }
 
 
-    def run_model_on_tile_embeddings(self, tile):
+    def run_model_on_tile_embedding(self, tile):
         height = tile.shape[1]
         width = tile.shape[2]
         output = np.zeros((len(self.classes), height, width), dtype=np.float32)
