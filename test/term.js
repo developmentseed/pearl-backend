@@ -96,10 +96,6 @@ class Prompt {
         this.term = term;
         this.focus = true;
 
-        this.websocket = fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
-            return f.replace(/.json/, '');
-        })//.concat(['Custom']);
-
         this.current = {
             shown: [],
             sel: 0
