@@ -9,6 +9,13 @@
         "bookmarked": {
             "type": "boolean",
             "description": "Has the checkpoint been bookmarked in the frontend"
+        },
+        "patches": {
+            "type": "array",
+            "description": "List of patch ids to apply on export",
+            "items": {
+                "type": "integer"
+            }
         }
     }
 }

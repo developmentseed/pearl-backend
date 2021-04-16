@@ -54,7 +54,7 @@ class AOIPatch {
             expiresOn: moment().add(365, 'days')
         }));
 
-        url.pathname = `aoi-${aoiid}-patch-${patchid}.tiff`;
+        url.pathname = `/aois/aoi-${aoiid}-patch-${patchid}.tiff`;
 
         return url;
     }

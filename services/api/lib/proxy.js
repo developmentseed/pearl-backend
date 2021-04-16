@@ -30,7 +30,9 @@ class Proxy {
             if (res) {
                 return request({
                     url: url,
-                    method: 'GET'
+                    json: typeof req.body === 'object',
+                    method: req.method,
+                    body: req.body
                 }).on('response', (proxres) => {
                     res.status(proxres.statusCode);
                     for (const h of ['content-type', 'content-length', 'content-encoding']) {
@@ -41,7 +43,9 @@ class Proxy {
 
             return await arequest({
                 url: url,
-                method: 'GET'
+                json: typeof req.body === 'object',
+                method: req.method,
+                body: req.body
             });
         } catch (err) {
             throw new Error(err);

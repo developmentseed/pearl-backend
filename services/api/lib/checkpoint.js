@@ -88,11 +88,20 @@ class CheckPoint {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of checkpoints to return
      * @param {Number} [query.page=0] - Page to return
+     * @param {String} [query.bookmarked] - Optional. Allowed true or false
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.sort) query.sort = 'desc';
+
+        const where = [];
+        where.push(`project_id = ${projectid}`);
+
+        if (query.bookmarked) {
+            where.push('bookmarked = ' + query.bookmarked);
+        }
 
         let pgres;
         try {
@@ -108,15 +117,15 @@ class CheckPoint {
                 FROM
                     checkpoints
                 WHERE
-                    project_id = $3
+                    ${where.join(' AND ')}
+                ORDER BY created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
                     $2
             `, [
                 query.limit,
-                query.page,
-                projectid
+                query.page
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list checkpoints');
@@ -376,45 +385,53 @@ class CheckPoint {
         try {
             pgres = await this.pool.query(`
             SELECT
-                ST_AsMVT(q, 'data', 4096, 'geom') AS mvt
+                ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
             FROM (
-                SELECT ST_AsMVTGeom(
-                    geom,
-                    ST_TileEnvelope($2, $3, $4),
-                    4096,
-                    256,
-                    false
-                ) AS geom
+                SELECT
+                    id,
+                    class,
+                    ST_AsMVTGeom(geom, ST_TileEnvelope($2, $3, $4), 4096, 256, false) AS geom
+                FROM (
+                    SELECT
+                        id,
+                        class,
+                        geom
                     FROM (
                         SELECT
-                            r.id as id,
-                            r.geom as geom
+                            r.id,
+                            t.class,
+                            ST_Transform(ST_GeomFromGeoJSON(t.geom), 3857) AS geom
                         FROM (
                             WITH RECURSIVE parents (id, geom) AS (
-                                SELECT id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
-                            FROM checkpoints
-                            WHERE id = $1
-
+                                SELECT
+                                    id,
+                                    checkpoints.retrain_geoms AS geom
+                                FROM
+                                    checkpoints
+                                WHERE
+                                    id = $1
                             UNION ALL
-
-                            SELECT
-                                checkpoints.id, ST_Transform(ST_GeomFromgeoJSON(Unnest(checkpoints.retrain_geoms)), 3857) AS geom
-                            FROM checkpoints
-                            JOIN parents ON checkpoints.parent = parents.id
+                                SELECT
+                                    checkpoints.id,
+                                    checkpoints.retrain_geoms AS geom
+                                FROM
+                                    checkpoints
+                                JOIN
+                                    parents ON checkpoints.parent = parents.id
                             )
                             SELECT
                                 id,
                                 geom
-                            FROM parents
-                        ) r
+                            FROM
+                                parents
+                        ) r, Unnest(r.geom) WITH ORDINALITY AS t (geom, class)
+                    ) u
                 WHERE
-                    ST_Intersects(
-                        geom,
-                        ST_TileEnvelope($2, $3, $4)
-                    )
+                    ST_Intersects(geom, ST_TileEnvelope($2, $3, $4))
             ) n
             GROUP BY
                 id,
+                class,
                 geom
         ) q
             `, [

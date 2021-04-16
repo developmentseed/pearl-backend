@@ -14,6 +14,7 @@ class _MosaicSettings(pydantic.BaseSettings):
 
     class Config:
         """model config"""
+
         env_file = ".env"
         env_prefix = "MOSAIC_"
 

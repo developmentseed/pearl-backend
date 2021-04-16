@@ -203,6 +203,7 @@ test('POST /api/project/1/aoi', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            patches: [],
             name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
@@ -320,7 +321,7 @@ test('GET /api/project/1/aoi/1/patch/1', (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
         t.deepEquals(res.body, {
-            id: 1, storage: true, project_id: 1, aoi_id: 1 
+            id: 1, storage: true, project_id: 1, aoi_id: 1
         });
         t.end();
     });
@@ -344,6 +345,37 @@ test('DELETE /api/project/1/aoi/1/patch/1', (t) => {
     });
 });
 
+test('PATCH /api/project/1/aoi/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            patches: [1]
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            storage: false,
+            project_id: 1,
+            checkpoint_id: 1,
+            bookmarked: false,
+            patches: [1],
+            name: 'Test AOI'
+        });
+        t.end();
+    });
+});
+
 test('GET /api/project/1/aoi/1/patch/1', (t) => {
     request({
         json: true,
@@ -357,7 +389,7 @@ test('GET /api/project/1/aoi/1/patch/1', (t) => {
 
         t.equals(res.statusCode, 404, 'status: 404');
         t.deepEquals(res.body, {
-            status: 404, message: 'AOI Patch not found', messages: []    
+            status: 404, message: 'AOI Patch not found', messages: []
         });
         t.end();
     });

@@ -10,7 +10,7 @@
     },
     "devDependencies": {
         "cli-progress": "^3.9.0",
-        "eslint": "^7.17.0",
+        "eslint": "^7.24.0",
         "eslint-plugin-node": "^11.1.0",
         "pg": "^8.5.1",
         "request": "^2.88.2",

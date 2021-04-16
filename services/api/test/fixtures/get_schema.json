@@ -79,7 +79,22 @@
         "query": false,
         "res": false
     },
+    "GET /aoi/:aoiuuid": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /project/:projectid/aoi/:aoiid/tiles": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /aoi/:aoiuuid/tiles": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /aoi/:aoiuuid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
@@ -140,6 +155,11 @@
         "res": false
     },
     "GET /project/:projectid/aoi/:aoiid/patch/:patchid": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles": {
         "body": false,
         "query": false,
         "res": false

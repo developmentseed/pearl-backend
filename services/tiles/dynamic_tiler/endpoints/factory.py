@@ -3,9 +3,11 @@
 import os
 from io import BytesIO
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Optional, Type
+from typing import Callable, Dict, Optional, Type, List, Tuple
 from urllib.parse import urlencode
+from contextlib import ExitStack
 
+import numpy
 from morecantile import TileMatrixSet
 from cogeo_mosaic.backends import BaseBackend, MosaicBackend
 from cogeo_mosaic.models import Info as mosaicInfo
@@ -13,7 +15,11 @@ from rio_tiler.constants import MAX_THREADS
 from rio_tiler.io import BaseReader
 
 from titiler import utils
-from titiler.endpoints.factory import BaseTilerFactory, TilerFactory, img_endpoint_params
+from titiler.endpoints.factory import (
+    BaseTilerFactory,
+    TilerFactory,
+    img_endpoint_params,
+)
 from titiler.models.mapbox import TileJSON
 from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHeader
 from titiler.dependencies import WebMercatorTMSParams
@@ -26,24 +32,42 @@ from fastapi import Depends, Path, Query
 from starlette.requests import Request
 from starlette.responses import Response, StreamingResponse
 
+from rio_tiler.colormap import parse_color
 from rio_cogeo import cog_translate, cog_profiles
+import rasterio
+from rasterio.merge import merge
 from rasterio.io import MemoryFile
+
+from pydantic import BaseModel, Field, validator
+
+
+# Models from POST/PUT Body
+class CogCreationModel(BaseModel):
+    """Request body the `COG` endpoint."""
+
+    input: str
+    patches: List[str] = Field(default_factory=list)
+    colormap: Optional[Dict]
+
+    @validator("colormap")
+    def validate_colormap(cls, v):
+        if v:
+            return {int(key): parse_color(val) for key, val in v.items()}
+        return v
 
 
 @dataclass
 class CustomTilerFactory(TilerFactory):
-
     def register_routes(self):
         """register routes."""
         super().register_routes()
         self.update_cog()
 
-
     def update_cog(self):
         """Register /update_cog endpoint."""
 
-        @self.router.get(
-            "/colorize",
+        @self.router.post(
+            "/cogify",
             responses={
                 200: {
                     "content": {
@@ -52,13 +76,10 @@ class CustomTilerFactory(TilerFactory):
                     "description": "Return a COG.",
                 }
             },
-            response_class=StreamingResponse
+            response_class=StreamingResponse,
         )
-        def colorize(
-            src_path=Depends(self.path_dependency),
-            colormap=Depends(self.colormap_dependency),
-        ):
-            """Return the bounds of the COG."""
+        def cogify(body: CogCreationModel):
+            """Create a COG."""
             config = self.gdal_config
             config.update(
                 dict(
@@ -68,17 +89,48 @@ class CustomTilerFactory(TilerFactory):
                 )
             )
             output_profile = cog_profiles.get("deflate")
-            with MemoryFile() as mem_dst:
-                cog_translate(
-                    src_path,
-                    mem_dst.name,
-                    output_profile,
-                    in_memory=True,
-                    quiet=True,
-                    colormap=colormap,
-                    config=config,
-                )
-                return StreamingResponse(BytesIO(mem_dst.read()), media_type="video/mp4")
+
+            with ExitStack() as stack:
+                patches = list(reversed(body.patches)) + [body.input]
+                sources = [
+                    stack.enter_context(rasterio.open(source)) for source in patches
+                ]
+                dest, output_transform = merge(sources)
+
+                try:
+                    colormap = sources[0].colormap(1)
+                except ValueError:
+                    colormap = None
+
+                count, height, width = dest.shape
+                profile = {
+                    "driver": "GTiff",
+                    "count": count,
+                    "dtype": dest.dtype,
+                    "nodata": 0,
+                    "height": height,
+                    "width": width,
+                    "crs": sources[0].crs,
+                    "transform": output_transform,
+                }
+                with MemoryFile() as in_mem:
+                    with in_mem.open(**profile) as in_mem_dst:
+                        in_mem_dst.write(dest)
+                        del dest
+                        with MemoryFile() as out_mem:
+                            cog_translate(
+                                in_mem_dst,
+                                out_mem.name,
+                                output_profile,
+                                in_memory=True,
+                                quiet=True,
+                                colormap=body.colormap or colormap,
+                                config=config,
+                            )
+                            return StreamingResponse(
+                                BytesIO(out_mem.read()),
+                                media_type="image/tiff; application=geotiff; profile=cloud-optimized",
+                            )
 
 
 @dataclass
@@ -98,6 +150,7 @@ class MosaicTilerFactory(BaseTilerFactory):
 
     def register_routes(self):
         """Register endpoints."""
+
         @self.router.get(
             r"/{layer}/info",
             response_model=mosaicInfo,
@@ -133,7 +186,9 @@ class MosaicTilerFactory(BaseTilerFactory):
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),
-            buffer: Optional[int] = Query(None, gt=0, description="tile buffer in pixel."),
+            buffer: Optional[int] = Query(
+                None, gt=0, description="tile buffer in pixel."
+            ),
             kwargs: Dict = Depends(self.additional_dependency),
         ):
             """Create map tile from a COG."""
@@ -205,7 +260,9 @@ class MosaicTilerFactory(BaseTilerFactory):
         )
         def tilejson(
             request: Request,
-            layer: str = Query(..., description="Mosaic Layer name ('{username}.{layer}')"),
+            layer: str = Query(
+                ..., description="Mosaic Layer name ('{username}.{layer}')"
+            ),
             tile_format: Optional[ImageType] = Query(
                 None, description="Output image type. Default is auto."
             ),
@@ -225,7 +282,9 @@ class MosaicTilerFactory(BaseTilerFactory):
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),  # noqa
-            buffer: Optional[int] = Query(None, gt=0, description="tile buffer in pixel."),  # noqa
+            buffer: Optional[int] = Query(
+                None, gt=0, description="tile buffer in pixel."
+            ),  # noqa
             kwargs: Dict = Depends(self.additional_dependency),  # noqa
         ):
             """Return TileJSON document for a Mosaic."""
