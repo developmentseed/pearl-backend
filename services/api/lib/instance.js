@@ -69,6 +69,7 @@ class Instance {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {Number} [query.status=active] - Should the session be active? `active`, `inactive`, or `all`
+     * @param {Number} [query.type] - Filter by type of instance. `gpu` or 'cpu'. Default all.
      */
     async list(projectid, query) {
         if (!query) query = {};
@@ -77,6 +78,10 @@ class Instance {
 
         const where = [];
         where.push(`project_id = ${projectid}`);
+
+        if (query.type) {
+            where.push(`type='${query.type}'`);
+        }
 
         if (query.status === 'active') {
             where.push('active IS true');
@@ -91,7 +96,8 @@ class Instance {
                     count(*) OVER() AS count,
                     id,
                     active,
-                    created
+                    created,
+                    type
                 FROM
                     instances
                 WHERE
@@ -116,7 +122,8 @@ class Instance {
                 return {
                     id: parseInt(row.id),
                     active: row.active,
-                    created: row.created
+                    created: row.created,
+                    type: row.type
                 };
             })
         };
@@ -153,26 +160,37 @@ class Instance {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
+        // FIXME: the list method is paginated, but just going to assume we won't
+        // have more than 100 active gpu users at the moment.
+        const activeGpuInstances = await this.list(instance.project_id, {
+            'status': 'active',
+            'type': 'gpu'
+        });
+
+        const type = activeGpuInstances.total < this.config.GpuCount ? 'gpu' : 'cpu';
+
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO instances (
                     project_id,
                     aoi_id,
-                    checkpoint_id
+                    checkpoint_id,
+                    type
                 ) VALUES (
-                    $1, $2, $3
+                    $1, $2, $3, $4
                 ) RETURNING *
             `, [
                 instance.project_id,
                 instance.aoi_id,
-                instance.checkpoint_id
+                instance.checkpoint_id,
+                type
             ]);
 
             const instanceId = parseInt(pgres.rows[0].id);
 
             let pod = {};
             if (this.config.Environment !== 'local') {
-                const podSpec = this.kube.makePodSpec(instanceId, [{
+                const podSpec = this.kube.makePodSpec(instanceId, type, [{
                     name: 'INSTANCE_ID',
                     value: instanceId.toString()
                 },{
