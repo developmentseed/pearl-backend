@@ -334,7 +334,8 @@ class AOI {
                     a.created AS created,
                     a.storage AS storage,
                     a.checkpoint_id AS checkpoint_id,
-                    c.name AS checkpoint_name
+                    c.name AS checkpoint_name,
+                    c.classes AS classes
                 FROM
                     aois a,
                     checkpoints c
@@ -366,7 +367,8 @@ class AOI {
                     created: row.created,
                     storage: row.storage,
                     checkpoint_id: row.checkpoint_id,
-                    checkpoint_name: row.checkpoint_name
+                    checkpoint_name: row.checkpoint_name,
+                    classes: row.classes
                 };
             })
         };
