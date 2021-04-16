@@ -9,7 +9,7 @@ api:
     Postgres: {{TEST_POSTGRES}}
     AZURE_STORAGE_CONNECTION_STRING: {{STAGING_AZURE_STORAGE_CONNECTION_STRING}}
     nodeSelectorKey: 'agentpool'
-    nodeSelectorValue: 'gpunodepool',
+    nodeSelectorValue: 'gpunodepool'
     GpuCount: 8
 socket:
   enabled: true
