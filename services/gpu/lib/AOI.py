@@ -7,6 +7,7 @@ import numpy as np
 import shapely.ops as ops
 import rasterio
 import supermercado
+from affine import Affine
 from rasterio.windows import Window
 from rasterio.io import MemoryFile
 from rasterio.warp import transform_geom
@@ -69,10 +70,10 @@ class AOI():
     @staticmethod
     def gen_fabric(bounds, zoom):
         extrema = supermercado.burntiles.tile_extrema(bounds, zoom)
-        transform = supermercado.burntiles.make_transform(extrema, zoom)
+        transform = make_transform(extrema, zoom)
 
-        height = (extrema["y"]["max"] - extrema["y"]["min"] - 1) * 256
-        width = (extrema["x"]["max"] - extrema["x"]["min"] - 1) * 256
+        height = (extrema["y"]["max"] - extrema["y"]["min"]) * 256
+        width = (extrema["x"]["max"] - extrema["x"]["min"]) * 256
 
         memfile = MemoryFile()
         writer = memfile.open(
@@ -85,7 +86,6 @@ class AOI():
             width=width,
             nodata=255
         )
-
         return (extrema, memfile, writer)
 
     @staticmethod
@@ -126,3 +126,17 @@ class AOI():
                 bounds[3] = tilebounds.north
 
         return list(bounds)
+
+def make_transform(tilerange, zoom):
+    ulx, uly = mercantile.xy(
+        *mercantile.ul(tilerange["x"]["min"], tilerange["y"]["min"], zoom)
+    )
+
+    lrx, lry = mercantile.xy(
+        *mercantile.ul(tilerange["x"]["max"], tilerange["y"]["max"], zoom)
+    )
+
+    xcell = (lrx - ulx) / (float(tilerange["x"]["max"] - tilerange["x"]["min"]) * 256)
+    ycell = (uly - lry) / (float(tilerange["y"]["max"] - tilerange["y"]["min"]) * 256)
+
+    return Affine(xcell, 0, ulx, 0, -ycell, uly)
