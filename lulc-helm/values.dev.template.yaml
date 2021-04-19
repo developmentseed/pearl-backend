@@ -7,7 +7,7 @@ api:
   env:
     SigningSecret: {{STAGING_SIGNING_SECRET}}
     Postgres: {{TEST_POSTGRES}}
-    AZURE_STORAGE_CONNECTION_STRING: {{STAGING_AZURE_STORAGE_CONNECTION_STRING}}
+    AZURE_STORAGE_CONNECTION_STRING: {{TEST_AZURE_STORAGE_CONNECTION_STRING}}
     nodeSelectorKey: 'agentpool'
     nodeSelectorValue: 'gpunodepool'
 socket:
