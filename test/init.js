@@ -387,8 +387,8 @@ function running(test, API) {
             t.deepEquals(res.body, {
                 version: '1.0.0',
                 limits: {
-                    live_inference: 10000000,
-                    max_inference: 10000000,
+                    live_inference: 100000000,
+                    max_inference: 100000000,
                     instance_window: 600
                 }
             });
