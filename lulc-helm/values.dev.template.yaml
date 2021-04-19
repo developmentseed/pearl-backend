@@ -10,7 +10,7 @@ api:
     AZURE_STORAGE_CONNECTION_STRING: {{STAGING_AZURE_STORAGE_CONNECTION_STRING}}
     nodeSelectorKey: 'agentpool'
     nodeSelectorValue: 'gpunodepool'
-    GpuCount: 2
+    GpuCount: '2'
 socket:
   enabled: true
   containerPort: 1999
