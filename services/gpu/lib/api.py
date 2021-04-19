@@ -364,6 +364,7 @@ class API():
             data['checkpoint_id'] = checkpoint_id
 
         LOGGER.info("ok - PATCH " + url)
+        print(json.dumps(data));
         r = self.requests.patch(url,
             headers={
                 "authorization": "Bearer " + self.token
@@ -374,6 +375,7 @@ class API():
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
+        print(r.json())
         return r.json()
 
     def instance_meta(self, instance_id):
