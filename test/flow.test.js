@@ -78,15 +78,28 @@ async function gpu() {
                 }));
                 return;
             } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 3) {
-                try {
-                    const inp = {
-                        ':projectid': 1,
-                        ':aoiid': 1
-                    };
+                const url = lulc.schema.cli[sel.value.split('#')[1]][sel.value.split('#')[2]];
+                const matches = url.match(/:[a-z]+/g);
 
-                    const outp = path.resolve('/tmp/', `aoi-${inp[':aoiid']}.tiff`);
+                const inp = {
+                    ':projectid': 1
+                };
+
+                if (matches) {
+                    for (const match of matches) {
+                        if (inp[match]) continue;
+                        inp[match] = await term.prompt.ask(match);
+                    }
+                }
+
+                try {
+                    const outp = path.resolve('/tmp/', `api-output`);
                     const out = fs.createWriteStream(outp).on('close', () => {
-                        term.log(`Downloaded: ${outp}`);
+                        try {
+                            term.log(JSON.stringify(JSON.parse(fs.readFileSync(outp)), null, 4));
+                        } catch (err) {
+                            term.log(`Downloaded: ${outp}`);
+                        }
                     });
 
                     lulc.cmd(
