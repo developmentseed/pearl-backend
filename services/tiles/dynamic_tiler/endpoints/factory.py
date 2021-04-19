@@ -91,9 +91,9 @@ class CustomTilerFactory(TilerFactory):
             output_profile = cog_profiles.get("deflate")
 
             with ExitStack() as stack:
+                patches = list(reversed(body.patches)) + [body.input]
                 sources = [
-                    stack.enter_context(rasterio.open(source))
-                    for source in [body.input, *body.patches]
+                    stack.enter_context(rasterio.open(source)) for source in patches
                 ]
                 dest, output_transform = merge(sources)
 

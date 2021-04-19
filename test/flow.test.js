@@ -51,13 +51,21 @@ async function gpu() {
 
         term.prompt.screen(['websockets', 'api']);
         term.on('promp#selection', async (sel) => {
-            if (sel.value === 'websockets') {
-                term.prompt.screen(fs.readdirSync(path.resolve(__dirname, './fixtures/')).map((f) => {
-                    return path.parse(f).name;
+            if (sel.value === 'websockets' || (sel.stats && sel.stats.isDirectory())) {
+                const dir = sel.stats ? sel.value : path.resolve(__dirname, './fixtures/');
+
+                term.prompt.screen(fs.readdirSync(dir).map((f) => {
+                    const stats = fs.statSync(path.resolve(dir, f));
+
+                    return {
+                        name: (stats.isDirectory() ? '*' : '') + path.parse(f).name,
+                        stats: stats,
+                        value: path.resolve(dir, f)
+                    }
                 }));
                 return;
-            } else if (sel.value.split('#')[0] === 'model' && sel.value.split('#').length === 2) {
-                ws.send(JSON.stringify(require(`./fixtures/${sel.value}.json`)));
+            } else if (sel.stats && sel.stats.isFile()) {
+                ws.send(String(fs.readFileSync(sel.value)));
                 term.log(`SENT: ${sel.value}`);
             } else if (sel.value === 'api') {
                 term.prompt.screen(Object.keys(lulc.schema.cli).map((k) => {
@@ -70,15 +78,28 @@ async function gpu() {
                 }));
                 return;
             } else if (sel.value.split('#')[0] === 'api' && sel.value.split('#').length === 3) {
-                try {
-                    const inp = {
-                        ':projectid': 1,
-                        ':aoiid': 1
-                    };
+                const url = lulc.schema.cli[sel.value.split('#')[1]][sel.value.split('#')[2]];
+                const matches = url.match(/:[a-z]+/g);
 
-                    const outp = path.resolve('/tmp/', `aoi-${inp[':aoiid']}.tiff`);
+                const inp = {
+                    ':projectid': 1
+                };
+
+                if (matches) {
+                    for (const match of matches) {
+                        if (inp[match]) continue;
+                        inp[match] = await term.prompt.ask(match);
+                    }
+                }
+
+                try {
+                    const outp = path.resolve('/tmp/', `api-output`);
                     const out = fs.createWriteStream(outp).on('close', () => {
-                        term.log(`Downloaded: ${outp}`);
+                        try {
+                            term.log(JSON.stringify(JSON.parse(fs.readFileSync(outp)), null, 4));
+                        } catch (err) {
+                            term.log(`Downloaded: ${outp}`);
+                        }
                     });
 
                     lulc.cmd(
@@ -125,7 +146,7 @@ async function gpu() {
                     term.log(`ok - model#checkpoint#complete - ${msg.data.checkpoint}`);
                     term.prog.update();
                 } else if (msg.message === 'model#aoi') {
-                    term.log(`ok - model#aoi - ${msg.data.name}`);
+                    term.log(`ok - model#aoi - ${msg.data.name} - chkpt: ${msg.data.checkpoint_id}`);
                     state.aois.push(msg.data);
                     term.prog.update('model#prediction', 0);
                 } else if (msg.message === 'model#patch') {

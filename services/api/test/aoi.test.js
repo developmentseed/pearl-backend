@@ -307,7 +307,8 @@ test('GET /api/project/1/aoi', (t) => {
                     ]
                 },
                 checkpoint_id: '1',
-                checkpoint_name: 'Test Checkpoint'
+                checkpoint_name: 'Test Checkpoint',
+                classes: [ { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' } ]
             }]
         });
 
