@@ -147,6 +147,28 @@ class Instance {
         }, this.config.SigningSecret, { expiresIn: '12h' });
     }
 
+    async activeGpuInstances() {
+        try {
+            const pgres = await this.pool.query(`
+                SELECT count(*) OVER() AS count
+                FROM instances
+                WHERE
+                    type='gpu'
+                AND
+                    active IS true
+            `);
+
+            if (pgres.rows.length) {
+                return pgres.rows[0].count;
+            } else {
+                return 0;
+            }
+
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to check active GPUs');
+        }
+    }
+
     /**
      * Create a new GPU instance
      *
@@ -160,16 +182,10 @@ class Instance {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
-        // FIXME: the list method is paginated, but just going to assume we won't
-        // have more than 100 active gpu users at the moment.
-        const activeGpuInstances = await this.list(instance.project_id, {
-            'status': 'active',
-            'type': 'gpu'
-        });
+        const activeGpuInstanceCount = await this.activeGpuInstances();
+        const type = Number(activeGpuInstanceCount) < this.config.GpuCount ? 'gpu' : 'cpu';
 
-        const type = activeGpuInstances.total < this.config.GpuCount ? 'gpu' : 'cpu';
-
-        console.log('## active instances', activeGpuInstances.total)
+        console.log('## active instances', activeGpuInstanceCount);
         console.log('## type', type);
 
         try {
