@@ -404,6 +404,7 @@ class ModelSrv():
         self.chk = self.api.get_checkpoint(load_id)
         chk_fs = self.api.download_checkpoint(self.chk['id'])
         self.model.load_state_from(self.chk, chk_fs)
+        self.api.instance_patch(checkpoint_id = self.chk['id'])
 
     def meta_save_checkpoint(self, body, websocket):
         classes = []
