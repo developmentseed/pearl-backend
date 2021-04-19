@@ -366,7 +366,8 @@ class API():
         LOGGER.info("ok - PATCH " + url)
         r = self.requests.patch(url,
             headers={
-                "authorization": "Bearer " + self.token
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
             },
             data = json.dumps(data)
         )
