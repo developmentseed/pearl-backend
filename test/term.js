@@ -96,8 +96,11 @@ class Prompt {
         this.term = term;
         this.focus = true;
 
+        this.resolve = false;
+
         this.current = {
             shown: [],
+            inp: '',
             sel: 0
         };
 
@@ -115,14 +118,37 @@ class Prompt {
                 }
                 this.update();
             } else if (key.name === 'return') {
-                this.term.emit('promp#selection', this.current.shown[this.current.sel], this.current.sel);
+                if (typeof this.current.shown === 'string') {
+                    this.resolve(this.current.inp);
+                } else {
+                    this.term.emit('promp#selection', this.current.shown[this.current.sel], this.current.sel);
+                }
             } else if (key.name === 'escape') {
                 this.term.emit('promp#escape');
+            } else {
+                if (typeof this.current.shown === 'string') {
+                    if (key.name === 'backspace' && this.current.inp.length) {
+                        this.current.inp = this.current.inp.slice(0, this.current.inp.length -1);
+                        this.update();
+                    } else {
+                        this.current.inp = this.current.inp + key.sequence;
+                        this.update();
+                    }
+                }
             }
 
         });
 
         this.update();
+    }
+
+    ask(question) {
+        return new Promise((resolve) => {
+            this.resolve = resolve;
+            this.current.shown = question;
+            this.current.inp = '';
+            this.update();
+        });
     }
 
     screen(options) {
@@ -137,18 +163,33 @@ class Prompt {
             return o;
         });
         this.current.sel = 0;
+        this.current.inp = '';
         this.update();
     }
 
     update() {
         this.term.charm.position(0, this.y);
-        this.term.line(5, this.current.shown.map((s, i) => {
-            if (this.current.sel === i) {
-                return ' '.repeat(Math.floor((process.stdout.columns - s.name.length - 6) / 2)) + ' > ' + s.name + ' < ';
-            } else {
-                return ' '.repeat(Math.floor((process.stdout.columns - s.name.length) / 2)) + s.name;
-            }
-        }).slice(this.current.sel > 3 ? this.current.sel - 2 : 0));
+
+        if (Array.isArray(this.current.shown)) {
+            this.term.line(5, this.current.shown.map((s, i) => {
+                if (this.current.sel === i) {
+                    return ' '.repeat(Math.floor((process.stdout.columns - s.name.length - 6) / 2)) + ' > ' + s.name + ' < ';
+                } else {
+                    return ' '.repeat(Math.floor((process.stdout.columns - s.name.length) / 2)) + s.name;
+                }
+            }).slice(this.current.sel > 3 ? this.current.sel - 2 : 0));
+        } else {
+            this.term.line(5, []);
+            this.term.charm.position(0, this.y);
+
+            const prompt = 'Enter a value for:';
+            return this.term.line(3, [
+                ' '.repeat(Math.floor((process.stdout.columns - prompt.length) / 2)) + prompt,
+                ' '.repeat(Math.floor((process.stdout.columns - this.current.shown.length) / 2)) + this.current.shown,
+                ' '.repeat(Math.floor((process.stdout.columns - this.current.inp.length) / 2)) + this.current.inp,
+            ] );
+
+        }
     }
 }
 
