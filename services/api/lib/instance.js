@@ -169,6 +169,9 @@ class Instance {
 
         const type = activeGpuInstances.total < this.config.GpuCount ? 'gpu' : 'cpu';
 
+        console.log('## active instances', activeGpuInstances.total)
+        console.log('## type', type);
+
         try {
             const pgres = await this.pool.query(`
                 INSERT INTO instances (
@@ -210,6 +213,7 @@ class Instance {
                     value: this.config.TileUrl
                 }]);
 
+                console.log('## PODSPECT', podSpec);
                 pod = await this.kube.createPod(podSpec);
             }
 
