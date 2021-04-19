@@ -121,7 +121,8 @@ test('POST /api/project/1/instance', (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: false,
-            pod: {}
+            pod: {},
+            type: 'gpu'
         });
 
         t.end();
@@ -182,7 +183,8 @@ test('PATCH /api/project/1/instance/1', (t) => {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: null,
-            active: true
+            active: true,
+            type: 'gpu'
         });
 
         t.end();
