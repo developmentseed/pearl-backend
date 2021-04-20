@@ -49,6 +49,8 @@ async function gpu() {
             token: state.token
         });
 
+        term.log(`TOKEN: ${state.token}`);
+
         term.prompt.screen(['websockets', 'api']);
         term.on('promp#selection', async (sel) => {
             if (sel.value === 'websockets' || (sel.stats && sel.stats.isDirectory())) {
