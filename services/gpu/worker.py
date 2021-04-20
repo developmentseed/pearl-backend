@@ -78,11 +78,6 @@ def load(gpu_id, api):
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
-    if api.instance.get('checkpoint_id') is not None:
-        chk = api.get_checkpoint(api.instance['checkpoint_id'])
-        chk_fs = api.download_checkpoint(api.instance['checkpoint_id'])
-        model.load_state_from(chk, chk_fs)
-
     return ModelSrv(model, api)
 
 def arg(iterable, default=False, pred=None):

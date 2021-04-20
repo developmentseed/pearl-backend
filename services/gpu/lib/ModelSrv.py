@@ -23,6 +23,9 @@ class ModelSrv():
         self.api = api
         self.model = model
 
+        if api.instance.get('checkpoint_id') is not None:
+            self.meta_load_checkpoint(api.instance.get('checkpoint_id'))
+
     def abort(self, body, websocket):
         if self.processing is False:
             websocket.error('Nothing to abort', 'The GPU is not currently processing and has nothing to abort')
