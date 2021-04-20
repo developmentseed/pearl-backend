@@ -144,6 +144,7 @@ class ModelSrv():
                     'message': 'model#patch',
                     'data': {
                         'id': patch.id,
+                        'live': self.patch.live,
                         'checkpoint_id': self.chk['id'],
                         'bounds': patch.bounds,
                         'total': patch.total
@@ -272,6 +273,7 @@ class ModelSrv():
                 'message': 'model#aoi',
                 'data': {
                     'id': self.aoi.id,
+                    'live': self.aoi.live,
                     'name': self.aoi.name,
                     'checkpoint_id': self.chk['id'],
                     'bounds': self.aoi.bounds,

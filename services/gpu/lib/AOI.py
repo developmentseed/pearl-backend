@@ -1,5 +1,4 @@
 import logging
-import pyproj
 import shapely
 import geojson
 import json
@@ -7,6 +6,7 @@ import numpy as np
 import shapely.ops as ops
 import rasterio
 import supermercado
+from pyproj import Geod
 from affine import Affine
 from rasterio.windows import Window
 from rasterio.io import MemoryFile
@@ -96,17 +96,8 @@ class AOI():
     @staticmethod
     def area(bounds):
         geom = box(*bounds)
-
-        return ops.transform(
-            partial(
-                pyproj.transform,
-                pyproj.Proj('EPSG:4326'),
-                pyproj.Proj(
-                    proj='aea',
-                    lat_1=geom.bounds[1],
-                    lat_2=geom.bounds[3]
-                )
-            ), geom).area
+        geod = Geod(ellps="WGS84")
+        return abs(geod.geometry_area_perimeter(geom)[0])
 
 
     @staticmethod
