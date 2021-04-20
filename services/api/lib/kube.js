@@ -33,24 +33,41 @@ class Kube {
     }
 
     /**
-     * Create a podspec for a gpu pod based on a given name and env vars.
+     * Create a podspec for a gpu pod based on a given name, type (gpu or cpu) and env vars.
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      *
      * @param {String} name
+     * @param {String} type
      * @param {Object} env
      */
-    makePodSpec(name, env) {
+    makePodSpec(name, type, env) {
         const nodeSelectorKey = this.config.nodeSelectorKey;
         const nodeSelectorValue = this.config.nodeSelectorValue;
         const deploymentName = this.config.Deployment;
         const gpuImageName = this.config.GpuImageName;
         const gpuImageTag = this.config.GpuImageTag;
 
-        const resources = {
-            limits: {
-                'nvidia.com/gpu': 1
+        let resources;
+        if (type === 'gpu') {
+            resources = {
+                limits: {
+                    'nvidia.com/gpu': 1
+                }
+            };
+        }
+
+        if (type === 'cpu') {
+            resources = {
+                requests: {
+                    'cpu': '4',
+                    'memory': '8Gi'
+                },
+                limits: {
+                    'cpu': '8',
+                    'memory': '16Gi'
+                }
             }
-        };
+        }
         // if (deploymentName === 'lulc-production-lulc-helm') {
         //     resources = {
         //         requests: {
@@ -90,7 +107,7 @@ class Kube {
                         env: env
                     }
                 ],
-                nodeSelector: nodeSelector,
+                nodeSelector: type === 'gpu' ? nodeSelector : {},
                 restartPolicy: 'Never'
             }
         };

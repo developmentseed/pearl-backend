@@ -51,6 +51,8 @@ spec:
               value: {{ .Values.gpu.image.name }}
             - name: GpuImageTag
               value: {{ .Values.gpu.image.tag }}
+            - name: GpuCount
+              value: {{ .Values.api.env.GpuCount | quote }}
             - name: AZURE_STORAGE_CONNECTION_STRING
               value: {{ .Values.api.env.AZURE_STORAGE_CONNECTION_STRING}}
             - name: Deployment
