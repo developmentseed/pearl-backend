@@ -324,7 +324,8 @@ test('PATCH /api/project/1/instance/1', (t) => {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: 1,
-            active: true
+            active: true,
+            type: 'gpu'
         });
 
         t.end();
