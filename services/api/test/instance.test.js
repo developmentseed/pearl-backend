@@ -122,7 +122,8 @@ test('POST /api/project/1/instance', (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: false,
-            pod: {}
+            pod: {},
+            type: 'gpu'
         });
 
         t.end();
@@ -148,7 +149,8 @@ test('GET /api/project/1/instance (empty)', (t) => {
             total: 1,
             instances: [{
                 id: 1,
-                active: false
+                active: false,
+                type: 'gpu'
             }]
         });
 
@@ -182,7 +184,8 @@ test('PATCH /api/project/1/instance/1', (t) => {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: null,
-            active: true
+            active: true,
+            type: 'gpu'
         });
 
         t.end();
@@ -206,7 +209,7 @@ test('GET /api/project/1/instance?status=active', (t) => {
 
         t.deepEquals(res.body, {
             total: 1,
-            instances: [ { id: 1, active: true } ]
+            instances: [ { id: 1, active: true, type: 'gpu' } ]
         });
 
         t.end();
@@ -232,7 +235,8 @@ test('GET /api/project/1/instance', (t) => {
             total: 1,
             instances: [{
                 id: 1,
-                active: true
+                active: true,
+                type: 'gpu'
             }]
         });
 
@@ -320,7 +324,8 @@ test('PATCH /api/project/1/instance/1', (t) => {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: 1,
-            active: true
+            active: true,
+            type: 'gpu'
         });
 
         t.end();

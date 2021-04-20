@@ -23,6 +23,9 @@ class ModelSrv():
         self.api = api
         self.model = model
 
+        if api.instance.get('checkpoint_id') is not None:
+            self.meta_load_checkpoint(api.instance.get('checkpoint_id'))
+
     def abort(self, body, websocket):
         if self.processing is False:
             websocket.error('Nothing to abort', 'The GPU is not currently processing and has nothing to abort')
@@ -141,6 +144,7 @@ class ModelSrv():
                     'message': 'model#patch',
                     'data': {
                         'id': patch.id,
+                        'live': self.patch.live,
                         'checkpoint_id': self.chk['id'],
                         'bounds': patch.bounds,
                         'total': patch.total
@@ -269,6 +273,7 @@ class ModelSrv():
                 'message': 'model#aoi',
                 'data': {
                     'id': self.aoi.id,
+                    'live': self.aoi.live,
                     'name': self.aoi.name,
                     'checkpoint_id': self.chk['id'],
                     'bounds': self.aoi.bounds,
