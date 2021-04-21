@@ -12,6 +12,7 @@ import zipfile
 import urllib3
 from os import path
 from io import BytesIO
+from shapely.geometry import mapping
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from shapely.ops import transform
@@ -275,7 +276,7 @@ class API():
             data = json.dumps({
                 'name': aoi.name,
                 'checkpoint_id': aoi.checkpointid,
-                'bounds': aoi.bounds
+                'bounds': mapping(aoi.poly)
             })
         )
 
