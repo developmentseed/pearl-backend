@@ -113,10 +113,7 @@ class Kube {
             metadata: {
                 name: `${deploymentName}-gpu-${name}`,
                 annotations: {
-                    'janitor/ttl': '15m'
-                },
-                labels: {
-                    type: type
+                    'janitor/ttl': '40m'
                 }
             },
             spec: {
