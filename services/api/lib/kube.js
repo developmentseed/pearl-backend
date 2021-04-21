@@ -110,7 +110,9 @@ class Kube {
                 annotations: {
                     'janitor/ttl': '15m'
                 },
-                type: type
+                labels: {
+                    type: type
+                }
             },
             spec: {
                 containers: [
