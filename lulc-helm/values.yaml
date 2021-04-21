@@ -57,6 +57,14 @@ tilesScaler:
 
 redis:
   enabled: true
+  resources:
+    requests:
+      cpu: 1900m
+      memory: 6Gi
+    limits:
+      cpu: 4
+      memory: 8Gi
+
 gpu:
   image:
     name: 'chartpress_replace'
