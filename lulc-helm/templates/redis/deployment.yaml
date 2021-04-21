@@ -21,6 +21,15 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-redis
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: agentpool
+                  operator: NotIn
+                  values:
+                    - "gpunodepool"
       containers:
         - name: {{ .Chart.Name }}-redis
           image: "redis:latest"

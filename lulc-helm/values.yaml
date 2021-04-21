@@ -23,10 +23,10 @@ socket:
     tag: 'chartpress_replace'
   resources:
     requests:
-      cpu: 2000m
+      cpu: 1
       memory: 2Gi
     limits:
-      cpu: 2000m
+      cpu: 4
       memory: 4Gi
 tiles:
   enabled: true
