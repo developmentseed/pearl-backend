@@ -22,10 +22,10 @@ class Kube {
     }
 
     /**
-     * Method to list pods in the cluster
+     * Method to list GPU pods in the cluster
      */
     async listPods() {
-        const res = await this.k8sApi.listNamespacedPod(this.namespace);
+        const res = await this.k8sApi.listNamespacedPod(this.namespace, { 'labelSelector': 'type=gpu'});
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
@@ -96,7 +96,8 @@ class Kube {
                 name: `${deploymentName}-gpu-${name}`,
                 annotations: {
                     'janitor/ttl': '15m'
-                }
+                },
+                type: type
             },
             spec: {
                 containers: [
