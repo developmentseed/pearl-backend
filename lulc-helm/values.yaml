@@ -27,7 +27,7 @@ socket:
       memory: 6Gi
     limits:
       cpu: 4
-      memory: 4Gi
+      memory: 8Gi
 tiles:
   enabled: true
   containerPort: 8000
