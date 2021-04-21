@@ -8,8 +8,6 @@ api:
     SigningSecret: {{STAGING_SIGNING_SECRET}}
     Postgres: {{PRODUCTION_POSTGRES}}
     AZURE_STORAGE_CONNECTION_STRING: {{PRODUCTION_AZURE_STORAGE_CONNECTION_STRING}}
-    nodeSelectorKey: 'agentpool'
-    nodeSelectorValue: 'gpu'
     GpuCount: 6
 socket:
   enabled: true
