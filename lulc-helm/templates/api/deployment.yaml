@@ -22,6 +22,16 @@ spec:
         run: {{ .Release.Name }}-api
     spec:
       serviceAccountName: kubesurfer
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: agentpool
+                  operator: NotIn
+                  values:
+                    - "gpunodepool"
+                    - "tiler"
       containers:
         - name: {{ .Chart.Name }}-api
           image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
