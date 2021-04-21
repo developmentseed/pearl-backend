@@ -100,7 +100,7 @@ class ModelSrv():
                         (zxy.x, zxy.y, zxy.z)
                     )
 
-                    output.clip(box(*patch.bounds))
+                    output.clip(patch.poly)
 
                     if patch.live:
                         # Create color versions of predictions
@@ -165,7 +165,7 @@ class ModelSrv():
 
                     output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
                     output = output.remove_buffer()
-                    output = output.clip(box(*patch.bounds))
+                    output = output.clip(patch.poly)
 
                     if patch.live:
                         # Create color versions of predictions
@@ -304,7 +304,7 @@ class ModelSrv():
                 output = output.remove_buffer()
 
                 #clip output
-                output.clip(box(*self.aoi.bounds))
+                output.clip(self.aoi.poly)
                 LOGGER.info("ok - generated inference");
 
                 if self.aoi.live:

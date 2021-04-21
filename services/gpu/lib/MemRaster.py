@@ -37,7 +37,7 @@ class MemRaster(object):
             self.buffered = False
         return self
 
-    def clip(self, bounds):
+    def clip(self, polygon):
         geom = transform_geom("epsg:4326", "epsg:3857", polygon)
         transform = from_bounds(*self.xy_bounds, 256, 256)
 

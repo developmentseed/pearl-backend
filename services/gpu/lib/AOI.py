@@ -25,9 +25,10 @@ LOGGER = logging.getLogger("server")
 
 
 class AOI():
-    def __init__(self, api, bounds, name, checkpointid, is_patch=False):
+    def __init__(self, api, poly, name, checkpointid, is_patch=False):
         self.api = api
-        self.bounds = bounds
+        self.poly = shape(poly)
+        self.bounds = self.poly.bounds
         self.name = name
         self.checkpointid = checkpointid
         self.is_patch = is_patch
@@ -37,7 +38,7 @@ class AOI():
         self.live = False
 
     def create(api, poly, name, checkpointid, is_patch=False):
-        aoi = AOI(api, shape(poly).bounds, name, checkpointid, is_patch);
+        aoi = AOI(api, poly, name, checkpointid, is_patch);
         aoi.tiles = AOI.gen_tiles(aoi.bounds, aoi.zoom)
         aoi.total = len(aoi.tiles)
 
@@ -62,7 +63,7 @@ class AOI():
     def load(api, aoiid):
         aoijson = api.aoi_meta(aoiid);
 
-        aoi = AOI(api, aoijson.get('bounds'), aoijson.get('name'), aoijson.get('checkpoint_id'));
+        aoi = AOI(api, shape(aoijson.get('bounds')), aoijson.get('name'), aoijson.get('checkpoint_id'));
         aoi.id = aoijson.get('id')
 
         aoi.api.instance_patch(aoi_id = aoi.id)
