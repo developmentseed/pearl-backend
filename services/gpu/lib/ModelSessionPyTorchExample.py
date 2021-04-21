@@ -304,7 +304,6 @@ class TorchFineTuning(ModelSession):
         output = np.zeros((len(self.classes), height, width), dtype=np.float32)
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
-        self.model.eval()
         with torch.no_grad():
             predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
             predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
@@ -326,7 +325,6 @@ class TorchFineTuning(ModelSession):
         output = np.zeros((len(self.classes), height, width), dtype=np.float32)
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
-        self.model.eval()
         with torch.no_grad():
             predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
             predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
