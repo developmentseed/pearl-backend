@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azureml/openmpi3.1.2-cuda10.1-cudnn7-ubuntu18.04:20210301.v1
+FROM mcr.microsoft.com/openmpi4.1.0-cuda11.0.3-cudnn8-ubuntu18.04
 
 EXPOSE 2001
 
