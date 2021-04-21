@@ -128,7 +128,7 @@ class Kube {
                         env: env
                     }
                 ],
-                nodeSelector: type === 'gpu' ? nodeSelector : {},
+                nodeSelector: nodeSelector,
                 restartPolicy: 'Never'
             }
         };
