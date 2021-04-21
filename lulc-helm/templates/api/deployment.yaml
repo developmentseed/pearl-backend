@@ -23,14 +23,15 @@ spec:
     spec:
       serviceAccountName: kubesurfer
       affinity:
-        podAntiAffinity:
+        nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
+            - nodeSelectorTerms:
                 matchExpressions:
                   - key: agentpool
-                    operator: In
+                    operator: NotIn
                     values:
                       - "gpunodepool"
+                      - "tiler"
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}-api
