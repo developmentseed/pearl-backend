@@ -183,8 +183,9 @@ class Instance {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
-        const activeGpuInstanceCount = await this.activeGpuInstances();
-        const type = Number(activeGpuInstanceCount) < this.config.GpuCount ? 'gpu' : 'cpu';
+        // const activeGpuInstanceCount = await this.activeGpuInstances();
+        const podList = await this.kube.listPods();
+        const type = podList.length < this.config.GpuCount ? 'gpu' : 'cpu';
 
         try {
             const pgres = await this.pool.query(`

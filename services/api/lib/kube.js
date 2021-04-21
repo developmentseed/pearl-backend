@@ -29,7 +29,12 @@ class Kube {
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
-        return res.body;
+
+        if (res.body.items) {
+            return res.body.items;
+        } else {
+            return [];
+        }
     }
 
     /**
