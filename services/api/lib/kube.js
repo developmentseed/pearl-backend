@@ -25,7 +25,7 @@ class Kube {
      * Method to list GPU pods in the cluster
      */
     async listPods() {
-        const res = await this.k8sApi.listNamespacedPod(this.namespace, { 'labelSelector': 'type=gpu'});
+        const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, undefined, undefined, undefined, 'type=gpu');
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
