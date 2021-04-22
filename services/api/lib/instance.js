@@ -190,8 +190,9 @@ class Instance {
         let type = 'gpu';
         if (podList.length) {
             const activePods = podList.filter(p => {
-                return p.status === 'Running'
+                return p.status.phase === 'Running'
             });
+
             console.log('# activePods', activePods.length);
             type = activePods.length < this.config.GpuCount ? 'gpu' : 'cpu';
         }
