@@ -29,14 +29,7 @@ placeholder:
   replicaCount: 1
   nodeSelectorName: 'gpu'
   isGpu: true
-  numGPUs: 4
-  resources:
-    requests:
-      cpu: 2
-      memory: 2Gi
-    limits:
-      cpu: 2
-      memory: 2Gi
+  numGPUs: 2
 
 tilesScaler:
   env:
