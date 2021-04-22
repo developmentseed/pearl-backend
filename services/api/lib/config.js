@@ -28,7 +28,7 @@ class Config {
 
         this.GpuImageName = process.env.GpuImageName || '';
         this.GpuImageTag = process.env.GpuImageTag || '';
-        this.Deployment = process.env.Deployment || '';
+        this.Deployment = process.env.Deployment || 'lulc-test-lulc-helm';
         this.nodeSelectorKey = process.env.nodeSelectorKey || 'agentpool';
         this.nodeSelectorValue = process.env.nodeSelectorValue || 'gpunodepool';
         this.GpuCount = process.env.GpuCount ? Number(process.env.GpuCount) : 2;

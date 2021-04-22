@@ -53,7 +53,8 @@ class Instance {
             last_update: row.last_update,
             created: row.created,
             active: row.active,
-            type: row.type
+            type: row.type,
+            status: row.status
         };
 
         if (row.token) inst.token = row.token;
@@ -183,9 +184,10 @@ class Instance {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
-        // const activeGpuInstanceCount = await this.activeGpuInstances();
-        const podList = await this.kube.listPods();
-        console.log('# podList', JSON.stringify(podList));
+        let podList = [];
+        if (this.config.Environment !== 'local') {
+            podList = await this.kube.listPods();
+        }
 
         let type = 'gpu';
         if (podList.length) {
@@ -303,9 +305,21 @@ class Instance {
             throw new Err(500, err, 'Internal Instance Error');
         }
 
+        const podName = `${this.config.Deployment}-gpu-${instanceid}`;
+        let podStatus
+
+        if (this.config.Environment !== 'local') {
+            try {
+                podStatus = await this.kube.getPodStatus(podName);
+            } catch (error) {
+                console.error('Couldnt fetch podstatus', error.statusMessage)
+            }
+        }
+
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
         pgres.rows[0].token = this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id);
+        pgres.rows[0].status = podStatus && podStatus.status ? podStatus.status : {}
         return Instance.json(pgres.rows[0]);
     }
 

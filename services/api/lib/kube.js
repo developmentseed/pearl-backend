@@ -174,6 +174,11 @@ class Kube {
      */
     async getPodStatus(name) {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);
+
+        if (res.statusCode === 404) {
+            return null
+        }
+
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
