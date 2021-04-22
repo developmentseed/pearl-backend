@@ -185,11 +185,18 @@ class Instance {
 
         // const activeGpuInstanceCount = await this.activeGpuInstances();
         const podList = await this.kube.listPods();
-        const activePods = podList.filter(p => {
-            return p.status === 'Running'
-        });
+        console.log('# podList', JSON.stringify(podList));
 
-        const type = activePods.length < this.config.GpuCount ? 'gpu' : 'cpu';
+        let type = 'gpu';
+        if (podList.length) {
+            const activePods = podList.filter(p => {
+                return p.status === 'Running'
+            });
+            console.log('# activePods', activePods.length);
+            type = activePods.length < this.config.GpuCount ? 'gpu' : 'cpu';
+        }
+
+        console.log('# type', type);
 
         try {
             const pgres = await this.pool.query(`
