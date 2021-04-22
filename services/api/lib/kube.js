@@ -22,10 +22,28 @@ class Kube {
     }
 
     /**
-     * Method to list pods in the cluster
+     * Method to list GPU pods in the cluster
      */
     async listPods() {
-        const res = await this.k8sApi.listNamespacedPod(this.namespace);
+        const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, undefined, undefined, undefined, 'type=gpu');
+        if (res.statusCode >= 400) {
+            return `Request failed: ${res.statusMessage}`;
+        }
+
+        if (res.body.items) {
+            return res.body.items;
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Method to return pod status
+     * @param {string} podName
+     * @returns {Object} status
+     */
+    async getPodStatus(podName) {
+        const res = await this.k8sApi.readNamespacedPodStatus(podName, this.namespace);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
@@ -96,6 +114,9 @@ class Kube {
                 name: `${deploymentName}-gpu-${name}`,
                 annotations: {
                     'janitor/ttl': '15m'
+                },
+                labels: {
+                    type: type
                 }
             },
             spec: {
@@ -153,6 +174,11 @@ class Kube {
      */
     async getPodStatus(name) {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);
+
+        if (res.statusCode === 404) {
+            return null
+        }
+
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
