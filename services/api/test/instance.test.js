@@ -268,7 +268,8 @@ test('GET /api/project/1/instance/1', (t) => {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: null,
-            active: true
+            active: true,
+            status: {}
         });
 
         t.end();
