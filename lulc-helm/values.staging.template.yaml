@@ -29,6 +29,7 @@ placeholder:
   replicaCount: 1
   nodeSelectorName: gpunodepool
   isGpu: true
+  numGPUs: 2
 
 tilesScaler:
   env:
