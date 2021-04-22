@@ -393,12 +393,20 @@ class ModelSrv():
                 } for cls in self.model.classes]
             }, websocket)
 
-            done_processing(self)
-            if self.aoi is not None:
-                self.prediction({
-                    'name': body['name'],
-                    'polygon': self.aoi.poly
-                }, websocket)
+            if self.is_aborting is True:
+                websocket.send(json.dumps({
+                    'message': 'model#aborted',
+                }))
+
+                done_processing(self)
+            else:
+                done_processing(self)
+
+                if self.aoi is not None:
+                    self.prediction({
+                        'name': body['name'],
+                        'polygon': self.aoi.poly
+                    }, websocket)
 
         except Exception as e:
             done_processing(self)
