@@ -12,7 +12,7 @@ import logging
 import rasterio
 from rasterio.io import MemoryFile
 from shapely.geometry import box, mapping
-from .DataSet import DataSet
+from .InferenceDataSet import InferenceDataSet
 
 LOGGER = logging.getLogger("server")
 
@@ -323,7 +323,7 @@ class ModelSrv():
 
             color_list = [item["color"] for item in self.model.classes]
 
-            dataset = DataSet(self)
+            dataset = InferenceDataSet(self.api, self.aoi.tiles)
             dataloader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=32,
@@ -332,51 +332,63 @@ class ModelSrv():
             )
 
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
-                outputs = self.model.run(dataloader, True)
+                for i, (data, xyz) in enumerate(dataloader):
+                    xyz = xyz.numpy()
+                    print(type(xyz))
 
-                for output in outputs:
-                    output = MemRaster(
-                        output,
-                        "epsg:3857",
-                        (in_memraster.x, in_memraster.y, in_memraster.z),
-                        True
-                    )
+                    print(xyz)
+                    print(xyz.shape)
 
-                    output = output.remove_buffer()
+                    outputs = self.model.run(data, True)
 
-                    #clip output
-                    output.clip(self.aoi.poly)
-                    LOGGER.info("ok - generated inference");
 
-                    if self.aoi.live:
-                        # Create color versions of predictions
-                        png = pred2png(output.data, color_list)
+                    for c, output in enumerate(outputs):
+                        print(c)
+                        print(type(output))
+                        print(output.shape)
+                        print(xyz[c])
+                        output = MemRaster(
+                            output,
+                            "epsg:3857",
+                            tuple(xyz[c]),
+                            True
+                        )
 
-                        LOGGER.info("ok - returning inference")
-                        websocket.send(json.dumps({
-                            'message': 'model#prediction',
-                            'data': {
-                                'aoi': self.aoi.id,
-                                'bounds': output.bounds,
-                                'x': output.x, 'y': output.y, 'z': output.z,
-                                'image': png,
-                                'total': self.aoi.total,
-                                'processed': self.aoi.total - len(self.aoi.tiles)
-                            }
-                        }))
-                    else:
-                        websocket.send(json.dumps({
-                            'message': 'model#prediction',
-                            'data': {
-                                'aoi': self.aoi.id,
-                                'total': self.aoi.total,
-                                'processed': len(self.aoi.tiles)
-                            }
-                        }))
+                        output = output.remove_buffer()
 
-                    # Push tile into geotiff fabric
-                    output = MemRaster(np.expand_dims(output.data, axis=-1), in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                    self.aoi.add_to_fabric(output)
+                        #clip output
+                        output.clip(self.aoi.poly)
+                        LOGGER.info("ok - generated inference");
+
+                        if self.aoi.live:
+                            # Create color versions of predictions
+                            png = pred2png(output.data, color_list)
+
+                            LOGGER.info("ok - returning inference")
+                            websocket.send(json.dumps({
+                                'message': 'model#prediction',
+                                'data': {
+                                    'aoi': self.aoi.id,
+                                    'bounds': output.bounds,
+                                    'x': output.x, 'y': output.y, 'z': output.z,
+                                    'image': png,
+                                    'total': self.aoi.total,
+                                    'processed': self.aoi.total - len(self.aoi.tiles)
+                                }
+                            }))
+                        else:
+                            websocket.send(json.dumps({
+                                'message': 'model#prediction',
+                                'data': {
+                                    'aoi': self.aoi.id,
+                                    'total': self.aoi.total,
+                                    'processed': len(self.aoi.tiles)
+                                }
+                            }))
+
+                        # Push tile into geotiff fabric
+                        output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
+                        self.aoi.add_to_fabric(output)
 
 
             if self.is_aborting is True:
