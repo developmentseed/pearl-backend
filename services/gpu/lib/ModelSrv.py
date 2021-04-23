@@ -325,50 +325,51 @@ class ModelSrv():
                 zxy = self.aoi.tiles.pop()
                 in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
 
-                output = self.model.run(in_memraster.data, True)
+                outputs = self.model.run(in_memraster.data, True) #this becomes an array
 
-                output = MemRaster(
-                    output,
-                    "epsg:3857",
-                    (in_memraster.x, in_memraster.y, in_memraster.z),
-                    True
-                )
+                for output in outputs:
+                    output = MemRaster(
+                        output,
+                        "epsg:3857",
+                        (in_memraster.x, in_memraster.y, in_memraster.z),
+                        True
+                    )
 
-                output = output.remove_buffer()
+                    output = output.remove_buffer()
 
-                #clip output
-                output.clip(self.aoi.poly)
-                LOGGER.info("ok - generated inference");
+                    #clip output
+                    output.clip(self.aoi.poly)
+                    LOGGER.info("ok - generated inference");
 
-                if self.aoi.live:
-                    # Create color versions of predictions
-                    png = pred2png(output.data, color_list)
+                    if self.aoi.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
 
-                    LOGGER.info("ok - returning inference")
-                    websocket.send(json.dumps({
-                        'message': 'model#prediction',
-                        'data': {
-                            'aoi': self.aoi.id,
-                            'bounds': output.bounds,
-                            'x': output.x, 'y': output.y, 'z': output.z,
-                            'image': png,
-                            'total': self.aoi.total,
-                            'processed': self.aoi.total - len(self.aoi.tiles)
-                        }
-                    }))
-                else:
-                    websocket.send(json.dumps({
-                        'message': 'model#prediction',
-                        'data': {
-                            'aoi': self.aoi.id,
-                            'total': self.aoi.total,
-                            'processed': len(self.aoi.tiles)
-                        }
-                    }))
+                        LOGGER.info("ok - returning inference")
+                        websocket.send(json.dumps({
+                            'message': 'model#prediction',
+                            'data': {
+                                'aoi': self.aoi.id,
+                                'bounds': output.bounds,
+                                'x': output.x, 'y': output.y, 'z': output.z,
+                                'image': png,
+                                'total': self.aoi.total,
+                                'processed': self.aoi.total - len(self.aoi.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#prediction',
+                            'data': {
+                                'aoi': self.aoi.id,
+                                'total': self.aoi.total,
+                                'processed': len(self.aoi.tiles)
+                            }
+                        }))
 
-                # Push tile into geotiff fabric
-                output = MemRaster(np.expand_dims(output.data, axis=-1), in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                self.aoi.add_to_fabric(output)
+                    # Push tile into geotiff fabric
+                    output = MemRaster(np.expand_dims(output.data, axis=-1), in_memraster.crs, in_memraster.tile, in_memraster.buffered)
+                    self.aoi.add_to_fabric(output)
 
 
             if self.is_aborting is True:
