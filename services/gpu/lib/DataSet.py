@@ -7,7 +7,7 @@ from rasterio.errors import RasterioIOError
 import torch
 from torch.utils.data.dataset import Dataset
 
-class DataLoader(Dataset):
+class DataSet(Dataset):
     def __init__(self, modelsrv):
         self.modelsrv = modelsrv
 
