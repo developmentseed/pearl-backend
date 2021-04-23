@@ -10,7 +10,7 @@ from .utils import serialize, deserialize
 import logging
 import rasterio
 from rasterio.io import MemoryFile
-from shapely.geometry import box
+from shapely.geometry import box, mapping
 
 LOGGER = logging.getLogger("server")
 
