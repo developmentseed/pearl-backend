@@ -122,11 +122,7 @@ class TorchFineTuning(ModelSession):
         self.model = self.model.to(self.device)
 
 
-    def run(self, tile, inference_mode=False):
-        tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
-        tile = tile / 255.0
-        tile = tile.astype(np.float32)
-
+    def run(self, dataloader, inference_mode=False):
         if inference_mode:
             return self.run_model_on_tile(tile)
         else:

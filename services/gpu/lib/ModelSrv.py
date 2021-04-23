@@ -2,6 +2,7 @@ import os
 import base64
 import json
 import numpy as np
+import torch
 
 from .utils import pred2png, geom2px, pxs2geojson, generate_random_points
 from .AOI import AOI
@@ -11,6 +12,7 @@ import logging
 import rasterio
 from rasterio.io import MemoryFile
 from shapely.geometry import box, mapping
+from .DataSet import DataSet
 
 LOGGER = logging.getLogger("server")
 
@@ -288,11 +290,16 @@ class ModelSrv():
 
             color_list = [item["color"] for item in self.model.classes]
 
-            while len(self.aoi.tiles) > 0 and self.is_aborting is False:
-                zxy = self.aoi.tiles.pop()
-                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+            dataset = DataSet(self)
+            dataloader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size=32,
+                num_workers=4,
+                pin_memory=True,
+            )
 
-                outputs = self.model.run(in_memraster.data, True) #this becomes an array
+            while len(self.aoi.tiles) > 0 and self.is_aborting is False:
+                outputs = self.model.run(dataloader, True)
 
                 for output in outputs:
                     output = MemRaster(
