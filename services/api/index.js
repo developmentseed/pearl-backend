@@ -96,8 +96,8 @@ async function server(config, cb) {
      *   {
      *       "version": "1.0.0"
      *       "limits": {
-     *           "live_inference": 10000000 (m^2)
-     *           "max_inference": 10000000 (m^2)
+     *           "live_inference": 100000000 (m^2)
+     *           "max_inference": 100000000 (m^2)
      *           "instance_window": 600 (m secs)
      *       }
      *   }
@@ -106,8 +106,8 @@ async function server(config, cb) {
         return res.json({
             version: pkg.version,
             limits: {
-                live_inference: 10000000,
-                max_inference: 10000000,
+                live_inference: 100000000,
+                max_inference: 100000000,
                 instance_window: 600
             }
         });
@@ -203,7 +203,10 @@ async function server(config, cb) {
             // Catch Auth0 errors
             if (err.name === 'UnauthorizedError') {
                 return Err.respond(new Err(err.status, err.code, err.message), res);
+            } else if (err instanceof ValidationError) {
+                return Err.respond(new Err(400, null, 'validation error'), res, err.validationErrors.body);
             }
+
             next();
         },
         async (req, res, next) => {
@@ -1159,8 +1162,6 @@ async function server(config, cb) {
                     patches: patchurls,
                     colormap: cmap
                 }
-
-                console.error(JSON.stringify(req.body));
 
                 await proxy.request(req, res);
             } catch (err) {
@@ -2469,13 +2470,11 @@ async function server(config, cb) {
 
     router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {
-            Err.respond(
+            return Err.respond(
                 new Err(400, null, 'validation error'),
                 res,
                 err.validationErrors.body
             );
-
-            next();
         } else {
             next(err);
         }

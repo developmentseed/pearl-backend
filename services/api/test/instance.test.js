@@ -75,6 +75,7 @@ test('POST /api/project', (t) => {
     });
 });
 
+
 test('GET /api/project/1/instance (empty)', (t) => {
     request({
         json: true,
@@ -121,7 +122,8 @@ test('POST /api/project/1/instance', (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: false,
-            pod: {}
+            pod: {},
+            type: 'gpu'
         });
 
         t.end();
@@ -147,7 +149,8 @@ test('GET /api/project/1/instance (empty)', (t) => {
             total: 1,
             instances: [{
                 id: 1,
-                active: false
+                active: false,
+                type: 'gpu'
             }]
         });
 
@@ -181,7 +184,8 @@ test('PATCH /api/project/1/instance/1', (t) => {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: null,
-            active: true
+            active: true,
+            type: 'gpu'
         });
 
         t.end();
@@ -205,7 +209,7 @@ test('GET /api/project/1/instance?status=active', (t) => {
 
         t.deepEquals(res.body, {
             total: 1,
-            instances: [ { id: 1, active: true } ]
+            instances: [ { id: 1, active: true, type: 'gpu' } ]
         });
 
         t.end();
@@ -231,7 +235,8 @@ test('GET /api/project/1/instance', (t) => {
             total: 1,
             instances: [{
                 id: 1,
-                active: true
+                active: true,
+                type: 'gpu'
             }]
         });
 
@@ -263,11 +268,70 @@ test('GET /api/project/1/instance/1', (t) => {
             project_id: 1,
             aoi_id: null,
             checkpoint_id: null,
-            active: true
+            active: true,
+            status: {}
         });
 
         t.end();
     });
 });
+
+test('POST /api/project/1/checkpoint', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/checkpoint',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            name: 'Test Checkpoint',
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.end();
+    });
+});
+
+test('PATCH /api/project/1/instance/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: {
+            checkpoint_id: 1
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        delete res.body.created;
+        delete res.body.last_update;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            project_id: 1,
+            aoi_id: null,
+            checkpoint_id: 1,
+            active: true,
+            type: 'gpu'
+        });
+
+        t.end();
+    });
+});
+
 
 flight.landing(test);

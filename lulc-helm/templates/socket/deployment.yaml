@@ -21,6 +21,16 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-socket
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: agentpool
+                  operator: NotIn
+                  values:
+                    - "gpunodepool"
+                    - "tiler"
       containers:
         - name: {{ .Chart.Name }}-socket
           image: "{{ .Values.socket.image.name }}:{{ .Values.socket.image.tag }}"

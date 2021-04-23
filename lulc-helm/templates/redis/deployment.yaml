@@ -21,6 +21,15 @@ spec:
         release: {{ .Release.Name }}
         run: {{ .Release.Name }}-redis
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: agentpool
+                  operator: NotIn
+                  values:
+                    - "gpunodepool"
       containers:
         - name: {{ .Chart.Name }}-redis
           image: "redis:latest"
@@ -28,4 +37,11 @@ spec:
             - name: http
               containerPort: 6379
               protocol: TCP
+          resources:
+            requests:
+              cpu: {{ .Values.redis.resources.requests.cpu }}
+              memory: {{ .Values.redis.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.redis.resources.limits.cpu }}
+              memory: {{ .Values.redis.resources.limits.memory }}
 {{- end }}

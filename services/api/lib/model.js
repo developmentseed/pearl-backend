@@ -207,6 +207,7 @@ class Model {
                     uid,
                     name,
                     meta,
+                    classes,
                     ST_AsGeoJSON(bounds)::JSON AS bounds
                 FROM
                     models
@@ -227,6 +228,7 @@ class Model {
                     uid: parseInt(r.uid),
                     name: r.name,
                     meta: r.meta,
+                    classes: r.classes,
                     bounds: bbox(r.bounds)
                 };
             })

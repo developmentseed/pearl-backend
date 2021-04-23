@@ -2,6 +2,7 @@ import os
 import base64
 import json
 import numpy as np
+
 from .utils import pred2png, geom2px, pxs2geojson, generate_random_points
 from .AOI import AOI
 from .MemRaster import MemRaster
@@ -9,6 +10,7 @@ from .utils import serialize, deserialize
 import logging
 import rasterio
 from rasterio.io import MemoryFile
+from shapely.geometry import box, mapping
 
 LOGGER = logging.getLogger("server")
 
@@ -22,6 +24,12 @@ class ModelSrv():
         self.processing = False
         self.api = api
         self.model = model
+
+        if api.instance.get('checkpoint_id') is not None:
+            self.meta_load_checkpoint(api.instance.get('checkpoint_id'))
+
+        if api.instance.get('aoi_id') is not None:
+            self.aoi = AOI.load(self.api, api.instance.get('aoi_id'))
 
     def abort(self, body, websocket):
         if self.processing is False:
@@ -70,7 +78,7 @@ class ModelSrv():
                 return;
 
             if body.get('type') == 'class':
-                patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
+                patch = AOI.create(self.api, body.get('polygon'), body.get('name', ''), self.chk['id'], is_patch=self.aoi.id)
 
                 websocket.send(json.dumps({
                     'message': 'model#patch',
@@ -136,11 +144,12 @@ class ModelSrv():
                 current_checkpoint = self.chk['id']
                 self.meta_load_checkpoint(body['checkpoint_id'])
 
-                patch = AOI(self.api, body, self.chk['id'], is_patch=self.aoi.id)
+                patch = AOI.create(self.api, body.get('polygon'), body.get('name', ''), self.chk['id'], is_patch=self.aoi.id)
                 websocket.send(json.dumps({
                     'message': 'model#patch',
                     'data': {
                         'id': patch.id,
+                        'live': patch.live,
                         'checkpoint_id': self.chk['id'],
                         'bounds': patch.bounds,
                         'total': patch.total
@@ -264,11 +273,12 @@ class ModelSrv():
                     } for cls in self.model.classes]
                 }, websocket)
 
-            self.aoi = AOI(self.api, body, self.chk['id'])
+            self.aoi = AOI.create(self.api, body.get('polygon'), body.get('name'), self.chk['id'])
             websocket.send(json.dumps({
                 'message': 'model#aoi',
                 'data': {
                     'id': self.aoi.id,
+                    'live': self.aoi.live,
                     'name': self.aoi.name,
                     'checkpoint_id': self.chk['id'],
                     'bounds': self.aoi.bounds,
@@ -388,12 +398,20 @@ class ModelSrv():
                 } for cls in self.model.classes]
             }, websocket)
 
-            done_processing(self)
-            if self.aoi is not None:
-                self.prediction({
-                    'name': body['name'],
-                    'polygon': self.aoi.poly
-                }, websocket)
+            if self.is_aborting is True:
+                websocket.send(json.dumps({
+                    'message': 'model#aborted',
+                }))
+
+                done_processing(self)
+            else:
+                done_processing(self)
+
+                if self.aoi is not None:
+                    self.prediction({
+                        'name': body['name'],
+                        'polygon': mapping(self.aoi.poly)
+                    }, websocket)
 
         except Exception as e:
             done_processing(self)
@@ -404,6 +422,13 @@ class ModelSrv():
         self.chk = self.api.get_checkpoint(load_id)
         chk_fs = self.api.download_checkpoint(self.chk['id'])
         self.model.load_state_from(self.chk, chk_fs)
+        self.api.instance_patch(checkpoint_id = self.chk['id'])
+
+    def meta_load_aoi(self, load_id):
+        self.chk = self.api.get_checkpoint(load_id)
+        chk_fs = self.api.download_checkpoint(self.chk['id'])
+        self.model.load_state_from(self.chk, chk_fs)
+        self.api.instance_patch(checkpoint_id = self.chk['id'])
 
     def meta_save_checkpoint(self, body, websocket):
         classes = []

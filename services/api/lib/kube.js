@@ -22,10 +22,28 @@ class Kube {
     }
 
     /**
-     * Method to list pods in the cluster
+     * Method to list GPU pods in the cluster
      */
     async listPods() {
-        const res = await this.k8sApi.listNamespacedPod(this.namespace);
+        const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, undefined, undefined, undefined, 'type=gpu');
+        if (res.statusCode >= 400) {
+            return `Request failed: ${res.statusMessage}`;
+        }
+
+        if (res.body.items) {
+            return res.body.items;
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Method to return pod status
+     * @param {string} podName
+     * @returns {Object} status
+     */
+    async getPodStatus(podName) {
+        const res = await this.k8sApi.readNamespacedPodStatus(podName, this.namespace);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
@@ -33,24 +51,41 @@ class Kube {
     }
 
     /**
-     * Create a podspec for a gpu pod based on a given name and env vars.
+     * Create a podspec for a gpu pod based on a given name, type (gpu or cpu) and env vars.
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      *
      * @param {String} name
+     * @param {String} type
      * @param {Object} env
      */
-    makePodSpec(name, env) {
+    makePodSpec(name, type, env) {
         const nodeSelectorKey = this.config.nodeSelectorKey;
         const nodeSelectorValue = this.config.nodeSelectorValue;
         const deploymentName = this.config.Deployment;
         const gpuImageName = this.config.GpuImageName;
         const gpuImageTag = this.config.GpuImageTag;
 
-        const resources = {
-            limits: {
-                'nvidia.com/gpu': 1
+        let resources;
+        if (type === 'gpu') {
+            resources = {
+                limits: {
+                    'nvidia.com/gpu': 1
+                }
+            };
+        }
+
+        if (type === 'cpu') {
+            resources = {
+                requests: {
+                    'cpu': '4',
+                    'memory': '8Gi'
+                },
+                limits: {
+                    'cpu': '8',
+                    'memory': '16Gi'
+                }
             }
-        };
+        }
         // if (deploymentName === 'lulc-production-lulc-helm') {
         //     resources = {
         //         requests: {
@@ -78,7 +113,7 @@ class Kube {
             metadata: {
                 name: `${deploymentName}-gpu-${name}`,
                 annotations: {
-                    'janitor/ttl': '15m'
+                    'janitor/ttl': '40m'
                 }
             },
             spec: {
@@ -136,6 +171,11 @@ class Kube {
      */
     async getPodStatus(name) {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);
+
+        if (res.statusCode === 404) {
+            return null
+        }
+
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }

@@ -1,4 +1,5 @@
 import websocket
+
 try:
     import thread
 except ImportError:
@@ -6,6 +7,7 @@ except ImportError:
 
 import traceback
 import logging
+import sys
 import time
 import json
 
@@ -31,6 +33,8 @@ class Socket():
             )
 
             self.websocket.run_forever()
+        except SystemExit:
+            sys.exit()
         except:
             LOGGER.error("not ok - failed to connect - retrying")
             time.sleep(1)
@@ -45,6 +49,8 @@ class Socket():
     def on_recv(self, ws, msg):
         try:
             self.handler(json.loads(msg))
+        except SystemExit:
+            sys.exit()
         except:
             LOGGER.error("not ok - failed to decode message")
             LOGGER.error(msg)
@@ -64,9 +70,6 @@ class Socket():
                 'detailed': str(detailed)
             }
         }));
-
-    def terminate(self):
-        exit()
 
 class Router():
     def __init__(self, uri):
@@ -112,7 +115,8 @@ class Router():
                     LOGGER.error("Error: {0}".format(e))
                     traceback.print_exc()
             elif action == "instance#terminate":
-                self.websocket.terminate()
+                LOGGER.info("ok - Recieved Instance#Terminate")
+                sys.exit()
             else:
                 LOGGER.info('ok - Unknown Action: {}'.format(json.dumps(msg)))
                 self.websocket.error('Unknown Action')

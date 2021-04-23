@@ -165,7 +165,7 @@ test('GET /api/model (storage: true)', (t) => {
         t.equals(res.body.models.length, 1, '1 model');
 
         for (const model of res.body.models) {
-            t.deepEquals(Object.keys(model).sort(), ['active', 'bounds', 'created', 'id', 'meta', 'name', 'uid']);
+            t.deepEquals(Object.keys(model).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'name', 'uid']);
 
             t.ok(parseInt(model.id), 'id is int');
             t.ok(parseInt(model.uid), 'uid is int');

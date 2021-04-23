@@ -12,12 +12,12 @@ import zipfile
 import urllib3
 from os import path
 from io import BytesIO
+from shapely.geometry import mapping
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from shapely.ops import transform
 from shapely.geometry import shape
 from tiletanic import tilecover, tileschemes
-from shapely.geometry import box, mapping
 from .MemRaster import MemRaster
 
 LOGGER = logging.getLogger("server")
@@ -251,6 +251,19 @@ class API():
         LOGGER.info("ok - Received " + url)
         return r.json()
 
+    def aoi_meta(self, aoiid):
+        url = self.url + '/api/project/' + str(self.project_id) + '/aoi/' + str(aoiid)
+
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url, headers={
+            "authorization": "Bearer " + self.token
+        })
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_aoi(self, aoi):
         url = self.url + '/api/project/' + str(self.project_id) + '/aoi'
 
@@ -263,7 +276,7 @@ class API():
             data = json.dumps({
                 'name': aoi.name,
                 'checkpoint_id': aoi.checkpointid,
-                'bounds': mapping(box(*aoi.bounds))
+                'bounds': mapping(aoi.poly)
             })
         )
 
@@ -366,7 +379,8 @@ class API():
         LOGGER.info("ok - PATCH " + url)
         r = self.requests.patch(url,
             headers={
-                "authorization": "Bearer " + self.token
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json"
             },
             data = json.dumps(data)
         )
