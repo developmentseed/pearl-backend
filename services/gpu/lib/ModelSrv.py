@@ -334,11 +334,6 @@ class ModelSrv():
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
                 for i, (data, xyz) in enumerate(dataloader):
                     xyz = xyz.numpy()
-                    print(type(xyz))
-
-                    print(xyz)
-                    print(xyz.shape)
-
                     outputs = self.model.run(data, True)
 
 
@@ -362,15 +357,19 @@ class ModelSrv():
 
                         if self.aoi.live:
                             # Create color versions of predictions
+                            print(output.data.shape)
+                            print(np.unique(output.data))
+                            print(color_list)
                             png = pred2png(output.data, color_list)
 
                             LOGGER.info("ok - returning inference")
+
                             websocket.send(json.dumps({
                                 'message': 'model#prediction',
                                 'data': {
                                     'aoi': self.aoi.id,
                                     'bounds': output.bounds,
-                                    'x': output.x, 'y': output.y, 'z': output.z,
+                                    'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
                                     'image': png,
                                     'total': self.aoi.total,
                                     'processed': self.aoi.total - len(self.aoi.tiles)

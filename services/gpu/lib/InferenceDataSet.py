@@ -21,12 +21,6 @@ class InferenceDataSet(Dataset):
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
         tile = tile.astype(np.float32)
-        print(in_memraster.x)
-        print(in_memraster.y)
-        print(in_memraster.z)
-
-        print(type((in_memraster.x, in_memraster.y, in_memraster.z)))
-
         return (tile, np.array([in_memraster.x, in_memraster.y, in_memraster.z])) #to-do also return x,y,z
 
     def __len__(self):
