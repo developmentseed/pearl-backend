@@ -10,6 +10,7 @@ from .MemRaster import MemRaster
 from .utils import serialize, deserialize
 import logging
 import rasterio
+import mercantile
 from rasterio.io import MemoryFile
 from shapely.geometry import box, mapping
 from .InferenceDataSet import InferenceDataSet
@@ -353,6 +354,7 @@ class ModelSrv():
                         )
 
                         output = output.remove_buffer()
+                        self.aoi.tiles.remove(mercantile.Tile(*xyz[c]))
 
                         #clip output
                         output.clip(self.aoi.poly)
@@ -360,12 +362,12 @@ class ModelSrv():
 
                         if self.aoi.live:
                             # Create color versions of predictions
-                            print(output.data.shape)
-                            print(np.unique(output.data))
-                            print(color_list)
                             png = pred2png(output.data, color_list)
 
                             LOGGER.info("ok - returning inference")
+
+                            print(self.aoi.total)
+                            print(len(self.aoi.tiles))
 
                             websocket.send(json.dumps({
                                 'message': 'model#prediction',
