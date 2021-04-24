@@ -332,7 +332,10 @@ class ModelSrv():
             )
 
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
+                print(len(self.aoi.tiles))
+                print(self.is_aborting)
                 for i, (data, xyz) in enumerate(dataloader):
+                    print(i)
                     xyz = xyz.numpy()
                     outputs = self.model.run(data, True)
 
@@ -390,23 +393,23 @@ class ModelSrv():
                         self.aoi.add_to_fabric(output)
 
 
-            if self.is_aborting is True:
-                websocket.send(json.dumps({
-                    'message': 'model#aborted',
-                }))
-            else:
-                self.aoi.upload_fabric()
+                if self.is_aborting is True:
+                    websocket.send(json.dumps({
+                        'message': 'model#aborted',
+                    }))
+                else:
+                    self.aoi.upload_fabric()
 
-                LOGGER.info("ok - done prediction");
+                    LOGGER.info("ok - done prediction");
 
-                websocket.send(json.dumps({
-                    'message': 'model#prediction#complete',
-                    'data': {
-                        'aoi': self.aoi.id,
-                    }
-                }))
+                    websocket.send(json.dumps({
+                        'message': 'model#prediction#complete',
+                        'data': {
+                            'aoi': self.aoi.id,
+                        }
+                    }))
 
-            done_processing(self)
+                done_processing(self)
         except Exception as e:
             done_processing(self)
             websocket.error('Processing Error', e)
