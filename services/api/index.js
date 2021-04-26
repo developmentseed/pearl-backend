@@ -102,7 +102,19 @@ async function server(config, cb) {
      *       }
      *   }
      */
-    app.get('/api', (req, res) => {
+    app.get('/api', async (req, res) => {
+        let podList = [];
+        if (config.Environment !== 'local') {
+            podList = await instance.kube.listPods();
+        }
+
+        let activePods;
+        if (podList.length) {
+            activePods = podList.filter(p => {
+                return p.status.phase === 'Running'
+            });
+        }
+
         return res.json({
             version: pkg.version,
             limits: {
