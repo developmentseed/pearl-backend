@@ -26,10 +26,10 @@ class ModelSrv():
         self.model = model
 
         if api.instance.get('checkpoint_id') is not None:
-            self.meta_load_checkpoint(api.instance.get('checkpoint_id'))
+            self.meta_load_checkpoint(self.api.instance.get('checkpoint_id'))
 
         if api.instance.get('aoi_id') is not None:
-            self.aoi = AOI.load(self.api, api.instance.get('aoi_id'))
+            self.aoi = AOI.load(self.api, self.api.instance.get('aoi_id'))
 
     def abort(self, body, websocket):
         if self.processing is False:
@@ -219,6 +219,39 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('AOI Patch Error', e)
+            raise e
+
+    def load_aoi(self, body, websocket):
+        try:
+            if self.processing is True:
+                return is_processing(websocket)
+
+            self.processing = True
+
+            websocket.send(json.dumps({
+                'message': 'model#aoi#progress',
+                'data': {
+                    'aoi': body['id'],
+                    'processed': 0,
+                    'total': 1
+                }
+            }))
+
+            self.aoi = AOI.load(self.api, body['id'])
+            self.meta_load_checkpoint(self.aoi.checkpointid)
+
+            websocket.send(json.dumps({
+                'message': 'model#aoi#complete',
+                'data': {
+                    'aoi': self.aoi.id
+                }
+            }))
+
+            done_processing(self)
+
+        except Exception as e:
+            done_processing(self)
+            websocket.error('AOI Load Error', e)
             raise e
 
     def load_checkpoint(self, body, websocket):
