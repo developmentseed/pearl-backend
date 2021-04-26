@@ -333,19 +333,12 @@ class ModelSrv():
             )
 
             while len(self.aoi.tiles) > 0 and self.is_aborting is False:
-                print(len(self.aoi.tiles))
-                print(self.is_aborting)
                 for i, (data, xyz) in enumerate(dataloader):
-                    print(i)
                     xyz = xyz.numpy()
                     outputs = self.model.run(data, True)
 
 
                     for c, output in enumerate(outputs):
-                        print(c)
-                        print(type(output))
-                        print(output.shape)
-                        print(xyz[c])
                         output = MemRaster(
                             output,
                             "epsg:3857",
