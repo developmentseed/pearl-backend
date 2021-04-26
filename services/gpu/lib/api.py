@@ -327,7 +327,7 @@ class API():
             tmpfs = '{}/tiles/{}-{}-{}.{}'.format(self.tmp_dir, x, y, z, iformat)
             res = False
 
-            if cache or not os.path.isfile(tmpfs):
+            if not cache or not os.path.isfile(tmpfs):
                 LOGGER.info("ok - GET " + url)
                 r = self.requests.get(url)
 
