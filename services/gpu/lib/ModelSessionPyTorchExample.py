@@ -296,32 +296,20 @@ class TorchFineTuning(ModelSession):
 
 
     def run_model_on_tile_embedding(self, tile):
-        # height = tile.shape[1]
-        # width = tile.shape[2]
-        # output = np.zeros((len(self.classes), height, width), dtype=np.float32)
-        tile_img = torch.from_numpy(tile)
+        output_preds = []
         data = tile.to(self.device)
         with torch.no_grad():
-            predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
-            predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
-
-        # get embeddings
-        newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
-        newmodel.eval()
-        with torch.no_grad():
-            features = newmodel(data[None, ...])
-            features = features.cpu().numpy()
-            features = np.moveaxis(features[0], 0, -1)
-        predictions = predictions[0].argmax(axis=0).astype(np.uint8)
-        return predictions, features
+            predictions, features = self.model.forward_features(data)
+            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            features = features.cpu().numpy() #embeddings per pixel for the image
+        for pred in predictions:
+            output_preds.append(pred.argmax(axis=0).astype(np.uint8))
+        features = np.moveaxis(features, 0, -1)
+        return  np.array(output_preds), features
 
 
     def run_model_on_tile(self, tile):
-        print('run model on tile')
-        # height = tile.shape[1]
-        # width = tile.shape[2]
         output_preds = []
-        #tile_img = torch.from_numpy(tile)
         data = tile.to(self.device)
         with torch.no_grad():
             predictions = self.model(data)
@@ -331,7 +319,7 @@ class TorchFineTuning(ModelSession):
 
         for pred in predictions:
             output_preds.append(pred.argmax(axis=0).astype(np.uint8))
-            print(np.unique(pred.argmax(axis=0).astype(np.uint8)))  #using [0] because using a "fake batch" of 1 tile
+            print(np.unique(pred.argmax(axis=0).astype(np.uint8)))
             print(pred.argmax(axis=0).astype(np.uint8).shape)
 
         print(np.array(output_preds).shape)
