@@ -87,9 +87,7 @@ class Flight {
                         limits: {
                             live_inference: 100000000,
                             max_inference: 100000000,
-                            instance_window: 600,
-                            total_gpus: 2,
-                            active_gpus: null
+                            instance_window: 600
                         }
                     });
 

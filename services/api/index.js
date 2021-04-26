@@ -102,27 +102,13 @@ async function server(config, cb) {
      *       }
      *   }
      */
-    app.get('/api', async (req, res) => {
-        let podList = [];
-        if (config.Environment !== 'local') {
-            podList = await this.kube.listPods();
-        }
-
-        let activePods;
-        if (podList.length) {
-            activePods = podList.filter(p => {
-                return p.status.phase === 'Running'
-            });
-        }
-
+    app.get('/api', (req, res) => {
         return res.json({
             version: pkg.version,
             limits: {
                 live_inference: 100000000,
                 max_inference: 100000000,
-                instance_window: 600,
-                total_gpus: config.GpuCount,
-                active_gpus: activePods ? activePods.length : null
+                instance_window: 600
             }
         });
     });
