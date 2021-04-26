@@ -108,12 +108,16 @@ async function server(config, cb) {
             podList = await instance.kube.listPods();
         }
 
+        console.log('# podList', podList);
+
         let activePods;
         if (podList.length) {
             activePods = podList.filter(p => {
                 return p.status.phase === 'Running'
             });
         }
+
+        console.log('# activePods', activePods);
 
         return res.json({
             version: pkg.version,
