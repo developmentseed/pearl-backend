@@ -147,6 +147,12 @@ async function gpu() {
                 } else if (msg.message === 'model#checkpoint#complete') {
                     term.log(`ok - model#checkpoint#complete - ${msg.data.checkpoint}`);
                     term.prog.update();
+                } else if (msg.message === 'model#aoi#progress') {
+                    term.log(`ok - model#aoi#progress - ${msg.data.aoi}`);
+                    term.prog.update('model#aoi', 0);
+                } else if (msg.message === 'model#aoi#complete') {
+                    term.log(`ok - model#aoi#complete - ${msg.data.aoi}`);
+                    term.prog.update();
                 } else if (msg.message === 'model#aoi') {
                     term.log(`ok - model#aoi - ${msg.data.name} - chkpt: ${msg.data.checkpoint_id}`);
                     state.aois.push(msg.data);
