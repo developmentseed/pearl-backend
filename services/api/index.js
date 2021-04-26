@@ -16,6 +16,7 @@ const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
+const { Kube } = require('./lib/kube');
 
 const argv = require('minimist')(process.argv, {
     boolean: ['prod'],
@@ -67,6 +68,8 @@ async function server(config, cb) {
     const Mosaic = require('./lib/mosaic');
     const schemas = new (require('./lib/schema'))();
 
+    const kube = new Kube(config, 'default');
+
     app.disable('x-powered-by');
     app.use(cors({
         origin: true,
@@ -105,7 +108,7 @@ async function server(config, cb) {
     app.get('/api', async (req, res) => {
         let podList = [];
         if (config.Environment !== 'local') {
-            podList = await instance.kube.listPods();
+            podList = await kube.listPods();
         }
 
         console.log('# podList', podList);
