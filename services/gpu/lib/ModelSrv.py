@@ -332,77 +332,78 @@ class ModelSrv():
                 pin_memory=True,
             )
 
-            while len(self.aoi.tiles) > 0 and self.is_aborting is False:
-                for i, (data, xyz) in enumerate(dataloader):
-                    xyz = xyz.numpy()
-                    outputs = self.model.run(data, True)
+            for i, (data, xyz) in enumerate(dataloader):
+                if self.is_aborting:
+                    break
+
+                xyz = xyz.numpy()
+                outputs = self.model.run(data, True)
+
+                for c, output in enumerate(outputs):
+                    output = MemRaster(
+                        output,
+                        "epsg:3857",
+                        tuple(xyz[c]),
+                        True
+                    )
+
+                    output = output.remove_buffer()
+                    self.aoi.tiles.remove(mercantile.Tile(*xyz[c]))
+
+                    #clip output
+                    output.clip(self.aoi.poly)
+                    LOGGER.info("ok - generated inference");
+
+                    if self.aoi.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
+
+                        LOGGER.info("ok - returning inference")
+
+                        print(self.aoi.total)
+                        print(len(self.aoi.tiles))
+
+                        websocket.send(json.dumps({
+                            'message': 'model#prediction',
+                            'data': {
+                                'aoi': self.aoi.id,
+                                'bounds': output.bounds,
+                                'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
+                                'image': png,
+                                'total': self.aoi.total,
+                                'processed': self.aoi.total - len(self.aoi.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#prediction',
+                            'data': {
+                                'aoi': self.aoi.id,
+                                'total': self.aoi.total,
+                                'processed': len(self.aoi.tiles)
+                            }
+                        }))
+
+                    # Push tile into geotiff fabric
+                    output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
+                    self.aoi.add_to_fabric(output)
 
 
-                    for c, output in enumerate(outputs):
-                        output = MemRaster(
-                            output,
-                            "epsg:3857",
-                            tuple(xyz[c]),
-                            True
-                        )
+            if self.is_aborting is True:
+                websocket.send(json.dumps({
+                    'message': 'model#aborted',
+                }))
+            else:
+                self.aoi.upload_fabric()
 
-                        output = output.remove_buffer()
-                        self.aoi.tiles.remove(mercantile.Tile(*xyz[c]))
+                LOGGER.info("ok - done prediction");
 
-                        #clip output
-                        output.clip(self.aoi.poly)
-                        LOGGER.info("ok - generated inference");
-
-                        if self.aoi.live:
-                            # Create color versions of predictions
-                            png = pred2png(output.data, color_list)
-
-                            LOGGER.info("ok - returning inference")
-
-                            print(self.aoi.total)
-                            print(len(self.aoi.tiles))
-
-                            websocket.send(json.dumps({
-                                'message': 'model#prediction',
-                                'data': {
-                                    'aoi': self.aoi.id,
-                                    'bounds': output.bounds,
-                                    'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
-                                    'image': png,
-                                    'total': self.aoi.total,
-                                    'processed': self.aoi.total - len(self.aoi.tiles)
-                                }
-                            }))
-                        else:
-                            websocket.send(json.dumps({
-                                'message': 'model#prediction',
-                                'data': {
-                                    'aoi': self.aoi.id,
-                                    'total': self.aoi.total,
-                                    'processed': len(self.aoi.tiles)
-                                }
-                            }))
-
-                        # Push tile into geotiff fabric
-                        output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
-                        self.aoi.add_to_fabric(output)
-
-
-                if self.is_aborting is True:
-                    websocket.send(json.dumps({
-                        'message': 'model#aborted',
-                    }))
-                else:
-                    self.aoi.upload_fabric()
-
-                    LOGGER.info("ok - done prediction");
-
-                    websocket.send(json.dumps({
-                        'message': 'model#prediction#complete',
-                        'data': {
-                            'aoi': self.aoi.id,
-                        }
-                    }))
+                websocket.send(json.dumps({
+                    'message': 'model#prediction#complete',
+                    'data': {
+                        'aoi': self.aoi.id,
+                    }
+                }))
 
                 done_processing(self)
         except Exception as e:
