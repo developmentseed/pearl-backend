@@ -26,7 +26,6 @@ class Kube {
      */
     async listPods() {
         const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, undefined, undefined, undefined, 'type=gpu');
-        console.log('# RES', res);
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }

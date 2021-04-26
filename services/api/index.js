@@ -127,7 +127,9 @@ async function server(config, cb) {
             limits: {
                 live_inference: 100000000,
                 max_inference: 100000000,
-                instance_window: 600
+                instance_window: 600,
+                total_gpus: config.GpuCount,
+                active_gpus: activePods ? activePods.length : null
             }
         });
     });
