@@ -161,14 +161,32 @@ class ModelSrv():
 
                 color_list = [item["color"] for item in self.model.classes]
 
-                while len(patch.tiles) > 0 and self.is_aborting is False:
-                    zxy = patch.tiles.pop()
-                    in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
-                    output = self.model.run(in_memraster.data, True)
 
-                    output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                    output = output.remove_buffer()
-                    output = output.clip(patch.poly)
+                dataset = InferenceDataSet(self.api, self.aoi.tiles)
+                dataloader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size=16,
+                num_workers=2,
+                pin_memory=True,
+                )
+
+                for i, (data, xyz) in enumerate(dataloader):
+                    if self.is_aborting:
+                        break
+                    xyz = xyz.numpy()
+                    outputs = self.model.run(data, True)
+
+                    for c, output in enumerate(outputs):
+                        output = MemRaster(
+                            output,
+                            "epsg:3857",
+                            tuple(xyz[c]),
+                            True
+                        )
+
+                        output = output.remove_buffer()
+                        output = output.clip(patch.poly)
+                        patch.tiles.remove(mercantile.Tile(*xyz[c]))
 
                     if patch.live:
                         # Create color versions of predictions
