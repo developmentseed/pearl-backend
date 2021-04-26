@@ -16,7 +16,13 @@ class InferenceDataSet(Dataset):
     def __getitem__(self, idx):
         zxy = self.tiles[idx]
 
-        in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+        in_memraster = False
+        while in_memraster is False:
+            try:
+                in_memraster = self.modelsrv.api.get_tile(zxy.z, zxy.x, zxy.y)
+            except:
+                print("ERROR", sys.exc_info()[0])
+                
         tile = in_memraster.data
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
