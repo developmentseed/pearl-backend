@@ -313,9 +313,7 @@ class API():
         url = os.environ['TileUrl'] + '/mosaic/' + self.mosaic_id + '/tilejson.json'
 
         LOGGER.info("ok - GET " + url)
-        r = self.requests.get(url, headers={
-            "authorization": "Bearer " + self.token
-        })
+        r = self.requests.get(url)
 
         r.raise_for_status()
 
@@ -331,9 +329,7 @@ class API():
 
             if cache or not os.path.isfile(tmpfs):
                 LOGGER.info("ok - GET " + url)
-                r = self.requests.get(url, headers={
-                    "authorization": "Bearer " + self.token
-                })
+                r = self.requests.get(url)
 
                 r.raise_for_status()
                 LOGGER.info("ok - Received " + url)
