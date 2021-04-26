@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 import rasterio
 from rasterio.windows import Window
@@ -22,7 +23,6 @@ class InferenceDataSet(Dataset):
                 in_memraster = self.modelsrv.api.get_tile(zxy.z, zxy.x, zxy.y)
             except:
                 print("ERROR", sys.exc_info()[0])
-                
         tile = in_memraster.data
         tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
         tile = tile / 255.0
