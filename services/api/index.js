@@ -108,10 +108,8 @@ async function server(config, cb) {
     app.get('/api', async (req, res) => {
         let podList = [];
         if (config.Environment !== 'local') {
-            podList = await kube.listPods();
+            podList = await instance.kube.listPods();
         }
-
-        console.log('# podList', podList);
 
         let activePods;
         if (podList.length) {
@@ -119,8 +117,6 @@ async function server(config, cb) {
                 return p.status.phase === 'Running'
             });
         }
-
-        console.log('# activePods', activePods);
 
         return res.json({
             version: pkg.version,
