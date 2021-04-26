@@ -21,6 +21,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score
 
 from .ModelSessionAbstract import ModelSession
+from .InferenceDataSet import InferenceDataSet
 
 import torch
 import torch.nn as nn
@@ -124,9 +125,9 @@ class TorchFineTuning(ModelSession):
 
     def run(self, dataloader, inference_mode=False):
         if inference_mode:
-            return self.run_model_on_tile(tile)
+            return self.run_model_on_tile(dataloader)
         else:
-            return self.run_model_on_tile_embedding(tile)
+            return self.run_model_on_tile_embedding(dataloader)
 
     def retrain(self, classes, **kwargs):
         names = [x['name'] for x in classes]
@@ -295,11 +296,11 @@ class TorchFineTuning(ModelSession):
 
 
     def run_model_on_tile_embedding(self, tile):
-        height = tile.shape[1]
-        width = tile.shape[2]
-        output = np.zeros((len(self.classes), height, width), dtype=np.float32)
-        tile_img = torch.from_numpy(tile)
-        data = tile_img.to(self.device)
+        # height = tile.shape[1]
+        # width = tile.shape[2]
+        # output = np.zeros((len(self.classes), height, width), dtype=np.float32)
+        # tile_img = torch.from_numpy(tile)
+        data = tile.to(self.device)
         with torch.no_grad():
             predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
             predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
@@ -316,19 +317,26 @@ class TorchFineTuning(ModelSession):
 
 
     def run_model_on_tile(self, tile):
-        height = tile.shape[1]
-        width = tile.shape[2]
-        output = np.zeros((len(self.classes), height, width), dtype=np.float32)
-        tile_img = torch.from_numpy(tile)
-        data = tile_img.to(self.device)
-        data = data.type(torch.cuda.FloatTensor)
+        print('run model on tile')
+        # height = tile.shape[1]
+        # width = tile.shape[2]
+        output_preds = []
+        #tile_img = torch.from_numpy(tile)
+        data = tile.to(self.device)
         with torch.no_grad():
-            predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
-            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            predictions = self.model(data)
+            predictions = F.softmax(predictions, dim=1).cpu().numpy()
+            print(predictions.shape) #this is giving us the highest probability class per pixel
 
-            predictions = predictions[0].argmax(axis=0).astype(np.uint8)  #using [0] because using a "fake batch" of 1 tile
 
-        return predictions
+        for pred in predictions:
+            output_preds.append(pred.argmax(axis=0).astype(np.uint8))
+            print(np.unique(pred.argmax(axis=0).astype(np.uint8)))  #using [0] because using a "fake batch" of 1 tile
+            print(pred.argmax(axis=0).astype(np.uint8).shape)
+
+        print(np.array(output_preds).shape)
+
+        return np.array(output_preds)
 
     def save_state_to(self, directory):
         torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt"))

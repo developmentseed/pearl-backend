@@ -59,6 +59,7 @@ def connection(uri, model):
     router.on_act("model#patch", model.patch)
     router.on_act("model#retrain", model.retrain)
     router.on_act("model#checkpoint", model.load_checkpoint)
+    router.on_act("model#aoi", model.load_aoi)
     router.on_act("model#status", model.status)
     router.on_act("model#abort", model.abort)
 
