@@ -14,24 +14,25 @@ from cogeo_mosaic.models import Info as mosaicInfo
 from rio_tiler.constants import MAX_THREADS
 from rio_tiler.io import BaseReader
 
-from titiler import utils
-from titiler.endpoints.factory import (
+from titiler.core.utils import Timer
+from titiler.core.factory import (
     BaseTilerFactory,
     TilerFactory,
     img_endpoint_params,
 )
-from titiler.models.mapbox import TileJSON
-from titiler.resources.enums import ImageType, PixelSelectionMethod, OptionalHeader
-from titiler.dependencies import WebMercatorTMSParams
+from titiler.core.models.mapbox import TileJSON
+from titiler.core.resources.enums import ImageType, OptionalHeader
+from titiler.mosaic.resources.enums import PixelSelectionMethod
+from titiler.core.dependencies import WebMercatorTMSParams
 
 from ..cache import cached
-from ..custom.reader import CustomCOGReader as COGReader
 
 from fastapi import Depends, Path, Query
 
 from starlette.requests import Request
 from starlette.responses import Response, StreamingResponse
 
+from rio_tiler.io import COGReader
 from rio_tiler.colormap import parse_color
 from rio_cogeo import cog_translate, cog_profiles
 import rasterio
@@ -198,7 +199,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             tilesize = scale * 256
 
             threads = int(os.getenv("MOSAIC_CONCURRENCY", MAX_THREADS))
-            with utils.Timer() as t:
+            with Timer() as t:
                 with self.reader(
                     src_path,
                     reader=self.dataset_reader,
@@ -215,7 +216,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                         pixel_selection=pixel_selection.method(),
                         tilesize=tilesize,
                         threads=threads,
-                        buffer=buffer,
+                        tile_buffer=buffer,
                         **layer_params.kwargs,
                         **dataset_params.kwargs,
                         **kwargs,
@@ -225,14 +226,14 @@ class MosaicTilerFactory(BaseTilerFactory):
             if not format:
                 format = ImageType.jpeg if data.mask.all() else ImageType.png
 
-            with utils.Timer() as t:
+            with Timer() as t:
                 image = data.post_process(
                     in_range=render_params.rescale_range,
                     color_formula=render_params.color_formula,
                 )
             timings.append(("postprocess", round(t.elapsed * 1000, 2)))
 
-            with utils.Timer() as t:
+            with Timer() as t:
                 content = image.render(
                     add_mask=render_params.return_mask,
                     img_format=format.driver,
