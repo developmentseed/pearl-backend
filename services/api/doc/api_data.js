@@ -102,7 +102,7 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Return the colourized aoi fabric geotiff</p>",
+    "description": "<p>Return the colourized aoi fabric geotiff - but doesn't save it to share page</p>",
     "filename": "./index.js",
     "groupTitle": "AOI"
   },
@@ -222,10 +222,19 @@ define({ "api": [
           },
           {
             "group": "Query",
-            "type": "Boolean",
+            "type": "String",
             "optional": true,
             "field": "bookmarked",
-            "description": "<p>Only return AOIs that have been bookmarked</p>"
+            "defaultValue": "",
+            "description": "<p>Filter AOIs based on bookmarked. Allowed 'true' or 'false'. By default returns all.</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "desc",
+            "description": "<p>Sorting order for listing AOIs based on created timestamp. Allowed 'desc' and 'asc'</p>"
           }
         ]
       }
@@ -467,9 +476,9 @@ define({ "api": [
     "group": "AOI",
     "permission": [
       {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "description": "<p>Return a Tile for a given AOI</p>",
@@ -485,12 +494,30 @@ define({ "api": [
     "group": "AOI",
     "permission": [
       {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return tilejson for a given AOI</p>",
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
+    "type": "get",
+    "url": "/api/aoi/:aoiuuid/tiles",
+    "title": "TileJSON AOI",
+    "version": "1.0.0",
+    "name": "TileJSONAOI",
+    "group": "AOI",
+    "permission": [
+      {
         "name": "public",
         "title": "Public",
         "description": "<p>This API endpoint does not require authentication</p>"
       }
     ],
-    "description": "<p>Return tilejson for a given AOI</p>",
+    "description": "<p>Return tilejson for a given AOI using uuid</p>",
     "filename": "./index.js",
     "groupTitle": "AOI"
   },
@@ -754,6 +781,22 @@ define({ "api": [
             "field": "page",
             "defaultValue": "0",
             "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "bookmarked",
+            "defaultValue": "",
+            "description": "<p>Only return bookmarked checkpoints. true or false.</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "desc",
+            "description": "<p>Sorting order for listing checkpoints based on created timestamp. Allowed 'desc' and 'asc'</p>"
           }
         ]
       }
@@ -1885,6 +1928,22 @@ define({ "api": [
             "field": "page",
             "defaultValue": "0",
             "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "desc",
+            "description": "<p>Sorting order for listing projects based on created timestamp. Allowed 'desc' and 'asc'. Default desc.</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "name",
+            "defaultValue": "",
+            "description": "<p>Filter projects that matches the name.</p>"
           }
         ]
       }
@@ -1894,7 +1953,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\",\n        \"aois\": [{\n           \"id\": 1,\n           \"name\": \"aoi name\",\n           \"created\": \"<date>\",\n           \"storage\": false\n        }],\n       \"checkpoints\": [{\n           \"id\": 1,\n           \"name\": \"checkpoint name\",\n           \"created\": \"<date>\",\n           \"storage\": false,\n           \"bookmarked\": false\n       }]\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\",\n        \"aois\": [{\n           \"id\": 1,\n           \"name\": \"aoi name\",\n           \"created\": \"<date>\",\n           \"storage\": false\n         }],\n         \"checkpoints\": []\n    }]\n}",
           "type": "json"
         }
       ]
@@ -2050,13 +2109,58 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 10000000 (m^2)\n        \"max_inference\": 10000000 (m^2)\n        \"instance_window\": 600 (m secs)\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 100000000 (m^2)\n        \"max_inference\": 100000000 (m^2)\n        \"instance_window\": 600 (m secs)\n    }\n}",
           "type": "json"
         }
       ]
     },
     "filename": "./index.js",
     "groupTitle": "Server"
+  },
+  {
+    "type": "get",
+    "url": "/api/share/:shareuuid",
+    "title": "Get AOI",
+    "version": "1.0.0",
+    "name": "GetAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return all information about a given AOI Export using the UUID</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"},\n    \"classes\": []\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/share/:shareuuid/tiles/:z/:x/:y",
+    "title": "Tile AOI",
+    "version": "1.0.0",
+    "name": "TileAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return a Tile for a given AOI using uuid</p>",
+    "filename": "./index.js",
+    "groupTitle": "Share"
   },
   {
     "type": "post",

@@ -856,14 +856,14 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/aoi/:aoiuuid Get AOI
+     * @api {get} /api/share/:shareuuid Get AOI
      * @apiVersion 1.0.0
-     * @apiName GetAOI UUID
-     * @apiGroup AOI
+     * @apiName GetAOI
+     * @apiGroup Share
      * @apiPermission public
      *
      * @apiDescription
-     *     Return all information about a given AOI using the UUID
+     *     Return all information about a given AOI Export using the UUID
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -879,7 +879,7 @@ async function server(config, cb) {
      *   }
      */
      router.get(
-        ...await schemas.get('GET /aoi/:aoiuuid'),
+        ...await schemas.get('GET /share/:aoiuuid'),
         async (req, res) => {
             try {
                 return res.json(await aoi.getuuid(req.params.aoiuuid));
@@ -986,17 +986,17 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/aoi/:aoiuuid/tiles/:z/:x/:y Tile AOI
+     * @api {get} /api/share/:shareuuid/tiles/:z/:x/:y Tile AOI
      * @apiVersion 1.0.0
      * @apiName TileAOI
-     * @apiGroup AOI
+     * @apiGroup Share
      * @apiPermission public
      *
      * @apiDescription
      *     Return a Tile for a given AOI using uuid
      */
      router.get(
-        ...await schemas.get('GET /aoi/:aoiuuid/tiles/:z/:x/:y'),
+        ...await schemas.get('GET /share/:shareuuid/tiles/:z/:x/:y'),
         async (req, res) => {
             try {
                 await Param.int(req, 'z');
@@ -1141,7 +1141,7 @@ async function server(config, cb) {
      * @apiPermission user
      *
      * @apiDescription
-     *     Return the colourized aoi fabric geotiff
+     *     Return the colourized aoi fabric geotiff - but doesn't save it to share page
      */
     router.get(
         ...await schemas.get('GET /project/:projectid/aoi/:aoiid/download/color'),
