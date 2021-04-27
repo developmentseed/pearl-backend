@@ -293,6 +293,8 @@ test('POST /api/project/1/aoi/1/share', (t) => {
     });
 });
 
+let uuid;
+
 test('GET /api/project/1/share', (t) => {
     request({
         json: true,
@@ -307,6 +309,7 @@ test('GET /api/project/1/share', (t) => {
 
         t.ok(res.body.shares[0].created, '.created: <date>');
         delete res.body.shares[0].created;
+        uuid = res.body.shares[0].uuid;
         t.ok(res.body.shares[0].uuid, '.uuid: <uuid>');
         delete res.body.shares[0].uuid;
 
@@ -322,5 +325,46 @@ test('GET /api/project/1/share', (t) => {
         t.end();
     });
 });
+
+test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 404, 'status: 404');
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'AOI Share not found',
+            messages: []
+        });
+
+        t.end();
+    });
+});
+
+test('DELETE /api/project/1/aoi/1/<uuid> - exists', (t) => {
+    request({
+        json: true,
+        url: `http://localhost:2000/api/project/1/aoi/1/share/${uuid}`,
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, true);
+
+        t.end();
+    });
+});
+
 
 flight.landing(test);
