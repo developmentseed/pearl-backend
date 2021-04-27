@@ -76,7 +76,7 @@ class AOI {
         };
 
         if (row.hasOwnProperty('classes')) {
-            def['classes'] = row.classes
+            def['classes'] = row.classes;
         }
 
         if (typeof row.bounds === 'object') {

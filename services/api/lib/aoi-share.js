@@ -51,7 +51,7 @@ class AOIShare {
             created: row.created,
             storage: row.storage,
             uuid: row.uuid,
-            patches: row.patches,
+            patches: row.patches
         };
 
         if (typeof row.bounds === 'object') {
@@ -139,7 +139,7 @@ class AOIShare {
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
         if (pgres.rows[0].storage && this.config.AzureStorage) {
-            const blob_client = this.container_client.getBlockBlobClient(`share-${uuid}.tiff`);
+            const blob_client = this.container_client.getBlockBlobClient(`share-${shareuuid}.tiff`);
             await blob_client.delete();
         }
 
@@ -147,31 +147,31 @@ class AOIShare {
     }
 
     /**
-     * Update AOI Patch properties
+     * Update AOI Share properties
      *
-     * @param {Number} patchid - Specific AOI Patch id
-     * @param {Object} patch AOI Object
-     * @param {Boolean} patch.storage Has the storage been uploaded
+     * @param {Number} shareuuid - Specific AOI Share uuid
+     * @param {Object} share AOI Share Object
+     * @param {Boolean} share.storage Has the storage been uploaded
      */
-    async patch(patchid, patch) {
+    async patch(shareuuid, share) {
         let pgres;
         try {
             pgres = await this.pool.query(`
-                UPDATE aoi_patch
+                UPDATE aois_share
                     SET
                         storage = COALESCE($2, storage)
                     WHERE
                         id = $1
                     RETURNING *
             `, [
-                patchid,
-                patch.storage
+                shareuuid,
+                share.storage
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update AOI Patch');
+            throw new Err(500, new Error(err), 'Failed to update AOI Share');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
         return AOIShare.json(pgres.rows[0]);
     }

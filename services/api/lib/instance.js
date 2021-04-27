@@ -191,8 +191,8 @@ class Instance {
 
         let type = 'gpu';
         if (podList.length) {
-            const activePods = podList.filter(p => {
-                return p.status.phase === 'Running'
+            const activePods = podList.filter((p) => {
+                return p.status.phase === 'Running';
             });
 
             console.log('# activePods', activePods.length);
@@ -306,20 +306,20 @@ class Instance {
         }
 
         const podName = `${this.config.Deployment}-gpu-${instanceid}`;
-        let podStatus
+        let podStatus;
 
         if (this.config.Environment !== 'local') {
             try {
                 podStatus = await this.kube.getPodStatus(podName);
             } catch (error) {
-                console.error('Couldnt fetch podstatus', error.statusMessage)
+                console.error('Couldnt fetch podstatus', error.statusMessage);
             }
         }
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
         pgres.rows[0].token = this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id);
-        pgres.rows[0].status = podStatus && podStatus.status ? podStatus.status : {}
+        pgres.rows[0].status = podStatus && podStatus.status ? podStatus.status : {};
         return Instance.json(pgres.rows[0]);
     }
 

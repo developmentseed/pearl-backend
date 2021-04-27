@@ -111,8 +111,8 @@ async function server(config, cb) {
 
         let activePods;
         if (podList.length) {
-            activePods = podList.filter(p => {
-                return p.status.phase === 'Running'
+            activePods = podList.filter((p) => {
+                return p.status.phase === 'Running';
             });
         }
 
@@ -571,7 +571,7 @@ async function server(config, cb) {
                         const aois = await aoi.list(p.id, { bookmarked: 'true' });
                         const checkpoints = await checkpoint.list(p.id, { bookmarked: 'true' });
                         // remove reduntant project id
-                        delete aois.project_id
+                        delete aois.project_id;
                         delete checkpoints.project_id;
                         p['aois'] = aois.aois;
                         p['checkpoints'] = checkpoints.checkpoints;
@@ -879,7 +879,7 @@ async function server(config, cb) {
      *       "classes": []
      *   }
      */
-     router.get(
+    router.get(
         ...await schemas.get('GET /share/:aoiuuid'),
         async (req, res) => {
             try {
@@ -916,7 +916,7 @@ async function server(config, cb) {
             `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
         ] : [
             `/api/aoi/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-        ]
+        ];
         return {
             tilejson: tj.tilejson,
             name: `aoi-${theAoi.id}`,
@@ -927,8 +927,8 @@ async function server(config, cb) {
             maxzoom: tj.maxzoom,
             bounds: tj.bounds,
             center: tj.center
-        }
-    }
+        };
+    };
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
@@ -970,7 +970,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Return tilejson for a given AOI using uuid
      */
-     router.get(
+    router.get(
         ...await schemas.get('GET /aoi/:aoiuuid/tiles'),
         async (req, res) => {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
@@ -996,7 +996,7 @@ async function server(config, cb) {
      * @apiDescription
      *     Return a Tile for a given AOI using uuid
      */
-     router.get(
+    router.get(
         ...await schemas.get('GET /share/:shareuuid/tiles/:z/:x/:y'),
         async (req, res) => {
             try {
@@ -1163,7 +1163,7 @@ async function server(config, cb) {
                     cmap[i] = chkpt.classes[i].color;
                 }
 
-                let patchurls = [];
+                const patchurls = [];
                 for (const patchid of a.patches) {
                     await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
                     patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
@@ -1176,7 +1176,7 @@ async function server(config, cb) {
                     input: tiffurl,
                     patches: patchurls,
                     colormap: cmap
-                }
+                };
 
                 await proxy.request(req, res);
             } catch (err) {
