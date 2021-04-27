@@ -64,6 +64,7 @@ async function server(config, cb) {
     const checkpoint = new (require('./lib/checkpoint').CheckPoint)(config);
     const aoi = new (require('./lib/aoi').AOI)(config);
     const aoipatch = new (require('./lib/aoi-patch').AOIPatch)(config);
+    const aoishare = new (require('./lib/aoi-share').AOIShare)(config);
     const Mosaic = require('./lib/mosaic');
     const schemas = new (require('./lib/schema'))();
 
@@ -1264,6 +1265,46 @@ async function server(config, cb) {
                 await project.has_auth(req.auth, req.params.projectid);
 
                 return res.json(await aoi.create(req.params.projectid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/project/:projectid/aoi/:aoiid/share Share AOI
+     * @apiVersion 1.0.0
+     * @apiName ShareAOI
+     * @apiGroup AOI
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Export an AOI & it's patches to share
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "id": 1432,
+     *       "project_id": 1,
+     *       "storage": true,
+     *       "created": "<date>",
+     *       "bounds": { "GeoJSON" }
+     *   }
+     */
+    router.post(
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/share', {
+            body: 'req.body.aoi.json'
+        }),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+                return res.json(await aoishare.create(a));
             } catch (err) {
                 return Err.respond(err, res);
             }

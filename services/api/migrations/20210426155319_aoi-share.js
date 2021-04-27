@@ -1,14 +1,17 @@
 exports.up = function(knex) {
     return knex.schema.raw(`
-        CREATE TABLE aois_export (
+        CREATE TABLE aois_share (
             id          BIGINT,
             project_id  BIGINT,
             bounds      GEOMETRY(Polygon, 4326),
             created     TIMESTAMP DEFAULT NOW(),
-            storate     BOOLEAN DEFAULT FALSE,
+            storage     BOOLEAN DEFAULT FALSE,
             uuid        UUID DEFAULT uuid_generate_v4(),
-            patches     BIGINT DEFAULT '{}'::bigint[]
-        )
+            patches     BIGINT[] DEFAULT '{}'::bigint[]
+        );
+
+        ALTER TABLE aois
+            DROP COLUMN uuid;
     `);
 }
 
