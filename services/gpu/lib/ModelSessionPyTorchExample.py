@@ -296,20 +296,19 @@ class TorchFineTuning(ModelSession):
 
 
     def run_model_on_tile_embedding(self, tile):
+
+        tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first
+        tile = tile / 255.0
+        tile = tile.astype(np.float32)
         tile_img = torch.from_numpy(tile)
+
         data = tile_img.to(self.device)
         with torch.no_grad():
-            predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
-            predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
-
-        # get embeddings
-        newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
-        newmodel.eval()
-        with torch.no_grad():
-            features = newmodel(data[None, ...])
-            features = features.cpu().numpy()
-            features = np.moveaxis(features[0], 0, -1)
+            predictions, features = self.model.forward_features(data[None, ...])
+            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            features = features.cpu().numpy() #embeddings per pixel for the image
         predictions = predictions[0].argmax(axis=0).astype(np.uint8)
+        features = np.moveaxis(features[0], 0, -1)
         return predictions, features
 
 
