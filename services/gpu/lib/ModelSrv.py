@@ -153,70 +153,70 @@ class ModelSrv():
                 }
             }))
 
-            color_list = [item["color"] for item in self.model.classes]
+                color_list = [item["color"] for item in self.model.classes]
 
 
-            dataset = InferenceDataSet(self.api, self.aoi.tiles)
-            dataloader = torch.utils.data.DataLoader(
-            dataset,
-            batch_size=16,
-            num_workers=2,
-            pin_memory=True,
-            )
+                dataset = InferenceDataSet(self.api, self.aoi.tiles)
+                dataloader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size=16,
+                num_workers=2,
+                pin_memory=True,
+                )
 
-            for i, (data, xyz) in enumerate(dataloader):
-                if self.is_aborting:
-                    break
-                xyz = xyz.numpy()
-                outputs = self.model.run(data, True)
+                for i, (data, xyz) in enumerate(dataloader):
+                    if self.is_aborting:
+                        break
+                    xyz = xyz.numpy()
+                    outputs = self.model.run(data, True)
 
-                for c, output in enumerate(outputs):
-                    output = MemRaster(
-                        output,
-                        "epsg:3857",
-                        tuple(xyz[c]),
-                        True
-                    )
+                    for c, output in enumerate(outputs):
+                        output = MemRaster(
+                            output,
+                            "epsg:3857",
+                            tuple(xyz[c]),
+                            True
+                        )
 
-                    output = output.remove_buffer()
-                    output = output.clip(patch.poly)
-                    patch.tiles.remove(mercantile.Tile(*xyz[c]))
+                        output = output.remove_buffer()
+                        output = output.clip(patch.poly)
+                        patch.tiles.remove(mercantile.Tile(*xyz[c]))
 
-                if patch.live:
-                    # Create color versions of predictions
-                    png = pred2png(output.data, color_list)
+                    if patch.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
 
-                    LOGGER.info("ok - returning patch inference");
-                    websocket.send(json.dumps({
-                        'message': 'model#patch#progress',
-                        'data': {
-                            'patch': patch.id,
-                            'bounds': output.bounds,
-                            'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
-                            'image': png,
-                            'total': patch.total,
-                            'processed': patch.total - len(patch.tiles)
-                        }
-                    }))
-                else:
-                    websocket.send(json.dumps({
-                        'message': 'model#patch#progress',
-                        'data': {
-                            'patch': patch.id,
-                            'total': patch.total,
-                            'processed': len(patch.tiles)
-                        }
-                    }))
+                        LOGGER.info("ok - returning patch inference");
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'bounds': output.bounds,
+                                'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
+                                'image': png,
+                                'total': patch.total,
+                                'processed': patch.total - len(patch.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'total': patch.total,
+                                'processed': len(patch.tiles)
+                            }
+                        }))
 
-                # Push tile into geotiff fabric
-                output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
-                patch.add_to_fabric(output)
+                    # Push tile into geotiff fabric
+                    output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
+                    patch.add_to_fabric(output)
 
-            patch.upload_fabric()
+                patch.upload_fabric()
 
-            LOGGER.info("ok - done patch prediction");
+                LOGGER.info("ok - done patch prediction");
 
-            self.meta_load_checkpoint(current_checkpoint)
+                self.meta_load_checkpoint(current_checkpoint)
 
             websocket.send(json.dumps({
                 'message': 'model#patch#complete',
