@@ -134,12 +134,6 @@ class ModelSrv():
                 # Push tile into geotiff fabric
                 output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
                 patch.add_to_fabric(output)
-
-            # if self.is_aborting is True:
-            #     websocket.send(json.dumps({
-            #         'message': 'model#aborted',
-            #     }))
-            # else:
                 patch.upload_fabric()
 
                 LOGGER.info("ok - done patch prediction");
@@ -147,8 +141,8 @@ class ModelSrv():
                 current_checkpoint = self.chk['id']
                 self.meta_load_checkpoint(body['checkpoint_id'])
 
-            patch = AOI.create(self.api, body.get('polygon'), body.get('name', ''), self.chk['id'], is_patch=self.aoi.id)
-            websocket.send(json.dumps({
+                patch = AOI.create(self.api, body.get('polygon'), body.get('name', ''), self.chk['id'], is_patch=self.aoi.id)
+                websocket.send(json.dumps({
                 'message': 'model#patch',
                 'data': {
                     'id': patch.id,
@@ -218,14 +212,9 @@ class ModelSrv():
                 output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
                 patch.add_to_fabric(output)
 
-            # if self.is_aborting is True:
-            #     websocket.send(json.dumps({
-            #         'message': 'model#aborted',
-            #     }))
-            # else:
-                patch.upload_fabric()
+            patch.upload_fabric()
 
-                LOGGER.info("ok - done patch prediction");
+            LOGGER.info("ok - done patch prediction");
 
             self.meta_load_checkpoint(current_checkpoint)
 
