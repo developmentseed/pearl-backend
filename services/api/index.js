@@ -1272,7 +1272,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {post} /api/project/:projectid/aoi/:aoiid/share Share AOI
+     * @api {post} /api/project/:projectid/aoi/:aoiid/share Create Share
      * @apiVersion 1.0.0
      * @apiName ShareAOI
      * @apiGroup AOI
@@ -1284,11 +1284,11 @@ async function server(config, cb) {
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
      *   {
-     *       "id": 1432,
+     *       "aoi_id": 1432,
      *       "project_id": 1,
-     *       "storage": true,
+     *       "storage": false,
      *       "created": "<date>",
-     *       "bounds": { "GeoJSON" }
+     *       "patches": []
      *   }
      */
     router.post(
@@ -1303,6 +1303,48 @@ async function server(config, cb) {
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 return res.json(await aoishare.create(a));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:projectid/share List Shares
+     * @apiVersion 1.0.0
+     * @apiName ListShares
+     * @apiGroup Share
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all shares for a given project
+     *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.aoi.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "project_id": 123,
+     *       "shares": [{
+     *           "uuid": "<uuid>",
+     *           "aoi_id": 1432,
+     *           "storage": true,
+     *           "created": "<date>"
+     *       }]
+     *   }
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/share', {
+            query: 'req.query.aoi.json'
+        }),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await project.has_auth(req.auth, req.params.projectid);
+
+                return res.json(await aoishare.list(req.params.projectid, req.query));
             } catch (err) {
                 return Err.respond(err, res);
             }

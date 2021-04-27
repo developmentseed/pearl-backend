@@ -183,6 +183,28 @@ test('POST /api/project/1/aoi', (t) => {
     });
 });
 
+test('GET /api/project/1/share', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/share',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.deepEquals(res.body, {
+            total: 0,
+            project_id: 1,
+            shares: []
+        });
+
+        t.end();
+    });
+});
+
 test('POST /api/project/1/aoi/1/share', (t) => {
     request({
         json: true,
@@ -257,7 +279,7 @@ test('POST /api/project/1/aoi/1/share', (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
-        t.ok(res.body.uuid, '.uuid: <date>');
+        t.ok(res.body.uuid, '.uuid: <uuid>');
         delete res.body.uuid;
 
         t.deepEquals(res.body, {
@@ -265,6 +287,36 @@ test('POST /api/project/1/aoi/1/share', (t) => {
             aoi_id: 1,
             storage: false,
             patches: []
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/share', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/share',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.shares[0].created, '.created: <date>');
+        delete res.body.shares[0].created;
+        t.ok(res.body.shares[0].uuid, '.uuid: <uuid>');
+        delete res.body.shares[0].uuid;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            project_id: 1,
+            shares: [{
+                aoi_id: 1,
+                storage: false
+            }]
         });
 
         t.end();

@@ -207,33 +207,32 @@ class AOIShare {
     }
 
     /**
-     * Return a list of AOI Patches
+     * Return a list of AOI Shares
      *
-     * @param {Number} projectid - AOI Patches related to a specific project
-     * @param {Number} aoiid - AOI Patches related to a specific AOI
+     * @param {Number} projectid - AOI Shares related to a specific project
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    async list(projectid, aoiid, query) {
+    async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
         const where = [];
         where.push(`project_id = ${projectid}`);
-        where.push(`aoi_id = ${aoiid}`);
 
         let pgres;
         try {
             pgres = await this.pool.query(`
                SELECT
                     count(*) OVER() AS count,
-                    id,
+                    uuid,
+                    aoi_id,
                     created,
                     storage
                 FROM
-                    aoi_patch
+                    aois_share
                 WHERE
                     ${where.join(' AND ')}
                 LIMIT
@@ -246,16 +245,16 @@ class AOIShare {
 
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to list AOI Patches');
+            throw new Err(500, new Error(err), 'Failed to list AOI Shares');
         }
 
         return {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
             project_id: projectid,
-            aoi_id: aoiid,
-            patches: pgres.rows.map((row) => {
+            shares: pgres.rows.map((row) => {
                 return {
-                    id: parseInt(row.id),
+                    uuid: row.uuid,
+                    aoi_id: parseInt(row.aoi_id),
                     created: row.created,
                     storage: row.storage
                 };
