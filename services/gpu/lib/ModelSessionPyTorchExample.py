@@ -123,11 +123,11 @@ class TorchFineTuning(ModelSession):
         self.model = self.model.to(self.device)
 
 
-    def run(self, dataloader, inference_mode=False):
+    def run(self, data, inference_mode=False):
         if inference_mode:
-            return self.run_model_on_tile(dataloader)
+            return self.run_model_on_tile(data)
         else:
-            return self.run_model_on_tile_embedding(dataloader)
+            return self.run_model_on_tile_embedding(data) #fix this
 
     def retrain(self, classes, **kwargs):
         names = [x['name'] for x in classes]
@@ -296,16 +296,22 @@ class TorchFineTuning(ModelSession):
 
 
     def run_model_on_tile_embedding(self, tile):
-        output_preds = []
-        data = tile.to(self.device)
+        tile_img = torch.from_numpy(tile)
+        data = tile_img.to(self.device)
         with torch.no_grad():
-            predictions, features = self.model.forward_features(data)
-            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
-            features = features.cpu().numpy() #embeddings per pixel for the image
-        for pred in predictions:
-            output_preds.append(pred.argmax(axis=0).astype(np.uint8))
-        features = np.moveaxis(features, 0, -1)
-        return  np.array(output_preds), features
+            predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
+
+        # get embeddings
+        newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
+        newmodel.eval()
+        with torch.no_grad():
+            features = newmodel(data[None, ...])
+            features = features.cpu().numpy()
+            features = np.moveaxis(features[0], 0, -1)
+        predictions = predictions[0].argmax(axis=0).astype(np.uint8)
+        return predictions, features
+
 
 
     def run_model_on_tile(self, tile):
