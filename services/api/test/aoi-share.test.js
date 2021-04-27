@@ -186,35 +186,41 @@ test('POST /api/project/1/aoi', (t) => {
 test('POST /api/project/1/aoi/1/share', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
+        url: 'http://localhost:2000/api/project/1/aoi/1/share',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
+        t.equals(res.statusCode, 404, 'status: 404');
 
         t.deepEquals(res.body, {
-            id: 1,
-            storage: false,
-            project_id: 1,
-            checkpoint_id: 1,
-            bookmarked: false,
-            patches: [],
-            name: 'Test AOI',
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
-                ]]
-            }
+            status: 404,
+            message: 'AOI has not been uploaded',
+            messages: []
+        });
+
+        t.end();
+    });
+});
+
+test('POST /api/project/1/aoi/2/share', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/2/share',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 404, 'status: 404');
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'AOI not found',
+            messages: []
         });
 
         t.end();
@@ -236,5 +242,33 @@ test('[meta] Set aoi.storage: true', async (t) => {
     t.end();
 });
 
+test('POST /api/project/1/aoi/1/share', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1/share',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.ok(res.body.uuid, '.uuid: <date>');
+        delete res.body.uuid;
+
+        t.deepEquals(res.body, {
+            project_id: 1,
+            aoi_id: 1,
+            storage: false,
+            patches: []
+        });
+
+        t.end();
+    });
+});
 
 flight.landing(test);

@@ -46,8 +46,8 @@ class AOIShare {
      */
     static json(row) {
         const def = {
-            id: parseInt(row.id),
             project_id: parseInt(row.project_id),
+            aoi_id: parseInt(row.aoi_id),
             created: row.created,
             storage: row.storage,
             uuid: row.uuid,
@@ -272,18 +272,20 @@ class AOIShare {
         let pgres;
         try {
             pgres = await this.pool.query(`
-                INSERT INTO aoi_share (
+                INSERT INTO aois_share (
                     project_id,
+                    aoi_id,
                     bounds,
                     patches
                 ) VALUES (
                     $1,
-                    ST_SetSRID(ST_GeomFromGeoJSON($2), 4326),
-                    $3
+                    $2,
+                    ST_SetSRID(ST_GeomFromGeoJSON($3), 4326),
+                    $4
                 ) RETURNING *
             `, [
-                ,
                 aoi.project_id,
+                aoi.id,
                 aoi.bounds,
                 aoi.patches
             ]);

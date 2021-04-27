@@ -1292,9 +1292,7 @@ async function server(config, cb) {
      *   }
      */
     router.post(
-        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/share', {
-            body: 'req.body.aoi.json'
-        }),
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/share'),
         requiresAuth,
         async (req, res) => {
             try {
