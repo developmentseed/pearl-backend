@@ -1310,6 +1310,32 @@ async function server(config, cb) {
     );
 
     /**
+     * @api {delete} /api/project/:projectid/aoi/:aoiid/share/:shareuuid Delete Share
+     * @apiVersion 1.0.0
+     * @apiName DeleteShare
+     * @apiGroup Share
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete a Shared AOI
+     */
+    router.delete(
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/share/:shareuuid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await project.has_auth(req.auth, req.params.projectid);
+
+                return res.json(await aoishare.delete(req.params.aoiid, req.params.shareuuid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
      * @api {get} /api/project/:projectid/share List Shares
      * @apiVersion 1.0.0
      * @apiName ListShares

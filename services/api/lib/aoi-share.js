@@ -112,32 +112,34 @@ class AOIShare {
     }
 
     /**
-     * Delete an AOI Patch
+     * Delete an AOI Share
      *
      * @param {Number} aoiid - Specific AOI id
-     * @param {Number} patchid - Specific AOI Patch id
+     * @param {String} shareuuid - Specific AOI Share UUID
      */
-    async delete(aoiid, patchid) {
+    async delete(aoiid, shareuuid) {
         let pgres;
         try {
             pgres = await this.pool.query(`
                 DELETE
                     FROM
-                        aoi_patch
+                        aois_share
                     WHERE
-                        id = $1
+                        aoi_id = $1
+                        AND uuid = $2
                     RETURNING *
             `, [
-                patchid
+                aoiid,
+                shareuuid
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to delete AOI Patch');
+            throw new Err(500, new Error(err), 'Failed to delete AOI Share');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
         if (pgres.rows[0].storage && this.config.AzureStorage) {
-            const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}-patch-${patchid}.tiff`);
+            const blob_client = this.container_client.getBlockBlobClient(`share-${uuid}.tiff`);
             await blob_client.delete();
         }
 
