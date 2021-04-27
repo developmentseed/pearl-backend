@@ -468,6 +468,33 @@
     "groupTitle": "AOIPatch"
   },
   {
+    "type": "post",
+    "url": "/api/project/:projectid/aoi/:aoiid/share",
+    "title": "Create Share",
+    "version": "1.0.0",
+    "name": "ShareAOI",
+    "group": "AOI",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Export an AOI &amp; it's patches to share</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"aoi_id\": 1432,\n    \"project_id\": 1,\n    \"storage\": false,\n    \"created\": \"<date>\",\n    \"patches\": []\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "AOI"
+  },
+  {
     "type": "get",
     "url": "/api/project/:project/aoi/:aoiid/tiles/:z/:x/:y",
     "title": "Tile AOI",
@@ -2118,6 +2145,24 @@
     "groupTitle": "Server"
   },
   {
+    "type": "delete",
+    "url": "/api/project/:projectid/aoi/:aoiid/share/:shareuuid",
+    "title": "Delete Share",
+    "version": "1.0.0",
+    "name": "DeleteShare",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a Shared AOI</p>",
+    "filename": "./index.js",
+    "groupTitle": "Share"
+  },
+  {
     "type": "get",
     "url": "/api/share/:shareuuid",
     "title": "Get AOI",
@@ -2137,6 +2182,79 @@
         {
           "title": "Success-Response:",
           "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"},\n    \"classes\": []\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/share",
+    "title": "List Shares",
+    "version": "1.0.0",
+    "name": "ListShares",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all shares for a given project</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned aois</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The offset based on limit to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpointid",
+            "defaultValue": "0",
+            "description": "<p>Only return AOIs for a specific checkpoint</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "bookmarked",
+            "defaultValue": "",
+            "description": "<p>Filter AOIs based on bookmarked. Allowed 'true' or 'false'. By default returns all.</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "desc",
+            "description": "<p>Sorting order for listing AOIs based on created timestamp. Allowed 'desc' and 'asc'</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"shares\": [{\n        \"uuid\": \"<uuid>\",\n        \"aoi_id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
           "type": "json"
         }
       ]
