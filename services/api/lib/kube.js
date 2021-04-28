@@ -38,19 +38,6 @@ class Kube {
     }
 
     /**
-     * Method to return pod status
-     * @param {string} podName
-     * @returns {Object} status
-     */
-    async getPodStatus(podName) {
-        const res = await this.k8sApi.readNamespacedPodStatus(podName, this.namespace);
-        if (res.statusCode >= 400) {
-            return `Request failed: ${res.statusMessage}`;
-        }
-        return res.body;
-    }
-
-    /**
      * Create a podspec for a gpu pod based on a given name, type (gpu or cpu) and env vars.
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      *
