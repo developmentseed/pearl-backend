@@ -3,7 +3,10 @@
 from setuptools import find_packages, setup
 
 inst_reqs = [
-    "titiler==0.2.0",
+    "titiler.core==0.3.1",
+    "titiler.mosaic==0.3.1",
+    "titiler.application==0.3.1",
+    "rio-tiler>=2.0.6,<2.1",
     "aiocache[redis]",
     "ujson",
 ]
