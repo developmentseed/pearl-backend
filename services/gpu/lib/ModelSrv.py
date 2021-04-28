@@ -332,8 +332,8 @@ class ModelSrv():
             dataset = InferenceDataSet(self.api, self.aoi.tiles)
             dataloader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size=16,
-                num_workers=2,
+                batch_size=32,
+                num_workers=4,
                 pin_memory=True,
             )
 
@@ -364,6 +364,8 @@ class ModelSrv():
                         png = pred2png(output.data, color_list)
 
                         LOGGER.info("ok - returning inference")
+                        print('processed')
+                        print(self.aoi.total - len(self.aoi.tiles))
 
                         websocket.send(json.dumps({
                             'message': 'model#prediction',
@@ -382,7 +384,7 @@ class ModelSrv():
                             'data': {
                                 'aoi': self.aoi.id,
                                 'total': self.aoi.total,
-                                'processed': len(self.aoi.tiles)
+                                'processed': self.aoi.total - len(self.aoi.tiles)
                             }
                         }))
 
