@@ -332,8 +332,8 @@ class ModelSrv():
             dataset = InferenceDataSet(self.api, self.aoi.tiles)
             dataloader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size=16,
-                num_workers=2,
+                batch_size=32,
+                num_workers=4,
                 pin_memory=True,
             )
 
@@ -376,7 +376,6 @@ class ModelSrv():
                                 'image': png,
                                 'total': self.aoi.total,
                                 'processed': self.aoi.total - len(self.aoi.tiles)
-                                #'processed': len(self.aoi.tiles)
                             }
                         }))
                     else:
