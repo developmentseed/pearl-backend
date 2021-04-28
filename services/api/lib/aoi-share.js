@@ -84,9 +84,11 @@ class AOIShare {
             throw new Err(500, err, 'Failed to upload AOI Share');
         }
 
-        return await this.patch(shareuuid, {
+        const patch = await this.patch(shareuuid, {
             storage: true
         });
+
+        return patch;
     }
 
     /**

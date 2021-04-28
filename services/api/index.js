@@ -1302,23 +1302,22 @@ async function server(config, cb) {
                 const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
+                const chkpt = await checkpoint.get(a.checkpoint_id);
+                const cmap = {};
+                for (let i = 0; i < chkpt.classes.length; i++) {
+                    cmap[i] = chkpt.classes[i].color;
+                }
+
+                const patchurls = [];
+                for (const patchid of a.patches) {
+                    await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                    patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
+                }
+
                 const share = await aoishare.create(a);
 
                 if (config.TileUrl) {
                     const tiffurl = await aoi.url(a.id);
-
-                    const chkpt = await checkpoint.get(a.checkpoint_id);
-                    const cmap = {};
-                    for (let i = 0; i < chkpt.classes.length; i++) {
-                        cmap[i] = chkpt.classes[i].color;
-                    }
-
-                    const patchurls = [];
-                    for (const patchid of a.patches) {
-                        await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
-                        patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
-                    }
-
                     req.method = 'POST';
                     req.url = '/cog/cogify';
 
@@ -1329,7 +1328,8 @@ async function server(config, cb) {
                     };
 
                     const pres = await proxy.request(req, true);
-                    return res.json(aoishare.upload(share.uuid, pres));
+                    const up = await aoishare.upload(share.uuid, pres);
+                    return res.json(up);
                 } else {
                     return res.json(share);
                 }
