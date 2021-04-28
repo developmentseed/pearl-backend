@@ -10,12 +10,12 @@
     },
     "devDependencies": {
         "cli-progress": "^3.9.0",
-        "eslint": "^7.24.0",
+        "eslint": "^7.25.0",
         "eslint-plugin-node": "^11.1.0",
-        "pg": "^8.5.1",
+        "pg": "^8.6.0",
         "request": "^2.88.2",
         "tape": "^5.1.0",
-        "ws": "^7.4.2"
+        "ws": "^7.4.5"
     },
     "dependencies": {
         "charm": "^1.0.2",
