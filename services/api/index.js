@@ -1307,7 +1307,7 @@ async function server(config, cb) {
                 if (config.TileUrl) {
                     const tiffurl = await aoi.url(a.id);
 
-                    const chkpt = await checkpoint.get(theAoi.checkpoint_id);
+                    const chkpt = await checkpoint.get(a.checkpoint_id);
                     const cmap = {};
                     for (let i = 0; i < chkpt.classes.length; i++) {
                         cmap[i] = chkpt.classes[i].color;

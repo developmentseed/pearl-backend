@@ -7,6 +7,7 @@
             "get": "GET /project/:projectid/aoi/:aoiid",
             "tilejson": "GET /project/:projectid/aoi/:aoiid/tiles",
             "tile": "GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y",
+            "share": "POST /project/:projectid/aoi/:aoiid/share",
             "download-color": "GET /project/:projectid/aoi/:aoiid/download/color",
             "download-raw": "GET /project/:projectid/aoi/:aoiid/download/raw"
         },

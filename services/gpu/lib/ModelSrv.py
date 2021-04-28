@@ -50,7 +50,7 @@ class ModelSrv():
             }
 
             if self.aoi is not None:
-                payload['aoi'] = self.aoi.id,
+                payload['aoi'] = self.aoi.id
 
             if self.chk is not None:
                 payload['checkpoint'] = self.chk['id']

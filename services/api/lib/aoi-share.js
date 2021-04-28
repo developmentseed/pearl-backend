@@ -158,7 +158,7 @@ class AOIShare {
                     SET
                         storage = COALESCE($2, storage)
                     WHERE
-                        id = $1
+                        uuid = $1
                     RETURNING *
             `, [
                 shareuuid,
