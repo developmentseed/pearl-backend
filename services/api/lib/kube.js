@@ -71,7 +71,7 @@ class Kube {
                     'cpu': '8',
                     'memory': '16Gi'
                 }
-            }
+            };
         }
         // if (deploymentName === 'lulc-production-lulc-helm') {
         //     resources = {
@@ -163,7 +163,7 @@ class Kube {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);
 
         if (res.statusCode === 404) {
-            return null
+            return null;
         }
 
         if (res.statusCode >= 400) {

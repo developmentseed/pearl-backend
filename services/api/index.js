@@ -64,6 +64,7 @@ async function server(config, cb) {
     const checkpoint = new (require('./lib/checkpoint').CheckPoint)(config);
     const aoi = new (require('./lib/aoi').AOI)(config);
     const aoipatch = new (require('./lib/aoi-patch').AOIPatch)(config);
+    const aoishare = new (require('./lib/aoi-share').AOIShare)(config);
     const Mosaic = require('./lib/mosaic');
     const schemas = new (require('./lib/schema'))();
 
@@ -110,8 +111,8 @@ async function server(config, cb) {
 
         let activePods;
         if (podList.length) {
-            activePods = podList.filter(p => {
-                return p.status.phase === 'Running'
+            activePods = podList.filter((p) => {
+                return p.status.phase === 'Running';
             });
         }
 
@@ -570,7 +571,7 @@ async function server(config, cb) {
                         const aois = await aoi.list(p.id, { bookmarked: 'true' });
                         const checkpoints = await checkpoint.list(p.id, { bookmarked: 'true' });
                         // remove reduntant project id
-                        delete aois.project_id
+                        delete aois.project_id;
                         delete checkpoints.project_id;
                         p['aois'] = aois.aois;
                         p['checkpoints'] = checkpoints.checkpoints;
@@ -856,14 +857,14 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/aoi/:aoiuuid Get AOI
+     * @api {get} /api/share/:shareuuid Get AOI
      * @apiVersion 1.0.0
-     * @apiName GetAOI UUID
-     * @apiGroup AOI
+     * @apiName GetAOI
+     * @apiGroup Share
      * @apiPermission public
      *
      * @apiDescription
-     *     Return all information about a given AOI using the UUID
+     *     Return all information about a given AOI Export using the UUID
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -878,11 +879,11 @@ async function server(config, cb) {
      *       "classes": []
      *   }
      */
-     router.get(
-        ...await schemas.get('GET /aoi/:aoiuuid'),
+    router.get(
+        ...await schemas.get('GET /share/:shareuuid'),
         async (req, res) => {
             try {
-                return res.json(await aoi.getuuid(req.params.aoiuuid));
+                return res.json(await aoishare.getuuid(req.params.shareuuid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -915,7 +916,7 @@ async function server(config, cb) {
             `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
         ] : [
             `/api/aoi/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-        ]
+        ];
         return {
             tilejson: tj.tilejson,
             name: `aoi-${theAoi.id}`,
@@ -926,8 +927,8 @@ async function server(config, cb) {
             maxzoom: tj.maxzoom,
             bounds: tj.bounds,
             center: tj.center
-        }
-    }
+        };
+    };
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
@@ -960,7 +961,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/aoi/:aoiuuid/tiles TileJSON AOI
+     * @api {get} /api/share/:shareuuid/tiles TileJSON AOI
      * @apiVersion 1.0.0
      * @apiName TileJSONAOI
      * @apiGroup AOI
@@ -969,13 +970,13 @@ async function server(config, cb) {
      * @apiDescription
      *     Return tilejson for a given AOI using uuid
      */
-     router.get(
-        ...await schemas.get('GET /aoi/:aoiuuid/tiles'),
+    router.get(
+        ...await schemas.get('GET /aoi/share/:shareuuid/tiles'),
         async (req, res) => {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
             try {
-                const a = await aoi.getuuid(req.params.aoiuuid);
+                const a = await aoishare.getuuid(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 res.json(await getAoiTileJSON(a, req));
@@ -986,24 +987,24 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/aoi/:aoiuuid/tiles/:z/:x/:y Tile AOI
+     * @api {get} /api/share/:shareuuid/tiles/:z/:x/:y Tile AOI
      * @apiVersion 1.0.0
      * @apiName TileAOI
-     * @apiGroup AOI
+     * @apiGroup Share
      * @apiPermission public
      *
      * @apiDescription
      *     Return a Tile for a given AOI using uuid
      */
-     router.get(
-        ...await schemas.get('GET /aoi/:aoiuuid/tiles/:z/:x/:y'),
+    router.get(
+        ...await schemas.get('GET /share/:shareuuid/tiles/:z/:x/:y'),
         async (req, res) => {
             try {
                 await Param.int(req, 'z');
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                const a = await aoi.getuuid(req.params.aoiuuid);
+                const a = await aoi.getuuid(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 const tiffurl = await aoi.url(a.id);
@@ -1141,7 +1142,7 @@ async function server(config, cb) {
      * @apiPermission user
      *
      * @apiDescription
-     *     Return the colourized aoi fabric geotiff
+     *     Return the colourized aoi fabric geotiff - but doesn't save it to share page
      */
     router.get(
         ...await schemas.get('GET /project/:projectid/aoi/:aoiid/download/color'),
@@ -1162,7 +1163,7 @@ async function server(config, cb) {
                     cmap[i] = chkpt.classes[i].color;
                 }
 
-                let patchurls = [];
+                const patchurls = [];
                 for (const patchid of a.patches) {
                     await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
                     patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
@@ -1175,7 +1176,7 @@ async function server(config, cb) {
                     input: tiffurl,
                     patches: patchurls,
                     colormap: cmap
-                }
+                };
 
                 await proxy.request(req, res);
             } catch (err) {
@@ -1264,6 +1265,142 @@ async function server(config, cb) {
                 await project.has_auth(req.auth, req.params.projectid);
 
                 return res.json(await aoi.create(req.params.projectid, req.body));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {post} /api/project/:projectid/aoi/:aoiid/share Create Share
+     * @apiVersion 1.0.0
+     * @apiName ShareAOI
+     * @apiGroup Share
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Export an AOI & it's patches to share
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "aoi_id": 1432,
+     *       "project_id": 1,
+     *       "storage": false,
+     *       "created": "<date>",
+     *       "patches": []
+     *   }
+     */
+    router.post(
+        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/share'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+                if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+                const chkpt = await checkpoint.get(a.checkpoint_id);
+                const cmap = {};
+                for (let i = 0; i < chkpt.classes.length; i++) {
+                    cmap[i] = chkpt.classes[i].color;
+                }
+
+                const patchurls = [];
+                for (const patchid of a.patches) {
+                    await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                    patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
+                }
+
+                const share = await aoishare.create(a);
+
+                if (config.TileUrl) {
+                    const tiffurl = await aoi.url(a.id);
+                    req.method = 'POST';
+                    req.url = '/cog/cogify';
+
+                    req.body = {
+                        input: tiffurl,
+                        patches: patchurls,
+                        colormap: cmap
+                    };
+
+                    const pres = await proxy.request(req, true);
+                    const up = await aoishare.upload(share.uuid, pres);
+                    return res.json(up);
+                } else {
+                    return res.json(share);
+                }
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {delete} /api/project/:projectid/aoi/:aoiid/share/:shareuuid Delete Share
+     * @apiVersion 1.0.0
+     * @apiName DeleteShare
+     * @apiGroup Share
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete a Shared AOI
+     */
+    router.delete(
+        ...await schemas.get('DELETE /project/:projectid/aoi/:aoiid/share/:shareuuid'),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await Param.int(req, 'aoiid');
+                await project.has_auth(req.auth, req.params.projectid);
+
+                return res.json(await aoishare.delete(req.params.aoiid, req.params.shareuuid));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+        }
+    );
+
+    /**
+     * @api {get} /api/project/:projectid/share List Shares
+     * @apiVersion 1.0.0
+     * @apiName ListShares
+     * @apiGroup Share
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return all shares for a given project
+     *
+     * @apiSchema (Query) {jsonschema=./schema/req.query.aoi.json} apiParam
+     *
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "total": 1,
+     *       "project_id": 123,
+     *       "shares": [{
+     *           "uuid": "<uuid>",
+     *           "aoi_id": 1432,
+     *           "storage": true,
+     *           "created": "<date>"
+     *       }]
+     *   }
+     */
+    router.get(
+        ...await schemas.get('GET /project/:projectid/share', {
+            query: 'req.query.aoi.json'
+        }),
+        requiresAuth,
+        async (req, res) => {
+            try {
+                await Param.int(req, 'projectid');
+                await project.has_auth(req.auth, req.params.projectid);
+
+                return res.json(await aoishare.list(req.params.projectid, req.query));
             } catch (err) {
                 return Err.respond(err, res);
             }

@@ -7,6 +7,7 @@
             "get": "GET /project/:projectid/aoi/:aoiid",
             "tilejson": "GET /project/:projectid/aoi/:aoiid/tiles",
             "tile": "GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y",
+            "share": "POST /project/:projectid/aoi/:aoiid/share",
             "download-color": "GET /project/:projectid/aoi/:aoiid/download/color",
             "download-raw": "GET /project/:projectid/aoi/:aoiid/download/raw"
         },
@@ -95,7 +96,22 @@
             "query": false,
             "res": false
         },
+        "GET /share/:shareuuid": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
         "GET /project/:projectid/aoi/:aoiid/tiles": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "GET /aoi/share/:shareuuid/tiles": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "GET /share/:shareuuid/tiles/:z/:x/:y": {
             "body": false,
             "query": false,
             "res": false
@@ -130,6 +146,21 @@
             "query": false,
             "res": false
         },
+        "POST /project/:projectid/aoi/:aoiid/share": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "DELETE /project/:projectid/aoi/:aoiid/share/:shareuuid": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "GET /project/:projectid/share": {
+            "body": false,
+            "query": true,
+            "res": false
+        },
         "DELETE /project/:projectid/aoi/:aoiid": {
             "body": false,
             "query": false,
@@ -137,6 +168,41 @@
         },
         "PATCH /project/:projectid/aoi/:aoiid": {
             "body": true,
+            "query": false,
+            "res": false
+        },
+        "GET /project/:projectid/aoi/:aoiid/patch": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "POST /project/:projectid/aoi/:aoiid/patch": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "DELETE /project/:projectid/aoi/:aoiid/patch/:patchid": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "GET /project/:projectid/aoi/:aoiid/patch/:patchid": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "GET /project/:projectid/aoi/:aoiid/patch/:patchid/download": {
+            "body": false,
+            "query": false,
+            "res": false
+        },
+        "POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
+            "body": false,
             "query": false,
             "res": false
         },

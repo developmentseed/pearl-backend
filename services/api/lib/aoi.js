@@ -75,13 +75,8 @@ class AOI {
             patches: row.patches.map((patch) => { return parseInt(patch); })
         };
 
-        // only return uuid for bookmarked aois
-        if (row.hasOwnProperty('uuid') && row.bookmarked) {
-            def['uuid'] = row.uuid;
-        }
-
         if (row.hasOwnProperty('classes')) {
-            def['classes'] = row.classes
+            def['classes'] = row.classes;
         }
 
         if (typeof row.bounds === 'object') {
@@ -211,48 +206,6 @@ class AOI {
     }
 
     /**
-     * Return a single bookmarked AOI using uuid
-     * @param {String} aoiuuid
-     */
-
-    async getuuid(aoiuuid) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(`
-               SELECT
-                    a.id AS id,
-                    a.uuid AS uuid,
-                    a.name AS name,
-                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
-                    a.project_id AS project_id,
-                    a.bookmarked AS bookmarked,
-                    a.checkpoint_id AS checkpoint_id,
-                    a.created AS created,
-                    a.storage AS storage,
-                    a.patches AS patches,
-                    c.classes as classes
-                FROM
-                    aois a,
-                    checkpoints c
-                WHERE
-                    a.uuid = $1
-                AND
-                    a.bookmarked=true
-                AND
-                    a.checkpoint_id = c.id
-            `, [
-                aoiuuid
-            ]);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to get AOI');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
-
-        return AOI.json(pgres.rows[0]);
-    }
-
-    /**
      * Return a single aoi
      *
      * @param {Number} aoiid - Specific AOI id
@@ -263,7 +216,6 @@ class AOI {
             pgres = await this.pool.query(`
                SELECT
                     a.id AS id,
-                    a.uuid AS uuid,
                     a.name AS name,
                     ST_AsGeoJSON(a.bounds)::JSON AS bounds,
                     a.project_id AS project_id,
@@ -327,7 +279,6 @@ class AOI {
                SELECT
                     count(*) OVER() AS count,
                     a.id AS id,
-                    a.uuid AS uuid,
                     a.name AS name,
                     a.bookmarked AS bookmarked,
                     ST_AsGeoJSON(a.bounds)::JSON AS bounds,
@@ -360,7 +311,6 @@ class AOI {
             aois: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
-                    uuid: row.uuid,
                     name: row.name,
                     bookmarked: row.bookmarked,
                     bounds: row.bounds,
