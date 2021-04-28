@@ -1275,7 +1275,7 @@ async function server(config, cb) {
      * @api {post} /api/project/:projectid/aoi/:aoiid/share Create Share
      * @apiVersion 1.0.0
      * @apiName ShareAOI
-     * @apiGroup AOI
+     * @apiGroup Share
      * @apiPermission user
      *
      * @apiDescription
@@ -1302,7 +1302,38 @@ async function server(config, cb) {
                 const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-                return res.json(await aoishare.create(a));
+                const share = await aoishare.create(a);
+
+                if (config.TileUrl) {
+                    const tiffurl = await aoi.url(a.id);
+
+                    const chkpt = await checkpoint.get(theAoi.checkpoint_id);
+                    const cmap = {};
+                    for (let i = 0; i < chkpt.classes.length; i++) {
+                        cmap[i] = chkpt.classes[i].color;
+                    }
+
+                    const patchurls = [];
+                    for (const patchid of a.patches) {
+                        await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                        patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
+                    }
+
+                    req.method = 'POST';
+                    req.url = '/cog/cogify';
+
+                    req.body = {
+                        input: tiffurl,
+                        patches: patchurls,
+                        colormap: cmap
+                    };
+
+                    const res = await proxy.request(req, true);
+
+                    return aoishare.upload(share.uuid, res);
+                } else {
+                    return res.json(share);
+                }
             } catch (err) {
                 return Err.respond(err, res);
             }

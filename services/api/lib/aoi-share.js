@@ -1,5 +1,3 @@
-'use strict';
-
 const Err = require('./error');
 const moment = require('moment');
 const {
@@ -70,24 +68,23 @@ class AOIShare {
     /**
      * Upload an AOI patch geotiff and mark the AOI patch storage property as true
      *
-     * @param {Number} aoiid AOI ID to upload to
-     * @param {Number} patchid AOI Patch ID to upload to
+     * @param {String} uuid AOI Share UUID to upload to
      * @param {Object} file File Stream to upload
      */
-    async upload(aoiid, patchid, file) {
+    async upload(shareuuid, file) {
         if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}-patch-${patchid}.tiff`);
+        const blockBlobClient = this.container_client.getBlockBlobClient(`share-${shareuuid}.tiff`);
 
         try {
             await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
                 blobHTTPHeaders: { blobContentType: 'image/tiff' }
             });
         } catch (err) {
-            throw new Err(500, err, 'Failed to upload AOI Patch');
+            throw new Err(500, err, 'Failed to upload AOI Share');
         }
 
-        return await this.patch(patchid, {
+        return await this.patch(shareuuid, {
             storage: true
         });
     }
