@@ -201,7 +201,7 @@ class TorchFineTuning(ModelSession):
         print('y_train pre split')
         print(len(np.unique(y_train)))
         x_train, x_test, y_train, y_test = train_test_split(
-                                            x_train, y_train, test_size=0.1, random_state=0)
+                                            x_train, y_train, test_size=0.1, random_state=0, stratify=y_train)
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
 
