@@ -198,15 +198,11 @@ class TorchFineTuning(ModelSession):
 
         # split re-training data into test 10% and train 90%
         # TO-DO confirm post split that all unique class labels are present in training!
-        print('y_train pre split')
-        print(len(np.unique(y_train)))
+
         x_train, x_test, y_train, y_test = train_test_split(
-                                            x_train, y_train, test_size=0.1, random_state=0, stratify=y_train)
+                                            x_train, y_train, test_size=0.1, random_state=0)
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
-
-        print('y_train post split')
-        print(len(np.unique(y_train)))
 
         # Check to see if new classes are added and randomly initaalize weights/biases for new classes.
         if len(np.unique(y_train)) > len(self.augment_model.intercept_):
@@ -323,16 +319,11 @@ class TorchFineTuning(ModelSession):
         data = tile.to(self.device)
         with torch.no_grad():
             predictions = self.model(data)
-            predictions = F.softmax(predictions, dim=1).cpu().numpy()
-            print(predictions.shape) #this is giving us the highest probability class per pixel
+            predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
 
 
         for pred in predictions:
             output_preds.append(pred.argmax(axis=0).astype(np.uint8))
-            print(np.unique(pred.argmax(axis=0).astype(np.uint8)))
-            print(pred.argmax(axis=0).astype(np.uint8).shape)
-
-        print(np.array(output_preds).shape)
 
         return np.array(output_preds)
 
