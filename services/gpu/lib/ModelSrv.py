@@ -364,6 +364,8 @@ class ModelSrv():
                         png = pred2png(output.data, color_list)
 
                         LOGGER.info("ok - returning inference")
+                        print('processed')
+                        print(self.aoi.total - len(self.aoi.tiles))
 
                         websocket.send(json.dumps({
                             'message': 'model#prediction',
@@ -374,6 +376,7 @@ class ModelSrv():
                                 'image': png,
                                 'total': self.aoi.total,
                                 'processed': self.aoi.total - len(self.aoi.tiles)
+                                #'processed': len(self.aoi.tiles)
                             }
                         }))
                     else:
@@ -382,7 +385,7 @@ class ModelSrv():
                             'data': {
                                 'aoi': self.aoi.id,
                                 'total': self.aoi.total,
-                                'processed': len(self.aoi.tiles)
+                                'processed': self.aoi.total - len(self.aoi.tiles)
                             }
                         }))
 
