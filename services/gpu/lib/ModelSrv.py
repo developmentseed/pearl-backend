@@ -441,9 +441,14 @@ class ModelSrv():
                 'message': 'model#retrain#complete'
             }))
 
+            if self.chk == None:
+                parent = None
+            else:
+                parent = self.chk['id']
+
             self.meta_save_checkpoint({
                 'name': body['name'],
-                'parent': self.chk['id'],
+                'parent': parent,
                 'input_geoms': [cls["geometry"] for cls in body['classes']],
                 'retrain_geoms': pxs2geojson([cls["retrain_geometry"] for cls in body['classes']]),
                 'analytics': [{
