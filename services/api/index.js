@@ -880,10 +880,10 @@ async function server(config, cb) {
      *   }
      */
     router.get(
-        ...await schemas.get('GET /share/:aoiuuid'),
+        ...await schemas.get('GET /share/:shareuuid'),
         async (req, res) => {
             try {
-                return res.json(await aoi.getuuid(req.params.aoiuuid));
+                return res.json(await aoi.getuuid(req.params.shareuuid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -961,7 +961,7 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/aoi/:aoiuuid/tiles TileJSON AOI
+     * @api {get} /api/share/:shareuuid/tiles TileJSON AOI
      * @apiVersion 1.0.0
      * @apiName TileJSONAOI
      * @apiGroup AOI
@@ -971,12 +971,12 @@ async function server(config, cb) {
      *     Return tilejson for a given AOI using uuid
      */
     router.get(
-        ...await schemas.get('GET /aoi/:aoiuuid/tiles'),
+        ...await schemas.get('GET /aoi/share/:shareuuid/tiles'),
         async (req, res) => {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
             try {
-                const a = await aoi.getuuid(req.params.aoiuuid);
+                const a = await aoishare.getuuid(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 res.json(await getAoiTileJSON(a, req));
@@ -1004,7 +1004,7 @@ async function server(config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                const a = await aoi.getuuid(req.params.aoiuuid);
+                const a = await aoi.getuuid(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 const tiffurl = await aoi.url(a.id);
@@ -1351,7 +1351,7 @@ async function server(config, cb) {
      *     Delete a Shared AOI
      */
     router.delete(
-        ...await schemas.get('POST /project/:projectid/aoi/:aoiid/share/:shareuuid'),
+        ...await schemas.get('DELETE /project/:projectid/aoi/:aoiid/share/:shareuuid'),
         requiresAuth,
         async (req, res) => {
             try {

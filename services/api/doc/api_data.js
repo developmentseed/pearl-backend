@@ -468,33 +468,6 @@ define({ "api": [
     "groupTitle": "AOIPatch"
   },
   {
-    "type": "post",
-    "url": "/api/project/:projectid/aoi/:aoiid/share",
-    "title": "Create Share",
-    "version": "1.0.0",
-    "name": "ShareAOI",
-    "group": "AOI",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Export an AOI &amp; it's patches to share</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"aoi_id\": 1432,\n    \"project_id\": 1,\n    \"storage\": false,\n    \"created\": \"<date>\",\n    \"patches\": []\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "AOI"
-  },
-  {
     "type": "get",
     "url": "/api/project/:project/aoi/:aoiid/tiles/:z/:x/:y",
     "title": "Tile AOI",
@@ -532,7 +505,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/aoi/:aoiuuid/tiles",
+    "url": "/api/share/:shareuuid/tiles",
     "title": "TileJSON AOI",
     "version": "1.0.0",
     "name": "TileJSONAOI",
@@ -2255,6 +2228,33 @@ define({ "api": [
         {
           "title": "Success-Response:",
           "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"shares\": [{\n        \"uuid\": \"<uuid>\",\n        \"aoi_id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./index.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:projectid/aoi/:aoiid/share",
+    "title": "Create Share",
+    "version": "1.0.0",
+    "name": "ShareAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Export an AOI &amp; it's patches to share</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"aoi_id\": 1432,\n    \"project_id\": 1,\n    \"storage\": false,\n    \"created\": \"<date>\",\n    \"patches\": []\n}",
           "type": "json"
         }
       ]
