@@ -94,8 +94,6 @@ class ModelSrv():
                 }))
 
                 color_list = [item["color"] for item in self.model.classes]
-
-                #while len(patch.tiles) > 0 and self.is_aborting is False:
                 zxy = patch.tiles.pop()
                 output = MemRaster(
                     np.ones([256,256], dtype=np.uint8) * body['class'],
@@ -366,9 +364,6 @@ class ModelSrv():
                         png = pred2png(output.data, color_list)
 
                         LOGGER.info("ok - returning inference")
-
-                        print(self.aoi.total)
-                        print(len(self.aoi.tiles))
 
                         websocket.send(json.dumps({
                             'message': 'model#prediction',
