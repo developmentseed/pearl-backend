@@ -883,7 +883,7 @@ async function server(config, cb) {
         ...await schemas.get('GET /share/:shareuuid'),
         async (req, res) => {
             try {
-                return res.json(await aoi.getuuid(req.params.shareuuid));
+                return res.json(await aoishare.getuuid(req.params.shareuuid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1328,9 +1328,8 @@ async function server(config, cb) {
                         colormap: cmap
                     };
 
-                    const res = await proxy.request(req, true);
-
-                    return aoishare.upload(share.uuid, res);
+                    const pres = await proxy.request(req, true);
+                    return res.json(aoishare.upload(share.uuid, pres));
                 } else {
                     return res.json(share);
                 }

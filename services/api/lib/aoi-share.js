@@ -66,7 +66,7 @@ class AOIShare {
     }
 
     /**
-     * Upload an AOI patch geotiff and mark the AOI patch storage property as true
+     * Upload an AOI share geotiff and mark the AOI share storage property as true
      *
      * @param {String} uuid AOI Share UUID to upload to
      * @param {Object} file File Stream to upload
@@ -90,19 +90,18 @@ class AOIShare {
     }
 
     /**
-     * Download an AOI patch geotiff
+     * Download an AOI share geotiff
      *
-     * @param {Number} aoiid AOI ID to download
-     * @param {Number} patchid Patch ID to download
+     * @param {Number} shareuuid AOI ID to download
      * @param {Stream} res Stream to pipe geotiff to (usually express response object)
      */
-    async download(aoiid, patchid, res) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
+    async download(shareuuid, res) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI Share storage not configured');
 
-        const aoi = await this.get(aoiid);
-        if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
+        const aoi = await this.get(shareuuid);
+        if (!aoi.storage) throw new Err(404, null, 'AOI Share has not been uploaded');
 
-        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}-patch-${patchid}.tiff`);
+        const blockBlobClient = this.container_client.getBlockBlobClient(`share-${shareuuid}.tiff`);
         const dwn = await blob_client.download(0);
 
         dwn.readableStreamBody.pipe(res);
@@ -174,33 +173,34 @@ class AOIShare {
     }
 
     /**
-     * Return a single aoi
+     * Return a single aoi share
      *
-     * @param {Number} patchid - Specific AOI id
+     * @param {String} shareuuid - Specific AOI Share UUID
      */
-    async get(patchid) {
+    async get(shareuuid) {
         let pgres;
         try {
             pgres = await this.pool.query(`
                SELECT
-                    id,
+                    uuid,
                     aoi_id,
                     project_id,
+                    ST_AsGeojson(bounds)::JSON AS bounds,
                     created,
                     storage
                 FROM
-                    aoi_patch
+                    aois_share
                 WHERE
-                    id = $1
+                    uuid = $1
             `, [
-                patchid
+                shareuuid
 
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to get AOI Patch');
+            throw new Err(500, new Error(err), 'Failed to get AOI Share');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
         return AOIShare.json(pgres.rows[0]);
     }
