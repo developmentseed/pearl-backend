@@ -21,6 +21,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score
 
 from .ModelSessionAbstract import ModelSession
+from .InferenceDataSet import InferenceDataSet
 
 import torch
 import torch.nn as nn
@@ -122,15 +123,11 @@ class TorchFineTuning(ModelSession):
         self.model = self.model.to(self.device)
 
 
-    def run(self, tile, inference_mode=False):
-        tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first (all MVP pytorch models will want the image tile to be (4, 256, 256))
-        tile = tile / 255.0
-        tile = tile.astype(np.float32)
-
+    def run(self, data, inference_mode=False):
         if inference_mode:
-            return self.run_model_on_tile(tile)
+            return self.run_model_on_tile(data)
         else:
-            return self.run_model_on_tile_embedding(tile)
+            return self.run_model_on_tile_embedding(data) #fix this
 
     def retrain(self, classes, **kwargs):
         names = [x['name'] for x in classes]
@@ -200,7 +197,8 @@ class TorchFineTuning(ModelSession):
 
 
         # split re-training data into test 10% and train 90%
-        # TO-DO confirm post split that all unqiue class labels are present in training!
+        # TO-DO confirm post split that all unique class labels are present in training!
+
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.1, random_state=0)
 
@@ -299,39 +297,35 @@ class TorchFineTuning(ModelSession):
 
 
     def run_model_on_tile_embedding(self, tile):
-        height = tile.shape[1]
-        width = tile.shape[2]
-        output = np.zeros((len(self.classes), height, width), dtype=np.float32)
+
+        tile = np.moveaxis(tile, -1, 0) #go from channels last to channels first
+        tile = tile / 255.0
+        tile = tile.astype(np.float32)
         tile_img = torch.from_numpy(tile)
+
         data = tile_img.to(self.device)
         with torch.no_grad():
-            predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
-            predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
-
-        # get embeddings
-        newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
-        newmodel.eval()
-        with torch.no_grad():
-            features = newmodel(data[None, ...])
-            features = features.cpu().numpy()
-            features = np.moveaxis(features[0], 0, -1)
+            predictions, features = self.model.forward_features(data[None, ...])
+            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            features = features.cpu().numpy() #embeddings per pixel for the image
         predictions = predictions[0].argmax(axis=0).astype(np.uint8)
+        features = np.moveaxis(features[0], 0, -1)
         return predictions, features
 
 
+
     def run_model_on_tile(self, tile):
-        height = tile.shape[1]
-        width = tile.shape[2]
-        output = np.zeros((len(self.classes), height, width), dtype=np.float32)
-        tile_img = torch.from_numpy(tile)
-        data = tile_img.to(self.device)
+        output_preds = []
+        data = tile.to(self.device)
         with torch.no_grad():
-            predictions = self.model(data[None, ...]) # insert singleton "batch" dimension to input data for pytorch to be happy
-            predictions = F.softmax(predictions, dim=1).cpu().numpy() #this is giving us the highest probability class per pixel
+            predictions = self.model(data)
+            predictions = F.softmax(predictions, dim=1).cpu().numpy()  #this is giving us the highest probability class per pixel
 
-            predictions = predictions[0].argmax(axis=0).astype(np.uint8)  #using [0] because using a "fake batch" of 1 tile
 
-        return predictions
+        for pred in predictions:
+            output_preds.append(pred.argmax(axis=0).astype(np.uint8))
+
+        return np.array(output_preds)
 
     def save_state_to(self, directory):
         torch.save(self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt"))
