@@ -197,11 +197,16 @@ class TorchFineTuning(ModelSession):
 
 
         # split re-training data into test 10% and train 90%
-        # TO-DO confirm post split that all unqiue class labels are present in training!
+        # TO-DO confirm post split that all unique class labels are present in training!
+        print('y_train pre split')
+        print(len(np.unique(y_train)))
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.1, random_state=0)
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+
+        print('y_train post split')
+        print(len(np.unique(y_train)))
 
         # Check to see if new classes are added and randomly initaalize weights/biases for new classes.
         if len(np.unique(y_train)) > len(self.augment_model.intercept_):
