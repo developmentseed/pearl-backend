@@ -849,7 +849,16 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'aoiid');
-                return res.json(await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid));
+
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+
+                const shares = await aoishare.list(req.params.projectid, {
+                    aoi_id: a.id
+                });
+
+                a.shares = shares.shares;
+
+                return res.json(a);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -1221,7 +1230,17 @@ async function server(config, cb) {
                 await Param.int(req, 'projectid');
                 await project.has_auth(req.auth, req.params.projectid);
 
-                return res.json(await aoi.list(req.params.projectid, req.query));
+                const aois = await aoi.list(req.params.projectid, req.query);
+
+                for (const a of aois.aois) {
+                    const shares = await aoishare.list(req.params.projectid, {
+                        aoi_id: a.id
+                    });
+
+                    a.shares = shares.shares;
+                }
+
+                return res.json(aois);
             } catch (err) {
                 return Err.respond(err, res);
             }

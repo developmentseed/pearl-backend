@@ -89,7 +89,7 @@
         "query": false,
         "res": false
     },
-    "GET /aoi/share/:shareuuid/tiles": {
+    "GET /share/:shareuuid/tiles": {
         "body": false,
         "query": false,
         "res": false

@@ -267,7 +267,6 @@ class AOI {
 
         const where = [];
         where.push(`a.project_id = ${projectid}`);
-        where.push('a.checkpoint_id = c.id');
 
         if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
             where.push('checkpoint_id = ' + query.checkpointid);
@@ -293,10 +292,10 @@ class AOI {
                     c.classes AS classes
                 FROM
                     aois a,
-                    checkpoints c,
-                    aois_share s
+                    checkpoints c
                 WHERE
-                    ${where.join(' AND ')}
+                    a.checkpoint_id = c.id
+                    AND ${where.join(' AND ')}
                 ORDER BY
                     a.created ${query.sort}
                 LIMIT
