@@ -62,16 +62,6 @@ class FCN(nn.Module):
         x = self.last(x)
         return x
 
-    def forward_features(self, inputs):
-        x = F.relu(self.conv1(inputs))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        z = F.relu(self.conv5(x))
-        y = self.last(z)
-
-        return y, z
-
 
 class TorchFineTuning(ModelSession):
 
