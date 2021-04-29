@@ -197,8 +197,6 @@ class TorchFineTuning(ModelSession):
 
 
         # split re-training data into test 10% and train 90%
-        # TO-DO confirm post split that all unique class labels are present in training!
-
         x_train, x_test, y_train, y_test = train_test_split(
                                             x_train, y_train, test_size=0.1, random_state=0, stratify=y_train)
 
