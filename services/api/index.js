@@ -892,7 +892,7 @@ async function server(config, cb) {
         ...await schemas.get('GET /share/:shareuuid'),
         async (req, res) => {
             try {
-                return res.json(await aoishare.getuuid(req.params.shareuuid));
+                return res.json(await aoishare.get(req.params.shareuuid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -985,7 +985,7 @@ async function server(config, cb) {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
             try {
-                const a = await aoishare.getuuid(req.params.shareuuid);
+                const a = await aoishare.get(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 res.json(await getAoiTileJSON(a, req));
