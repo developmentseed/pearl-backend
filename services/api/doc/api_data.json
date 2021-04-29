@@ -504,24 +504,6 @@
     "groupTitle": "AOI"
   },
   {
-    "type": "get",
-    "url": "/api/share/:shareuuid/tiles",
-    "title": "TileJSON AOI",
-    "version": "1.0.0",
-    "name": "TileJSONAOI",
-    "group": "AOI",
-    "permission": [
-      {
-        "name": "public",
-        "title": "Public",
-        "description": "<p>This API endpoint does not require authentication</p>"
-      }
-    ],
-    "description": "<p>Return tilejson for a given AOI using uuid</p>",
-    "filename": "./index.js",
-    "groupTitle": "AOI"
-  },
-  {
     "type": "post",
     "url": "/api/project/:projectid/aoi/:aoiid/upload",
     "title": "Upload AOI",
@@ -2140,7 +2122,7 @@
     "url": "/api/share/:shareuuid",
     "title": "Get AOI",
     "version": "1.0.0",
-    "name": "GetAOI",
+    "name": "GetShare",
     "group": "Share",
     "permission": [
       {
@@ -2265,9 +2247,9 @@
   {
     "type": "get",
     "url": "/api/share/:shareuuid/tiles/:z/:x/:y",
-    "title": "Tile AOI",
+    "title": "Tiles",
     "version": "1.0.0",
-    "name": "TileAOI",
+    "name": "Tile",
     "group": "Share",
     "permission": [
       {
@@ -2277,6 +2259,24 @@
       }
     ],
     "description": "<p>Return a Tile for a given AOI using uuid</p>",
+    "filename": "./index.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/share/:shareuuid/tiles",
+    "title": "TileJSON",
+    "version": "1.0.0",
+    "name": "TileJSON",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return tilejson for a given AOI using uuid</p>",
     "filename": "./index.js",
     "groupTitle": "Share"
   },

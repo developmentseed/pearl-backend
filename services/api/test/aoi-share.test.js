@@ -326,6 +326,54 @@ test('GET /api/project/1/share', (t) => {
     });
 });
 
+test('GET /api/project/1/aoi/1', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+
+        t.ok(res.body.shares[0].created, '.shares[0].created: <date>');
+        delete res.body.shares[0].created;
+        t.ok(res.body.shares[0].uuid, '.shares[0].uuid: <date>');
+        delete res.body.shares[0].uuid;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            name: 'Test AOI',
+            storage: true,
+            bookmarked: false,
+            project_id: 1,
+            checkpoint_id: 1,
+            patches: [],
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' } 
+            ],
+            bounds: {
+                type: 'Polygon',
+                coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
+            },
+            shares: [{
+                aoi_id: 1,
+                storage: false
+            }]
+        });
+
+        t.end();
+    });
+});
+
 test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', (t) => {
     request({
         json: true,
