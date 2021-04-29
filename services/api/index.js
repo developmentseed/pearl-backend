@@ -859,7 +859,7 @@ async function server(config, cb) {
     /**
      * @api {get} /api/share/:shareuuid Get AOI
      * @apiVersion 1.0.0
-     * @apiName GetAOI
+     * @apiName GetShare
      * @apiGroup Share
      * @apiPermission public
      *
@@ -961,17 +961,17 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/share/:shareuuid/tiles TileJSON AOI
+     * @api {get} /api/share/:shareuuid/tiles TileJSON
      * @apiVersion 1.0.0
-     * @apiName TileJSONAOI
-     * @apiGroup AOI
+     * @apiName TileJSON
+     * @apiGroup Share
      * @apiPermission public
      *
      * @apiDescription
      *     Return tilejson for a given AOI using uuid
      */
     router.get(
-        ...await schemas.get('GET /aoi/share/:shareuuid/tiles'),
+        ...await schemas.get('GET /share/:shareuuid/tiles'),
         async (req, res) => {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
@@ -987,9 +987,9 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/share/:shareuuid/tiles/:z/:x/:y Tile AOI
+     * @api {get} /api/share/:shareuuid/tiles/:z/:x/:y Tiles
      * @apiVersion 1.0.0
-     * @apiName TileAOI
+     * @apiName Tile
      * @apiGroup Share
      * @apiPermission public
      *
