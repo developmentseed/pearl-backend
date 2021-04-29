@@ -261,6 +261,10 @@ class AOI {
         if (!query.page) query.page = 0;
         if (!query.sort) query.sort = 'desc';
 
+        if (query.sort !== 'desc' && query.sort !== 'asc') {
+            throw new Err(400, null, 'Invalid Sort');
+        }
+
         const where = [];
         where.push(`a.project_id = ${projectid}`);
         where.push('a.checkpoint_id = c.id');
@@ -289,10 +293,12 @@ class AOI {
                     c.classes AS classes
                 FROM
                     aois a,
-                    checkpoints c
+                    checkpoints c,
+                    aois_share s
                 WHERE
                     ${where.join(' AND ')}
-                ORDER BY a.created ${query.sort}
+                ORDER BY
+                    a.created ${query.sort}
                 LIMIT
                     $1
                 OFFSET

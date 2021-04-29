@@ -236,6 +236,8 @@ class AOIShare {
                     aois_share
                 WHERE
                     ${where.join(' AND ')}
+                ORDER BY
+                    created DESC
                 LIMIT
                     $1
                 OFFSET

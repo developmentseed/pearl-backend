@@ -96,6 +96,10 @@ class CheckPoint {
         if (!query.page) query.page = 0;
         if (!query.sort) query.sort = 'desc';
 
+        if (query.sort !== 'desc' && query.sort !== 'asc') {
+            throw new Err(400, null, 'Invalid Sort');
+        }
+
         const where = [];
         where.push(`project_id = ${projectid}`);
 
