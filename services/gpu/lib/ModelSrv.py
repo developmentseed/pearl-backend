@@ -2,7 +2,6 @@ import json
 import numpy as np
 import torch
 
-
 from .utils import pred2png, geom2px, pxs2geojson, generate_random_points
 from .AOI import AOI
 from .MemRaster import MemRaster
