@@ -225,6 +225,7 @@ test('GET /api/project/1/aoi/1', (t) => {
             checkpoint_id: 1,
             bookmarked: false,
             patches: [],
+            shares:  [],
             name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
@@ -275,6 +276,7 @@ test('GET /api/project/1/aoi', (t) => {
             aois: [{
                 id: 1,
                 name: 'Test AOI',
+                shares: [],
                 storage: true,
                 bookmarked: false,
                 bounds: {

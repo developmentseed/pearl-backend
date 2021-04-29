@@ -214,6 +214,7 @@ class AOIShare {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
+     * @param {Number} query.aoi_id - Specfic AOI to filter for
      */
     async list(projectid, query) {
         if (!query) query = {};
@@ -222,6 +223,8 @@ class AOIShare {
 
         const where = [];
         where.push(`project_id = ${projectid}`);
+
+        if (query.aoi) where.push(`aoi_id = ${query.aoi_id}`);
 
         let pgres;
         try {
@@ -236,6 +239,8 @@ class AOIShare {
                     aois_share
                 WHERE
                     ${where.join(' AND ')}
+                ORDER BY
+                    created DESC
                 LIMIT
                     $1
                 OFFSET

@@ -849,7 +849,16 @@ async function server(config, cb) {
             try {
                 await Param.int(req, 'projectid');
                 await Param.int(req, 'aoiid');
-                return res.json(await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid));
+
+                const a = await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+
+                const shares = await aoishare.list(req.params.projectid, {
+                    aoi_id: a.id
+                });
+
+                a.shares = shares.shares;
+
+                return res.json(a);
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -859,7 +868,7 @@ async function server(config, cb) {
     /**
      * @api {get} /api/share/:shareuuid Get AOI
      * @apiVersion 1.0.0
-     * @apiName GetAOI
+     * @apiName GetShare
      * @apiGroup Share
      * @apiPermission public
      *
@@ -883,7 +892,7 @@ async function server(config, cb) {
         ...await schemas.get('GET /share/:shareuuid'),
         async (req, res) => {
             try {
-                return res.json(await aoishare.getuuid(req.params.shareuuid));
+                return res.json(await aoishare.get(req.params.shareuuid));
             } catch (err) {
                 return Err.respond(err, res);
             }
@@ -961,22 +970,22 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/share/:shareuuid/tiles TileJSON AOI
+     * @api {get} /api/share/:shareuuid/tiles TileJSON
      * @apiVersion 1.0.0
-     * @apiName TileJSONAOI
-     * @apiGroup AOI
+     * @apiName TileJSON
+     * @apiGroup Share
      * @apiPermission public
      *
      * @apiDescription
      *     Return tilejson for a given AOI using uuid
      */
     router.get(
-        ...await schemas.get('GET /aoi/share/:shareuuid/tiles'),
+        ...await schemas.get('GET /share/:shareuuid/tiles'),
         async (req, res) => {
             if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
             try {
-                const a = await aoishare.getuuid(req.params.shareuuid);
+                const a = await aoishare.get(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 res.json(await getAoiTileJSON(a, req));
@@ -987,9 +996,9 @@ async function server(config, cb) {
     );
 
     /**
-     * @api {get} /api/share/:shareuuid/tiles/:z/:x/:y Tile AOI
+     * @api {get} /api/share/:shareuuid/tiles/:z/:x/:y Tiles
      * @apiVersion 1.0.0
-     * @apiName TileAOI
+     * @apiName Tile
      * @apiGroup Share
      * @apiPermission public
      *
@@ -1221,7 +1230,17 @@ async function server(config, cb) {
                 await Param.int(req, 'projectid');
                 await project.has_auth(req.auth, req.params.projectid);
 
-                return res.json(await aoi.list(req.params.projectid, req.query));
+                const aois = await aoi.list(req.params.projectid, req.query);
+
+                for (const a of aois.aois) {
+                    const shares = await aoishare.list(req.params.projectid, {
+                        aoi_id: a.id
+                    });
+
+                    a.shares = shares.shares;
+                }
+
+                return res.json(aois);
             } catch (err) {
                 return Err.respond(err, res);
             }

@@ -261,9 +261,12 @@ class AOI {
         if (!query.page) query.page = 0;
         if (!query.sort) query.sort = 'desc';
 
+        if (query.sort !== 'desc' && query.sort !== 'asc') {
+            throw new Err(400, null, 'Invalid Sort');
+        }
+
         const where = [];
         where.push(`a.project_id = ${projectid}`);
-        where.push('a.checkpoint_id = c.id');
 
         if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
             where.push('checkpoint_id = ' + query.checkpointid);
@@ -291,8 +294,10 @@ class AOI {
                     aois a,
                     checkpoints c
                 WHERE
-                    ${where.join(' AND ')}
-                ORDER BY a.created ${query.sort}
+                    a.checkpoint_id = c.id
+                    AND ${where.join(' AND ')}
+                ORDER BY
+                    a.created ${query.sort}
                 LIMIT
                     $1
                 OFFSET
