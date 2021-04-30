@@ -94,46 +94,48 @@ class ModelSrv():
                 }))
 
                 color_list = [item["color"] for item in self.model.classes]
-                zxy = patch.tiles.pop()
-                output = MemRaster(
-                    np.ones([256,256], dtype=np.uint8) * body['class'],
-                    "epsg:3857",
-                    (zxy.x, zxy.y, zxy.z)
-                )
 
-                output.clip(patch.poly)
+                while len(patch.tiles) > 0 and self.is_aborting is False:
+                    zxy = patch.tiles.pop()
+                    output = MemRaster(
+                        np.ones([256,256], dtype=np.uint8) * body['class'],
+                        "epsg:3857",
+                        (zxy.x, zxy.y, zxy.z)
+                    )
 
-                if patch.live:
-                    # Create color versions of predictions
-                    png = pred2png(output.data, color_list)
+                    output.clip(patch.poly)
 
-                    LOGGER.info("ok - returning patch inference");
-                    websocket.send(json.dumps({
-                        'message': 'model#patch#progress',
-                        'data': {
-                            'patch': patch.id,
-                            'bounds': output.bounds,
-                            'x': output.x, 'y': output.y, 'z': output.z,
-                            'image': png,
-                            'total': patch.total,
-                            'processed': patch.total - len(patch.tiles)
-                        }
-                    }))
-                else:
-                    websocket.send(json.dumps({
-                        'message': 'model#patch#progress',
-                        'data': {
-                            'patch': patch.id,
-                            'total': patch.total,
-                            'processed': len(patch.tiles)
-                        }
-                    }))
+                    if patch.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
 
-                # Push tile into geotiff fabric
-                output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
-                patch.add_to_fabric(output)
+                        LOGGER.info("ok - returning patch inference");
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'bounds': output.bounds,
+                                'x': output.x, 'y': output.y, 'z': output.z,
+                                'image': png,
+                                'total': patch.total,
+                                'processed': patch.total - len(patch.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#patch#progress',
+                            'data': {
+                                'patch': patch.id,
+                                'total': patch.total,
+                                'processed': len(patch.tiles)
+                            }
+                        }))
+
+                    # Push tile into geotiff fabric
+                    output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
+                    patch.add_to_fabric(output)
+
                 patch.upload_fabric()
-
                 LOGGER.info("ok - done patch prediction");
             elif body.get('type') == 'brush':
                 current_checkpoint = self.chk['id']
@@ -141,25 +143,24 @@ class ModelSrv():
 
                 patch = AOI.create(self.api, body.get('polygon'), body.get('name', ''), self.chk['id'], is_patch=self.aoi.id)
                 websocket.send(json.dumps({
-                'message': 'model#patch',
-                'data': {
-                    'id': patch.id,
-                    'live': patch.live,
-                    'checkpoint_id': self.chk['id'],
-                    'bounds': patch.bounds,
-                    'total': patch.total
-                }
-            }))
+                    'message': 'model#patch',
+                    'data': {
+                        'id': patch.id,
+                        'live': patch.live,
+                        'checkpoint_id': self.chk['id'],
+                        'bounds': patch.bounds,
+                        'total': patch.total
+                    }
+                }))
 
                 color_list = [item["color"] for item in self.model.classes]
 
-
                 dataset = InferenceDataSet(self.api, self.aoi.tiles)
                 dataloader = torch.utils.data.DataLoader(
-                dataset,
-                batch_size=16,
-                num_workers=2,
-                pin_memory=True,
+                    dataset,
+                    batch_size=16,
+                    num_workers=2,
+                    pin_memory=True,
                 )
 
                 for i, (data, xyz) in enumerate(dataloader):
