@@ -94,6 +94,26 @@ class Kube {
         const nodeSelector = {};
         nodeSelector[nodeSelectorKey] = nodeSelectorValue;
 
+        let volumes = [];
+        let volumeMounts = [];
+        if (type === 'gpu') {
+            volumes = [
+                {
+                    name: 'dshm',
+                    emptyDir: {
+                        medium: 'Memory'
+                    }
+                }
+            ];
+
+            volumeMounts = [
+                {
+                    mountPath: '/dev/shm',
+                    name: 'dshm'
+                }
+            ];
+        }
+
         return {
             apiVersion: 'v1',
             kind: 'Pod',
@@ -113,22 +133,10 @@ class Kube {
                         image: `${gpuImageName}:${gpuImageTag}`,
                         resources: resources,
                         env: env,
-                        volumeMounts: [
-                            {
-                                mountPath: '/dev/shm',
-                                name: 'dshm'
-                            }
-                        ]
+                        volumeMounts: volumeMounts
                     }
                 ],
-                volumes: [
-                    {
-                        name: 'dshm',
-                        emptyDir: {
-                            medium: 'Memory'
-                        }
-                    }
-                ],
+                volumes: volumes,
                 nodeSelector: nodeSelector,
                 restartPolicy: 'Never'
             }
