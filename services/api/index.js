@@ -906,27 +906,32 @@ async function server(config, cb) {
         req.query.url = tiffurl.origin + tiffurl.pathname;
         req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-        const chkpt = await checkpoint.get(theAoi.checkpoint_id);
-        const cmap = {};
-        for (let i = 0; i < chkpt.classes.length; i++) {
-            cmap[i] = chkpt.classes[i].color;
-        }
 
-        req.query.colormap = JSON.stringify(cmap);
-
-        const response = await proxy.request(req);
-
-        if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
-
-        const tj = response.body;
-
-        let tiles;
+        let tj, tiles;
         if (theAoi.hasOwnProperty('uuid')) {
+            const response = await proxy.request(req);
+
+            if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
+
             // this is a share
             tiles = [
-                `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+                `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}`
             ]
         } else {
+            const chkpt = await checkpoint.get(theAoi.checkpoint_id);
+            const cmap = {};
+            for (let i = 0; i < chkpt.classes.length; i++) {
+                cmap[i] = chkpt.classes[i].color;
+            }
+
+            req.query.colormap = JSON.stringify(cmap);
+
+            const response = await proxy.request(req);
+
+            if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
+
+            tj = response.body;
+
             tiles = [
                 `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
             ]

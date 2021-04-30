@@ -27,7 +27,7 @@ tiles:
 placeholder:
   enabled: true
   replicaCount: 1
-  nodeSelectorName: 'gpu'
+  nodeSelectorName: 'gpunodepool'
   isGpu: true
   numGPUs: 2
 

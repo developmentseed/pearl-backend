@@ -108,7 +108,7 @@ class CustomTilerFactory(TilerFactory):
                     "driver": "GTiff",
                     "count": count,
                     "dtype": dest.dtype,
-                    "nodata": 0,
+                    "nodata": sources[0].nodata,
                     "height": height,
                     "width": width,
                     "crs": sources[0].crs,
