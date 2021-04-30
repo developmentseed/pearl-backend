@@ -333,8 +333,8 @@ class ModelSrv():
             dataset = InferenceDataSet(self.api, self.aoi.tiles)
             dataloader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size=32,
-                num_workers=4,
+                batch_size=2,
+                num_workers=2,
                 pin_memory=True,
             )
 
