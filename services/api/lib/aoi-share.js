@@ -49,7 +49,9 @@ class AOIShare {
             created: row.created,
             storage: row.storage,
             uuid: row.uuid,
-            patches: row.patches
+            patches: row.patches,
+            checkpoint_id: row.checkpoint_id,
+            classes: row.classes
         };
 
         if (typeof row.bounds === 'object') {
@@ -184,16 +186,24 @@ class AOIShare {
         try {
             pgres = await this.pool.query(`
                SELECT
-                    uuid,
-                    aoi_id,
-                    project_id,
-                    ST_AsGeojson(bounds)::JSON AS bounds,
-                    created,
-                    storage
+                    s.uuid AS uuid,
+                    s.aoi_id AS aoi_id,
+                    s.project_id AS project_id,
+                    ST_AsGeojson(s.bounds)::JSON AS bounds,
+                    s.created AS created,
+                    s.storage AS storage,
+                    a.checkpoint_id AS checkpoint_id,
+                    c.classes AS classes
                 FROM
-                    aois_share
+                    aois_share s,
+                    aois a,
+                    checkpoints c
                 WHERE
-                    uuid = $1
+                    s.uuid = $1
+                AND
+                    a.id = s.aoi_id
+                AND
+                    c.id = a.checkpoint_id
             `, [
                 shareuuid
 

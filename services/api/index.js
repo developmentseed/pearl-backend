@@ -900,7 +900,7 @@ async function server(config, cb) {
     );
 
     const getAoiTileJSON = async (theAoi, req) => {
-        const tiffurl = await aoi.url(theAoi.id);
+        const tiffurl = theAoi.hasOwnProperty('uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id)
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -919,16 +919,24 @@ async function server(config, cb) {
         if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
         const tj = response.body;
-        // This is verbose as if the upstream JSON response changes
-        // and includes the URL in another place, we leak an access cred
-        const tiles = req.params.projectid && req.params.aoiid ? [
-            `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-        ] : [
-            `/api/aoi/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-        ];
+
+        let tiles;
+        if (theAoi.hasOwnProperty('uuid')) {
+            // this is a share
+            tiles = [
+                `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+            ]
+        } else {
+            tiles = [
+                `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+            ]
+        }
+
+        const aoiTileName = theAoi.hasOwnProperty('aoi_id') ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
+
         return {
             tilejson: tj.tilejson,
-            name: `aoi-${theAoi.id}`,
+            name: aoiTileName,
             version: tj.version,
             schema: tj.scheme,
             tiles: tiles,
@@ -1013,10 +1021,10 @@ async function server(config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                const a = await aoi.getuuid(req.params.shareuuid);
+                const a = await aoishare.get(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-                const tiffurl = await aoi.url(a.id);
+                const tiffurl = await aoishare.url(req.params.shareuuid);
                 req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
                 req.query.url = tiffurl.origin + tiffurl.pathname;
                 req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
