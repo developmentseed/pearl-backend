@@ -900,7 +900,7 @@ async function server(config, cb) {
     );
 
     const getAoiTileJSON = async (theAoi, req) => {
-        const tiffurl = await aoi.url(theAoi.id);
+        const tiffurl = theAoi.hasOwnProperty('uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id)
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
