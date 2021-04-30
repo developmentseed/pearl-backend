@@ -50,7 +50,8 @@ class AOIShare {
             storage: row.storage,
             uuid: row.uuid,
             patches: row.patches,
-            checkpoint_id: row.checkpoint_id
+            checkpoint_id: row.checkpoint_id,
+            classes: row.classes
         };
 
         if (typeof row.bounds === 'object') {
@@ -191,14 +192,18 @@ class AOIShare {
                     ST_AsGeojson(s.bounds)::JSON AS bounds,
                     s.created AS created,
                     s.storage AS storage,
-                    a.checkpoint_id AS checkpoint_id
+                    a.checkpoint_id AS checkpoint_id,
+                    c.classes AS classes
                 FROM
                     aois_share s,
-                    aois a
+                    aois a,
+                    checkpoints c
                 WHERE
                     s.uuid = $1
                 AND
                     a.id = s.aoi_id
+                AND
+                    c.id = a.checkpoint_id
             `, [
                 shareuuid
 

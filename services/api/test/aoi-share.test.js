@@ -356,6 +356,7 @@ test('GET /api/share/uuid', (t) => {
                 aoi_id: 1,
                 storage: false,
                 checkpoint_id: '1',
+                classes: [ { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' } ],
                 bounds: {
                     "type": "Polygon",
                     "coordinates": [
