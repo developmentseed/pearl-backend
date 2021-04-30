@@ -56,11 +56,15 @@ class Project {
         if (!query.page) query.page = 0;
         if (!query.sort) query.sort = 'desc';
 
+        if (query.sort !== 'desc' && query.sort !== 'asc') {
+            throw new Err(400, null, 'Invalid Sort');
+        }
+
         const where = [];
-        where.push(`uid = ${uid}`)
+        where.push(`uid = ${uid}`);
 
         if (query.name) {
-            where.push(`name ILIKE '${query.name}%'`)
+            where.push(`name ILIKE '${query.name}%'`);
         }
 
         let pgres;
@@ -83,7 +87,7 @@ class Project {
                     $2
             `, [
                 query.limit,
-                query.page,
+                query.page
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list projects');

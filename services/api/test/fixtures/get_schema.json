@@ -79,7 +79,7 @@
         "query": false,
         "res": false
     },
-    "GET /aoi/:aoiuuid": {
+    "GET /share/:shareuuid": {
         "body": false,
         "query": false,
         "res": false
@@ -89,12 +89,12 @@
         "query": false,
         "res": false
     },
-    "GET /aoi/:aoiuuid/tiles": {
+    "GET /share/:shareuuid/tiles": {
         "body": false,
         "query": false,
         "res": false
     },
-    "GET /aoi/:aoiuuid/tiles/:z/:x/:y": {
+    "GET /share/:shareuuid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
@@ -127,6 +127,21 @@
     "POST /project/:projectid/aoi": {
         "body": true,
         "query": false,
+        "res": false
+    },
+    "POST /project/:projectid/aoi/:aoiid/share": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "DELETE /project/:projectid/aoi/:aoiid/share/:shareuuid": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/share": {
+        "body": false,
+        "query": true,
         "res": false
     },
     "DELETE /project/:projectid/aoi/:aoiid": {

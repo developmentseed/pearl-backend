@@ -38,19 +38,6 @@ class Kube {
     }
 
     /**
-     * Method to return pod status
-     * @param {string} podName
-     * @returns {Object} status
-     */
-    async getPodStatus(podName) {
-        const res = await this.k8sApi.readNamespacedPodStatus(podName, this.namespace);
-        if (res.statusCode >= 400) {
-            return `Request failed: ${res.statusMessage}`;
-        }
-        return res.body;
-    }
-
-    /**
      * Create a podspec for a gpu pod based on a given name, type (gpu or cpu) and env vars.
      * env should be for example: [{name: test, value: test}, {name: test1, value: test1}]
      *
@@ -84,7 +71,7 @@ class Kube {
                     'cpu': '8',
                     'memory': '16Gi'
                 }
-            }
+            };
         }
         // if (deploymentName === 'lulc-production-lulc-helm') {
         //     resources = {
@@ -114,6 +101,9 @@ class Kube {
                 name: `${deploymentName}-gpu-${name}`,
                 annotations: {
                     'janitor/ttl': '40m'
+                },
+                labels: {
+                    type: type
                 }
             },
             spec: {
@@ -173,7 +163,7 @@ class Kube {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);
 
         if (res.statusCode === 404) {
-            return null
+            return null;
         }
 
         if (res.statusCode >= 400) {

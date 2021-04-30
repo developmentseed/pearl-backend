@@ -28,17 +28,23 @@ class Proxy {
 
         try {
             if (res) {
-                return request({
+                const pres = request({
                     url: url,
                     json: typeof req.body === 'object',
                     method: req.method,
                     body: req.body
-                }).on('response', (proxres) => {
-                    res.status(proxres.statusCode);
-                    for (const h of ['content-type', 'content-length', 'content-encoding']) {
-                        if (proxres.headers[h]) res.append(h, proxres.headers[h]);
-                    }
-                }).pipe(res);
+                })
+
+                if (res === true) {
+                    return pres;
+                } else {
+                    pres.on('response', (proxres) => {
+                        res.status(proxres.statusCode);
+                        for (const h of ['content-type', 'content-length', 'content-encoding']) {
+                            if (proxres.headers[h]) res.append(h, proxres.headers[h]);
+                        }
+                    }).pipe(res);
+                }
             }
 
             return await arequest({

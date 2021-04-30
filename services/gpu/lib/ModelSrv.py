@@ -2,6 +2,7 @@ import os
 import base64
 import json
 import numpy as np
+import torch
 
 from .utils import pred2png, geom2px, pxs2geojson, generate_random_points
 from .AOI import AOI
@@ -9,8 +10,10 @@ from .MemRaster import MemRaster
 from .utils import serialize, deserialize
 import logging
 import rasterio
+import mercantile
 from rasterio.io import MemoryFile
 from shapely.geometry import box, mapping
+from .InferenceDataSet import InferenceDataSet
 
 LOGGER = logging.getLogger("server")
 
@@ -26,10 +29,10 @@ class ModelSrv():
         self.model = model
 
         if api.instance.get('checkpoint_id') is not None:
-            self.meta_load_checkpoint(api.instance.get('checkpoint_id'))
+            self.meta_load_checkpoint(self.api.instance.get('checkpoint_id'))
 
         if api.instance.get('aoi_id') is not None:
-            self.aoi = AOI.load(self.api, api.instance.get('aoi_id'))
+            self.aoi = AOI.load(self.api, self.api.instance.get('aoi_id'))
 
     def abort(self, body, websocket):
         if self.processing is False:
@@ -47,7 +50,7 @@ class ModelSrv():
             }
 
             if self.aoi is not None:
-                payload['aoi'] = self.aoi.id,
+                payload['aoi'] = self.aoi.id
 
             if self.chk is not None:
                 payload['checkpoint'] = self.chk['id']
@@ -132,14 +135,8 @@ class ModelSrv():
                     output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
                     patch.add_to_fabric(output)
 
-                if self.is_aborting is True:
-                    websocket.send(json.dumps({
-                        'message': 'model#aborted',
-                    }))
-                else:
-                    patch.upload_fabric()
-
-                    LOGGER.info("ok - done patch prediction");
+                patch.upload_fabric()
+                LOGGER.info("ok - done patch prediction");
             elif body.get('type') == 'brush':
                 current_checkpoint = self.chk['id']
                 self.meta_load_checkpoint(body['checkpoint_id'])
@@ -158,14 +155,31 @@ class ModelSrv():
 
                 color_list = [item["color"] for item in self.model.classes]
 
-                while len(patch.tiles) > 0 and self.is_aborting is False:
-                    zxy = patch.tiles.pop()
-                    in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
-                    output = self.model.run(in_memraster.data, True)
+                dataset = InferenceDataSet(self.api, self.aoi.tiles)
+                dataloader = torch.utils.data.DataLoader(
+                    dataset,
+                    batch_size=16,
+                    num_workers=2,
+                    pin_memory=True,
+                )
 
-                    output = MemRaster(output, in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                    output = output.remove_buffer()
-                    output = output.clip(patch.poly)
+                for i, (data, xyz) in enumerate(dataloader):
+                    if self.is_aborting:
+                        break
+                    xyz = xyz.numpy()
+                    outputs = self.model.run(data, True)
+
+                    for c, output in enumerate(outputs):
+                        output = MemRaster(
+                            output,
+                            "epsg:3857",
+                            tuple(xyz[c]),
+                            True
+                        )
+
+                        output = output.remove_buffer()
+                        output = output.clip(patch.poly)
+                        patch.tiles.remove(mercantile.Tile(*xyz[c]))
 
                     if patch.live:
                         # Create color versions of predictions
@@ -177,7 +191,7 @@ class ModelSrv():
                             'data': {
                                 'patch': patch.id,
                                 'bounds': output.bounds,
-                                'x': output.x, 'y': output.y, 'z': output.z,
+                                'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
                                 'image': png,
                                 'total': patch.total,
                                 'processed': patch.total - len(patch.tiles)
@@ -197,14 +211,9 @@ class ModelSrv():
                     output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
                     patch.add_to_fabric(output)
 
-                if self.is_aborting is True:
-                    websocket.send(json.dumps({
-                        'message': 'model#aborted',
-                    }))
-                else:
-                    patch.upload_fabric()
+                patch.upload_fabric()
 
-                    LOGGER.info("ok - done patch prediction");
+                LOGGER.info("ok - done patch prediction");
 
                 self.meta_load_checkpoint(current_checkpoint)
 
@@ -219,6 +228,39 @@ class ModelSrv():
         except Exception as e:
             done_processing(self)
             websocket.error('AOI Patch Error', e)
+            raise e
+
+    def load_aoi(self, body, websocket):
+        try:
+            if self.processing is True:
+                return is_processing(websocket)
+
+            self.processing = True
+
+            websocket.send(json.dumps({
+                'message': 'model#aoi#progress',
+                'data': {
+                    'aoi': body['id'],
+                    'processed': 0,
+                    'total': 1
+                }
+            }))
+
+            self.aoi = AOI.load(self.api, body['id'])
+            self.meta_load_checkpoint(self.aoi.checkpointid)
+
+            websocket.send(json.dumps({
+                'message': 'model#aoi#complete',
+                'data': {
+                    'aoi': self.aoi.id
+                }
+            }))
+
+            done_processing(self)
+
+        except Exception as e:
+            done_processing(self)
+            websocket.error('AOI Load Error', e)
             raise e
 
     def load_checkpoint(self, body, websocket):
@@ -288,54 +330,68 @@ class ModelSrv():
 
             color_list = [item["color"] for item in self.model.classes]
 
-            while len(self.aoi.tiles) > 0 and self.is_aborting is False:
-                zxy = self.aoi.tiles.pop()
-                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+            dataset = InferenceDataSet(self.api, self.aoi.tiles)
+            dataloader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size=32,
+                num_workers=4,
+                pin_memory=True,
+            )
 
-                output = self.model.run(in_memraster.data, True)
+            for i, (data, xyz) in enumerate(dataloader):
+                if self.is_aborting:
+                    break
 
-                output = MemRaster(
-                    output,
-                    "epsg:3857",
-                    (in_memraster.x, in_memraster.y, in_memraster.z),
-                    True
-                )
+                xyz = xyz.numpy()
+                outputs = self.model.run(data, True)
 
-                output = output.remove_buffer()
+                for c, output in enumerate(outputs):
+                    output = MemRaster(
+                        output,
+                        "epsg:3857",
+                        tuple(xyz[c]),
+                        True
+                    )
 
-                #clip output
-                output.clip(self.aoi.poly)
-                LOGGER.info("ok - generated inference");
+                    output = output.remove_buffer()
+                    self.aoi.tiles.remove(mercantile.Tile(*xyz[c]))
 
-                if self.aoi.live:
-                    # Create color versions of predictions
-                    png = pred2png(output.data, color_list)
+                    #clip output
+                    output.clip(self.aoi.poly)
+                    LOGGER.info("ok - generated inference");
 
-                    LOGGER.info("ok - returning inference")
-                    websocket.send(json.dumps({
-                        'message': 'model#prediction',
-                        'data': {
-                            'aoi': self.aoi.id,
-                            'bounds': output.bounds,
-                            'x': output.x, 'y': output.y, 'z': output.z,
-                            'image': png,
-                            'total': self.aoi.total,
-                            'processed': self.aoi.total - len(self.aoi.tiles)
-                        }
-                    }))
-                else:
-                    websocket.send(json.dumps({
-                        'message': 'model#prediction',
-                        'data': {
-                            'aoi': self.aoi.id,
-                            'total': self.aoi.total,
-                            'processed': len(self.aoi.tiles)
-                        }
-                    }))
+                    if self.aoi.live:
+                        # Create color versions of predictions
+                        png = pred2png(output.data, color_list)
 
-                # Push tile into geotiff fabric
-                output = MemRaster(np.expand_dims(output.data, axis=-1), in_memraster.crs, in_memraster.tile, in_memraster.buffered)
-                self.aoi.add_to_fabric(output)
+                        LOGGER.info("ok - returning inference")
+                        print('processed')
+                        print(self.aoi.total - len(self.aoi.tiles))
+
+                        websocket.send(json.dumps({
+                            'message': 'model#prediction',
+                            'data': {
+                                'aoi': self.aoi.id,
+                                'bounds': output.bounds,
+                                'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
+                                'image': png,
+                                'total': self.aoi.total,
+                                'processed': self.aoi.total - len(self.aoi.tiles)
+                            }
+                        }))
+                    else:
+                        websocket.send(json.dumps({
+                            'message': 'model#prediction',
+                            'data': {
+                                'aoi': self.aoi.id,
+                                'total': self.aoi.total,
+                                'processed': self.aoi.total - len(self.aoi.tiles)
+                            }
+                        }))
+
+                    # Push tile into geotiff fabric
+                    output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
+                    self.aoi.add_to_fabric(output)
 
 
             if self.is_aborting is True:
@@ -354,7 +410,7 @@ class ModelSrv():
                     }
                 }))
 
-            done_processing(self)
+                done_processing(self)
         except Exception as e:
             done_processing(self)
             websocket.error('Processing Error', e)
@@ -372,7 +428,7 @@ class ModelSrv():
                 for feature in cls['geometry']['geometries']:
                     cls['retrain_geometry'] = []
                     if feature['type'] == 'Polygon':
-                        points = generate_random_points(100, feature, self)
+                        points = generate_random_points(50, feature, self)
                         cls['retrain_geometry'] = cls['retrain_geometry'] + points
 
                     if feature['type'] == 'MultiPoint':
@@ -386,9 +442,14 @@ class ModelSrv():
                 'message': 'model#retrain#complete'
             }))
 
+            if self.chk == None:
+                parent = None
+            else:
+                parent = self.chk['id']
+
             self.meta_save_checkpoint({
                 'name': body['name'],
-                'parent': self.chk['id'],
+                'parent': parent,
                 'input_geoms': [cls["geometry"] for cls in body['classes']],
                 'retrain_geoms': pxs2geojson([cls["retrain_geometry"] for cls in body['classes']]),
                 'analytics': [{

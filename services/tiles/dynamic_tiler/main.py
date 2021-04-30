@@ -4,10 +4,11 @@ from brotli_asgi import BrotliMiddleware
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from titiler.errors import DEFAULT_STATUS_CODES, add_exception_handlers
-from titiler.middleware import CacheControlMiddleware, TotalTimeMiddleware
-from titiler.endpoints.factory import TMSFactory
-from titiler.resources.enums import OptionalHeader
+from titiler.core.factory import TMSFactory
+from titiler.core.resources.enums import OptionalHeader
+from titiler.application.middleware import CacheControlMiddleware, TotalTimeMiddleware
+from titiler.core.errors import DEFAULT_STATUS_CODES, add_exception_handlers
+from titiler.mosaic.errors import MOSAIC_STATUS_CODES
 
 from .endpoints.factory import MosaicTilerFactory, CustomTilerFactory
 from .cache import setup_cache
@@ -36,6 +37,7 @@ if api_settings.debug:
 
 app.add_event_handler("startup", setup_cache)
 add_exception_handlers(app, DEFAULT_STATUS_CODES)
+add_exception_handlers(app, MOSAIC_STATUS_CODES)
 
 mosaic_endpoint = MosaicTilerFactory(
     path_dependency=CustomMosaicParams,

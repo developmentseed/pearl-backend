@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+## v0.2.0
+
+## Features
+- Remove colormap that isn't needed for pre-colored Tiffs [`#371`](https://github.com/developmentseed/lulc-infra/pull/371)
+- AOI Share [`#348`](https://github.com/developmentseed/lulc-infra/pull/348)
+- Shares List [`#361`](https://github.com/developmentseed/lulc-infra/pull/361)
+- Batch inference [`#346`](https://github.com/developmentseed/lulc-infra/pull/346)
+- AOI Loading [`#328`](https://github.com/developmentseed/lulc-infra/pull/328)
+- Abort Retrain [`#333`](https://github.com/developmentseed/lulc-infra/pull/333)
+
+## Improvements
+- Retrain Improvements: Decrease point sample from polygon [`#357`](https://github.com/developmentseed/lulc-infra/pull/357)
+- less memory intensive retrain [`#364`](https://github.com/developmentseed/lulc-infra/pull/364)
+- update TiTiler version to 0.3.1 [`#351`](https://github.com/developmentseed/lulc-infra/pull/351)
+- Add the ability to load AOIs [`#345`](https://github.com/developmentseed/lulc-infra/pull/345)
+- return gpu availability with the config endpoint [`#342`](https://github.com/developmentseed/lulc-infra/pull/342)
+- make 15 gpus before using cpus on staging for testing [`#332`](https://github.com/developmentseed/lulc-infra/pull/332)
+- Use big placeholders  [`#331`](https://github.com/developmentseed/lulc-infra/pull/331)
+- Nodeselectors + TTL updates [`#325`](https://github.com/developmentseed/lulc-infra/pull/325)
+## Fixes
+- Fix Class Brush [`#365`](https://github.com/developmentseed/lulc-infra/pull/365)
+- Fix share call [`#362`](https://github.com/developmentseed/lulc-infra/pull/362)
+- Actually generate aoi share tile url [`#366`](https://github.com/developmentseed/lulc-infra/pull/366)
+- checkpoint edge case fix [`#350`](https://github.com/developmentseed/lulc-infra/pull/350)
+- Model Prediction Count up not down [`#356`](https://github.com/developmentseed/lulc-infra/pull/356)
+- remove duplicate getPodStatus method [`#353`](https://github.com/developmentseed/lulc-infra/pull/353)
+- dont make username a primary key [`#341`](https://github.com/developmentseed/lulc-infra/pull/341)
+- import mapping from shapely. possible merge conflict bug [`#336`](https://github.com/developmentseed/lulc-infra/pull/336)
+- Instance#Terminate [`#334`](https://github.com/developmentseed/lulc-infra/pull/334)
+
 ## v0.1.0
 
 ### Features
