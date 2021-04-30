@@ -1024,7 +1024,7 @@ async function server(config, cb) {
                 const a = await aoishare.get(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-                const tiffurl = await aoi.url(a.id);
+                const tiffurl = await aoishare.url(req.params.shareuuid);
                 req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
                 req.query.url = tiffurl.origin + tiffurl.pathname;
                 req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
