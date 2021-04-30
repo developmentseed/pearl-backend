@@ -1,3 +1,5 @@
+import os
+import base64
 import json
 import numpy as np
 import torch
@@ -5,9 +7,12 @@ import torch
 from .utils import pred2png, geom2px, pxs2geojson, generate_random_points
 from .AOI import AOI
 from .MemRaster import MemRaster
+from .utils import serialize, deserialize
 import logging
+import rasterio
 import mercantile
-from shapely.geometry import mapping
+from rasterio.io import MemoryFile
+from shapely.geometry import box, mapping
 from .InferenceDataSet import InferenceDataSet
 
 LOGGER = logging.getLogger("server")
@@ -504,7 +509,7 @@ class ModelSrv:
                 for feature in cls["geometry"]["geometries"]:
                     cls["retrain_geometry"] = []
                     if feature["type"] == "Polygon":
-                        points = generate_random_points(100, feature, self)
+                        points = generate_random_points(50, feature, self)
                         cls["retrain_geometry"] = cls["retrain_geometry"] + points
 
                     if feature["type"] == "MultiPoint":
@@ -518,7 +523,7 @@ class ModelSrv:
 
             websocket.send(json.dumps({"message": "model#retrain#complete"}))
 
-            if self.chk is None:
+            if self.chk == None:
                 parent = None
             else:
                 parent = self.chk["id"]
