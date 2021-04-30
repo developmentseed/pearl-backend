@@ -157,7 +157,7 @@ class ModelSrv():
 
                 dataset = InferenceDataSet(self.api, self.aoi.tiles)
                 if torch.cuda.is_available():
-                    batch_size = 16
+                    batch_size = 8
                 else:
                     batch_size = 2
                 dataloader = torch.utils.data.DataLoader(
@@ -336,9 +336,11 @@ class ModelSrv():
 
             dataset = InferenceDataSet(self.api, self.aoi.tiles)
             if torch.cuda.is_available():
-                batch_size = 16
+                batch_size = 8
             else:
                 batch_size = 2
+            print('batch size')
+            print(batch_size)
             dataloader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=batch_size,
