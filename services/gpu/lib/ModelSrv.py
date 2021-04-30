@@ -156,9 +156,13 @@ class ModelSrv():
                 color_list = [item["color"] for item in self.model.classes]
 
                 dataset = InferenceDataSet(self.api, self.aoi.tiles)
+                if torch.cuda.is_available():
+                    batch_size = 16
+                else:
+                    batch_size = 2
                 dataloader = torch.utils.data.DataLoader(
                     dataset,
-                    batch_size=2,
+                    batch_size=batch_size,
                     num_workers=2,
                     pin_memory=True,
                 )
@@ -331,9 +335,13 @@ class ModelSrv():
             color_list = [item["color"] for item in self.model.classes]
 
             dataset = InferenceDataSet(self.api, self.aoi.tiles)
+            if torch.cuda.is_available():
+                batch_size = 16
+            else:
+                batch_size = 2
             dataloader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size=2,
+                batch_size=batch_size,
                 num_workers=2,
                 pin_memory=True,
             )
