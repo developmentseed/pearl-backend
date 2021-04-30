@@ -326,6 +326,69 @@ test('GET /api/project/1/share', (t) => {
     });
 });
 
+test('GET /api/share/uuid', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/share',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        uuid = res.body.shares[0].uuid;
+        request({
+            json: true,
+            url: `http://localhost:2000/api/share/${uuid}`,
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }, (err, res) => {
+            t.error(err, 'no errors');
+            t.equals(res.statusCode, 200, 'status: 200');
+            t.ok(res.body.created, '.created: <date>');
+            delete res.body.created;
+            t.ok(res.body.uuid, '.uuid: <uuid>');
+            delete res.body.uuid;
+
+            t.deepEqual(res.body, {
+                project_id: 1,
+                aoi_id: 1,
+                storage: false,
+                checkpoint_id: '1',
+                bounds: {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [
+                                -79.377245307,
+                                38.834281801
+                            ],
+                            [
+                                -79.37677592,
+                                38.834281801
+                            ],
+                            [
+                                -79.37677592,
+                                38.834555504
+                            ],
+                            [
+                                -79.377245307,
+                                38.834555504
+                            ],
+                            [
+                                -79.377245307,
+                                38.834281801
+                            ]
+                        ]
+                    ]
+                }
+            });
+            t.end();
+        })
+    });
+});
+
 test('GET /api/project/1/aoi/1', (t) => {
     request({
         json: true,

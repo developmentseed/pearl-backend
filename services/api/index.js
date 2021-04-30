@@ -919,16 +919,24 @@ async function server(config, cb) {
         if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
         const tj = response.body;
-        // This is verbose as if the upstream JSON response changes
-        // and includes the URL in another place, we leak an access cred
-        const tiles = req.params.projectid && req.params.aoiid ? [
-            `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-        ] : [
-            `/api/aoi/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-        ];
+
+        let tiles;
+        if (theAoi.hasOwnProperty('uuid')) {
+            // this is a share
+            tiles = [
+                `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+            ]
+        } else {
+            tiles = [
+                `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+            ]
+        }
+
+        const aoiTileName = theAoi.hasOwnProperty('aoi_id') ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
+
         return {
             tilejson: tj.tilejson,
-            name: `aoi-${theAoi.id}`,
+            name: aoiTileName,
             version: tj.version,
             schema: tj.scheme,
             tiles: tiles,
