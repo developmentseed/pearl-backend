@@ -112,7 +112,21 @@ class Kube {
                         name: `gpu-${name}`,
                         image: `${gpuImageName}:${gpuImageTag}`,
                         resources: resources,
-                        env: env
+                        env: env,
+                        volumeMounts: [
+                            {
+                                mountPath: '/dev/shm',
+                                name: 'dshm'
+                            }
+                        ]
+                    }
+                ],
+                volumes: [
+                    {
+                        name: 'dshm',
+                        emptyDir: {
+                            medium: 'Memory'
+                        }
                     }
                 ],
                 nodeSelector: nodeSelector,
