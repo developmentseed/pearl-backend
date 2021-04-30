@@ -1021,7 +1021,7 @@ async function server(config, cb) {
                 await Param.int(req, 'x');
                 await Param.int(req, 'y');
 
-                const a = await aoi.getuuid(req.params.shareuuid);
+                const a = await aoishare.get(req.params.shareuuid);
                 if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
                 const tiffurl = await aoi.url(a.id);
