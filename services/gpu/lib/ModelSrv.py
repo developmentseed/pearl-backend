@@ -156,13 +156,18 @@ class ModelSrv():
                 color_list = [item["color"] for item in self.model.classes]
 
                 dataset = InferenceDataSet(self.api, self.aoi.tiles)
+                if torch.cuda.is_available():
+                    batch_size = 8
+                else:
+                    batch_size = 2
                 dataloader = torch.utils.data.DataLoader(
                     dataset,
-                    batch_size=16,
+                    batch_size=batch_size,
                     num_workers=2,
                     pin_memory=True,
                 )
 
+                current = 0
                 for i, (data, xyz) in enumerate(dataloader):
                     if self.is_aborting:
                         break
@@ -179,7 +184,6 @@ class ModelSrv():
 
                         output = output.remove_buffer()
                         output = output.clip(patch.poly)
-                        patch.tiles.remove(mercantile.Tile(*xyz[c]))
 
                     if patch.live:
                         # Create color versions of predictions
@@ -194,7 +198,7 @@ class ModelSrv():
                                 'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
                                 'image': png,
                                 'total': patch.total,
-                                'processed': patch.total - len(patch.tiles)
+                                'processed': current
                             }
                         }))
                     else:
@@ -203,9 +207,11 @@ class ModelSrv():
                             'data': {
                                 'patch': patch.id,
                                 'total': patch.total,
-                                'processed': len(patch.tiles)
+                                'processed': current
                             }
                         }))
+
+                    current = current + 1
 
                     # Push tile into geotiff fabric
                     output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
@@ -331,13 +337,20 @@ class ModelSrv():
             color_list = [item["color"] for item in self.model.classes]
 
             dataset = InferenceDataSet(self.api, self.aoi.tiles)
+            if torch.cuda.is_available():
+                batch_size = 8
+            else:
+                batch_size = 2
+            print('batch size')
+            print(batch_size)
             dataloader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size=32,
-                num_workers=4,
+                batch_size=batch_size,
+                num_workers=2,
                 pin_memory=True,
             )
 
+            current = 0
             for i, (data, xyz) in enumerate(dataloader):
                 if self.is_aborting:
                     break
@@ -354,7 +367,6 @@ class ModelSrv():
                     )
 
                     output = output.remove_buffer()
-                    self.aoi.tiles.remove(mercantile.Tile(*xyz[c]))
 
                     #clip output
                     output.clip(self.aoi.poly)
@@ -365,8 +377,6 @@ class ModelSrv():
                         png = pred2png(output.data, color_list)
 
                         LOGGER.info("ok - returning inference")
-                        print('processed')
-                        print(self.aoi.total - len(self.aoi.tiles))
 
                         websocket.send(json.dumps({
                             'message': 'model#prediction',
@@ -376,7 +386,7 @@ class ModelSrv():
                                 'x': output.x.item(), 'y': output.y.item(), 'z': output.z.item(), # Convert from int64 to int
                                 'image': png,
                                 'total': self.aoi.total,
-                                'processed': self.aoi.total - len(self.aoi.tiles)
+                                'processed': current
                             }
                         }))
                     else:
@@ -385,9 +395,11 @@ class ModelSrv():
                             'data': {
                                 'aoi': self.aoi.id,
                                 'total': self.aoi.total,
-                                'processed': self.aoi.total - len(self.aoi.tiles)
+                                'processed': current
                             }
                         }))
+
+                    current = current + 1
 
                     # Push tile into geotiff fabric
                     output = MemRaster(np.expand_dims(output.data, axis=-1), output.crs, output.tile, output.buffered)
