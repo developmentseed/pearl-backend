@@ -913,6 +913,8 @@ async function server(config, cb) {
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
+            tj = response.body;
+
             // this is a share
             tiles = [
                 `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}`

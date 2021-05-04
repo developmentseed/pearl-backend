@@ -10,7 +10,7 @@ api:
     AZURE_STORAGE_CONNECTION_STRING: {{PRODUCTION_AZURE_STORAGE_CONNECTION_STRING}}
     nodeSelectorKey: 'agentpool'
     nodeSelectorValue: 'gpunodepool'
-    GpuCount: 6
+    GpuCount: 15
 socket:
   enabled: true
   containerPort: 1999
@@ -19,7 +19,7 @@ tiles:
   replicaCount: 2
   containerPort: 8000
   env:
-    Debug: TRUE
+    Debug: FALSE
     Backends: {{STAGING_MOSAIC_BACKEND}}
     Host: {{STAGING_MOSAIC_HOST}}
     WebConcurrency: 2

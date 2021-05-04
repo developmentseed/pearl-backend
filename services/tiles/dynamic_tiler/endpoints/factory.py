@@ -168,8 +168,11 @@ class MosaicTilerFactory(BaseTilerFactory):
         @self.router.get(
             r"/{layer}/tiles/{z}/{x}/{y}@{scale}x.{format}", **img_endpoint_params
         )
-        @cached()
+        @cached(
+            key_builder=lambda f, req, z, x, y, scale, format, src_path, **kwargs: f"{src_path.split(':')[-1]}_{z}/{x}/{y}.{format.name if format else 'auto'}_{str(req.query_params)}"
+        )
         def tile(
+            req: Request,
             z: int = Path(..., ge=0, le=30, description="Mercator tiles's zoom level"),
             x: int = Path(..., description="Mercator tiles's column"),
             y: int = Path(..., description="Mercator tiles's row"),
