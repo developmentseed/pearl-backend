@@ -36,7 +36,7 @@ class _CacheSettings(pydantic.BaseSettings):
     """Cache settings"""
 
     endpoint: Optional[str] = None
-    ttl: int = 3600
+    ttl: int = 86400
 
     class Config:
         """model config"""
