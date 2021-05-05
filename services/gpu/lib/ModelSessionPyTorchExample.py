@@ -16,7 +16,7 @@ LOGGER = logging.getLogger("server")
 import numpy as np
 
 import sklearn.base
-from sklearn.linear_model import SGDClassifier, LogisticRegression
+from sklearn.linear_model import SGDClassifier
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer
@@ -66,8 +66,14 @@ class FCN(nn.Module):
 
 class TorchFineTuning(ModelSession):
 
-    AUGMENT_MODEL = LogisticRegression(
-        warm_start=True
+    AUGMENT_MODEL = SGDClassifier(
+        loss="log",
+        shuffle=True,
+        n_jobs=-1,
+        learning_rate="constant",
+        eta0=0.001,
+        warm_start=True,
+        verbose=False,
     )
 
     def __init__(self, gpu_id, model_dir, classes):
