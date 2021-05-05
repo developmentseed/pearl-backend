@@ -43,7 +43,10 @@ class PX:
         self.value = value # Pixel Value from retrain numpy array (Model#Run)
 
     def __str__(self):
-        return '{}: {}'.format(self.coords, self.value)
+        return 'PX({}: {})'.format(self.coords, self.value)
+
+    def __repr__(self):
+        return 'PX({}, {}, {}, {}, {})'.format(self.coords, self.xy, self.xyz, self.px, self.value)
 
 def pxs2geojson(classes):
     geoms = []
