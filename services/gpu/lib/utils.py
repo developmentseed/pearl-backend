@@ -42,6 +42,9 @@ class PX:
         self.px = px # Per Tile Pixel Coordinates
         self.value = value # Pixel Value from retrain numpy array (Model#Run)
 
+    def __str__(self):
+        return '{}: {}'.format(self.coords, self.value)
+
 def pxs2geojson(classes):
     geoms = []
     for cls in classes:
