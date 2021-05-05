@@ -78,8 +78,6 @@ def geom2px(geom, modelsrv):
         return False
 
     pxs = []
-    print('len coords')
-    print(len(coords))
     for coord in coords:
         xy = ll2xy(coord[0], coord[1])
         xyz = mercantile.tile(coord[0], coord[1], zoom)
