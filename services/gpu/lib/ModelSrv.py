@@ -437,13 +437,15 @@ class ModelSrv():
             LOGGER.info("ok - starting retrain");
 
             for cls in body['classes']:
+                cls['retrain_geometry'] = []
                 for feature in cls['geometry']['geometries']:
-                    cls['retrain_geometry'] = []
                     if feature['type'] == 'Polygon':
                         points = generate_random_points(2, feature, self)
                         cls['retrain_geometry'] = cls['retrain_geometry'] + points
                     elif feature['type'] == 'MultiPoint' and len(feature['coordinates']) > 0:
                         cls['retrain_geometry'] = cls['retrain_geometry'] + geom2px(feature, self)
+
+            print([{'name': x['name'], 'geom': x['retrain_geometry'], 'color': x['color']} for x in body['classes']])
 
             self.model.retrain(body['classes'])
 
