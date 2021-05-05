@@ -43,7 +43,7 @@ class PX:
         self.value = value # Pixel Value from retrain numpy array (Model#Run)
 
     def __str__(self):
-        return 'PX({}: {})'.format(self.coords, self.value)
+        return 'PX({}: vals: {})'.format(self.coords, len(self.value))
 
     def __repr__(self):
         return str(self)
