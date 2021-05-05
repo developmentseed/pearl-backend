@@ -440,7 +440,7 @@ class ModelSrv():
                 cls['retrain_geometry'] = []
                 for feature in cls['geometry']['geometries']:
                     if feature['type'] == 'Polygon':
-                        points = generate_random_points(2, feature, self)
+                        points = generate_random_points(50, feature, self)
                         cls['retrain_geometry'] = cls['retrain_geometry'] + points
                     elif feature['type'] == 'MultiPoint' and len(feature['coordinates']) > 0:
                         cls['retrain_geometry'] = cls['retrain_geometry'] + geom2px(feature, self)
