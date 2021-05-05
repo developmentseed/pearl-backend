@@ -46,7 +46,7 @@ class PX:
         return 'PX({}: {})'.format(self.coords, self.value)
 
     def __repr__(self):
-        return 'PX({}, {}, {}, {}, {})'.format(self.coords, self.xy, self.xyz, self.px, self.value)
+        return str(self)
 
 def pxs2geojson(classes):
     geoms = []
