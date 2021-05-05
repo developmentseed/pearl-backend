@@ -137,15 +137,8 @@ class TorchFineTuning(ModelSession):
 
         retrain_classes = [{"name": x["name"], "color": x["color"]} for x in classes]
 
-        print(retrain_classes)
-
         pixels = [x["retrain_geometry"] for x in classes]
         counts = [len(x) for x in pixels]
-        print('counts')
-        print(counts)
-        total = sum(counts)
-        print('total')
-        print(total)
 
         # add re-training counts to classes attribute
         for i, c in enumerate(counts):

@@ -445,8 +445,6 @@ class ModelSrv():
                     elif feature['type'] == 'MultiPoint' and len(feature['coordinates']) > 0:
                         cls['retrain_geometry'] = cls['retrain_geometry'] + geom2px(feature, self)
 
-            print([{'name': x['name'], 'geom': x['retrain_geometry'], 'color': x['color']} for x in body['classes']])
-
             self.model.retrain(body['classes'])
 
             LOGGER.info("ok - done retrain");
