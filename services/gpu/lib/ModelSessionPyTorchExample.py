@@ -17,6 +17,7 @@ import numpy as np
 
 import sklearn.base
 from sklearn.linear_model import SGDClassifier
+
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
@@ -144,7 +145,6 @@ class TorchFineTuning(ModelSession):
 
         pixels = [x["retrain_geometry"] for x in classes]
         counts = [len(x) for x in pixels]
-        total = sum(counts)
 
         # add re-training counts to classes attribute
         for i, c in enumerate(counts):

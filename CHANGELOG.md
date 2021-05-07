@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+## v0.3.0
+
+## Fixes
+- Retrain Geom Fix  [`#386`](https://github.com/developmentseed/lulc-infra/pull/386)
+- gpu shared volume memory [`#367`](https://github.com/developmentseed/lulc-infra/pull/367)
+- make tile caching longer and remove debug for production [`#376`](https://github.com/developmentseed/lulc-infra/pull/376)
+
 ## v0.2.0
 
 ## Features
