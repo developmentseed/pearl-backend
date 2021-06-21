@@ -10,7 +10,7 @@ import sklearn.base
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 
@@ -70,7 +70,16 @@ class TorchFineTuning(ModelSession):
     Initalizes Retraining Layer.
     """
 
-    AUGMENT_MODEL = LogisticRegression(max_iter=1000, multi_class="multinomial")
+    AUGMENT_MODEL = SGDClassifier(
+        loss="log",
+        shuffle=True,
+        n_jobs=-1,
+        learning_rate="constant",
+        eta0=0.001,
+        warm_start=True,
+        verbose=False,
+    )
+
 
     def __init__(self, gpu_id, model_dir, classes):
         """
