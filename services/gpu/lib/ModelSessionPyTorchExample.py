@@ -105,10 +105,18 @@ class TorchFineTuning(ModelSession):
         )
         self._init_model()
 
+        self.initial_weights = (
+        self.model.last.weight.cpu().detach().numpy().squeeze()
+        )  # (10, 64)
+        self.initial_biases = self.model.last.bias.cpu().detach().numpy()  # (10,)
+
         for param in self.model.parameters():
             param.requires_grad = False
 
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+
+        self.augment_model.coef_ = self.initial_weights.astype(np.float64)
+        self.augment_model.intercept_ = self.initial_biases.astype(np.float64)
 
         self._last_tile = None
 
