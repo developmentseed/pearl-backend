@@ -1,7 +1,7 @@
 import abc
 
-class ModelSession(abc.ABC):
 
+class ModelSession(abc.ABC):
     @property
     @abc.abstractmethod
     def last_tile(self):
@@ -77,7 +77,6 @@ class ModelSession(abc.ABC):
             according to "success".
         """
         raise NotImplementedError()
-
 
     @abc.abstractmethod
     def undo(self):

@@ -1,15 +1,19 @@
+"""Defines Raster datasource."""
+
 import mercantile
-import rasterio
-import supermercado
-from rasterio.warp import transform_geom
-from rasterio.transform import from_bounds
-from rasterio.io import MemoryFile
 import numpy as np
+import rasterio
+from rasterio.io import MemoryFile
+from rasterio.transform import from_bounds
+from rasterio.warp import transform_geom
 
 
 class MemRaster(object):
+    """
+    wrapper around the four pieces of information needed to define a raster datasource.
+    """
 
-    def __init__(self, data, crs, tile, buffered = False):
+    def __init__(self, data, crs, tile, buffered=False):
         """A wrapper around the four pieces of information needed to define a raster datasource.
 
         Args:
@@ -32,26 +36,36 @@ class MemRaster(object):
         self.shape = data.shape
 
     def remove_buffer(self):
+        """
+        Removes 32 pixel buffer on each side of tile post inferece.
+        """
         if self.buffered:
             self.data = self.data[32:288, 32:288]
             self.buffered = False
         return self
 
     def clip(self, polygon):
+        """
+        Clips inference to specific user submitted AOI because inference is based on xyz tiles bounds.
+        """
         geom = transform_geom("epsg:4326", "epsg:3857", polygon)
         transform = from_bounds(*self.xy_bounds, 256, 256)
 
         with MemoryFile() as memfile:
-            with memfile.open(driver='GTiff',
-                dtype='uint8',
-                crs='EPSG:3857',
+            with memfile.open(
+                driver="GTiff",
+                dtype="uint8",
+                crs="EPSG:3857",
                 count=1,
                 transform=transform,
                 height=256,
                 width=256,
-                nodata=255) as dataset:
-                    dataset.write(np.expand_dims(self.data, axis=0))
+                nodata=255,
+            ) as dataset:
+                dataset.write(np.expand_dims(self.data, axis=0))
 
-                    clipped_output, clipped_transform = rasterio.mask.mask(dataset=dataset, shapes=[geom], nodata=255)
+                clipped_output, clipped_transform = rasterio.mask.mask(
+                    dataset=dataset, shapes=[geom], nodata=255
+                )
         self.data = clipped_output[0]
         return self
