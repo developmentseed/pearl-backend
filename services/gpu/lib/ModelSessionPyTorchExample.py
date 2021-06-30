@@ -107,8 +107,6 @@ class TorchFineTuning(ModelSession):
         self.initial_weights = (
             self.model.last.weight.cpu().detach().numpy().squeeze()
         )  # (10, 64)
-        print("initial weigths shape")
-        print(self.initial_weights.shape)
         self.initial_biases = self.model.last.bias.cpu().detach().numpy()  # (10,)
 
         for param in self.model.parameters():
@@ -175,7 +173,6 @@ class TorchFineTuning(ModelSession):
                     counts[names.index(c["name"])] + self.classes[i]["counts"]
                 )
         for i, c in enumerate(self.classes):
-            print(c)
             self.classes[i]["percent"] = counts[names.index(c["name"])] / sum(counts)
 
         # combine starter model classes and retrain classes
