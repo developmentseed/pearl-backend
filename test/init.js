@@ -164,7 +164,6 @@ function connect(test, API) {
                 model_zoom: 17,
                 storage: null,
                 classes: [
-                    { name: 'No Data', color: '#62a092' },
                     { name: 'Water', color: '#0000FF' },
                     { name: 'Emergent Wetlands', color: '#008000' },
                     { name: 'Tree Canopy', color: '#80FF80' },
@@ -220,7 +219,6 @@ function connect(test, API) {
                 model_zoom: 17,
                 storage: true,
                 classes: [
-                    { name: 'No Data', color: '#62a092' },
                     { name: 'Water', color: '#0000FF' },
                     { name: 'Emergent Wetlands', color: '#008000' },
                     { name: 'Tree Canopy', color: '#80FF80' },
@@ -303,8 +301,8 @@ function connect(test, API) {
 
             state.instance = JSON.parse(JSON.stringify(res.body));
 
-            delete res.body.id,
-                delete res.body.created;
+            delete res.body.id;
+            delete res.body.created;
             delete res.body.last_update;
             delete res.body.token;
 
