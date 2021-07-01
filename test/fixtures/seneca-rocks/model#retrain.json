@@ -102,28 +102,6 @@
                 }
             },
             {
-                "name": "No Data",
-                "color": "#62a092",
-                "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
-                        {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.377054334995179,
-                                    38.834430418523333
-                                ],
-                                [
-                                    -79.377054334995179,
-                                    38.834430418523333
-                                ]
-                            ]
-                        }
-                    ]
-                }
-            },
-            {
                 "name": "Impervious Road",
                 "color": "#0218a2",
                 "geometry": {

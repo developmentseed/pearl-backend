@@ -4,7 +4,7 @@ const { promisify } = require('util');
 const request = promisify(require('request'));
 const Knex = require('knex');
 
-const {drop, genconfig} = require('../services/api/test/drop');
+const { drop, genconfig } = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
 let state = {
@@ -55,7 +55,7 @@ function reconnect(test, API) {
             state.instance = JSON.parse(JSON.stringify(res.body));
 
             delete res.body.id,
-            delete res.body.created;
+                delete res.body.created;
             delete res.body.last_update;
             delete res.body.token;
             delete res.body.active;
@@ -126,7 +126,6 @@ function connect(test, API) {
                     model_inputshape: [256, 256, 4],
                     model_zoom: 17,
                     classes: [
-                        { name: 'No Data', color: '#62a092' },
                         { name: 'Water', color: '#0000FF' },
                         { name: 'Emergent Wetlands', color: '#008000' },
                         { name: 'Tree Canopy', color: '#80FF80' },
@@ -305,7 +304,7 @@ function connect(test, API) {
             state.instance = JSON.parse(JSON.stringify(res.body));
 
             delete res.body.id,
-            delete res.body.created;
+                delete res.body.created;
             delete res.body.last_update;
             delete res.body.token;
 
