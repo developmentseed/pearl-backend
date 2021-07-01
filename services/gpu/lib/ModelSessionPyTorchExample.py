@@ -237,7 +237,7 @@ class TorchFineTuning(ModelSession):
         print("y_test")
         print(np.unique(y_test_user, return_counts=True))
 
-        self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+        self.augment_model.classes_ = np.array(np.unique(y_train))
 
         self.augment_model.fit(
             x_train, y_train
