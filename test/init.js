@@ -54,8 +54,8 @@ function reconnect(test, API) {
 
             state.instance = JSON.parse(JSON.stringify(res.body));
 
-            delete res.body.id,
-                delete res.body.created;
+            delete res.body.id;
+            delete res.body.created;
             delete res.body.last_update;
             delete res.body.token;
             delete res.body.active;
