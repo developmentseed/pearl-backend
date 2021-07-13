@@ -7,96 +7,109 @@
                 "name": "Structure",
                 "color": "#f76f73",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.376936712501418,
-                                    38.834394753436762
-                                ],
-                                [
-                                    -79.377090146278206,
-                                    38.834530999727654
-                                ]
-                            ]
-                        },
-                        {
-                            "type": "Polygon",
-                            "coordinates": [
-                                [
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
                                     [
-                                        -79.38049077987671,
-                                        38.83848752076715
+                                        -79.376936712501418,
+                                        38.834394753436762
                                     ],
                                     [
-                                        -79.37873125076294,
-                                        38.83848752076715
-                                    ],
-                                    [
-                                        -79.37873125076294,
-                                        38.8397243269996
-                                    ],
-                                    [
-                                        -79.38049077987671,
-                                        38.8397243269996
-                                    ],
-                                    [
-                                        -79.38049077987671,
-                                        38.83848752076715
+                                        -79.377090146278206,
+                                        38.834530999727654
                                     ]
                                 ]
-                            ]
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            -79.38049077987671,
+                                            38.83848752076715
+                                        ],
+                                        [
+                                            -79.37873125076294,
+                                            38.83848752076715
+                                        ],
+                                        [
+                                            -79.37873125076294,
+                                            38.8397243269996
+                                        ],
+                                        [
+                                            -79.38049077987671,
+                                            38.8397243269996
+                                        ],
+                                        [
+                                            -79.38049077987671,
+                                            38.83848752076715
+                                        ]
+                                    ]
+                                ]
+                            }
                         }
                     ]
                 }
+                
             },
             {
                 "name": "Water",
                 "color": "#0000FF",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.37696804261671,
-                                    38.834380908318451
-                                ],
-                                [
-                                    -79.377184066049367,
-                                    38.834321175495617
-                                ]
-                            ]
-                        },
-                        {
-                            "type": "Polygon",
-                            "coordinates": [
-                                [
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
                                     [
-                                        -79.37866687774658,
-                                        38.84356831724291
+                                        -79.37696804261671,
+                                        38.834380908318451
                                     ],
                                     [
-                                        -79.37675714492798,
-                                        38.84228143928492
-                                    ],
-                                    [
-                                        -79.37641382217407,
-                                        38.84348475444575
-                                    ],
-                                    [
-                                        -79.37703609466553,
-                                        38.84467133696776
-                                    ],
-                                    [
-                                        -79.37866687774658,
-                                        38.84356831724291
+                                        -79.377184066049367,
+                                        38.834321175495617
                                     ]
                                 ]
-                            ]
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            -79.37866687774658,
+                                            38.84356831724291
+                                        ],
+                                        [
+                                            -79.37675714492798,
+                                            38.84228143928492
+                                        ],
+                                        [
+                                            -79.37641382217407,
+                                            38.84348475444575
+                                        ],
+                                        [
+                                            -79.37703609466553,
+                                            38.84467133696776
+                                        ],
+                                        [
+                                            -79.37866687774658,
+                                            38.84356831724291
+                                        ]
+                                    ]
+                                ]
+                            }
                         }
                     ]
                 }
@@ -105,20 +118,23 @@
                 "name": "Impervious Road",
                 "color": "#0218a2",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.377173465020022,
-                                    38.834299523357863
-                                ],
-                                [
-                                    -79.376966596942438,
-                                    38.834323695161871
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.377173465020022,
+                                        38.834299523357863
+                                    ],
+                                    [
+                                        -79.376966596942438,
+                                        38.834323695161871
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
                 }
@@ -127,8 +143,8 @@
                 "name": "Emergent Wetlands",
                 "color": "#008000",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
                             "type": "MultiPoint",
                             "coordinates": [
@@ -149,24 +165,27 @@
                 "name": "Impervious Surface",
                 "color": "#ffb703",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.376836609778778,
-                                    38.834442041615475
-                                ],
-                                [
-                                    -79.376948437562518,
-                                    38.834433152757917
-                                ],
-                                [
-                                    -79.376910948390474,
-                                    38.834417625757332
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.376836609778778,
+                                        38.834442041615475
+                                    ],
+                                    [
+                                        -79.376948437562518,
+                                        38.834433152757917
+                                    ],
+                                    [
+                                        -79.376910948390474,
+                                        38.834417625757332
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
                 }
@@ -175,20 +194,27 @@
                 "name": "Tree Canopy",
                 "color": "#80FF80",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.377115299643052,
-                                    38.834525768732178
-                                ],
-                                [
-                                    -79.377060944876419,
-                                    38.834393055366228
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.376836609778778,
+                                        38.834442041615475
+                                    ],
+                                    [
+                                        -79.376948437562518,
+                                        38.834433152757917
+                                    ],
+                                    [
+                                        -79.376910948390474,
+                                        38.834417625757332
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
                 }
@@ -197,42 +223,48 @@
                 "name": "Shrubland",
                 "color": "#806060",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.376997929836634,
-                                    38.834476753022301
-                                ],
-                                [
-                                    -79.376993520578864,
-                                    38.834320148825498
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.376997929836634,
+                                        38.834476753022301
+                                    ],
+                                    [
+                                        -79.376993520578864,
+                                        38.834320148825498
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
-                }
+                }                
             },
             {
                 "name": "Barren",
                 "color": "#027fdc",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.376950679117911,
-                                    38.834398686286974
-                                ],
-                                [
-                                    -79.377184762372309,
-                                    38.834317436038809
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.376950679117911,
+                                        38.834398686286974
+                                    ],
+                                    [
+                                        -79.377184762372309,
+                                        38.834317436038809
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
                 }
@@ -241,20 +273,23 @@
                 "name": "Low Vegetation",
                 "color": "#07c4c5",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.376824957802995,
-                                    38.834323027184489
-                                ],
-                                [
-                                    -79.376824957802995,
-                                    38.834323027184489
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.376824957802995,
+                                        38.834323027184489
+                                    ],
+                                    [
+                                        -79.376824957802995,
+                                        38.834323027184489
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
                 }
@@ -263,20 +298,23 @@
                 "name": "Tundra",
                 "color": "#ffffff",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.377064851017821,
-                                    38.834368202090261
-                                ],
-                                [
-                                    -79.37707642397551,
-                                    38.834321754940582
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.377064851017821,
+                                        38.834368202090261
+                                    ],
+                                    [
+                                        -79.37707642397551,
+                                        38.834321754940582
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
                 }
@@ -285,20 +323,23 @@
                 "name": "Mountain",
                 "color": "#a4afbf",
                 "geometry": {
-                    "type": "GeometryCollection",
-                    "geometries": [
+                    "type": "FeatureCollection",
+                    "features": [
                         {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [
-                                    -79.378064851017821,
-                                    38.834368202090261
-                                ],
-                                [
-                                    -79.37907642397551,
-                                    38.834321754940582
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [
+                                        -79.378064851017821,
+                                        38.834368202090261
+                                    ],
+                                    [
+                                        -79.37907642397551,
+                                        38.834321754940582
+                                    ]
                                 ]
-                            ]
+                            }
                         }
                     ]
                 }
