@@ -2112,8 +2112,8 @@ async function server(config, cb) {
                         return e;
                     });
                     req.body.input_geoms = req.body.input_geoms.map((e) => {
-                        if (!e || e.type !== 'GeometryCollection') {
-                            return { type: 'GeometryCollection', 'geometries': [] };
+                        if (!e || e.type !== 'FeatureCollection') {
+                            return { type: 'FeatureCollection', 'features': [] };
                         }
                         return e;
                     });
