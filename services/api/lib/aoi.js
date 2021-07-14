@@ -72,7 +72,8 @@ class AOI {
             bookmarked: row.bookmarked,
             project_id: parseInt(row.project_id),
             checkpoint_id: parseInt(row.checkpoint_id),
-            patches: row.patches.map((patch) => { return parseInt(patch); })
+            patches: row.patches.map((patch) => { return parseInt(patch); }),
+            px_stats: row.px_stats
         };
 
         if (row.hasOwnProperty('classes')) {
@@ -185,7 +186,8 @@ class AOI {
                         storage = COALESCE($2, storage),
                         name = COALESCE($3, name),
                         bookmarked = COALESCE($4, bookmarked),
-                        patches = COALESCE($5, patches)
+                        patches = COALESCE($5, patches),
+                        px_stats = COALESCE($6, px_stats)
                     WHERE
                         id = $1
                     RETURNING *
@@ -194,7 +196,8 @@ class AOI {
                 aoi.storage,
                 aoi.name,
                 aoi.bookmarked,
-                aoi.patches
+                aoi.patches,
+                aoi.px_stats
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI');
@@ -224,6 +227,7 @@ class AOI {
                     a.created AS created,
                     a.storage AS storage,
                     a.patches AS patches,
+                    a.px_stats AS px_stats,
                     c.classes as classes
                 FROM
                     aois a,
