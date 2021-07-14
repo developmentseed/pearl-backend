@@ -4,6 +4,8 @@
 
 require('dotenv').config();
 
+const fs = require('fs');
+const path = require('path');
 const Err = require('./lib/error');
 const express = require('express');
 const Busboy = require('busboy');
@@ -255,6 +257,12 @@ async function server(config, cb) {
             next();
         }
     ];
+
+    // Load dynamic routes directory
+    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
+        if (!config.silent) console.error(`ok - loaded routes/${r}`);
+        await require('./routes/' + r)(router, schemas, config);
+    } 
 
     /**
      * @api {get} /api/schema List Schemas

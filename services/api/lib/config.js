@@ -8,6 +8,8 @@ class Config {
             throw new Error('SigningSecret env var must be set in production environment');
         }
 
+        this.silent = !!args.silent;
+
         this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
         if (this.AzureStorage) console.log('ok - AzureStorage: Enabled');
 
