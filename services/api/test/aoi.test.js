@@ -188,6 +188,7 @@ test('POST /api/project/1/aoi', (t) => {
             bookmarked: false,
             patches: [],
             name: 'Test AOI',
+            px_stats: {},
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
@@ -227,6 +228,7 @@ test('GET /api/project/1/aoi/1', (t) => {
             patches: [],
             shares:  [],
             name: 'Test AOI',
+            px_stats: {},
             bounds: {
                 type: 'Polygon',
                 coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
@@ -279,6 +281,7 @@ test('GET /api/project/1/aoi', (t) => {
                 shares: [],
                 storage: true,
                 bookmarked: false,
+                px_stats: {},
                 bounds: {
                     "type": "Polygon",
                     "coordinates": [
@@ -401,6 +404,7 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             storage: true,
             project_id: 1,
             patches: [],
+            px_stats: {},
             checkpoint_id: 1,
             bookmarked: true,
             name: 'RENAMED',
@@ -464,6 +468,7 @@ test('POST /api/project/1/aoi', (t) => {
             bookmarked: false,
             patches: [],
             name: 'Test AOI 2',
+            px_stats: {},
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
