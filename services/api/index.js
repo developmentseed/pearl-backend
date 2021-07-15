@@ -18,8 +18,8 @@ const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
-    boolean: ['prod'],
-    string: ['port']
+    boolean: ['prod', 'silent'],
+    string: ['port'],
 });
 
 const Config = require('./lib/config');
@@ -1107,7 +1107,9 @@ async function server(config, cb) {
                 await Param.int(req, 'aoiid');
                 await auth.is_admin(req);
 
-                const busboy = new Busboy({ headers: req.headers });
+                const busboy = new Busboy({
+                    headers: req.headers
+                });
 
                 const files = [];
 
@@ -1117,6 +1119,14 @@ async function server(config, cb) {
 
                 busboy.on('finish', async () => {
                     try {
+
+                        const tiffurl = await aoi.url(req.params.aoiid);
+
+                        await proxy.request({
+                            url: `/cog/metadata?url=${encodeURIComponent(String(tiffurl))}`,
+                            method: 'GET'
+                        }, res);
+
                         return res.json(await aoi.get(req.params.aoiid));
                     } catch (err) {
                         Err.respond(res, err);
