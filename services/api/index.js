@@ -1122,14 +1122,16 @@ async function server(config, cb) {
 
                         const tiffurl = await aoi.url(req.params.aoiid);
 
-                        await proxy.request({
+                        const pres = await proxy.request({
                             url: `/cog/metadata?url=${encodeURIComponent(String(tiffurl))}`,
                             method: 'GET'
-                        }, res);
+                        }, true);
+
+                        console.error(pres.body);
 
                         return res.json(await aoi.get(req.params.aoiid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -1827,7 +1829,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await aoipatch.get(req.params.patchid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -1987,7 +1989,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await checkpoint.get(req.params.checkpointid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -2340,7 +2342,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await model.get(req.params.modelid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
