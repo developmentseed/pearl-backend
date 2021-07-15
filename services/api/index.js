@@ -1122,14 +1122,33 @@ async function server(config, cb) {
 
                         const tiffurl = await aoi.url(req.params.aoiid);
 
+                        const a = await aoi.get(req.params.aoiid);
+                        const chkpt = await checkpoint.get(a.checkpoint_id);
+
+                        const histo = [];
+                        for (let i = 0; i < chkpt.classes.length; i++) {
+                            histo[i] = i + 1;
+                        }
+
                         const pres = await proxy.request({
-                            url: `/cog/metadata?url=${encodeURIComponent(String(tiffurl))}`,
+                            url: `/cog/metadata`,
+                            query: {
+                                url: String(tiffurl),
+                                histogram_bins: histo.join(',')
+                            },
+                            body: {},
                             method: 'GET'
-                        }, true);
+                        }, false);
 
-                        console.error(pres.body);
+                        const px_stats = {};
+                        const totalpx = pres.body.width * pres.body.height;
+                        for (let i = 0; i < chkpt.classes.length; i++) {
+                            px_stats[i] = pres.body.statistics['1'].histogram[0][i + 1] / totalpx;
+                        }
 
-                        return res.json(await aoi.get(req.params.aoiid));
+                        console.error(px_stats)
+
+                        return res.json(a);
                     } catch (err) {
                         Err.respond(err, res);
                     }
