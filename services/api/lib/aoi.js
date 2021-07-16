@@ -187,7 +187,7 @@ class AOI {
                         name = COALESCE($3, name),
                         bookmarked = COALESCE($4, bookmarked),
                         patches = COALESCE($5, patches),
-                        px_stats = COALESCE($6, px_stats)
+                        px_stats = COALESCE($6::JSONB, px_stats)
                     WHERE
                         id = $1
                     RETURNING *
@@ -197,7 +197,7 @@ class AOI {
                 aoi.name,
                 aoi.bookmarked,
                 aoi.patches,
-                aoi.px_stats
+                JSON.stringify(aoi.px_stats)
             ]);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI');

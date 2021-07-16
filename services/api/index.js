@@ -1126,7 +1126,7 @@ async function server(config, cb) {
                         const chkpt = await checkpoint.get(a.checkpoint_id);
 
                         const histo = [];
-                        for (let i = 0; i < chkpt.classes.length; i++) {
+                        for (let i = 0; i <= chkpt.classes.length; i++) {
                             histo[i] = i + 1;
                         }
 
@@ -1142,13 +1142,14 @@ async function server(config, cb) {
 
                         const px_stats = {};
                         const totalpx = pres.body.width * pres.body.height;
+
                         for (let i = 0; i < chkpt.classes.length; i++) {
-                            px_stats[i] = pres.body.statistics['1'].histogram[0][i + 1] / totalpx;
+                            px_stats[i] = pres.body.statistics['1'].histogram[0][i] / totalpx;
                         }
 
-                        console.error(px_stats)
-
-                        return res.json(a);
+                        return res.json(await aoi.patch(a.id, {
+                            px_stats
+                        }));
                     } catch (err) {
                         Err.respond(err, res);
                     }
