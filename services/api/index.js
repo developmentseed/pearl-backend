@@ -18,8 +18,8 @@ const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
-    boolean: ['prod'],
-    string: ['port']
+    boolean: ['prod', 'silent'],
+    string: ['port'],
 });
 
 const Config = require('./lib/config');
@@ -1107,7 +1107,9 @@ async function server(config, cb) {
                 await Param.int(req, 'aoiid');
                 await auth.is_admin(req);
 
-                const busboy = new Busboy({ headers: req.headers });
+                const busboy = new Busboy({
+                    headers: req.headers
+                });
 
                 const files = [];
 
@@ -1117,9 +1119,39 @@ async function server(config, cb) {
 
                 busboy.on('finish', async () => {
                     try {
-                        return res.json(await aoi.get(req.params.aoiid));
+
+                        const tiffurl = await aoi.url(req.params.aoiid);
+
+                        const a = await aoi.get(req.params.aoiid);
+                        const chkpt = await checkpoint.get(a.checkpoint_id);
+
+                        const histo = [];
+                        for (let i = 0; i <= chkpt.classes.length; i++) {
+                            histo[i] = i + 1;
+                        }
+
+                        const pres = await proxy.request({
+                            url: `/cog/metadata`,
+                            query: {
+                                url: String(tiffurl),
+                                histogram_bins: histo.join(',')
+                            },
+                            body: {},
+                            method: 'GET'
+                        }, false);
+
+                        const px_stats = {};
+                        const totalpx = pres.body.width * pres.body.height;
+
+                        for (let i = 0; i < chkpt.classes.length; i++) {
+                            px_stats[i] = pres.body.statistics['1'].histogram[0][i] / totalpx;
+                        }
+
+                        return res.json(await aoi.patch(a.id, {
+                            px_stats
+                        }));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -1817,7 +1849,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await aoipatch.get(req.params.patchid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -1977,7 +2009,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await checkpoint.get(req.params.checkpointid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -2330,7 +2362,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await model.get(req.params.modelid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
