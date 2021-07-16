@@ -10,7 +10,7 @@
         "lint": "eslint index.js lib/**.js",
         "prod": "node --trace-warnings ./index.js --prod",
         "dev": "nodemon ./index.js",
-        "test": "tape test/**.test.js"
+        "test": "tape test/**.test.js | tap-dot"
     },
     "dependencies": {
         "@azure/storage-blob": "^12.4.0",
@@ -40,6 +40,7 @@
         "request": "^2.88.2"
     },
     "devDependencies": {
+        "tap-dot": "^2.0.0",
         "apidoc-plugin-schema": "^0.1.8",
         "eslint": "^7.24.0",
         "eslint-plugin-node": "^11.1.0",

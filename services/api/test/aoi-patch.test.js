@@ -205,6 +205,7 @@ test('POST /api/project/1/aoi', (t) => {
             bookmarked: false,
             patches: [],
             name: 'Test AOI',
+            px_stats: {},
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
@@ -369,6 +370,7 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            px_stats: {},
             patches: [1],
             name: 'Test AOI'
         });

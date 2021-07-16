@@ -167,6 +167,7 @@ test('POST /api/project/1/aoi', (t) => {
             bookmarked: false,
             patches: [],
             name: 'Test AOI',
+            px_stats: {},
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
@@ -418,6 +419,7 @@ test('GET /api/project/1/aoi/1', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             patches: [],
+            px_stats: {},
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
