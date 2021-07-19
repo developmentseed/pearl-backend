@@ -17,5 +17,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: {{ template "lulc-helm.fullname" . }}-socket
-          servicePort: 80
+          service:
+            name: {{ template "lulc-helm.fullname" . }}-socket
+            port:
+              number: 80
