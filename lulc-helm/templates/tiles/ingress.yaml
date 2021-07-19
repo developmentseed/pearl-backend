@@ -1,5 +1,5 @@
 {{- if .Values.tiles.enabled }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "lulc-helm.fullname" . }}-ingress-tiles
@@ -16,7 +16,11 @@ spec:
   - host: tiles.{{ .Values.domain }}
     http:
       paths:
-      - backend:
-          serviceName: {{ template "lulc-helm.fullname" . }}-tiles
-          servicePort: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ template "lulc-helm.fullname" . }}-tiles
+            port:
+              number: 80
 {{- end }}
