@@ -16,7 +16,9 @@ spec:
   - host: api.{{ .Values.domain }}
     http:
       paths:
-      - backend:
+      - path: /
+        pathType: Prefix
+        backend:
           service:
             name: {{ template "lulc-helm.fullname" . }}-api
             port:
