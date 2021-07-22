@@ -64,6 +64,18 @@ class FCN(nn.Module):
         x = self.last(x)
         return x
 
+    def forward_features(self, inputs):
+        """
+        Returns last layer of network and embedding features.
+        """
+        x = F.relu(self.conv1(inputs))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        z = F.relu(self.conv5(x))
+        y = self.last(z)
+        return y, z
+
 
 class TorchFineTuning(ModelSession):
     """
@@ -329,20 +341,14 @@ class TorchFineTuning(ModelSession):
         data = tile_img.to(self.device)
 
         with torch.no_grad():
-            predictions = self.model(
-                data[None, ...]
-            )  # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions, features = self.model.forward_features(data[None, ...])
+            # insert singleton "batch" dimension to input data for pytorch to be happy
             predictions = (
                 F.softmax(predictions, dim=1).cpu().numpy()
             )  # this is giving us the highest probability class per pixel
 
         # get embeddings
-        newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
-        newmodel.eval()
-        with torch.no_grad():
-            features = newmodel(data[None, ...])
-            features = features.cpu().numpy()
-            features = np.moveaxis(features[0], 0, -1)
+        features = np.rollaxis(features.squeeze().cpu().numpy(), 0, 3)
         predictions = predictions[0].argmax(axis=0).astype(np.uint8)
         return predictions, features
 
