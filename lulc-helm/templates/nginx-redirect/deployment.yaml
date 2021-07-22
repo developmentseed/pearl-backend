@@ -1,0 +1,35 @@
+{{- if .Values.nginx.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-nginx
+  labels:
+    component: api-deployment
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "lulc-helm.name" . }}
+      release: {{ .Release.Name }}
+      run: {{ .Release.Name }}-nginx
+  template:
+    metadata:
+      labels:
+        app: {{ template "lulc-helm.name" . }}
+        release: {{ .Release.Name }}
+        run: {{ .Release.Name }}-nginx
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-nginx
+          image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: FRONTEND_DOMAIN
+              value: {{ .Values.api.env.FRONTEND_DOMAIN }}
+
+{{- end }}

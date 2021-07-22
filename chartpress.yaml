@@ -22,3 +22,7 @@ charts:
         valuesPath: gpu.image
         contextPath: services/gpu/
         dockerfilePath: services/gpu/Dockerfile
+      nginx:
+        valuesPath: nginx.image
+        contextPath: services/nginx-redirect
+        dockerfilePath: services/nginx-redirect/Dockerfile
