@@ -66,7 +66,7 @@
         },
         "input_geoms": {
             "type": "array",
-            "description": "Array of GeoJSON GeometryCollections that were input by the user. Length of geomms array must equals classes",
+            "description": "Array of GeoJSON FeatureCollection that were input by the user. Length of this array must equals classes",
             "items": {
                 "type": ["null", "object"]
             }
