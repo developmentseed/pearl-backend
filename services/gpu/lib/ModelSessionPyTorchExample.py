@@ -212,6 +212,14 @@ class TorchFineTuning(ModelSession):
         x_train_user, x_test_user, y_train_user, y_test_user = train_test_split(
             x_user, y_user, test_size=0.1, random_state=0, stratify=y_user
         )
+        print("y user")
+        print(np.unique(y_user))
+
+        print("y user test")
+        print(np.unique(y_test_user))
+
+        print("y user train")
+        print(np.unique(y_train_user))
 
         # Place holder to load in seed npz
         seed_data = np.load(self.model_dir + "/model.npz", allow_pickle=True)
@@ -220,9 +228,12 @@ class TorchFineTuning(ModelSession):
 
         x_train = np.vstack((x_train_user, seed_x))
         y_train = np.hstack((y_train_user, seed_y))
+        print(np.unique(y_train))
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
-        # self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+
+        print("augment model classes")
+        print(self.augment_model.classes_)
 
         if x_train.shape[0] == 0:
             return {
@@ -230,11 +241,14 @@ class TorchFineTuning(ModelSession):
                 "success": False,
             }
 
-        self.augment_model.classes_ = np.array(np.unique(y_train))
+        # self.augment_model.classes_ = np.array(np.unique(y_train))
 
         self.augment_model.fit(
             x_train, y_train
         )  # figure out if this is running on GPU or CPU
+
+        print("coef shape")
+        print(self.augment_model.coef_.shape)
 
         lr_preds = self.augment_model.predict(x_test_user)
 
@@ -248,7 +262,7 @@ class TorchFineTuning(ModelSession):
             list(np.arange(len(list(self.class_names_mapping.keys())))), f1_labels
         )
 
-        # where the unique cls id exist, fill in f1 per calss
+        # where the unique cls id exist, fill in f1 per class
         per_class_f1_final[f1_labels] = per_class_f1
         # where is the missing id, fill in np.nan, but actually 0 for db to not break
         per_class_f1_final[missing_labels] = 0
