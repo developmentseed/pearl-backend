@@ -17,8 +17,6 @@ from sklearn.model_selection import train_test_split
 from .ModelSessionAbstract import ModelSession
 
 sys.path.append("..")
-
-
 LOGGER = logging.getLogger("server")
 
 
@@ -63,6 +61,18 @@ class FCN(nn.Module):
         x = F.relu(self.conv5(x))
         x = self.last(x)
         return x
+
+    def forward_features(self, inputs):
+        """
+        Returns last layer of network and embedding features.
+        """
+        x = F.relu(self.conv1(inputs))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        z = F.relu(self.conv5(x))
+        y = self.last(z)
+        return y, z
 
 
 class TorchFineTuning(ModelSession):
@@ -200,6 +210,14 @@ class TorchFineTuning(ModelSession):
         x_train_user, x_test_user, y_train_user, y_test_user = train_test_split(
             x_user, y_user, test_size=0.1, random_state=0, stratify=y_user
         )
+        print("y user")
+        print(np.unique(y_user))
+
+        print("y user test")
+        print(np.unique(y_test_user))
+
+        print("y user train")
+        print(np.unique(y_train_user))
 
         # Place holder to load in seed npz
         seed_data = np.load(self.model_dir + "/model.npz", allow_pickle=True)
@@ -208,9 +226,12 @@ class TorchFineTuning(ModelSession):
 
         x_train = np.vstack((x_train_user, seed_x))
         y_train = np.hstack((y_train_user, seed_y))
+        print(np.unique(y_train))
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
-        # self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+
+        print("augment model classes")
+        print(self.augment_model.classes_)
 
         if x_train.shape[0] == 0:
             return {
@@ -218,11 +239,14 @@ class TorchFineTuning(ModelSession):
                 "success": False,
             }
 
-        self.augment_model.classes_ = np.array(np.unique(y_train))
+        # self.augment_model.classes_ = np.array(np.unique(y_train))
 
         self.augment_model.fit(
             x_train, y_train
         )  # figure out if this is running on GPU or CPU
+
+        print("coef shape")
+        print(self.augment_model.coef_.shape)
 
         lr_preds = self.augment_model.predict(x_test_user)
 
@@ -236,7 +260,7 @@ class TorchFineTuning(ModelSession):
             list(np.arange(len(list(self.class_names_mapping.keys())))), f1_labels
         )
 
-        # where the unique cls id exist, fill in f1 per calss
+        # where the unique cls id exist, fill in f1 per class
         per_class_f1_final[f1_labels] = per_class_f1
         # where is the missing id, fill in np.nan, but actually 0 for db to not break
         per_class_f1_final[missing_labels] = 0
@@ -315,20 +339,14 @@ class TorchFineTuning(ModelSession):
         data = tile_img.to(self.device)
 
         with torch.no_grad():
-            predictions = self.model(
-                data[None, ...]
-            )  # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions, features = self.model.forward_features(data[None, ...])
+            # insert singleton "batch" dimension to input data for pytorch to be happy
             predictions = (
                 F.softmax(predictions, dim=1).cpu().numpy()
             )  # this is giving us the highest probability class per pixel
 
         # get embeddings
-        newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
-        newmodel.eval()
-        with torch.no_grad():
-            features = newmodel(data[None, ...])
-            features = features.cpu().numpy()
-            features = np.moveaxis(features[0], 0, -1)
+        features = np.rollaxis(features.squeeze().cpu().numpy(), 0, 3)
         predictions = predictions[0].argmax(axis=0).astype(np.uint8)
         return predictions, features
 
