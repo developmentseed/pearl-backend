@@ -184,7 +184,7 @@ class TorchFineTuning(ModelSession):
         self.classes = self.classes + [
             x for x in retrain_classes if not x["name"] in current_class_names
         ]  # don't check against entire dict
-        self.augment_x_train = [
+        self.augment_x_train = self.augment_x_train + [
             item.value for sublist in pixels for item in sublist
         ]  # get pixel values
 
@@ -202,7 +202,7 @@ class TorchFineTuning(ModelSession):
                 )  # to-do? this new classs name + value need to stay in the dictionary for future re-training iterations
             ints_retrain.append(self.class_names_mapping.get(name))
 
-        self.augment_y_train = ints_retrain
+        self.augment_y_train = self.augment_y_train + ints_retrain
         x_user = np.array(self.augment_x_train)
         y_user = np.array(self.augment_y_train)
 
@@ -211,13 +211,13 @@ class TorchFineTuning(ModelSession):
             x_user, y_user, test_size=0.1, random_state=0, stratify=y_user
         )
         print("y user")
-        print(np.unique(y_user))
+        print(np.unique(y_user, return_counts=True))
 
         print("y user test")
-        print(np.unique(y_test_user))
+        print(np.unique(y_test_user, return_counts=True))
 
         print("y user train")
-        print(np.unique(y_train_user))
+        print(np.unique(y_train_user, return_counts=True))
 
         # Place holder to load in seed npz
         seed_data = np.load(self.model_dir + "/model.npz", allow_pickle=True)
