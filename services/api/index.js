@@ -900,7 +900,7 @@ async function server(config, cb) {
     );
 
     const getAoiTileJSON = async (theAoi, req) => {
-        const tiffurl = theAoi.hasOwnProperty('uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id)
+        const tiffurl = theAoi.hasOwnProperty('uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id);
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -918,7 +918,7 @@ async function server(config, cb) {
             // this is a share
             tiles = [
                 `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}`
-            ]
+            ];
         } else {
             const chkpt = await checkpoint.get(theAoi.checkpoint_id);
             const cmap = {};
@@ -936,7 +936,7 @@ async function server(config, cb) {
 
             tiles = [
                 `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-            ]
+            ];
         }
 
         const aoiTileName = theAoi.hasOwnProperty('aoi_id') ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;

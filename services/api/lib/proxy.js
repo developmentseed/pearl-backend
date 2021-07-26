@@ -33,7 +33,7 @@ class Proxy {
                     json: typeof req.body === 'object',
                     method: req.method,
                     body: req.body
-                })
+                });
 
                 if (res === true) {
                     return pres;

@@ -234,7 +234,10 @@ class AOIShare {
         const where = [];
         where.push(`project_id = ${projectid}`);
 
-        if (query.aoi) where.push(`aoi_id = ${query.aoi_id}`);
+        if (query.aoi) {
+            if (isNaN(parseInt(query.aoi))) throw new Err(400, null, 'AOI Must be an Integer');
+            where.push(`aoi_id = ${parseInt(query.aoi)}`);
+        }
 
         let pgres;
         try {
