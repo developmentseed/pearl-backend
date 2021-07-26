@@ -1249,7 +1249,7 @@ async function server(config, cb) {
 
                 for (const a of aois.aois) {
                     const shares = await aoishare.list(req.params.projectid, {
-                        aoi_id: a.id
+                        aoi: a.id
                     });
 
                     a.shares = shares.shares;
