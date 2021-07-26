@@ -1,0 +1,27 @@
+{{- if .Values.nginx.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-nginx
+  labels:
+    app: {{ template "lulc-helm.name" . }}
+    component: api-service
+    environment: {{ .Values.environment }}
+    release: {{ .Release.Name }}
+spec:
+  {{- if eq .Values.environment "local" }}
+  type: NodePort
+  {{- else }}
+  type: ClusterIP
+  {{- end }}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: null
+
+  selector:
+    app: {{ template "lulc-helm.name" . }}
+    release: {{ .Release.Name }}
+    run: {{ .Release.Name }}-nginx
+{{- end }}

@@ -1,0 +1,5 @@
+server {
+    listen 80;
+    server_name ${FRONTEND_DOMAIN};
+    return 301 https://www.${FRONTEND_DOMAIN}$request_uri;
+}

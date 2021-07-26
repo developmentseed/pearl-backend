@@ -31,6 +31,11 @@ placeholder:
   isGpu: true
   numGPUs: 2
 
+nginx:
+  enabled: true
+  env:
+    FRONTEND_DOMAIN: 'landcover.io'
+
 tilesScaler:
   env:
     backendPool: pool-default-lulc-production-lulc-helm-tiles-80-bp-8000~bp-default-lulc-production-lulc-helm-tiles-80-8-374794b60d6d018518c60d63627773ba
