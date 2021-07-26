@@ -31,6 +31,9 @@ placeholder:
   isGpu: true
   numGPUs: 2
 
+nginx:
+  enabled: false
+
 tilesScaler:
   env:
     backendPool: pool-default-lulc-staging-lulc-helm-tiles-80-bp-8000~bp-default-lulc-staging-lulc-helm-tiles-80-8000-029e669b1fed84821a79034b9b2e4ee9
