@@ -1141,7 +1141,9 @@ async function server(config, cb) {
                         }, false);
 
                         const px_stats = {};
-                        const totalpx = pres.body.width * pres.body.height;
+                        const totalpx = pres.body.statistics['1'].histogram[0].reduce((acc, curr) => {
+                            return acc + curr;
+                        });
 
                         for (let i = 0; i < chkpt.classes.length; i++) {
                             if (pres.body.statistics && pres.body.statistics['1'] && pres.body.statistics['1'].histogram && pres.body.statistics['1'].histogram[0]) {
