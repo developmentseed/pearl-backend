@@ -1131,26 +1131,20 @@ async function server(config, cb) {
                         }
 
                         const pres = await proxy.request({
-                            url: `/cog/metadata`,
+                            url: `/cog/statistics`,
                             query: {
                                 url: String(tiffurl),
-                                histogram_bins: histo.join(',')
+                                categorical: 'true'
                             },
                             body: {},
                             method: 'GET'
                         }, false);
 
                         const px_stats = {};
-                        const totalpx = pres.body.statistics['1'].histogram[0].reduce((acc, curr) => {
-                            return acc + curr;
-                        });
 
+                        const totalpx = pres.body[0].valid_pixels;
                         for (let i = 0; i < chkpt.classes.length; i++) {
-                            if (pres.body.statistics && pres.body.statistics['1'] && pres.body.statistics['1'].histogram && pres.body.statistics['1'].histogram[0]) {
-                                px_stats[i] = pres.body.statistics['1'].histogram[0][i] / totalpx;
-                            } else {
-                                console.error('PX_Stats Error: ', JSON.stringify(pres.body));
-                            }
+                            px_stats[i] = (pres.body[0].categories[i] || 0) / totalpx;
                         }
 
                         return res.json(await aoi.patch(a.id, {
