@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+## v0.4.0
+
+## Fixes
+- Standard Dependency Maintenance [`#413`](https://github.com/developmentseed/lulc-infra/pull/413)
+- Retrain Fix  [`#416`](https://github.com/developmentseed/lulc-infra/pull/416)
+- Embedding Fix [`#418`](https://github.com/developmentseed/lulc-infra/pull/418)
+- Ensure px stats exist before using [`#423`](https://github.com/developmentseed/lulc-infra/pull/423)
+- Use categorical endpoint [`#429`](https://github.com/developmentseed/lulc-infra/pull/429)
+- add statistics endpoint [`#428`](https://github.com/developmentseed/lulc-infra/pull/428)
+- Use sum of histo instead of px x,y [`#427`](https://github.com/developmentseed/lulc-infra/pull/427)
+
+## Features
+- AOI Stats [`#412`](https://github.com/developmentseed/lulc-infra/pull/412)
+- Support retrain samples as feature collection [`#411`](https://github.com/developmentseed/lulc-infra/pull/411)
+
+## Improvements
+- Pre-Commit + Linting  [`#398`](https://github.com/developmentseed/lulc-infra/pull/398)
+- retrain metrics improvements  [`#403`](https://github.com/developmentseed/lulc-infra/pull/403)
+- k8s upgrade 1.9 [`#417`](https://github.com/developmentseed/lulc-infra/pull/417)
+- Filter by AOI [`#424`](https://github.com/developmentseed/lulc-infra/pull/424)
+- create nginx container to redirect to www [`#419`](https://github.com/developmentseed/lulc-infra/pull/419)
+- Persist user submitted retrain samples [`#422`](https://github.com/developmentseed/lulc-infra/pull/422)
+
 ## v0.3.0
 
 ## Fixes
