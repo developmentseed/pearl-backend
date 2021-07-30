@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "lulc-helm.fullname" . }}-ingress-socket
@@ -16,6 +16,10 @@ spec:
   - host: socket.{{ .Values.domain }}
     http:
       paths:
-      - backend:
-          serviceName: {{ template "lulc-helm.fullname" . }}-socket
-          servicePort: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ template "lulc-helm.fullname" . }}-socket
+            port:
+              number: 80

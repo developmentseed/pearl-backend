@@ -1,26 +1,26 @@
-{{- if .Values.tiles.enabled }}
+{{- if .Values.nginx.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "lulc-helm.fullname" . }}-ingress-tiles
+  name: {{ template "lulc-helm.fullname" . }}-ingress-nginx
   annotations:
     kubernetes.io/ingress.class: azure/application-gateway
     cert-manager.io/cluster-issuer: letsencrypt-prod-issuer
 spec:
   tls:
     - hosts:
-      - tiles.{{ .Values.domain }}
-      secretName: {{ template "lulc-helm.fullname" . }}-secret-tiles
+      - {{ .Values.domain }}
+      secretName: {{ template "lulc-helm.fullname" . }}-secret-nginx
 
   rules:
-  - host: tiles.{{ .Values.domain }}
+  - host: {{ .Values.nginx.env.FRONTEND_DOMAIN }}
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: {{ template "lulc-helm.fullname" . }}-tiles
+            name: {{ template "lulc-helm.fullname" . }}-nginx
             port:
               number: 80
 {{- end }}

@@ -139,6 +139,14 @@ ingress-azure:
   rbac:
       enabled: true # true/false
 
+nginx:
+  enabled: false
+  image:
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
+  env:
+    FRONTEND_DOMAIN: ''
+  
 kubejanitor:
   image:
     repository: hjacobs/kube-janitor
@@ -184,3 +192,4 @@ kubejanitor:
     #   # see http://jmespath.org/specification.html#starts-with
     #   jmespath: "starts_with(metadata.name, 'pr-')"
     #   ttl: 4h
+

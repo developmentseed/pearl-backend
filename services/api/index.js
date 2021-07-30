@@ -18,8 +18,8 @@ const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 
 const argv = require('minimist')(process.argv, {
-    boolean: ['prod'],
-    string: ['port']
+    boolean: ['prod', 'silent'],
+    string: ['port'],
 });
 
 const Config = require('./lib/config');
@@ -900,7 +900,7 @@ async function server(config, cb) {
     );
 
     const getAoiTileJSON = async (theAoi, req) => {
-        const tiffurl = theAoi.hasOwnProperty('uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id)
+        const tiffurl = theAoi.hasOwnProperty('uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id);
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -918,7 +918,7 @@ async function server(config, cb) {
             // this is a share
             tiles = [
                 `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}`
-            ]
+            ];
         } else {
             const chkpt = await checkpoint.get(theAoi.checkpoint_id);
             const cmap = {};
@@ -936,7 +936,7 @@ async function server(config, cb) {
 
             tiles = [
                 `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
-            ]
+            ];
         }
 
         const aoiTileName = theAoi.hasOwnProperty('aoi_id') ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
@@ -1107,7 +1107,9 @@ async function server(config, cb) {
                 await Param.int(req, 'aoiid');
                 await auth.is_admin(req);
 
-                const busboy = new Busboy({ headers: req.headers });
+                const busboy = new Busboy({
+                    headers: req.headers
+                });
 
                 const files = [];
 
@@ -1117,9 +1119,39 @@ async function server(config, cb) {
 
                 busboy.on('finish', async () => {
                     try {
-                        return res.json(await aoi.get(req.params.aoiid));
+
+                        const tiffurl = await aoi.url(req.params.aoiid);
+
+                        const a = await aoi.get(req.params.aoiid);
+                        const chkpt = await checkpoint.get(a.checkpoint_id);
+
+                        const histo = [];
+                        for (let i = 0; i <= chkpt.classes.length; i++) {
+                            histo[i] = i + 1;
+                        }
+
+                        const pres = await proxy.request({
+                            url: `/cog/statistics`,
+                            query: {
+                                url: String(tiffurl),
+                                categorical: 'true'
+                            },
+                            body: {},
+                            method: 'GET'
+                        }, false);
+
+                        const px_stats = {};
+
+                        const totalpx = pres.body[0].valid_pixels;
+                        for (let i = 0; i < chkpt.classes.length; i++) {
+                            px_stats[i] = (pres.body[0].categories[i] || 0) / totalpx;
+                        }
+
+                        return res.json(await aoi.patch(a.id, {
+                            px_stats
+                        }));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -1249,7 +1281,7 @@ async function server(config, cb) {
 
                 for (const a of aois.aois) {
                     const shares = await aoishare.list(req.params.projectid, {
-                        aoi_id: a.id
+                        aoi: a.id
                     });
 
                     a.shares = shares.shares;
@@ -1817,7 +1849,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await aoipatch.get(req.params.patchid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -1977,7 +2009,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await checkpoint.get(req.params.checkpointid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 
@@ -2112,8 +2144,8 @@ async function server(config, cb) {
                         return e;
                     });
                     req.body.input_geoms = req.body.input_geoms.map((e) => {
-                        if (!e || e.type !== 'GeometryCollection') {
-                            return { type: 'GeometryCollection', 'geometries': [] };
+                        if (!e || e.type !== 'FeatureCollection') {
+                            return { type: 'FeatureCollection', 'features': [] };
                         }
                         return e;
                     });
@@ -2330,7 +2362,7 @@ async function server(config, cb) {
                     try {
                         return res.json(await model.get(req.params.modelid));
                     } catch (err) {
-                        Err.respond(res, err);
+                        Err.respond(err, res);
                     }
                 });
 

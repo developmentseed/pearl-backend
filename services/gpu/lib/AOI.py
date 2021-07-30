@@ -1,30 +1,19 @@
 import logging
-import shapely
-import geojson
-import json
-import numpy as np
-import shapely.ops as ops
-import rasterio
-import supermercado
-from shapely.geometry import shape
-from pyproj import Geod
-from affine import Affine
-from rasterio.windows import Window
-from shapely.geometry import box, mapping
-from rasterio.io import MemoryFile
-from rasterio.warp import transform_geom
-from rasterio.crs import CRS
-from shapely.geometry.polygon import Polygon
-from shapely.geometry import box
-from functools import partial
-from shapely.ops import transform
-from shapely.geometry import shape
+
 import mercantile
+import numpy as np
+import supermercado
+from affine import Affine
+from pyproj import Geod
+from rasterio.io import MemoryFile
+from rasterio.windows import Window
+from shapely.geometry import box, shape
+from shapely.ops import transform
 
 LOGGER = logging.getLogger("server")
 
 
-class AOI():
+class AOI:
     def __init__(self, api, poly, name, checkpointid, is_patch=False):
         self.api = api
         self.poly = shape(poly)
@@ -32,41 +21,46 @@ class AOI():
         self.name = name
         self.checkpointid = checkpointid
         self.is_patch = is_patch
-        self.zoom = self.api.model['model_zoom']
+        self.zoom = self.api.model["model_zoom"]
         self.tiles = []
         self.total = 0
         self.live = False
 
     def create(api, poly, name, checkpointid, is_patch=False):
-        aoi = AOI(api, poly, name, checkpointid, is_patch);
+        aoi = AOI(api, poly, name, checkpointid, is_patch)
         aoi.tiles = AOI.gen_tiles(aoi.bounds, aoi.zoom)
         aoi.total = len(aoi.tiles)
 
         LOGGER.info("ok - " + str(aoi.total) + " tiles queued")
 
         aoi.bounds = AOI.gen_bounds(aoi.tiles)
-        LOGGER.info("ok - [" + ','.join(str(x) for x in aoi.bounds) + "] aoi bounds")
+        LOGGER.info("ok - [" + ",".join(str(x) for x in aoi.bounds) + "] aoi bounds")
 
         # TODO Check Max size too
-        aoi.live = AOI.area(aoi.bounds) < aoi.api.server['limits']['live_inference']
+        aoi.live = AOI.area(aoi.bounds) < aoi.api.server["limits"]["live_inference"]
 
         if aoi.is_patch is not False:
             aoi.id = aoi.api.create_patch(is_patch)["id"]
         else:
             aoi.id = aoi.api.create_aoi(aoi)["id"]
-            aoi.api.instance_patch(aoi_id = aoi.id)
+            aoi.api.instance_patch(aoi_id=aoi.id)
 
         aoi.extrema, aoi.raw_fabric, aoi.fabric = AOI.gen_fabric(aoi.bounds, aoi.zoom)
 
         return aoi
 
     def load(api, aoiid):
-        aoijson = api.aoi_meta(aoiid);
+        aoijson = api.aoi_meta(aoiid)
 
-        aoi = AOI(api, shape(aoijson.get('bounds')), aoijson.get('name'), aoijson.get('checkpoint_id'));
-        aoi.id = aoijson.get('id')
+        aoi = AOI(
+            api,
+            shape(aoijson.get("bounds")),
+            aoijson.get("name"),
+            aoijson.get("checkpoint_id"),
+        )
+        aoi.id = aoijson.get("id")
 
-        aoi.api.instance_patch(aoi_id = aoi.id)
+        aoi.api.instance_patch(aoi_id=aoi.id)
 
         return aoi
 
@@ -96,14 +90,14 @@ class AOI():
 
         memfile = MemoryFile()
         writer = memfile.open(
-            driver='GTiff',
+            driver="GTiff",
             count=1,
-            dtype='uint8',
-            crs='EPSG:3857',
+            dtype="uint8",
+            crs="EPSG:3857",
             transform=transform,
             height=height,
             width=width,
-            nodata=255
+            nodata=255,
         )
         return (extrema, memfile, writer)
 
@@ -116,7 +110,6 @@ class AOI():
         geom = box(*bounds)
         geod = Geod(ellps="WGS84")
         return abs(geod.geometry_area_perimeter(geom)[0])
-
 
     @staticmethod
     def gen_bounds(tiles):
@@ -135,6 +128,7 @@ class AOI():
                 bounds[3] = tilebounds.north
 
         return list(bounds)
+
 
 def make_transform(tilerange, zoom):
     ulx, uly = mercantile.xy(

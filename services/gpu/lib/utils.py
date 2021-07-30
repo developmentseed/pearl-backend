@@ -1,31 +1,25 @@
-from collections.abc import Iterable
 import base64
-import sys
 import io
+import logging
 import math
+import os
+import random
+import sys
+import threading
+from collections.abc import Iterable
+from logging.handlers import TimedRotatingFileHandler
+
 import mercantile
 import numpy as np
-import random
-from rasterio.transform import from_bounds
-from PIL import Image
-from shapely.geometry import shape, mapping, Point
-
-import os
-import threading
-
 import rasterio
-import rasterio.warp
 import rasterio.crs
 import rasterio.io
 import rasterio.mask
-import rasterio.transform
-from rasterio.transform import from_bounds
 import rasterio.merge
-
-import numpy as np
-
-import logging
-from logging.handlers import TimedRotatingFileHandler
+import rasterio.transform
+from PIL import Image
+from rasterio.transform import from_bounds
+from shapely.geometry import Point, mapping, shape
 
 R2D = 180 / math.pi
 RE = 6378137.0
@@ -36,28 +30,26 @@ LL_EPSILON = 1e-11
 
 class PX:
     def __init__(self, coords, xy, xyz, px, value):
-        self.xyz = xyz # Tile Coordinates
-        self.xy = xy # Mercator Coordinates
-        self.coords = coords #WGS84 Coordinates
-        self.px = px # Per Tile Pixel Coordinates
-        self.value = value # Pixel Value from retrain numpy array (Model#Run)
+        self.xyz = xyz  # Tile Coordinates
+        self.xy = xy  # Mercator Coordinates
+        self.coords = coords  # WGS84 Coordinates
+        self.px = px  # Per Tile Pixel Coordinates
+        self.value = value  # Pixel Value from retrain numpy array (Model#Run)
 
     def __str__(self):
-        return 'PX({}: vals: {})'.format(self.coords, len(self.value))
+        return "PX({}: vals: {})".format(self.coords, len(self.value))
 
     def __repr__(self):
         return str(self)
 
+
 def pxs2geojson(classes):
     geoms = []
     for cls in classes:
-        geo = {
-            'type': 'MultiPoint',
-            'coordinates': []
-        }
+        geo = {"type": "MultiPoint", "coordinates": []}
 
         for px in cls:
-            geo['coordinates'].append(px.coords)
+            geo["coordinates"].append(px.coords)
 
         geoms.append(geo)
 
@@ -65,14 +57,14 @@ def pxs2geojson(classes):
 
 
 def geom2px(geom, modelsrv):
-    zoom = modelsrv.api.model['model_zoom']
+    zoom = modelsrv.api.model["model_zoom"]
 
     coords = []
 
-    if geom['type'] == 'Point':
-        coords.append(geom['coordinates'])
-    elif geom['type'] == 'MultiPoint':
-        for coord in geom['coordinates']:
+    if geom["type"] == "Point":
+        coords.append(geom["coordinates"])
+    elif geom["type"] == "MultiPoint":
+        for coord in geom["coordinates"]:
             coords.append(coord)
     else:
         return False
@@ -86,7 +78,7 @@ def geom2px(geom, modelsrv):
 
         pixels = rowcol(transform, *xy)
 
-        in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat='npy')
+        in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat="npy")
 
         _, retrain = modelsrv.model.run(in_memraster.data)
         retrain = retrain[32:288, 32:288, :]
@@ -102,16 +94,16 @@ def pred2png(output, color_list):
     rgb_list = []
     for color in color_list:
         rgb_list.append(hex2rgb(color))
-    #add alpah channel with no transperency
+    # add alpah channel with no transperency
     rgba_lst = [x + (255,) for x in rgb_list]
-    rgb = Image.new('RGBA', (output.shape[0], output.shape[1]))
+    rgb = Image.new("RGBA", (output.shape[0], output.shape[1]))
 
     newdata = []
     for x in range(output.shape[0]):
         for y in range(output.shape[1]):
-            #full transperancy for maksed out areas
+            # full transperancy for maksed out areas
             if output[x][y] == 255:
-                newdata.append((255,255,255,0))
+                newdata.append((255, 255, 255, 0))
             else:
                 newdata.append(rgba_lst[output[x][y]])
     rgb.putdata(newdata)
@@ -120,9 +112,11 @@ def pred2png(output, color_list):
         rgb.save(output, format="PNG")
         return base64.b64encode(output.getvalue()).decode("utf-8")
 
+
 def hex2rgb(hexstr):
-    hexstr = hexstr.lstrip('#')
-    return tuple(int(hexstr[i:i+2], 16) for i in (0, 2, 4))
+    hexstr = hexstr.lstrip("#")
+    return tuple(int(hexstr[i : i + 2], 16) for i in (0, 2, 4))
+
 
 def ll2xy(lng, lat, truncate=False):
     """Convert longitude and latitude to web mercator x, y
@@ -151,6 +145,7 @@ def ll2xy(lng, lat, truncate=False):
         y = RE * math.log(math.tan((math.pi * 0.25) + (0.5 * math.radians(lat))))
 
     return x, y
+
 
 def rowcol(transform, xs, ys, op=math.floor, precision=None):
     """
@@ -213,31 +208,34 @@ def rowcol(transform, xs, ys, op=math.floor, precision=None):
 
     return rows, cols
 
+
 def generate_random_points(count, feature, modelsrv):
     polygon = shape(feature)
-    points = {
-        "type": "MultiPoint",
-        "coordinates": []
-    }
+    points = {"type": "MultiPoint", "coordinates": []}
     minx, miny, maxx, maxy = polygon.bounds
-    while len(points['coordinates']) < count:
+    while len(points["coordinates"]) < count:
         point = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
         if polygon.contains(point):
-            points['coordinates'].append(mapping(point)['coordinates'])
+            points["coordinates"].append(mapping(point)["coordinates"])
     return geom2px(points, modelsrv)
+
 
 def setup_logging(log_path, log_name, level=logging.DEBUG):
 
     if not os.path.exists(log_path):
         os.makedirs(log_path)
 
-    print_formatter = logging.Formatter('[%(asctime)s] - %(message)s')
-    file_formatter = logging.Formatter('%(asctime)s - %(name)-8s - %(levelname)-6s - %(message)s')
+    print_formatter = logging.Formatter("[%(asctime)s] - %(message)s")
+    file_formatter = logging.Formatter(
+        "%(asctime)s - %(name)-8s - %(levelname)-6s - %(message)s"
+    )
 
     logger = logging.getLogger("server")
     logger.setLevel(level)
 
-    file_handler = TimedRotatingFileHandler(log_path + "/%s.txt" % (log_name), when='midnight', interval=1)
+    file_handler = TimedRotatingFileHandler(
+        log_path + "/%s.txt" % (log_name), when="midnight", interval=1
+    )
     file_handler.suffix = "%Y%m%d"
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
@@ -254,12 +252,15 @@ def serialize(array):
         np.save(f, array)
         return f.getvalue()
 
+
 def deserialize(data):
     with io.BytesIO(data) as f:
         return np.load(f)
 
+
 class AtomicCounter:
-    ''' From https://gist.github.com/benhoyt/8c8a8d62debe8e5aa5340373f9c509c7 '''
+    """From https://gist.github.com/benhoyt/8c8a8d62debe8e5aa5340373f9c509c7"""
+
     def __init__(self, initial=0):
         """Initialize a new atomic counter to given initial value (default 0)."""
         self.value = initial
@@ -273,6 +274,9 @@ class AtomicCounter:
             self.value += num
             return self.value
 
+
 def get_random_string(length):
     alphabet = "abcdefghijklmnopqrstuvwxyz"
-    return "".join([alphabet[np.random.randint(0, len(alphabet))] for i in range(length)])
+    return "".join(
+        [alphabet[np.random.randint(0, len(alphabet))] for i in range(length)]
+    )

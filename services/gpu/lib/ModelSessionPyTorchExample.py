@@ -1,38 +1,34 @@
-import sys
-
-sys.path.append("..")
-
-import os
-import time
-import copy
-import json
-import types
-import joblib
+"""Infernece and Retraining with Pytorch FCN starter models"""
 
 import logging
+import os
+import sys
 
-LOGGER = logging.getLogger("server")
-
+import joblib
 import numpy as np
-
 import sklearn.base
-from sklearn.linear_model import SGDClassifier
-
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score
-
-from .ModelSessionAbstract import ModelSession
-from .InferenceDataSet import InferenceDataSet
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import f1_score
+from sklearn.model_selection import train_test_split
+
+from .ModelSessionAbstract import ModelSession
+
+sys.path.append("..")
+LOGGER = logging.getLogger("server")
 
 
 class FCN(nn.Module):
+    """
+    Initalize Fully Connected Neural Net that was used during initial model training.
+    """
+
     def __init__(self, num_input_channels, num_output_classes, num_filters=64):
+        """
+        Make FCN model.
+        """
         super(FCN, self).__init__()
 
         self.conv1 = nn.Conv2d(
@@ -55,6 +51,9 @@ class FCN(nn.Module):
         )
 
     def forward(self, inputs):
+        """
+        Returns last layer of network.
+        """
         x = F.relu(self.conv1(inputs))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
@@ -63,8 +62,23 @@ class FCN(nn.Module):
         x = self.last(x)
         return x
 
+    def forward_features(self, inputs):
+        """
+        Returns last layer of network and embedding features.
+        """
+        x = F.relu(self.conv1(inputs))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        z = F.relu(self.conv5(x))
+        y = self.last(z)
+        return y, z
+
 
 class TorchFineTuning(ModelSession):
+    """
+    Initalizes Retraining Layer.
+    """
 
     AUGMENT_MODEL = SGDClassifier(
         loss="log",
@@ -77,6 +91,9 @@ class TorchFineTuning(ModelSession):
     )
 
     def __init__(self, gpu_id, model_dir, classes):
+        """
+        Make Retraining Model
+        """
         self.model_dir = model_dir
         self.classes = classes
 
@@ -92,8 +109,6 @@ class TorchFineTuning(ModelSession):
         # will need to figure out for re-training
         self.output_channels = len(self.classes)
         self.output_features = 64
-
-        ### TODO
         self.model = FCN(
             num_input_channels=4, num_output_classes=len(self.classes), num_filters=64
         )
@@ -102,16 +117,7 @@ class TorchFineTuning(ModelSession):
         for param in self.model.parameters():
             param.requires_grad = False
 
-        # will need to figure out for re-training
-        self.initial_weights = (
-            self.model.last.weight.cpu().detach().numpy().squeeze()
-        )  # (10, 64)
-        self.initial_biases = self.model.last.bias.cpu().detach().numpy()  # (10,)
-
         self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
-
-        self.augment_model.coef_ = self.initial_weights.astype(np.float64)
-        self.augment_model.intercept_ = self.initial_biases.astype(np.float64)
 
         self._last_tile = None
 
@@ -124,23 +130,34 @@ class TorchFineTuning(ModelSession):
 
     @property
     def last_tile(self):
+        """
+        Acccesses last tile
+        """
         return self._last_tile
 
     def _init_model(self):
+        """
+        Initalizes starter model
+        """
         checkpoint = torch.load(self.model_dir + "/model.pt", map_location=self.device)
         self.model.load_state_dict(checkpoint)
         self.model.eval()
         self.model = self.model.to(self.device)
 
     def run(self, data, inference_mode=False):
+        """
+        Runs starter model initial inference
+        """
         if inference_mode:
             return self.run_model_on_tile(data)
         else:
             return self.run_model_on_tile_embedding(data)  # fix this
 
     def retrain(self, classes, **kwargs):
+        """
+        Runs model retraining.
+        """
         names = [x["name"] for x in classes]
-
         retrain_classes = [{"name": x["name"], "color": x["color"]} for x in classes]
 
         pixels = [x["retrain_geometry"] for x in classes]
@@ -157,8 +174,6 @@ class TorchFineTuning(ModelSession):
                 self.classes[i]["counts"] = (
                     counts[names.index(c["name"])] + self.classes[i]["counts"]
                 )
-
-        total_retrain_counts = sum(x["counts"] for x in self.classes)
         for i, c in enumerate(self.classes):
             self.classes[i]["percent"] = counts[names.index(c["name"])] / sum(counts)
 
@@ -169,7 +184,7 @@ class TorchFineTuning(ModelSession):
         self.classes = self.classes + [
             x for x in retrain_classes if not x["name"] in current_class_names
         ]  # don't check against entire dict
-        self.augment_x_train = [
+        self.augment_x_train = self.augment_x_train + [
             item.value for sublist in pixels for item in sublist
         ]  # get pixel values
 
@@ -187,19 +202,36 @@ class TorchFineTuning(ModelSession):
                 )  # to-do? this new classs name + value need to stay in the dictionary for future re-training iterations
             ints_retrain.append(self.class_names_mapping.get(name))
 
-        self.augment_y_train = ints_retrain
-        x_train = np.array(self.augment_x_train)
-        y_train = np.array(self.augment_y_train)
+        self.augment_y_train = self.augment_y_train + ints_retrain
+        x_user = np.array(self.augment_x_train)
+        y_user = np.array(self.augment_y_train)
+
+        # split user submitted re-training data into test 20% and train 80%
+        x_train_user, x_test_user, y_train_user, y_test_user = train_test_split(
+            x_user, y_user, test_size=0.1, random_state=0, stratify=y_user
+        )
+        print("y user")
+        print(np.unique(y_user, return_counts=True))
+
+        print("y user test")
+        print(np.unique(y_test_user, return_counts=True))
+
+        print("y user train")
+        print(np.unique(y_train_user, return_counts=True))
 
         # Place holder to load in seed npz
         seed_data = np.load(self.model_dir + "/model.npz", allow_pickle=True)
         seed_x = seed_data["embeddings"]
         seed_y = seed_data["labels"]
 
-        x_train = np.vstack((x_train, seed_x))
-        y_train = np.hstack((y_train, seed_y))
+        x_train = np.vstack((x_train_user, seed_x))
+        y_train = np.hstack((y_train_user, seed_y))
+        print(np.unique(y_train))
 
         self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+
+        print("augment model classes")
+        print(self.augment_model.classes_)
 
         if x_train.shape[0] == 0:
             return {
@@ -207,65 +239,43 @@ class TorchFineTuning(ModelSession):
                 "success": False,
             }
 
-        # split re-training data into test 10% and train 90%
-        x_train, x_test, y_train, y_test = train_test_split(
-            x_train, y_train, test_size=0.1, random_state=0, stratify=y_train
-        )
-
-        self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
-
-        # Check to see if new classes are added and randomly initaalize weights/biases for new classes.
-        if len(np.unique(y_train)) > len(self.augment_model.intercept_):
-            for i in range(
-                len(np.unique(y_train)) - len(self.augment_model.intercept_)
-            ):
-                b = self.augment_model.intercept_
-                w = self.augment_model.coef_
-
-                random_new_bias = np.round(
-                    b.max() - b.min() * np.random.random_sample() + b.min(), 8
-                )
-
-                random_new_weights = np.round(
-                    w.max() - w.min() * np.random.random_sample(((64, 1, 1))) + w.min(),
-                    8,
-                )
-                random_new_weights = np.expand_dims(
-                    random_new_weights, axis=0
-                ).squeeze()
-
-                self.augment_model.intercept_ = np.append(b, random_new_bias)
-                self.augment_model.coef_ = np.vstack((w, random_new_weights))
+        # self.augment_model.classes_ = np.array(np.unique(y_train))
 
         self.augment_model.fit(
             x_train, y_train
         )  # figure out if this is running on GPU or CPU
 
-        lr_preds = self.augment_model.predict(x_test)
+        print("coef shape")
+        print(self.augment_model.coef_.shape)
 
-        per_class_f1 = f1_score(y_test, lr_preds, average=None)
+        lr_preds = self.augment_model.predict(x_test_user)
+
+        per_class_f1 = f1_score(y_test_user, lr_preds, average=None)
 
         # add per class f1 to classes attribute
-        f1_labels = np.unique(np.concatenate((y_test, lr_preds)))
+        f1_labels = np.unique(np.concatenate((y_test_user, lr_preds)))
         per_class_f1_final = np.zeros(len(list(self.class_names_mapping.keys())))
 
         missing_labels = np.setdiff1d(
             list(np.arange(len(list(self.class_names_mapping.keys())))), f1_labels
         )
 
-        # where the unique cls id exist, fill in f1 per calss
+        # where the unique cls id exist, fill in f1 per class
         per_class_f1_final[f1_labels] = per_class_f1
         # where is the missing id, fill in np.nan, but actually 0 for db to not break
         per_class_f1_final[missing_labels] = 0
+
+        print("per class f1 final")
+        print(per_class_f1_final)
 
         # add  retrainingper class f1-scores counts to classes attribute
         for i, f1 in enumerate(per_class_f1_final):
             self.classes[i].update({"retraining_f1score": f1})
 
-        global_f1 = f1_score(y_test, lr_preds, average="weighted")
+        global_f1 = f1_score(y_test_user, lr_preds, average="weighted")
         print("Global f1-score: %0.4f" % (global_f1))
 
-        score = self.augment_model.score(x_test, y_test)
+        score = self.augment_model.score(x_test_user, y_test_user)
         print("Fine-tuning accuracy: %0.4f" % (score))
 
         new_weights = torch.from_numpy(
@@ -290,6 +300,9 @@ class TorchFineTuning(ModelSession):
         return {"message": "Accuracy Score on data: %0.2f" % (score), "success": True}
 
     def undo(self):
+        """
+        Removes label point
+        """
         if len(self.augment_y_train) > 0:
             self.augment_x_train.pop()
             self.augment_y_train.pop()
@@ -298,6 +311,9 @@ class TorchFineTuning(ModelSession):
             return {"message": "Nothing to undo", "success": False}
 
     def add_sample_point(self, row, col, class_idx):
+        """
+        Adds sample point for retraining
+        """
         if self._last_tile is not None:
             self.augment_x_train.append(self._last_tile[row, col, :].copy())
             self.augment_y_train.append(class_idx)
@@ -312,6 +328,9 @@ class TorchFineTuning(ModelSession):
             }
 
     def run_model_on_tile_embedding(self, tile):
+        """
+        Gets embeddings for retraining
+        """
         tile = np.moveaxis(tile, -1, 0)  # go from channels last to channels first
         tile = tile / 255.0
         tile = tile.astype(np.float32)
@@ -320,24 +339,21 @@ class TorchFineTuning(ModelSession):
         data = tile_img.to(self.device)
 
         with torch.no_grad():
-            predictions = self.model(
-                data[None, ...]
-            )  # insert singleton "batch" dimension to input data for pytorch to be happy
+            predictions, features = self.model.forward_features(data[None, ...])
+            # insert singleton "batch" dimension to input data for pytorch to be happy
             predictions = (
                 F.softmax(predictions, dim=1).cpu().numpy()
             )  # this is giving us the highest probability class per pixel
 
         # get embeddings
-        newmodel = torch.nn.Sequential(*(list(self.model.children())[:-1]))
-        newmodel.eval()
-        with torch.no_grad():
-            features = newmodel(data[None, ...])
-            features = features.cpu().numpy()
-            features = np.moveaxis(features[0], 0, -1)
+        features = np.rollaxis(features.squeeze().cpu().numpy(), 0, 3)
         predictions = predictions[0].argmax(axis=0).astype(np.uint8)
         return predictions, features
 
     def run_model_on_tile(self, tile):
+        """
+        Gets model predicted classes per tile
+        """
         output_preds = []
         data = tile.to(self.device)
         with torch.no_grad():
@@ -352,6 +368,9 @@ class TorchFineTuning(ModelSession):
         return np.array(output_preds)
 
     def save_state_to(self, directory):
+        """
+        Saves model weights checkpoint
+        """
         torch.save(
             self.model.state_dict(), os.path.join(directory, "retraining_checkpoint.pt")
         )
@@ -370,6 +389,9 @@ class TorchFineTuning(ModelSession):
         return {"message": "Saved model state", "success": True}
 
     def load_state_from(self, chkpt, chkpt_fs):
+        """
+        Loads in checkpoint and retraining embedding, label pairs"
+        """
         self.augment_x_train = []
         self.augment_y_train = []
 
