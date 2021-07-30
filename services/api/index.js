@@ -1142,9 +1142,13 @@ async function server(config, cb) {
 
                         const px_stats = {};
 
-                        const totalpx = pres.body[0].valid_pixels;
-                        for (let i = 0; i < chkpt.classes.length; i++) {
-                            px_stats[i] = (pres.body[0].categories[i] || 0) / totalpx;
+                        if (pres && pres.body && pres.body.length && pres.body[0].valid_pixels) {
+                            const totalpx = pres.body[0].valid_pixels;
+                            for (let i = 0; i < chkpt.classes.length; i++) {
+                                px_stats[i] = (pres.body[0].categories[i] || 0) / totalpx;
+                            }
+                        } else {
+                            console.log('PX_Stats Error:', JSON.stringify(pres.body));
                         }
 
                         return res.json(await aoi.patch(a.id, {
