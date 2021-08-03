@@ -1119,6 +1119,7 @@ async function server(config, cb) {
 
                 busboy.on('finish', async () => {
                     try {
+                        await Promise.all(files);
 
                         const tiffurl = await aoi.url(req.params.aoiid);
 
@@ -1130,10 +1131,13 @@ async function server(config, cb) {
                             histo[i] = i + 1;
                         }
 
+                        if (!(await aoi.exists(req.params.aoiid))) throw new Err(500, null, 'AOI is not on Azure?!');
+
                         const pres = await proxy.request({
                             url: `/cog/statistics`,
                             query: {
-                                url: String(tiffurl),
+                                url: tiffurl.origin + tiffurl.pathname,
+                                url_params: Buffer.from(tiffurl.search).toString('base64'),
                                 categorical: 'true'
                             },
                             body: {},
