@@ -120,6 +120,21 @@ class AOI {
     /**
      * Download an AOI geotiff fabric
      *
+     * @param {Number} aoiid AOI ID to check for existance
+     */
+    async exists(aoiid) {
+        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
+
+        const aoi = await this.get(aoiid);
+        if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
+        return await blob_client.exists();
+    }
+
+    /**
+     * Download an AOI geotiff fabric
+     *
      * @param {Number} aoiid AOI ID to download
      * @param {Stream} res Stream to pipe geotiff to (usually express response object)
      */
