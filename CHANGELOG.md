@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+# v0.4.1
+
+## Fixes
+- set aoi maxzoom to 20 [`#439`](https://github.com/developmentseed/lulc-infra/pull/439)
+- Add url_params & check aoi existance [`#437`](https://github.com/developmentseed/lulc-infra/pull/437)
+- sometimes stats aren't what's expected [`#431`](https://github.com/developmentseed/lulc-infra/pull/431)
+
 ## v0.4.0
 
 ## Fixes
