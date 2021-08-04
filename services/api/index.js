@@ -905,6 +905,7 @@ async function server(config, cb) {
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
         req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+        req.query.maxzoom = 20;
 
 
         let tj, tiles;
