@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    docker-compose up --build -d
+    docker build --platform=linux/amd64 -t test .
+    docker network ls
+    docker run --network lulc-infra_default test
+fi
