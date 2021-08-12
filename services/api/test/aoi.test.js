@@ -519,4 +519,22 @@ test('DELETE /api/project/1/aoi/1', (t) => {
     });
 });
 
+// after delete there should only be 1 aoi
+test('GET /api/project/1/aoi?sort=asc', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi?sort=asc',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.equals(res.body.total, 1);
+        t.end();
+    });
+});
+
 flight.landing(test);

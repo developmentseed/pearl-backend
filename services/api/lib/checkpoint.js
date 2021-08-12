@@ -122,6 +122,7 @@ class CheckPoint {
                     checkpoints
                 WHERE
                     ${where.join(' AND ')}
+                AND archived = false
                 ORDER BY created ${query.sort}
                 LIMIT
                     $1
@@ -160,24 +161,18 @@ class CheckPoint {
         let pgres;
         try {
             pgres = await this.pool.query(`
-                DELETE
-                    FROM
-                        checkpoints
+                UPDATE checkpoints
+                    SET
+                        archived = true
                     WHERE
                         id = $1
                     RETURNING *
             `, [checkpointid]);
         } catch (err) {
-            if (err.code === '23503') throw new Err(400, new Error(err), 'Cannot delete checkpoint with dependants');
-            throw new Err(500, new Error(err), 'Failed to delete Checkpoint');
+            throw new Err(500, new Error(err), 'Failed to archive Checkpoint');
         }
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
-
-        if (pgres.rows[0].storage && this.config.AzureStorage) {
-            const blob_client = this.container_client.getBlockBlobClient(`checkpoint-${checkpointid}`);
-            await blob_client.delete();
-        }
 
         return true;
     }
@@ -299,6 +294,7 @@ class CheckPoint {
                     checkpoints
                 WHERE
                     checkpoints.id = $1
+                AND checkpoints.archived = false
                 GROUP BY
                     g.id,
                     checkpoints.id,

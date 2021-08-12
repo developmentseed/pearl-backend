@@ -159,9 +159,9 @@ class AOI {
         let pgres;
         try {
             pgres = await this.pool.query(`
-                DELETE
-                    FROM
-                        aois
+                UPDATE aois
+                    SET
+                        archived = true
                     WHERE
                         id = $1
                     RETURNING *
@@ -173,11 +173,6 @@ class AOI {
         }
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
-
-        if (pgres.rows[0].storage && this.config.AzureStorage) {
-            const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
-            await blob_client.delete();
-        }
 
         return true;
     }
@@ -251,6 +246,8 @@ class AOI {
                     a.id = $1
                 AND
                     a.checkpoint_id = c.id
+                AND
+                    a.archived = false
             `, [
                 aoiid
             ]);
@@ -315,6 +312,7 @@ class AOI {
                     checkpoints c
                 WHERE
                     a.checkpoint_id = c.id
+                    AND a.archived = false
                     AND ${where.join(' AND ')}
                 ORDER BY
                     a.created ${query.sort}
