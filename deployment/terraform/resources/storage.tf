@@ -31,4 +31,8 @@ resource "azurerm_storage_account" "lulcfrontend" {
   location                 = azurerm_resource_group.lulc.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  static_website {
+    index_document = "index.html"
+    error_404_document = "404.html"
+  }
 }
