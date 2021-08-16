@@ -402,7 +402,7 @@ async function server(config, cb) {
      *       "flags": {}
      *   }
      */
-    await schema.get('/user/me', requiresAuth, async (req, res) => {
+    await schema.get('/user/me', {}, requiresAuth, async (req, res) => {
         return res.json({
             username: req.auth.username,
             email: req.auth.email,
