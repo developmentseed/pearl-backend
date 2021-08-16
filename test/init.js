@@ -295,7 +295,17 @@ function connect(test, API) {
             t.equals(res.statusCode, 200, '200 status code');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'active', 'aoi_id', 'checkpoint_id', 'created', 'id', 'last_update', 'pod', 'project_id', 'token', 'type',
+                'active',
+                'aoi_id',
+                'checkpoint_id',
+                'created',
+                'id',
+                'is_draft',
+                'last_update',
+                'pod',
+                'project_id',
+                'token',
+                'type',
             ].sort(), 'expected props');
 
             t.ok(parseInt(res.body.id), 'id: <integer>');
@@ -309,6 +319,7 @@ function connect(test, API) {
 
             t.deepEquals(res.body, {
                 project_id: 1,
+                is_draft: false,
                 aoi_id: null,
                 checkpoint_id: null,
                 active: false,
