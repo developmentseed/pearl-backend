@@ -80,6 +80,7 @@ class Project {
                     projects
                 WHERE
                     ${where.join(' AND ')}
+                AND archived = false
                 ORDER BY created ${query.sort}
                 LIMIT
                     $1
@@ -166,6 +167,7 @@ class Project {
                     p.id = $1
                 AND
                     p.model_id = m.id
+                AND archived = false
             `, [
                 projectid
             ]);
@@ -217,14 +219,16 @@ class Project {
     async delete(projectid) {
         try {
             await this.pool.query(`
-                DELETE FROM projects
+                UPDATE projects
+                    SET
+                        archived = true
                     WHERE
                         id = $1
             `, [
                 projectid
             ]);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to delete Project');
+            throw new Err(500, new Error(err), 'Failed to archive Project');
         }
 
         return {};

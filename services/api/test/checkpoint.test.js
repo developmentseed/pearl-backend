@@ -581,13 +581,7 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 400, 'status: 400');
-
-        t.deepEquals(res.body, {
-            status: 400,
-            message: 'Cannot delete checkpoint with dependants',
-            messages: []
-        });
+        t.equals(res.statusCode, 200, 'status: 200');
 
         t.end();
     });
@@ -619,8 +613,7 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.deepEquals(res.body, true);
+        t.equals(res.statusCode, 404, 'status: 404');
         t.end();
     });
 });
