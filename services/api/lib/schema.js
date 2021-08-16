@@ -4,19 +4,66 @@ const { Validator } = require('express-json-validator-middleware');
 const $RefParser = require('json-schema-ref-parser');
 const path = require('path');
 
+/**
+ * @class
+ */
 class Schemas {
-    constructor() {
+    /**
+     * @constructor
+     *
+     * @param {Object} router Express Router Object
+     */
+    constructor(router) {
+        if (!router) throw new Error('Router Param Required');
+
         this.validator = new Validator({
             allErrors: true
         });
 
+        this.router = router;
         this.schemas = new Map();
         this.validate = this.validator.validate;
     }
 
-    async get(url, schemas = {}) {
+    check (url, schemas, fns) {
+        if (typeof url !== 'string') throw new Error('URL should be string');
+
+        if (schemas === null) schemas = {};
+        if (typeof schemas !== 'object') throw new Error('Schemas should be object');
+
+        if (!fns.length) throw new Error('At least 1 route function should be defined');
+    }
+
+    async get(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
+        this.router.get(...await this.generic(`GET ${url}`, schemas), ...fns);
+    }
+
+    async delete(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
+        this.router.delete(...await this.generic(`DELETE ${url}`, schemas), ...fns);
+    }
+
+    async post(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
+        this.router.post(...await this.generic(`POST ${url}`, schemas), ...fns);
+    }
+
+    async patch(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
+        this.router.patch(...await this.generic(`PATCH ${url}`, schemas), ...fns);
+    }
+
+    async put(url, schemas, ...fns) {
+        this.check(url, schemas, fns);
+        this.router.put(...await this.generic(`PUT ${url}`, schemas), ...fns);
+    }
+
+    async generic(url, schemas = {}) {
+        if (!schemas) schemas = {};
+
         const parsed = url.split(' ');
-        if (parsed.length !== 2) throw new Error('schema.get() must be of format "<VERB> <URL>"');
+        if (parsed.length !== 2) throw new Error('schema.generic() must be of format "<VERB> <URL>"');
 
         for (const type of ['body', 'query', 'res']) {
             if (!schemas[type]) continue;
@@ -55,6 +102,8 @@ class Schemas {
             for (const key of Object.keys(req.query)) {
                 if (schema.properties[key] && schema.properties[key].type === 'integer') {
                     req.query[key] = parseInt(req.query[key]);
+                } else if (schema.properties[key] && schema.properties[key].type === 'number') {
+                    req.query[key] = Number(req.query[key]);
                 } else if (schema.properties[key] && schema.properties[key].type === 'boolean') {
                     if (['true', '1'].includes(req.query[key])) {
                         req.query[key] = true;
