@@ -61,6 +61,7 @@ function reconnect(test, API) {
             delete res.body.active;
 
             t.deepEquals(res.body, {
+                is_batch: false,
                 project_id: 1,
                 aoi_id: null,
                 checkpoint_id: null

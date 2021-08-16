@@ -47,6 +47,7 @@ class Instance {
     static json(row) {
         const inst = {
             id: parseInt(row.id),
+            is_batch: row.is_batch,
             project_id: parseInt(row.project_id),
             aoi_id: parseInt(row.aoi_id),
             checkpoint_id: parseInt(row.checkpoint_id),
@@ -97,6 +98,7 @@ class Instance {
                SELECT
                     count(*) OVER() AS count,
                     id,
+                    is_batch,
                     active,
                     created,
                     type
@@ -123,6 +125,7 @@ class Instance {
             instances: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    is_batch: row.is_batch,
                     active: row.active,
                     created: row.created,
                     type: row.type
@@ -152,19 +155,17 @@ class Instance {
     async activeGpuInstances() {
         try {
             const pgres = await this.pool.query(`
-                SELECT count(*) OVER() AS count
-                FROM instances
+                SELECT
+                    count(*) OVER() AS count
+                FROM
+                    instances
                 WHERE
-                    type='gpu'
+                    type = 'gpu'
                 AND
-                    active IS true
+                    active IS True
             `);
 
-            if (pgres.rows.length) {
-                return pgres.rows[0].count;
-            } else {
-                return 0;
-            }
+            return pgres.rows.length ? pgres.rows[0].count : 0;
 
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to check active GPUs');
@@ -290,6 +291,7 @@ class Instance {
             pgres = await this.pool.query(`
                 SELECT
                     id,
+                    is_batch,
                     created,
                     project_id,
                     last_update,
