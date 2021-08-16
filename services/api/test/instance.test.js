@@ -119,6 +119,7 @@ test('POST /api/project/1/instance', (t) => {
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
+            is_batch: false,
             aoi_id: null,
             checkpoint_id: null,
             active: false,
@@ -150,6 +151,7 @@ test('GET /api/project/1/instance (empty)', (t) => {
             instances: [{
                 id: 1,
                 active: false,
+                is_batch: false,
                 type: 'gpu'
             }]
         });
@@ -182,6 +184,7 @@ test('PATCH /api/project/1/instance/1', (t) => {
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
+            is_batch: false,
             aoi_id: null,
             checkpoint_id: null,
             active: true,
@@ -209,7 +212,12 @@ test('GET /api/project/1/instance?status=active', (t) => {
 
         t.deepEquals(res.body, {
             total: 1,
-            instances: [ { id: 1, active: true, type: 'gpu' } ]
+            instances: [{
+                id: 1,
+                is_batch: false,
+                active: true,
+                type: 'gpu'
+            }]
         });
 
         t.end();
@@ -235,6 +243,7 @@ test('GET /api/project/1/instance', (t) => {
             total: 1,
             instances: [{
                 id: 1,
+                is_batch: false,
                 active: true,
                 type: 'gpu'
             }]
@@ -266,6 +275,7 @@ test('GET /api/project/1/instance/1', (t) => {
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
+            is_batch: false,
             aoi_id: null,
             checkpoint_id: null,
             active: true,
@@ -323,6 +333,7 @@ test('PATCH /api/project/1/instance/1', (t) => {
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
+            is_batch: false,
             aoi_id: null,
             checkpoint_id: 1,
             active: true,
