@@ -10,6 +10,8 @@ class Config {
 
         this.silent = !!args.silent;
 
+        this.test = !!args.test;
+
         this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
         if (this.AzureStorage) console.log('ok - AzureStorage: Enabled');
 

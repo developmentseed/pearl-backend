@@ -1,19 +1,13 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
 const fs = require('fs');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', (t) => {
     request({
@@ -35,7 +29,7 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     } , (err, res, body) => {
         t.error(err, 'no error');
@@ -50,7 +44,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -82,7 +76,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Checkpoint',
@@ -137,7 +131,7 @@ test('GET /api/project/1/aoi (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -158,7 +152,7 @@ test('POST /api/project/1/aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test AOI',
@@ -211,7 +205,7 @@ test('GET /api/project/1/aoi/1', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -263,7 +257,7 @@ test('GET /api/project/1/aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -325,7 +319,7 @@ test('GET /api/project/1/aoi?bookmarked=false', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi?bookmarked=false',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -348,7 +342,7 @@ test.skip('GET /api/project/1/aoi/1/tiles', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/tiles',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -366,7 +360,7 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', (t) => {
         url: 'http://localhost:2000' + url.replace('{z}', 9).replace('{x}', '143').replace('{y}', '195'),
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -389,7 +383,7 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             name: 'RENAMED'
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -420,7 +414,7 @@ test('GET /api/project/1/aoi?bookmarked=true', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi?bookmarked=true',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -438,7 +432,7 @@ test('POST /api/project/1/aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test AOI 2',
@@ -491,7 +485,7 @@ test('GET /api/project/1/aoi?sort=asc', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi?sort=asc',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -508,7 +502,7 @@ test('DELETE /api/project/1/aoi/1', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -526,7 +520,7 @@ test('GET /api/project/1/aoi?sort=asc', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi?sort=asc',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');

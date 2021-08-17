@@ -78,7 +78,7 @@ class AOI {
             px_stats: row.px_stats
         };
 
-        if (row.hasOwnProperty('classes')) {
+        if (Object.hasOwn(row, 'classes')) {
             def['classes'] = row.classes;
         }
 
@@ -297,7 +297,6 @@ class AOI {
                     AND (${query.checkpointid}::BIGINT IS NULL OR checkpoint_id = ${query.checkpointid})
                     AND (${query.bookmarked}::BOOLEAN IS NULL OR a.bookmarked = ${query.bookmarked})
                     AND a.archived = false
-                    AND ${where.join(' AND ')}
                 ORDER BY
                     created ${query.sort}
                 LIMIT

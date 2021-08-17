@@ -1,3 +1,5 @@
+'use strict';
+
 const Err = require('./error');
 const moment = require('moment');
 const {
@@ -72,7 +74,7 @@ class AOIShare {
     /**
      * Upload an AOI share geotiff and mark the AOI share storage property as true
      *
-     * @param {String} uuid AOI Share UUID to upload to
+     * @param {String} shareuuid AOI Share UUID to upload to
      * @param {Object} file File Stream to upload
      */
     async upload(shareuuid, file) {
@@ -108,7 +110,7 @@ class AOIShare {
         if (!aoi.storage) throw new Err(404, null, 'AOI Share has not been uploaded');
 
         const blockBlobClient = this.container_client.getBlockBlobClient(`share-${shareuuid}.tiff`);
-        const dwn = await blob_client.download(0);
+        const dwn = await blockBlobClient.download(0);
 
         dwn.readableStreamBody.pipe(res);
     }
