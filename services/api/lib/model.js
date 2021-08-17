@@ -4,6 +4,7 @@ const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const poly = require('@turf/bbox-polygon').default;
 const bbox = require('@turf/bbox').default;
+const { sql } = require('slonik');
 
 class Model {
     constructor(config) {
@@ -55,7 +56,7 @@ class Model {
         model.bounds = poly([-180, -90, 180, 90]).geometry;
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 INSERT INTO models (
                     active,
                     uid,
@@ -68,7 +69,16 @@ class Model {
                     meta,
                     bounds
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromGeoJSON($10::JSON)
+                    ${model.active},
+                    ${user.uid},
+                    ${model.name},
+                    ${model.model_type},
+                    ${model.model_inputshape},
+                    ${model.model_zoom},
+                    ${model.storage},
+                    ${JSON.stringify(model.classes)},
+                    ${model.meta},
+                    ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON)
                 ) RETURNING
                     id,
                     created,
@@ -82,18 +92,7 @@ class Model {
                     classes,
                     meta,
                     ST_AsGeoJSON(bounds)::JSON AS bounds
-            `, [
-                model.active,
-                user.uid,
-                model.name,
-                model.model_type,
-                model.model_inputshape,
-                model.model_zoom,
-                model.storage,
-                JSON.stringify(model.classes),
-                model.meta,
-                JSON.stringify(model.bounds)
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }
@@ -139,13 +138,13 @@ class Model {
 
         if (model.bounds) model.bounds = poly(model.bounds).geometry;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE models
                     SET
-                        storage = COALESCE($2, storage),
-                        bounds = COALESCE(ST_GeomFromGeoJSON($3::JSON), bounds)
+                        storage = COALESCE(${model.storage}, storage),
+                        bounds = COALESCE(ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON), bounds)
                     WHERE
-                        id = $1
+                        id = ${modelid}
                     RETURNING
                         id,
                         created,
@@ -159,11 +158,7 @@ class Model {
                         classes,
                         meta,
                         ST_AsGeoJSON(bounds)::JSON AS bounds
-            `, [
-                modelid,
-                model.storage,
-                JSON.stringify(model.bounds)
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Model');
         }
@@ -199,7 +194,7 @@ class Model {
         let pgres;
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     created,
@@ -244,7 +239,7 @@ class Model {
         let pgres;
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     created,
@@ -261,8 +256,8 @@ class Model {
                 FROM
                     models
                 WHERE
-                    id = $1
-            `, [modelid]);
+                    id = ${modelid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }
@@ -280,15 +275,15 @@ class Model {
     async delete(modelid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE
                     model
                 SET
                     active = false
                 WHERE
-                    id = $1
+                    id = ${modelid}
                 RETURNING *
-            `, [modelid]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
         }

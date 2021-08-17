@@ -5,6 +5,8 @@ const {
     BlobServiceClient
 } = require('@azure/storage-blob');
 
+const { sql } = require('slonik');
+
 class AOIShare {
     constructor(config) {
         this.pool = config.pool;
@@ -120,18 +122,15 @@ class AOIShare {
     async delete(aoiid, shareuuid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 DELETE
                     FROM
                         aois_share
                     WHERE
-                        aoi_id = $1
-                        AND uuid = $2
+                        aoi_id = ${aoiid}
+                        AND uuid = ${shareuuid}
                     RETURNING *
-            `, [
-                aoiid,
-                shareuuid
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to delete AOI Share');
         }
@@ -156,17 +155,14 @@ class AOIShare {
     async patch(shareuuid, share) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE aois_share
                     SET
-                        storage = COALESCE($2, storage)
+                        storage = COALESCE(${share.storage}, storage)
                     WHERE
-                        uuid = $1
+                        uuid = ${shareuuid}
                     RETURNING *
-            `, [
-                shareuuid,
-                share.storage
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI Share');
         }
@@ -184,7 +180,7 @@ class AOIShare {
     async get(shareuuid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     s.uuid AS uuid,
                     s.aoi_id AS aoi_id,
@@ -199,15 +195,12 @@ class AOIShare {
                     aois a,
                     checkpoints c
                 WHERE
-                    s.uuid = $1
+                    s.uuid = ${shareuuid}
                 AND
                     a.id = s.aoi_id
                 AND
                     c.id = a.checkpoint_id
-            `, [
-                shareuuid
-
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get AOI Share');
         }
@@ -231,17 +224,9 @@ class AOIShare {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
-        const where = [];
-        where.push(`project_id = ${projectid}`);
-
-        if (query.aoi) {
-            if (isNaN(parseInt(query.aoi))) throw new Err(400, null, 'AOI Must be an Integer');
-            where.push(`aoi_id = ${parseInt(query.aoi)}`);
-        }
-
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     uuid,
@@ -251,18 +236,15 @@ class AOIShare {
                 FROM
                     aois_share
                 WHERE
-                    ${where.join(' AND ')}
+                    project_id = ${projectid}
+                    AND (${query.aoi}::BIGINT IS NULL OR aoi_id = ${query.aoi})
                 ORDER BY
                     created DESC
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list AOI Shares');
         }
@@ -289,24 +271,19 @@ class AOIShare {
     async create(aoi) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 INSERT INTO aois_share (
                     project_id,
                     aoi_id,
                     bounds,
                     patches
                 ) VALUES (
-                    $1,
-                    $2,
-                    ST_SetSRID(ST_GeomFromGeoJSON($3), 4326),
-                    $4
+                    ${aoi.project_id},
+                    ${aoi.id},
+                    ST_SetSRID(ST_GeomFromGeoJSON(${aoi.bounds}), 4326),
+                    ${aoi.patches}
                 ) RETURNING *
-            `, [
-                aoi.project_id,
-                aoi.id,
-                aoi.bounds,
-                aoi.patches
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create AOI Share');
         }

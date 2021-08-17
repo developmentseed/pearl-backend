@@ -7,6 +7,8 @@ const {
     BlobServiceClient
 } = require('@azure/storage-blob');
 
+const { sql } = require('slonik');
+
 class AOI {
     constructor(config) {
         this.pool = config.pool;
@@ -158,16 +160,14 @@ class AOI {
     async delete(aoiid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE aois
                     SET
                         archived = true
                     WHERE
-                        id = $1
+                        id = ${aoiid}
                     RETURNING *
-            `, [
-                aoiid
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to delete AOI');
         }
@@ -190,25 +190,18 @@ class AOI {
     async patch(aoiid, aoi) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE aois
                     SET
-                        storage = COALESCE($2, storage),
-                        name = COALESCE($3, name),
-                        bookmarked = COALESCE($4, bookmarked),
-                        patches = COALESCE($5, patches),
-                        px_stats = COALESCE($6::JSONB, px_stats)
+                        storage = COALESCE(${aoi.storage}, storage),
+                        name = COALESCE(${aoi.name}, name),
+                        bookmarked = COALESCE(${aoi.bookmarked}, bookmarked),
+                        patches = COALESCE(${aoi.patches}, patches),
+                        px_stats = COALESCE(${JSON.stringify(aoi.px_stats)}::JSONB, px_stats)
                     WHERE
-                        id = $1
+                        id = ${aoiid}
                     RETURNING *
-            `, [
-                aoiid,
-                aoi.storage,
-                aoi.name,
-                aoi.bookmarked,
-                aoi.patches,
-                JSON.stringify(aoi.px_stats)
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI');
         }
@@ -226,7 +219,7 @@ class AOI {
     async get(aoiid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     a.id AS id,
                     a.name AS name,
@@ -243,14 +236,12 @@ class AOI {
                     aois a,
                     checkpoints c
                 WHERE
-                    a.id = $1
+                    a.id = ${aoiid}
                 AND
                     a.checkpoint_id = c.id
                 AND
                     a.archived = false
-            `, [
-                aoiid
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get AOI');
         }
@@ -275,26 +266,16 @@ class AOI {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.sort) query.sort = 'desc';
 
-        if (query.sort !== 'desc' && query.sort !== 'asc') {
-            throw new Err(400, null, 'Invalid Sort');
-        }
-
-        const where = [];
-        where.push(`a.project_id = ${projectid}`);
-
-        if (query.checkpointid && !isNaN(parseInt(query.checkpointid))) {
-            where.push('checkpoint_id = ' + query.checkpointid);
-        }
-
-        if (query.bookmarked) {
-            where.push('a.bookmarked = ' + query.bookmarked);
+        if (!query.sort || query.sort === 'desc') {
+            query.sort = sql`desc`;
+        } else {
+            query.order = sql`asc`;
         }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     a.id AS id,
@@ -312,18 +293,18 @@ class AOI {
                     checkpoints c
                 WHERE
                     a.checkpoint_id = c.id
+                    a.project_id = ${projectid}
+                    AND (${query.checkpointid}::BIGINT IS NULL OR checkpoint_id = ${query.checkpointid})
+                    AND (${query.bookmarked}::BOOLEAN IS NULL OR a.bookmarked = ${query.bookmarked})
                     AND a.archived = false
                     AND ${where.join(' AND ')}
                 ORDER BY
-                    a.created ${query.sort}
+                    created ${query.sort}
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list aois');
         }
@@ -360,25 +341,19 @@ class AOI {
     async create(projectid, aoi) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 INSERT INTO aois (
                     project_id,
                     name,
                     checkpoint_id,
                     bounds
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    ST_SetSRID(ST_GeomFromGeoJSON($4), 4326)
+                    ${projectid},
+                    ${aoi.name},
+                    ${aoi.checkpoint_id},
+                    ST_SetSRID(ST_GeomFromGeoJSON(${aoi.bounds}), 4326)
                 ) RETURNING *
-            `, [
-                projectid,
-                aoi.name,
-                aoi.checkpoint_id,
-                aoi.bounds
-            ]);
-
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create aoi');
         }

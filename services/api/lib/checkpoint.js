@@ -3,6 +3,8 @@
 const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
 
+const { sql } = require('slonik');
+
 class CheckPoint {
     constructor(config) {
         this.pool = config.pool;
@@ -100,16 +102,9 @@ class CheckPoint {
             throw new Err(400, null, 'Invalid Sort');
         }
 
-        const where = [];
-        where.push(`project_id = ${projectid}`);
-
-        if (query.bookmarked) {
-            where.push('bookmarked = ' + query.bookmarked);
-        }
-
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -121,8 +116,9 @@ class CheckPoint {
                 FROM
                     checkpoints
                 WHERE
-                    ${where.join(' AND ')}
-                AND archived = false
+                    project_id = ${projectid}
+                    AND (${query.bookmarked}::BOOLEAN IS NULL OR bookmarked = ${query.bookmarked})
+                    AND archived = false
                 ORDER BY created ${query.sort}
                 LIMIT
                     $1
@@ -160,14 +156,14 @@ class CheckPoint {
     async delete(checkpointid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE checkpoints
                     SET
                         archived = true
                     WHERE
-                        id = $1
+                        id = ${checkpointid}
                     RETURNING *
-            `, [checkpointid]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to archive Checkpoint');
         }
@@ -240,23 +236,17 @@ class CheckPoint {
         }
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE checkpoints
                     SET
-                        storage = COALESCE($2, storage),
-                        name = COALESCE($3, name),
-                        bookmarked = COALESCE($4, bookmarked),
-                        classes = COALESCE($5::JSONB, classes)
+                        storage = COALESCE(${checkpoint.storage}, storage),
+                        name = COALESCE(${checkpoint.name}, name),
+                        bookmarked = COALESCE(${checkpoint.bookmarked}, bookmarked),
+                        classes = COALESCE(${JSON.stringify(checkpoint.classes)}::JSONB, classes)
                     WHERE
-                        id = $1
+                        id = ${checkpointid}
                     RETURNING *
-            `, [
-                checkpointid,
-                checkpoint.storage,
-                checkpoint.name,
-                checkpoint.bookmarked,
-                JSON.stringify(checkpoint.classes)
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Checkpoint');
         }
@@ -274,7 +264,7 @@ class CheckPoint {
     async get(checkpointid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     checkpoints.id,
                     checkpoints.name,
@@ -290,10 +280,10 @@ class CheckPoint {
                     ST_AsText(ST_Centroid(ST_Envelope(ST_Collect(geom)))) AS center,
                     ST_Extent(geom) AS bounds
                 FROM
-                    (SELECT id, ST_GeomFromGeoJSON(Unnest(retrain_geoms)) as geom FROM checkpoints WHERE id = $1) g,
+                    (SELECT id, ST_GeomFromGeoJSON(Unnest(retrain_geoms)) as geom FROM checkpoints WHERE id = ${checkpointid}) g,
                     checkpoints
                 WHERE
-                    checkpoints.id = $1
+                    checkpoints.id = ${checkpointid}
                 AND checkpoints.archived = false
                 GROUP BY
                     g.id,
@@ -307,9 +297,7 @@ class CheckPoint {
                     checkpoints.project_id,
                     checkpoints.retrain_geoms,
                     checkpoints.input_geoms
-            `, [
-                checkpointid
-            ]);
+            `);
 
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get checkpoint');
@@ -333,7 +321,7 @@ class CheckPoint {
      */
     async create(projectid, checkpoint) {
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 INSERT INTO checkpoints (
                     project_id,
                     parent,
@@ -343,27 +331,19 @@ class CheckPoint {
                     input_geoms,
                     analytics
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    $4::JSONB,
-                    $5::JSONB[],
-                    $6::JSONB[],
-                    $7::JSONB
+                    ${projectid},
+                    ${checkpoint.parent},
+                    ${checkpoint.name},
+                    ${JSON.stringify(checkpoint.classes)}::JSONB,
+                    ${checkpoint.retrain_geoms.map((e) => {
+                        return JSON.stringify(e);
+                    })}::JSONB[],
+                    ${checkpoint.input_geoms.map((e) => {
+                        return JSON.stringify(e);
+                    })}::JSONB[],
+                    ${JSON.stringify(checkpoint.analytics)}::JSONB
                 ) RETURNING *
-            `, [
-                projectid,
-                checkpoint.parent,
-                checkpoint.name,
-                JSON.stringify(checkpoint.classes),
-                checkpoint.retrain_geoms.map((e) => {
-                    return JSON.stringify(e);
-                }),
-                checkpoint.input_geoms.map((e) => {
-                    return JSON.stringify(e);
-                }),
-                JSON.stringify(checkpoint.analytics)
-            ]);
+            `);
 
             return CheckPoint.json(pgres.rows[0]);
         } catch (err) {
@@ -383,61 +363,58 @@ class CheckPoint {
     async mvt(checkpointid, z, x, y) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
-            SELECT
-                ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
-            FROM (
+            pgres = await this.pool.query(sql`
                 SELECT
-                    id,
-                    class,
-                    ST_AsMVTGeom(geom, ST_TileEnvelope($2, $3, $4), 4096, 256, false) AS geom
+                    ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
                 FROM (
                     SELECT
                         id,
                         class,
-                        geom
+                        ST_AsMVTGeom(geom, ST_TileEnvelope(${z}, ${x}, ${y}), 4096, 256, false) AS geom
                     FROM (
                         SELECT
-                            r.id,
-                            t.class,
-                            ST_Transform(ST_GeomFromGeoJSON(t.geom), 3857) AS geom
+                            id,
+                            class,
+                            geom
                         FROM (
-                            WITH RECURSIVE parents (id, geom) AS (
+                            SELECT
+                                r.id,
+                                t.class,
+                                ST_Transform(ST_GeomFromGeoJSON(t.geom), 3857) AS geom
+                            FROM (
+                                WITH RECURSIVE parents (id, geom) AS (
+                                    SELECT
+                                        id,
+                                        checkpoints.retrain_geoms AS geom
+                                    FROM
+                                        checkpoints
+                                    WHERE
+                                        id = ${checkpointid}
+                                UNION ALL
+                                    SELECT
+                                        checkpoints.id,
+                                        checkpoints.retrain_geoms AS geom
+                                    FROM
+                                        checkpoints
+                                    JOIN
+                                        parents ON checkpoints.parent = parents.id
+                                )
                                 SELECT
                                     id,
-                                    checkpoints.retrain_geoms AS geom
+                                    geom
                                 FROM
-                                    checkpoints
-                                WHERE
-                                    id = $1
-                            UNION ALL
-                                SELECT
-                                    checkpoints.id,
-                                    checkpoints.retrain_geoms AS geom
-                                FROM
-                                    checkpoints
-                                JOIN
-                                    parents ON checkpoints.parent = parents.id
-                            )
-                            SELECT
-                                id,
-                                geom
-                            FROM
-                                parents
-                        ) r, Unnest(r.geom) WITH ORDINALITY AS t (geom, class)
-                    ) u
-                WHERE
-                    ST_Intersects(geom, ST_TileEnvelope($2, $3, $4))
-            ) n
-            GROUP BY
-                id,
-                class,
-                geom
-        ) q
-            `, [
-                checkpointid,
-                z, x, y
-            ]);
+                                    parents
+                            ) r, Unnest(r.geom) WITH ORDINALITY AS t (geom, class)
+                        ) u
+                    WHERE
+                        ST_Intersects(geom, ST_TileEnvelope(${z}, ${x}, ${y}))
+                ) n
+                GROUP BY
+                    id,
+                    class,
+                    geom
+            ) q
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create checkpoint MVT');
         }
