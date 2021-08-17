@@ -38,4 +38,12 @@ locals {
   prefix                = "${local.stack_id}-${var.environment}"
   storage               = "${local.stack_id}${var.environment}"
   deploy_secrets_prefix = "${local.stack_id}-${var.environment}"
+
+  backend_address_pool_name      = "${azurerm_virtual_network.lulc-cluster.name}-beap"
+  frontend_port_name             = "${azurerm_virtual_network.lulc-gateway.name}-feport"
+  frontend_ip_configuration_name = "${azurerm_virtual_network.lulc-gateway.name}-feip"
+  http_setting_name              = "${azurerm_virtual_network.lulc-cluster.name}-be-htst"
+  listener_name                  = "${azurerm_virtual_network.lulc-cluster.name}-httplstn"
+  request_routing_rule_name      = "${azurerm_virtual_network.lulc-cluster.name}-rqrt"
+  redirect_configuration_name    = "${azurerm_virtual_network.example.name}-rdrcfg"
 }
