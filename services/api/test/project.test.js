@@ -276,7 +276,7 @@ test('GET /api/project', (t) => {
                             4
                         ],
                         "model_zoom": 17,
-                        "storage": null,
+                        "storage": false,
                         "classes": [
                             {
                                 "name": "Water",
@@ -395,7 +395,7 @@ test('GET /api/project?name=lulc', (t) => {
                             4
                         ],
                         "model_zoom": 17,
-                        "storage": null,
+                        "storage": false,
                         "classes": [
                             {
                                 "name": "Water",

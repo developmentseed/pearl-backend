@@ -275,7 +275,6 @@ class AOIShare {
     async create(aoi) {
         let pgres;
         try {
-            console.error(aoi);
             pgres = await this.pool.query(sql`
                 INSERT INTO aois_share (
                     project_id,

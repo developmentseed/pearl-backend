@@ -77,7 +77,7 @@ class Project {
                 WHERE
                     uid = ${uid}
                     AND archived = false
-                    AND (${query.name}::TEXT IS NULL OR ${query.name} ~ ${query.name})
+                    AND (${query.name}::TEXT IS NULL OR name ~* ${query.name})
                 ORDER BY
                     created ${query.sort}
                 LIMIT
