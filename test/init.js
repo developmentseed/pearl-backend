@@ -3,8 +3,9 @@
 const { promisify } = require('util');
 const request = promisify(require('request'));
 const Knex = require('knex');
+const Config = require('../services/api/lib/config');
 
-const { drop, genconfig } = require('../services/api/test/drop');
+const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
 let state = {
@@ -19,7 +20,7 @@ function reconnect(test, API) {
     running(test, API);
 
     test('pre-run', async (t) => {
-        const config = await genconfig();
+        const config = await Config.env();
         try {
             const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
             state.token = (await authtoken.generate({
@@ -82,7 +83,9 @@ function reconnect(test, API) {
 function connect(test, API) {
     test('pre-run', async (t) => {
         try {
-            const config = await drop();
+            await drop();
+
+            const config = await Config.env();
 
             KnexConfig.connection = config.Postgres;
             const knex = Knex(KnexConfig);
@@ -98,13 +101,15 @@ function connect(test, API) {
                 auth0Id: 0
             });
 
+            const user = await auth.user(1);
+
             state.token = (await authtoken.generate({
                 type: 'auth0',
-                uid: 1
+                uid: user.uid
             }, 'API Token')).token;
 
             await knex.destroy();
-            config.pool.end();
+            await config.pool.end();
         } catch (err) {
             t.error(err, 'no errors');
         }

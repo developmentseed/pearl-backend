@@ -124,7 +124,7 @@ class Auth {
     async user(uid, idField = 'id') {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     username,
@@ -134,10 +134,8 @@ class Auth {
                 FROM
                     users
                 WHERE
-                    ${idField} = $1
-            `, [
-                uid
-            ]);
+                    ${sql.identifier(['users', idField])} = ${uid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
