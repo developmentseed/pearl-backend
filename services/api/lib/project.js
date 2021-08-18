@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const { sql } = require('slonik');
 
 class Project {
     constructor(config) {
@@ -54,22 +55,17 @@ class Project {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.sort) query.sort = 'desc';
+        if (!query.name) query.name = null;
 
-        if (query.sort !== 'desc' && query.sort !== 'asc') {
-            throw new Err(400, null, 'Invalid Sort');
-        }
-
-        const where = [];
-        where.push(`uid = ${uid}`);
-
-        if (query.name) {
-            where.push(`name ILIKE '${query.name}%'`);
+        if (!query.sort || query.sort === 'desc') {
+            query.sort = sql`desc`;
+        } else {
+            query.sort = sql`asc`;
         }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -79,17 +75,16 @@ class Project {
                 FROM
                     projects
                 WHERE
-                    ${where.join(' AND ')}
-                AND archived = false
-                ORDER BY created ${query.sort}
+                    uid = ${uid}
+                    AND archived = false
+                    AND (${query.name}::TEXT IS NULL OR name ~* ${query.name})
+                ORDER BY
+                    created ${query.sort}
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list projects');
         }
@@ -118,24 +113,19 @@ class Project {
      */
     async create(uid, project) {
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 INSERT INTO projects (
                     uid,
                     name,
                     model_id,
                     mosaic
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    $4
+                    ${uid},
+                    ${project.name},
+                    ${project.model_id},
+                    ${project.mosaic}
                 ) RETURNING *
-            `, [
-                uid,
-                project.name,
-                project.model_id,
-                project.mosaic
-            ]);
+            `);
 
             return Project.json(pgres.rows[0]);
         } catch (err) {
@@ -151,7 +141,7 @@ class Project {
     async get(projectid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     p.id AS id,
                     p.uid AS uid,
@@ -164,13 +154,11 @@ class Project {
                     projects p,
                     models m
                 WHERE
-                    p.id = $1
+                    p.id = ${projectid}
                 AND
                     p.model_id = m.id
                 AND archived = false
-            `, [
-                projectid
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to get project');
         }
@@ -191,17 +179,14 @@ class Project {
         let pgres;
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE projects
                     SET
-                        name = COALESCE($2, name)
+                        name = COALESCE(${project.name}, name)
                     WHERE
-                        id = $1
+                        id = ${projectid}
                     RETURNING *
-            `, [
-                projectid,
-                project.name
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Project');
         }
@@ -218,15 +203,13 @@ class Project {
      */
     async delete(projectid) {
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 UPDATE projects
                     SET
                         archived = true
                     WHERE
-                        id = $1
-            `, [
-                projectid
-            ]);
+                        id = ${projectid}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to archive Project');
         }

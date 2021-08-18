@@ -22,8 +22,8 @@ const pkg = require('./package.json');
 const Schema = require('./lib/schema');
 
 const argv = require('minimist')(process.argv, {
-    boolean: ['prod', 'silent'],
-    string: ['port'],
+    boolean: ['prod', 'silent', 'test'],
+    string: ['port']
 });
 
 const Config = require('./lib/config');
@@ -32,9 +32,12 @@ if (require.main === module) {
     configure(argv);
 }
 
-function configure(argv = {}, cb) {
-    Config.env(argv).then((config) => {
-        return server(config, cb);
+function configure(args = {}, cb) {
+    Config.env(args).then((config) => {
+        return server(args, config, cb);
+    }).catch((err) => {
+        console.error(err);
+        process.exit(1);
     });
 }
 
@@ -55,7 +58,7 @@ function configure(argv = {}, cb) {
  * @param {Config} config
  * @param {function} cb
  */
-async function server(config, cb) {
+async function server(args, config, cb) {
     const app = express();
     const schema = new Schema(express.Router());
 
@@ -811,7 +814,7 @@ async function server(config, cb) {
     });
 
     const getAoiTileJSON = async (theAoi, req) => {
-        const tiffurl = theAoi.hasOwnProperty('uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id);
+        const tiffurl = theAoi.uuid ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id);
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -820,7 +823,7 @@ async function server(config, cb) {
 
 
         let tj, tiles;
-        if (theAoi.hasOwnProperty('uuid')) {
+        if (theAoi.uuid) {
             const response = await proxy.request(req);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
@@ -851,7 +854,7 @@ async function server(config, cb) {
             ];
         }
 
-        const aoiTileName = theAoi.hasOwnProperty('aoi_id') ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
+        const aoiTileName = theAoi.aoi_id ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
 
         return {
             tilejson: tj.tilejson,
@@ -1029,7 +1032,7 @@ async function server(config, cb) {
                     if (!(await aoi.exists(req.params.aoiid))) throw new Err(500, null, 'AOI is not on Azure?!');
 
                     const pres = await proxy.request({
-                        url: `/cog/statistics`,
+                        url: '/cog/statistics',
                         query: {
                             url: tiffurl.origin + tiffurl.pathname,
                             url_params: Buffer.from(tiffurl.search).toString('base64'),
@@ -1162,7 +1165,7 @@ async function server(config, cb) {
      *   }
      */
     await schema.get('/project/:projectid/aoi', {
-            query: 'req.query.aoi.json'
+        query: 'req.query.aoi.json'
     }, requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -2454,15 +2457,10 @@ async function server(config, cb) {
     const srv = app.listen(config.Port, (err) => {
         if (err) return err;
 
-        if (cb) return cb(srv, config.pool);
-
-        console.error(`ok - running ${config.BaseUrl}`);
+        if (!config.silent) console.log(`ok - ${config.BaseUrl}`);
+        if (cb) return cb(srv, config);
     });
 
 }
 
-module.exports = {
-    server,
-    configure,
-    Config
-};
+module.exports = configure;

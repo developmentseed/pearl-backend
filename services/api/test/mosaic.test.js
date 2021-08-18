@@ -1,16 +1,12 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t)).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('GET /api/mosaic', (t) => {
     request({
@@ -18,7 +14,7 @@ test('GET /api/mosaic', (t) => {
         url: 'http://localhost:2000/api/mosaic',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -40,7 +36,7 @@ test('GET /api/mosaic/naip.latest', (t) => {
         url: 'http://localhost:2000/api/mosaic/naip.latest',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');

@@ -7,6 +7,8 @@ const {
     BlobServiceClient
 } = require('@azure/storage-blob');
 
+const { sql } = require('slonik');
+
 class AOIPatch {
     constructor(config) {
         this.pool = config.pool;
@@ -131,16 +133,14 @@ class AOIPatch {
     async delete(aoiid, patchid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 DELETE
                     FROM
                         aoi_patch
                     WHERE
-                        id = $1
+                        id = ${patchid}
                     RETURNING *
-            `, [
-                patchid
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to delete AOI Patch');
         }
@@ -165,17 +165,14 @@ class AOIPatch {
     async patch(patchid, patch) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE aoi_patch
                     SET
-                        storage = COALESCE($2, storage)
+                        storage = COALESCE(${patch.storage}, storage)
                     WHERE
-                        id = $1
+                        id = ${patchid}
                     RETURNING *
-            `, [
-                patchid,
-                patch.storage
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update AOI Patch');
         }
@@ -193,7 +190,7 @@ class AOIPatch {
     async get(patchid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     id,
                     aoi_id,
@@ -203,11 +200,8 @@ class AOIPatch {
                 FROM
                     aoi_patch
                 WHERE
-                    id = $1
-            `, [
-                patchid
-
-            ]);
+                    id = ${patchid}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get AOI Patch');
         }
@@ -231,13 +225,9 @@ class AOIPatch {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
-        const where = [];
-        where.push(`project_id = ${projectid}`);
-        where.push(`aoi_id = ${aoiid}`);
-
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -246,16 +236,13 @@ class AOIPatch {
                 FROM
                     aoi_patch
                 WHERE
-                    ${where.join(' AND ')}
+                    project_id = ${projectid}
+                    AND aoi_id = ${aoiid}
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list AOI Patches');
         }
@@ -283,18 +270,15 @@ class AOIPatch {
     async create(projectid, aoiid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 INSERT INTO aoi_patch (
                     project_id,
                     aoi_id
                 ) VALUES (
-                    $1,
-                    $2
+                    ${projectid},
+                    ${aoiid}
                 ) RETURNING *
-            `, [
-                projectid,
-                aoiid
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create AOI Patch');
         }

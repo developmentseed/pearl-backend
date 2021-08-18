@@ -1,18 +1,12 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true)
 
 test('POST /api/model', (t) => {
     request({
@@ -34,7 +28,7 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     } , (err, res, body) => {
         t.error(err, 'no error');
@@ -49,7 +43,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -82,7 +76,7 @@ test('GET /api/project/1/instance (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1/instance',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -103,7 +97,7 @@ test('POST /api/project/1/instance', (t) => {
         url: 'http://localhost:2000/api/project/1/instance',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -137,7 +131,7 @@ test('GET /api/project/1/instance (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1/instance',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -167,7 +161,7 @@ test('PATCH /api/project/1/instance/1', (t) => {
         url: 'http://localhost:2000/api/project/1/instance/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             active: true
@@ -201,7 +195,7 @@ test('GET /api/project/1/instance?status=active', (t) => {
         url: 'http://localhost:2000/api/project/1/instance?status=active',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -230,7 +224,7 @@ test('GET /api/project/1/instance', (t) => {
         url: 'http://localhost:2000/api/project/1/instance',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -259,7 +253,7 @@ test('GET /api/project/1/instance/1', (t) => {
         url: 'http://localhost:2000/api/project/1/instance/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -292,7 +286,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Checkpoint',
@@ -316,7 +310,7 @@ test('PATCH /api/project/1/instance/1', (t) => {
         url: 'http://localhost:2000/api/project/1/instance/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             checkpoint_id: 1

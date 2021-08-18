@@ -1,6 +1,6 @@
 'use strict';
 
-const { Pool } = require('pg');
+const { sql, createPool } = require('slonik');
 
 class Config {
     static async env(args = {}) {
@@ -9,6 +9,8 @@ class Config {
         }
 
         this.silent = !!args.silent;
+
+        this.test = !!args.test;
 
         this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
         if (this.AzureStorage) console.log('ok - AzureStorage: Enabled');
@@ -42,11 +44,9 @@ class Config {
         let retry = 5;
         do {
             try {
-                this.pool = new Pool({
-                    connectionString: this.Postgres
-                });
+                this.pool = createPool(this.Postgres);
 
-                await this.pool.query('SELECT NOW()');
+                await this.pool.query(sql`SELECT NOW()`);
             } catch (err) {
                 this.pool = false;
 

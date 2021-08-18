@@ -3,6 +3,7 @@
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const { Kube } = require('./kube');
+const { sql } = require('slonik');
 
 /**
  * @class
@@ -78,23 +79,20 @@ class Instance {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.type) query.type = null;
 
-        const where = [];
-        where.push(`project_id = ${projectid}`);
-
-        if (query.type) {
-            where.push(`type='${query.type}'`);
-        }
-
+        let active = null;
         if (query.status === 'active') {
-            where.push('active IS true');
+            active = true;
         } else if (query.status === 'inactive') {
-            where.push('active IS false');
+            active = false;
+        } else if (query.status === 'all') {
+            active = null;
         }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -105,17 +103,16 @@ class Instance {
                 FROM
                     instances
                 WHERE
-                    ${where.join(' AND ')}
+                    project_id = ${projectid}
+                    AND (${query.type}::TEXT IS NULL OR type = ${query.type})
+                    AND (${active}::BOOLEAN IS NULL OR active = ${active})
                 ORDER BY
                     last_update
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list instances');
         }
@@ -124,7 +121,7 @@ class Instance {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
             instances: pgres.rows.map((row) => {
                 return {
-                    id: parseInt(row.id),
+                    id: row.id,
                     is_batch: row.is_batch,
                     active: row.active,
                     created: row.created,
@@ -154,7 +151,7 @@ class Instance {
 
     async activeGpuInstances() {
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 SELECT
                     count(*) OVER() AS count
                 FROM
@@ -203,21 +200,19 @@ class Instance {
         console.log('# type', type);
 
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 INSERT INTO instances (
                     project_id,
                     aoi_id,
                     checkpoint_id,
                     type
                 ) VALUES (
-                    $1, $2, $3, $4
+                    ${instance.project_id},
+                    ${instance.aoi_id || null},
+                    ${instance.checkpoint_id || null},
+                    ${type}
                 ) RETURNING *
-            `, [
-                instance.project_id,
-                instance.aoi_id,
-                instance.checkpoint_id,
-                type
-            ]);
+            `);
 
             const instanceId = parseInt(pgres.rows[0].id);
 
@@ -265,13 +260,13 @@ class Instance {
      */
     async delete(instanceid) {
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE
                     FROM
                         instances
                     WHERE
-                        id = $1
-            `, [instanceid]);
+                        id = ${instanceid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Instance Delete Error');
         }
@@ -288,7 +283,7 @@ class Instance {
         let pgres;
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     is_batch,
@@ -301,8 +296,8 @@ class Instance {
                 FROM
                     instances
                 WHERE
-                    id = $1
-            `, [instanceid]);
+                    id = ${instanceid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Instance Error');
         }
@@ -338,22 +333,17 @@ class Instance {
         let pgres;
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE instances
                     SET
-                        active = COALESCE($2, active),
-                        aoi_id = COALESCE($3, aoi_id),
-                        checkpoint_id = COALESCE($4, checkpoint_id),
+                        active = COALESCE(${instance.active || null}, active),
+                        aoi_id = COALESCE(${instance.aoi_id || null}, aoi_id),
+                        checkpoint_id = COALESCE(${instance.checkpoint_id || null}, checkpoint_id),
                         last_update = NOW()
                     WHERE
-                        id = $1
+                        id = ${instanceid}
                     RETURNING *
-            `, [
-                instanceid,
-                instance.active,
-                instance.aoi_id,
-                instance.checkpoint_id
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Instance');
         }
@@ -370,7 +360,7 @@ class Instance {
      */
     async reset() {
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 UPDATE instances
                     SET active = False
             `, []);

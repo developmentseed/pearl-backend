@@ -3,6 +3,8 @@
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
 
+const { sql } = require('slonik');
+
 class Auth {
     constructor(config) {
         this.pool = config.pool;
@@ -42,20 +44,16 @@ class Auth {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE users
                     SET
-                        flags = $2,
-                        access = $3
+                        flags = ${user.flags},
+                        access = ${user.access}
 
                     WHERE
-                        id = $1
+                        id = ${uid}
                     RETURNING *
-            `, [
-                uid,
-                user.flags,
-                user.access
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -87,7 +85,7 @@ class Auth {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
                     id,
@@ -98,17 +96,13 @@ class Auth {
                 FROM
                     users
                 WHERE
-                    username iLIKE '%'||$3||'%'
-                    OR email iLIKE '%'||$3||'%'
+                    username iLIKE '%'||${query.filter}||'%'
+                    OR email iLIKE '%'||${query.filter}||'%'
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page,
-                query.filter
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -130,7 +124,7 @@ class Auth {
     async user(uid, idField = 'id') {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     username,
@@ -140,10 +134,8 @@ class Auth {
                 FROM
                     users
                 WHERE
-                    ${idField} = $1
-            `, [
-                uid
-            ]);
+                    ${sql.identifier(['users', idField])} = ${uid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -170,28 +162,23 @@ class Auth {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
-                    INSERT INTO users (
-                        username,
-                        email,
-                        auth0_id,
-                        access,
-                        flags
-                    ) VALUES (
-                        $1,
-                        $2,
-                        $3,
-                        $4,
-                        '{}'::JSONB
-                    ) RETURNING *
-                `, [
-                user.username,
-                user.email,
-                user.auth0Id,
-                user.access
-            ]);
+            pgres = await this.pool.query(sql`
+                INSERT INTO users (
+                    username,
+                    email,
+                    auth0_id,
+                    access,
+                    flags
+                ) VALUES (
+                    ${user.username},
+                    ${user.email},
+                    ${user.auth0Id},
+                    ${user.access},
+                    '{}'::JSONB
+                ) RETURNING *
+            `);
         } catch (err) {
-            if (err && err.code === '23505') {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, err, 'Cannot create duplicate user');
             } else if (err) {
                 throw new Err(500, err, 'Failed to create user');
@@ -221,16 +208,13 @@ class AuthToken {
         }
 
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE FROM
                     users_tokens
                 WHERE
-                    uid = $1
-                    AND id = $2
-            `, [
-                auth.uid,
-                token_id
-            ]);
+                    uid = ${auth.uid}
+                    AND id = ${token_id}
+            `);
 
             return {
                 status: 200,
@@ -259,7 +243,7 @@ class AuthToken {
                     email: false
                 };
             }
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
                     users.id AS uid,
                     users.username,
@@ -270,10 +254,8 @@ class AuthToken {
                     users_tokens INNER JOIN users
                         ON users.id = users_tokens.uid
                 WHERE
-                    users_tokens.token = $1
-            `, [
-                token
-            ]);
+                    users_tokens.token = ${token}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to validate token');
         }
@@ -305,7 +287,7 @@ class AuthToken {
         }
 
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 SELECT
                     id,
                     created,
@@ -313,10 +295,8 @@ class AuthToken {
                 FROM
                     users_tokens
                 WHERE
-                    uid = $1
-            `, [
-                auth.uid
-            ]);
+                    uid = ${auth.uid}
+            `);
 
             return pgres.rows.map((token) => {
                 token.id = parseInt(token.id);
@@ -343,23 +323,19 @@ class AuthToken {
         }, this.config.SigningSecret);
 
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 INSERT INTO users_tokens (
                     token,
                     created,
                     uid,
                     name
                 ) VALUES (
-                    $1,
+                    ${token},
                     NOW(),
-                    $2,
-                    $3
+                    ${auth.uid},
+                    ${name}
                 ) RETURNING *
-            `, [
-                token,
-                auth.uid,
-                name
-            ]);
+            `);
 
             return {
                 id: parseInt(pgres.rows[0].id),
