@@ -168,7 +168,7 @@ function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
-                storage: null,
+                storage: false,
                 classes: [
                     { name: 'Water', color: '#0000FF' },
                     { name: 'Emergent Wetlands', color: '#008000' },
