@@ -141,7 +141,7 @@ class Model {
                 UPDATE models
                     SET
                         storage = COALESCE(${model.storage || null}, storage),
-                        bounds = COALESCE(ST_GeomFromGeoJSON(${JSON.stringify(model.bounds || null)}::JSON), bounds)
+                        bounds = COALESCE(ST_GeomFromGeoJSON(${model.bounds ? JSON.stringify(model.bounds) : null}::JSON), bounds)
                     WHERE
                         id = ${modelid}
                     RETURNING
