@@ -1,18 +1,13 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', (t) => {
     request({
@@ -34,7 +29,7 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     } , (err, res, body) => {
         t.error(err, 'no error');
@@ -49,7 +44,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -81,7 +76,7 @@ test('GET /api/project/1/checkpoint (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -102,7 +97,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST',
@@ -180,7 +175,7 @@ test('PATCH /api/project/1/checkpoint/1 (no class length change)', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             classes: [
@@ -208,7 +203,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'NEW NAME',
@@ -270,7 +265,7 @@ test('GET /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -318,7 +313,7 @@ test('GET /api/project/1/checkpoint/1', (t) => {
 });
 
 test('Set Storage: true', async (t) => {
-    await flight.pool.query(`
+    await flight.config.pool.query(sql`
         UPDATE checkpoints SET storage = True
     `);
 
@@ -331,7 +326,7 @@ test('GET /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -362,7 +357,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST',
@@ -441,7 +436,7 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -467,7 +462,7 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0 - geometries', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles/1/0/0.mvt',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');

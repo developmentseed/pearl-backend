@@ -53,14 +53,13 @@ class Model {
         let pgres;
 
         if (!model.bounds) model.bounds = [-180, -90, 180, 90];
-        model.bounds = poly([-180, -90, 180, 90]).geometry;
-
+        model.bounds = poly(model.bounds).geometry;
         try {
             pgres = await this.pool.query(sql`
                 INSERT INTO models (
-                    active,
                     uid,
                     name,
+                    active,
                     model_type,
                     model_inputshape,
                     model_zoom,
@@ -69,15 +68,15 @@ class Model {
                     meta,
                     bounds
                 ) VALUES (
-                    ${model.active},
                     ${user.uid},
                     ${model.name},
+                    ${model.active},
                     ${model.model_type},
-                    ${model.model_inputshape},
+                    ${sql.array(model.model_inputshape, 'int8')},
                     ${model.model_zoom},
-                    ${model.storage},
-                    ${JSON.stringify(model.classes)},
-                    ${model.meta},
+                    False,
+                    ${JSON.stringify(model.classes)}::JSONB,
+                    ${JSON.stringify(model.meta)}::JSONB,
                     ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON)
                 ) RETURNING
                     id,
@@ -141,8 +140,8 @@ class Model {
             pgres = await this.pool.query(sql`
                 UPDATE models
                     SET
-                        storage = COALESCE(${model.storage}, storage),
-                        bounds = COALESCE(ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON), bounds)
+                        storage = COALESCE(${model.storage || null}, storage),
+                        bounds = COALESCE(ST_GeomFromGeoJSON(${JSON.stringify(model.bounds || null)}::JSON), bounds)
                     WHERE
                         id = ${modelid}
                     RETURNING

@@ -96,10 +96,12 @@ class CheckPoint {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.sort) query.sort = 'desc';
 
-        if (query.sort !== 'desc' && query.sort !== 'asc') {
-            throw new Err(400, null, 'Invalid Sort');
+        if (!query.bookmarked) query.bookmarked = null;
+        if (!query.sort || query.sort === 'desc') {
+            query.sort = sql`desc`;
+        } else {
+            query.sort = sql`asc`;
         }
 
         let pgres;
@@ -119,15 +121,13 @@ class CheckPoint {
                     project_id = ${projectid}
                     AND (${query.bookmarked}::BOOLEAN IS NULL OR bookmarked = ${query.bookmarked})
                     AND archived = false
-                ORDER BY created ${query.sort}
+                ORDER BY
+                    created ${query.sort}
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list checkpoints');
         }
@@ -239,10 +239,10 @@ class CheckPoint {
             pgres = await this.pool.query(sql`
                 UPDATE checkpoints
                     SET
-                        storage = COALESCE(${checkpoint.storage}, storage),
-                        name = COALESCE(${checkpoint.name}, name),
-                        bookmarked = COALESCE(${checkpoint.bookmarked}, bookmarked),
-                        classes = COALESCE(${JSON.stringify(checkpoint.classes)}::JSONB, classes)
+                        storage = COALESCE(${checkpoint.storage || null}, storage),
+                        name = COALESCE(${checkpoint.name || null}, name),
+                        bookmarked = COALESCE(${checkpoint.bookmarked || null}, bookmarked),
+                        classes = COALESCE(${JSON.stringify(checkpoint.classes || null)}::JSONB, classes)
                     WHERE
                         id = ${checkpointid}
                     RETURNING *
@@ -332,22 +332,22 @@ class CheckPoint {
                     analytics
                 ) VALUES (
                     ${projectid},
-                    ${checkpoint.parent},
+                    ${checkpoint.parent ? checkpoint.parent : null},
                     ${checkpoint.name},
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
-                    ${checkpoint.retrain_geoms.map((e) => {
-        return JSON.stringify(e);
-    })}::JSONB[],
-                    ${checkpoint.input_geoms.map((e) => {
-        return JSON.stringify(e);
-    })}::JSONB[],
-                    ${JSON.stringify(checkpoint.analytics)}::JSONB
+                    ${sql.array(checkpoint.retrain_geoms.map((e) => {
+                        return JSON.stringify(e);
+                    }), 'json')}::JSONB[],
+                    ${sql.array(checkpoint.input_geoms.map((e) => {
+                        return JSON.stringify(e);
+                    }), 'json')}::JSONB[],
+                    ${JSON.stringify(checkpoint.analytics ? checkpoint.analytics : null)}::JSONB
                 ) RETURNING *
             `);
 
             return CheckPoint.json(pgres.rows[0]);
         } catch (err) {
-            if (err.code === '23503') throw new Err(400, err, 'Parent does not exist');
+            if (err.originalError && err.originalError.code && err.originalError.code === '23503') throw new Err(400, err, 'Parent does not exist');
             throw new Err(500, err, 'Failed to create checkpoint');
         }
     }

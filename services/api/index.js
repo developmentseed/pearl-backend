@@ -814,7 +814,7 @@ async function server(args, config, cb) {
     });
 
     const getAoiTileJSON = async (theAoi, req) => {
-        const tiffurl = Object.hasOwn(theAoi, 'uuid') ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id);
+        const tiffurl = theAoi.uuid ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id);
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -823,7 +823,7 @@ async function server(args, config, cb) {
 
 
         let tj, tiles;
-        if (Object.hasOwn(theAoi, 'uuid')) {
+        if (theAoi.uuid) {
             const response = await proxy.request(req);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
@@ -854,7 +854,7 @@ async function server(args, config, cb) {
             ];
         }
 
-        const aoiTileName = Object.hasOwn(theAoi, 'aoi_id') ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
+        const aoiTileName = theAoi.aoi_id ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
 
         return {
             tilejson: tj.tilejson,

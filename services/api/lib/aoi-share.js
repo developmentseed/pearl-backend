@@ -226,6 +226,8 @@ class AOIShare {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
+        if (!query.aoi) query.aoi = null;
+
         let pgres;
         try {
             pgres = await this.pool.query(sql`
@@ -273,6 +275,7 @@ class AOIShare {
     async create(aoi) {
         let pgres;
         try {
+            console.error(aoi);
             pgres = await this.pool.query(sql`
                 INSERT INTO aois_share (
                     project_id,
@@ -282,8 +285,8 @@ class AOIShare {
                 ) VALUES (
                     ${aoi.project_id},
                     ${aoi.id},
-                    ST_SetSRID(ST_GeomFromGeoJSON(${aoi.bounds}), 4326),
-                    ${aoi.patches}
+                    ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)}), 4326),
+                    ${sql.array(aoi.patches,  sql`BIGINT[]`)}
                 ) RETURNING *
             `);
         } catch (err) {

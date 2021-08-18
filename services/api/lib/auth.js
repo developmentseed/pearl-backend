@@ -180,7 +180,7 @@ class Auth {
                 ) RETURNING *
             `);
         } catch (err) {
-            if (err && err.code === '23505') {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, err, 'Cannot create duplicate user');
             } else if (err) {
                 throw new Err(500, err, 'Failed to create user');

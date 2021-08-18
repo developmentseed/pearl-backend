@@ -75,10 +75,10 @@ class AOI {
             project_id: parseInt(row.project_id),
             checkpoint_id: parseInt(row.checkpoint_id),
             patches: row.patches.map((patch) => { return parseInt(patch); }),
-            px_stats: row.px_stats
+            px_stats: row.px_stats ? row.px_stats : {}
         };
 
-        if (Object.hasOwn(row, 'classes')) {
+        if (row.classes) {
             def['classes'] = row.classes;
         }
 
@@ -193,11 +193,11 @@ class AOI {
             pgres = await this.pool.query(sql`
                 UPDATE aois
                     SET
-                        storage = COALESCE(${aoi.storage}, storage),
-                        name = COALESCE(${aoi.name}, name),
-                        bookmarked = COALESCE(${aoi.bookmarked}, bookmarked),
-                        patches = COALESCE(${aoi.patches}, patches),
-                        px_stats = COALESCE(${JSON.stringify(aoi.px_stats)}::JSONB, px_stats)
+                        storage = COALESCE(${aoi.storage || null}, storage),
+                        name = COALESCE(${aoi.name || null}, name),
+                        bookmarked = COALESCE(${aoi.bookmarked || null}, bookmarked),
+                        patches = COALESCE(${sql.array(aoi.patches, sql`BIGINT[]`) || null}, patches),
+                        px_stats = COALESCE(${JSON.stringify(aoi.px_stats || null)}::JSONB, px_stats)
                     WHERE
                         id = ${aoiid}
                     RETURNING *
@@ -270,8 +270,11 @@ class AOI {
         if (!query.sort || query.sort === 'desc') {
             query.sort = sql`desc`;
         } else {
-            query.order = sql`asc`;
+            query.sort = sql`asc`;
         }
+
+        if (!query.checkpointid) query.checkpointid = null;
+        if (!query.bookmarked) query.bookmarked = null;
 
         let pgres;
         try {
@@ -293,12 +296,12 @@ class AOI {
                     checkpoints c
                 WHERE
                     a.checkpoint_id = c.id
-                    a.project_id = ${projectid}
+                    AND a.project_id = ${projectid}
                     AND (${query.checkpointid}::BIGINT IS NULL OR checkpoint_id = ${query.checkpointid})
                     AND (${query.bookmarked}::BOOLEAN IS NULL OR a.bookmarked = ${query.bookmarked})
                     AND a.archived = false
                 ORDER BY
-                    created ${query.sort}
+                    a.created ${query.sort}
                 LIMIT
                     ${query.limit}
                 OFFSET
@@ -350,7 +353,7 @@ class AOI {
                     ${projectid},
                     ${aoi.name},
                     ${aoi.checkpoint_id},
-                    ST_SetSRID(ST_GeomFromGeoJSON(${aoi.bounds}), 4326)
+                    ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)}), 4326)
                 ) RETURNING *
             `);
         } catch (err) {

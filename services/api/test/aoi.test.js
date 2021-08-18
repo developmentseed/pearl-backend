@@ -2,6 +2,7 @@ const test = require('tape');
 const request = require('request');
 const Flight = require('./flight');
 const fs = require('fs');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
@@ -238,7 +239,7 @@ test('GET /api/project/1/aoi/1', (t) => {
 
 test('[meta] Set aoi.storage: true', async (t) => {
     try {
-        await flight.pool.query(`
+        await flight.config.pool.query(sql`
             UPDATE
                 aois
             SET
@@ -266,48 +267,29 @@ test('GET /api/project/1/aoi', (t) => {
 
         delete res.body.aois[0].created;
 
-        t.deepEquals(res.body, {
-            total: 1,
-            project_id: 1,
-            aois: [{
-                id: 1,
-                name: 'Test AOI',
-                shares: [],
-                storage: true,
-                bookmarked: false,
-                px_stats: {},
-                bounds: {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [
-                                -79.377245307,
-                                38.834281801
-                            ],
-                            [
-                                -79.37677592,
-                                38.834281801
-                            ],
-                            [
-                                -79.37677592,
-                                38.834555504
-                            ],
-                            [
-                                -79.377245307,
-                                38.834555504
-                            ],
-                            [
-                                -79.377245307,
-                                38.834281801
-                            ]
-                        ]
-                    ]
-                },
-                checkpoint_id: '1',
-                checkpoint_name: 'Test Checkpoint',
-                classes: [ { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' } ]
-            }]
+        t.equals(res.body.total, 1);
+        t.equals(res.body.project_id, 1);
+        t.equals(res.body.aois.length, 1);
+        t.equals(res.body.aois[0].id, 1);
+        t.equals(res.body.aois[0].name, 'Test AOI');
+        t.deepEquals(res.body.aois[0].shares, []);
+        t.equals(res.body.aois[0].storage, true);
+        t.equals(res.body.aois[0].bookmarked, false);
+        t.deepEquals(res.body.aois[0].px_stats, {});
+        t.deepEquals(res.body.aois[0].bounds, {
+            type: 'Polygon',
+            coordinates: [[
+                    [ -79.377245307, 38.834281801 ],
+                    [ -79.37677592, 38.834281801 ],
+                    [ -79.37677592, 38.834555504 ],
+                    [ -79.377245307, 38.834555504 ],
+                    [ -79.377245307, 38.834281801 ]
+            ]]
         });
+
+        t.equals(res.body.aois[0].checkpoint_id, 1);
+        t.equals(res.body.aois[0].checkpoint_name, 'Test Checkpoint');
+        t.deepEquals(res.body.aois[0].classes, [ { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' } ]);
 
         t.end();
     });

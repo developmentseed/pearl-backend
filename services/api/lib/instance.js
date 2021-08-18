@@ -79,8 +79,9 @@ class Instance {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.type) query.type = null;
 
-        let active = true;
+        let active = null;
         if (query.status === 'active') {
             active = true;
         } else if (query.status === 'inactive') {
@@ -120,7 +121,7 @@ class Instance {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
             instances: pgres.rows.map((row) => {
                 return {
-                    id: parseInt(row.id),
+                    id: row.id,
                     is_batch: row.is_batch,
                     active: row.active,
                     created: row.created,
@@ -207,8 +208,8 @@ class Instance {
                     type
                 ) VALUES (
                     ${instance.project_id},
-                    ${instance.aoi_id},
-                    ${instance.checkpoint_id},
+                    ${instance.aoi_id || null},
+                    ${instance.checkpoint_id || null},
                     ${type}
                 ) RETURNING *
             `);
@@ -335,9 +336,9 @@ class Instance {
             pgres = await this.pool.query(sql`
                 UPDATE instances
                     SET
-                        active = COALESCE(${instance.active}, active),
-                        aoi_id = COALESCE(${instance.aoi_id}, aoi_id),
-                        checkpoint_id = COALESCE(${instance.checkpoint_id}, checkpoint_id),
+                        active = COALESCE(${instance.active || null}, active),
+                        aoi_id = COALESCE(${instance.aoi_id || null}, aoi_id),
+                        checkpoint_id = COALESCE(${instance.checkpoint_id || null}, checkpoint_id),
                         last_update = NOW()
                     WHERE
                         id = ${instanceid}

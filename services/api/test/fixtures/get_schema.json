@@ -4,6 +4,11 @@
         "query": true,
         "res": false
     },
+    "POST /user": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /token": {
         "body": false,
         "query": false,

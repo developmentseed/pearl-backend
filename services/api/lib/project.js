@@ -55,11 +55,12 @@ class Project {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (!query.name) query.name = null;
 
         if (!query.sort || query.sort === 'desc') {
             query.sort = sql`desc`;
         } else {
-            query.order = sql`asc`;
+            query.sort = sql`asc`;
         }
 
         let pgres;

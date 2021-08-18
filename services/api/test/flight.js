@@ -149,7 +149,6 @@ class Flight {
                     method: 'POST',
                     body: {
                         username: username,
-                        password: 'test',
                         email: `${username}@example.com`
                     }
                 });
@@ -166,17 +165,7 @@ class Flight {
                     `);
                 }
 
-                const login = await prequest({
-                    url: new URL(`/api/login`, this.base),
-                    json: true,
-                    method: 'POST',
-                    body: {
-                        username: username,
-                        password: 'test'
-                    }
-                });
-
-                this.token[username] = login.body.token;
+                this.token[username] = new_user.body.token;
 
             } catch (err) {
                 t.error(err);

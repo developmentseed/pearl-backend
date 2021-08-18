@@ -1,18 +1,12 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('GET /api/project (empty)', (t) => {
     request({
@@ -20,7 +14,7 @@ test('GET /api/project (empty)', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -41,7 +35,7 @@ test('GET /api/project/1 (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -70,7 +64,7 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     } , (err, res, body) => {
         t.error(err, 'no error');
@@ -85,7 +79,7 @@ test('POST /api/project (Invalid Mosaic)', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -112,7 +106,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -144,7 +138,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Checkpoint',
@@ -199,7 +193,7 @@ test('POST /api/project/1/aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test AOI',
@@ -252,7 +246,7 @@ test('GET /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -323,7 +317,7 @@ test('POST /api/project (sort)', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'LULC Test Project',
@@ -355,7 +349,7 @@ test('GET /api/project?sort=asc', (t) => {
         url: 'http://localhost:2000/api/project?sort=asc',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -373,7 +367,7 @@ test('GET /api/project?name=lulc', (t) => {
         url: 'http://localhost:2000/api/project?name=lulc',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -441,7 +435,7 @@ test('GET /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 200, 'status: 200');
@@ -468,7 +462,7 @@ test('PATCH /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Renamed Test Project'
@@ -497,7 +491,7 @@ test('GET /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 200, 'status: 200');
@@ -524,7 +518,7 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -542,7 +536,7 @@ test('DELETE /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 200, 'status: 200');
@@ -559,7 +553,7 @@ test('GET /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 404, 'status: 404');
@@ -574,7 +568,7 @@ test('DELETE /api/project/3', (t) => {
         url: 'http://localhost:2000/api/project/3',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 404, 'status: 404');
