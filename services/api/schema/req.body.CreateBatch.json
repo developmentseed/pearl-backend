@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "required": [
+        "name",
+        "bounds"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "bounds": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}
