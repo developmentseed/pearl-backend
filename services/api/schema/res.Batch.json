@@ -1,0 +1,49 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "uid",
+        "project_id",
+        "created",
+        "updated",
+        "aoi",
+        "name",
+        "completed",
+        "bounds"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "uid": {
+            "type": "integer"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "aoi": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "completed": {
+            "type": "boolean"
+        },
+        "bounds": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}
