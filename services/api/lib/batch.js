@@ -15,25 +15,37 @@ class Batch extends Generic {
 
         this._table = Batch._table;
 
-        this.id = false;
-        this.uid = false;
-        this.created = false;
-        this.updated = false;
-        this.name = false;
-        this.bounds = false;
-        this.completed = false;
-
         // Attributes which are allowed to be patched
         this.attrs = Object.keys(require('../schema/req.body.PatchBatch.json').properties);
+    }
+
+    /**
+     * Ensure a user can only access their own project assets (or is an admin and can access anything)
+     *
+     * @param {Project} project Instantiated Project class
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     * @param {Number} checkpointid Checkpoint the user is attemping to access
+     */
+    static async has_auth(project, auth, projectid, batchid) {
+        const proj = await project.has_auth(auth, projectid);
+        const checkpoint = await this.get(checkpointid);
+
+        if (checkpoint.project_id !== proj.id) {
+            throw new Err(400, null, `Checkpoint #${checkpointid} is not associated with project #${projectid}`);
+        }
+
+        return batch;
     }
 
     /**
      * Return a list of batches
      *
      * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Number} uid - User ID to filter by
      *
      * @param {Object} query - Query Object
+     * @param {Number} query.uid - User ID
+     * @param {Number} query.projectid - Project ID
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      * @param {boolean} [query.completed] - Filter by completion
@@ -59,15 +71,16 @@ class Batch extends Generic {
                 SELECT
                     count(*) OVER() AS count,
                     id,
-                    uid,
                     created,
                     updated,
+                    aoi,
                     name,
                     completed
                 FROM
                     batch
                 WHERE
-                    uid = ${uid}
+                    uid = ${query.uid}
+                    AND project_id = ${query.projectid}
                     AND (${query.completed}::BOOLEAN IS NULL OR ${query.completed} = completed)
                 ORDER BY
                     ${sql.identifier(['batch', query.sort])} ${query.order}
@@ -85,9 +98,12 @@ class Batch extends Generic {
 
     serialize() {
         return {
-            id: parseInt(this.id),
+            id: this.id,
+            uid: this.uid,
+            project_id: this.project_id,
             created: this.created,
             updated: this.updated,
+            aoi: this.aoi,
             name: this.name,
             bounds: this.bounds,
             completed: this.completed
@@ -99,6 +115,7 @@ class Batch extends Generic {
             await pool.query(sql`
                 UPDATE batch
                     SET
+                        aoi         = ${this.aoi},
                         completed   = ${this.completed},
                         updated     = NOW()
                     WHERE
@@ -116,10 +133,12 @@ class Batch extends Generic {
             const pgres = await pool.query(sql`
                 INSERT INTO batch (
                     uid,
+                    project_id,
                     name,
                     bounds
                 ) VALUES (
                     ${batch.uid},
+                    ${batch.project_id},
                     ${batch.name},
                     ${batch.bounds}
                 ) RETURNING *

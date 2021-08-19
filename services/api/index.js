@@ -415,7 +415,7 @@ async function server(args, config, cb) {
     });
 
     /**
-     * @api {get} /api/project/:project/instance Create Instance
+     * @api {get} /api/project/:projectid/instance Create Instance
      * @apiVersion 1.0.0
      * @apiName CreateInstance
      * @apiGroup Instance
