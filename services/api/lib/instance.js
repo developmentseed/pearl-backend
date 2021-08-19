@@ -48,7 +48,7 @@ class Instance {
     static json(row) {
         const inst = {
             id: parseInt(row.id),
-            is_batch: row.is_batch,
+            batch: row.batch,
             project_id: parseInt(row.project_id),
             aoi_id: parseInt(row.aoi_id),
             checkpoint_id: parseInt(row.checkpoint_id),
@@ -96,7 +96,7 @@ class Instance {
                SELECT
                     count(*) OVER() AS count,
                     id,
-                    is_batch,
+                    batch,
                     active,
                     created,
                     type
@@ -122,7 +122,7 @@ class Instance {
             instances: pgres.rows.map((row) => {
                 return {
                     id: row.id,
-                    is_batch: row.is_batch,
+                    batch: row.batch,
                     active: row.active,
                     created: row.created,
                     type: row.type
@@ -286,7 +286,7 @@ class Instance {
             pgres = await this.pool.query(sql`
                 SELECT
                     id,
-                    is_batch,
+                    batch,
                     created,
                     project_id,
                     last_update,
