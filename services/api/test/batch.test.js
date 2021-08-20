@@ -81,11 +81,34 @@ test('GET /api/project/1/batch (empty)', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.deepEquals(res.body, {
             total: 0,
             batch: []
+        });
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+
+test('GET /api/project/1/batch/1 (does not exist)', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/batch/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        });
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'batch not found',
+            messages: []
         });
     } catch (err) {
         t.error(err);

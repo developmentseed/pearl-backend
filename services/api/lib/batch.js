@@ -22,17 +22,19 @@ class Batch extends Generic {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Project} project Instantiated Project class
+     * @param {Object} config Server config
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} checkpointid Checkpoint the user is attemping to access
+     * @param {Number} batchid Checkpoint the user is attemping to access
      */
-    static async has_auth(project, auth, projectid, batchid) {
-        const proj = await project.has_auth(auth, projectid);
-        const checkpoint = await this.get(checkpointid);
+    static async has_auth(config, auth, projectid, batchid) {
+        const project = new (require('../lib/project').Project)(config);
 
-        if (checkpoint.project_id !== proj.id) {
-            throw new Err(400, null, `Checkpoint #${checkpointid} is not associated with project #${projectid}`);
+        const proj = await project.has_auth(auth, projectid);
+        const batch = await this.from(config.pool, batchid);
+
+        if (batch.project_id !== proj.id) {
+            throw new Err(400, null, `Batch #${batch} is not associated with project #${projectid}`);
         }
 
         return batch;

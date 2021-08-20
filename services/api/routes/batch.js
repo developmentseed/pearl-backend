@@ -102,11 +102,10 @@ async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await user.is_auth(req);
             await Param.int(req, 'projectid');
             await Param.int(req, 'batchid');
 
-            const batch = await Batch.has_auth(project, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config, req.auth, req.params.projectid, req.params.batchid);
 
             return res.json(batch.serialize());
         } catch (err) {
@@ -132,11 +131,10 @@ async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await user.is_auth(req);
             await Param.int(req, 'projectid');
             await Param.int(req, 'batchid');
 
-            const batch = await Batch.has_auth(project, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config, req.auth, req.params.projectid, req.params.batchid);
             batch.patch(req.body);
             await batch.commit(config.pool);
 
