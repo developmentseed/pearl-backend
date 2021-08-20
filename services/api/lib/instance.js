@@ -193,6 +193,7 @@ class Instance {
      * @param {Object} instance - Instance Object
      * @param {Number} instance.aoi_id The current AOI loaded on the instance
      * @param {Number} instance.checkpoint_id The current checkpoint loaded on the instance
+     * @param {Number} instance.batch If the instance is a batch job, specify batch ID
      */
     async create(auth, instance) {
         if (!auth.uid) {
@@ -222,11 +223,13 @@ class Instance {
                     project_id,
                     aoi_id,
                     checkpoint_id,
+                    batch,
                     type
                 ) VALUES (
                     ${instance.project_id},
                     ${instance.aoi_id || null},
                     ${instance.checkpoint_id || null},
+                    ${instance.batch || null},
                     ${type}
                 ) RETURNING *
             `);

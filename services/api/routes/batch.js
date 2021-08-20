@@ -63,7 +63,14 @@ async function router(schema, config) {
             req.body.project_id = req.params.projectid;
             const batch = await Batch.generate(config.pool, req.body);
 
-            return res.json(batch.serialize());
+            req.body.project_id = req.params.projectid;
+            req.body.batch = batch.id;
+            const inst = await instance.create(req.auth, req.body);
+
+            const batch_json = batch.serialize();
+            batch_json.instance = inst.id;
+
+            return res.json(batch_json);
         } catch (err) {
             return Err.respond(err, res);
         }

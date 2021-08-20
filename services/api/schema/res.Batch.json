@@ -37,6 +37,10 @@
         "completed": {
             "type": "boolean"
         },
+        "instance": {
+            "type": "integer",
+            "description": "Instance ID of batch"
+        },
         "bounds": {
             "type": "array",
             "minItems": 4,
