@@ -353,7 +353,7 @@ class AOI {
                     ${projectid},
                     ${aoi.name},
                     ${aoi.checkpoint_id},
-                    ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)}), 4326)
+                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
                 ) RETURNING *
             `);
         } catch (err) {

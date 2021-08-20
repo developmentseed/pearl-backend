@@ -132,8 +132,7 @@ class Batch extends Generic {
 
     static async generate(pool, batch) {
         try {
-            const pgres = await pool.query(sql`
-                INSERT INTO batch (
+            const pgres = await pool.query(sql` INSERT INTO batch (
                     uid,
                     project_id,
                     name,
@@ -142,7 +141,7 @@ class Batch extends Generic {
                     ${batch.uid},
                     ${batch.project_id},
                     ${batch.name},
-                    ${batch.bounds}
+                    ST_GeomFromGeoJSON(${JSON.stringify(batch.bounds)})
                 ) RETURNING *
             `);
 

@@ -42,12 +42,7 @@
             "description": "Instance ID of batch"
         },
         "bounds": {
-            "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
-            "items": {
-                "type": "number"
-            }
+            "$ref": "./util/polygon.json"
         }
     }
 }

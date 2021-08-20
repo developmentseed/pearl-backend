@@ -93,12 +93,15 @@ class Instance {
         }
 
         let batch = null;
+        let batch_id = null;
         if (query.batch === 'true') {
             batch = true;
         } else if (query.batch === 'false') {
             batch = false;
-        } else if (!isNaN(parseInt(query.batch))) {
-            batch = parseInt(query.batch);
+        }
+
+        if (!isNaN(parseInt(query.batch))) {
+            batch_id = parseInt(query.batch);
         }
 
         let pgres;
@@ -118,10 +121,10 @@ class Instance {
                     AND (${query.type}::TEXT IS NULL OR type = ${query.type})
                     AND (${active}::BOOLEAN IS NULL OR active = ${active})
                     AND (
-                        ${batch}::BOOLEAN IS NULL
+                        (${batch}::BOOLEAN IS NULL AND ${batch_id}::BIGINT IS NULL)
                         OR (${batch}::BOOLEAN = True AND batch IS NOT NULL)
                         OR (${batch}::BOOLEAN = False AND batch IS NULL)
-                        OR (${batch}::BIGINT IS NOT NULL AND ${batch} = batch)
+                        OR (${batch_id}::BIGINT IS NOT NULL AND ${batch_id}::BIGINT = batch)
                     )
                 ORDER BY
                     last_update

@@ -14,12 +14,7 @@
             "description": "The current checkpoint loaded on the instance"
         },
         "bounds": {
-            "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
-            "items": {
-                "type": "number"
-            }
+            "$ref": "./util/polygon.json"
         }
     }
 }

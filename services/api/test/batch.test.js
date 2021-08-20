@@ -117,4 +117,40 @@ test('GET /api/project/1/batch/1 (does not exist)', async (t) => {
     t.end();
 });
 
+test('POST /api/project/1/batch', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/batch',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Area',
+                bounds: {
+                    type: 'Polygon',
+                    coordinates: [[
+                        [ -79.37724530696869, 38.83428180092151 ],
+                        [ -79.37677592039108, 38.83428180092151 ],
+                        [ -79.37677592039108, 38.83455550411051 ],
+                        [ -79.37724530696869, 38.83455550411051 ],
+                        [ -79.37724530696869, 38.83428180092151 ]
+                    ]]
+                }
+            }
+        });
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'batch not found',
+            messages: []
+        });
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+
 flight.landing(test);

@@ -39,7 +39,8 @@
         "path-to-regexp": "^6.2.0",
         "pg": "^8.5.1",
         "request": "^2.88.2",
-        "slonik": "^24.0.0"
+        "slonik": "^24.0.0",
+        "wkx": "^0.5.0"
     },
     "devDependencies": {
         "apidoc-plugin-schema": "^0.1.8",
