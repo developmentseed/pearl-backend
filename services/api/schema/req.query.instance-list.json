@@ -21,6 +21,14 @@
                 "inactive",
                 "all"
             ]
+        },
+        "batch": {
+            "type": ["string", "integer"],
+            "description": "Filter batch instances, if a boolean - show hide batch instances, if an integer, only show specific instance with a given batch id",
+            "enum": [
+                "true",
+                "false"
+            ]
         }
     }
 }

@@ -74,12 +74,14 @@ class Instance {
      * @param {Number} [query.page=0] - Page of users to return
      * @param {Number} [query.status=active] - Should the session be active? `active`, `inactive`, or `all`
      * @param {Number} [query.type] - Filter by type of instance. `gpu` or 'cpu'. Default all.
+     * @param {Number} [query.batch] - Filter by batch status (batch=true/false - Show/Hide batches, batch=<num> show instance with specific batch)
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
         if (!query.type) query.type = null;
+        if (!query.batch) query.batch = null;
 
         let active = null;
         if (query.status === 'active') {
@@ -88,6 +90,15 @@ class Instance {
             active = false;
         } else if (query.status === 'all') {
             active = null;
+        }
+
+        let batch = null;
+        if (query.batch === 'true') {
+            batch = true;
+        } else if (query.batch === 'false') {
+            batch = false;
+        } else if (!isNaN(parseInt(query.batch))) {
+            batch = parseInt(query.batch);
         }
 
         let pgres;
@@ -106,6 +117,12 @@ class Instance {
                     project_id = ${projectid}
                     AND (${query.type}::TEXT IS NULL OR type = ${query.type})
                     AND (${active}::BOOLEAN IS NULL OR active = ${active})
+                    AND (
+                        ${batch}::BOOLEAN IS NULL
+                        OR (${batch}::BOOLEAN = True AND batch IS NOT NULL)
+                        OR (${batch}::BOOLEAN = False AND batch IS NULL)
+                        OR (${batch}::BIGINT IS NOT NULL AND ${batch} = batch)
+                    )
                 ORDER BY
                     last_update
                 LIMIT
