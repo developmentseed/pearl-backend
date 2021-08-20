@@ -1,4 +1,4 @@
-'use strict';
+
 
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const wkx = require('wkx');

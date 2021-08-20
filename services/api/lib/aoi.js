@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('./error');
 const moment = require('moment');

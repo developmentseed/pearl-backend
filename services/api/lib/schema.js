@@ -1,4 +1,4 @@
-'use strict';
+
 
 const { Validator } = require('express-json-validator-middleware');
 const $RefParser = require('json-schema-ref-parser');

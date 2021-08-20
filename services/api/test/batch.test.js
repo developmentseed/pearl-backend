@@ -192,4 +192,9 @@ test('GET /api/project/1/instance/1', async (t) => {
     t.end();
 });
 
+// TODO
+// Test instance creation with initial AOI
+// Ensure only 1 batch can be running at a time
+// Test instance filtering with batch=true, batch=false, batch=<num>
+
 flight.landing(test);

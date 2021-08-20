@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('./error');
 const { sql } = require('slonik');
@@ -40,8 +40,6 @@ class Generic {
     }
 
     static deserialize(dbrow, alias) {
-        const array = false;
-
         // Return a list style result
         if (Array.isArray(dbrow)) {
             const res = {

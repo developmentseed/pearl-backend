@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');

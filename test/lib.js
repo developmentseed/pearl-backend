@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-'use strict';
+
 
 const util = require('./lib/util');
 const run = require('./lib/run');
@@ -23,7 +23,7 @@ class LULC {
         this.user = {
             username: api.username ? api.username : process.env.LULC_USERNAME,
             password: api.password ? api.password : process.env.LULC_PASSWORD,
-            token: api.token ? api.token : process.env.LULC_TOKEN,
+            token: api.token ? api.token : process.env.LULC_TOKEN
         };
 
         this.schema = util.local_schema();
@@ -38,7 +38,7 @@ class LULC {
      * @param {Object} payload - Optional API Payload
      */
     async cmd(cmd, subcmd, payload, stream = false) {
-        if (process.env.UPDATE) this.schema = await util.schema(this.url)
+        if (process.env.UPDATE) this.schema = await util.schema(this.url);
 
         if (!this.schema.cli[cmd]) throw new Error('Command Not Found');
         if (!this.schema.cli[cmd][subcmd]) throw new Error('Subcommand Not Found');
@@ -51,16 +51,13 @@ class LULC {
             for (const match of matches) {
                 if (!payload[match]) throw new Error(`"${match}" is required in body`);
                 url = url.replace(match, payload[match]);
-                delete payload[match]
+                delete payload[match];
             }
         }
 
         const schema = this.schema.schema[this.schema.cli[cmd][subcmd]];
-        try {
-            return await run(this, schema, url, payload, stream);
-        } catch (err) {
-            throw err;
-        }
+
+        return await run(this, schema, url, payload, stream);
     }
 }
 

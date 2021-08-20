@@ -1,4 +1,4 @@
-'use strict';
+
 
 const { promisify } = require('util');
 const request = promisify(require('request'));
@@ -8,7 +8,7 @@ const Config = require('../services/api/lib/config');
 const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
-let state = {
+const state = {
     project: 1,
     token: false,
     instance: false,
@@ -310,7 +310,7 @@ function connect(test, API) {
                 'pod',
                 'project_id',
                 'token',
-                'type',
+                'type'
             ].sort(), 'expected props');
 
             t.ok(parseInt(res.body.id), 'id: <integer>');
