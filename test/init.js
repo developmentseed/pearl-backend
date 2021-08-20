@@ -305,7 +305,7 @@ function connect(test, API) {
                 'checkpoint_id',
                 'created',
                 'id',
-                'is_batch',
+                'batch',
                 'last_update',
                 'pod',
                 'project_id',
@@ -324,7 +324,7 @@ function connect(test, API) {
 
             t.deepEquals(res.body, {
                 project_id: 1,
-                is_batch: false,
+                batch: null,
                 aoi_id: null,
                 checkpoint_id: null,
                 active: false,
