@@ -440,6 +440,7 @@ async function server(args, config, cb) {
      *     Create a new project
      *
      * @apiSchema (Body) {jsonschema=./schema/req.body.project.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Project.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -450,7 +451,8 @@ async function server(args, config, cb) {
      *   }
      */
     await schema.post('/project', {
-        body: 'req.body.project.json'
+        body: 'req.body.project.json',
+        res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
@@ -1833,30 +1835,14 @@ async function server(args, config, cb) {
      * @apiPermission admin
      *
      * @apiSchema (Body) {jsonschema=./schema/req.body.model.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      *
      * @apiDescription
      *     Create a new model in the system
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "created": "<date>",
-     *       "active": true,
-     *       "uid": 1,
-     *       "name": "HCMC Sentinel 2019 Unsupervised",
-     *       "model_type": "keras_example",
-     *       "model_inputshape": [100,100,4],
-     *       "model_zoom" 17,
-     *       "storage": true,
-     *       "classes": [
-     *           {"name": "Water", "color": "#0000FF"},
-     *       ],
-     *       "meta": {}
-     *   }
      */
     await schema.post('/model', {
-        body: 'req.body.model.json'
+        body: 'req.body.model.json',
+        res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await auth.is_admin(req);
@@ -1875,12 +1861,14 @@ async function server(args, config, cb) {
      * @apiPermission admin
      *
      * @apiSchema (Body) {jsonschema=./schema/req.body.model-patch.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      *
      * @apiDescription
      *     Update a model
      */
     await schema.patch('/model/:modelid', {
-        body: 'req.body.model-patch.json'
+        body: 'req.body.model-patch.json',
+        res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
@@ -1903,26 +1891,11 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Upload a new model asset to the API
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "created": "<date>",
-     *       "active": true,
-     *       "uid": 1,
-     *       "name": "HCMC Sentinel 2019 Unsupervised",
-     *       "model_type": "keras_example",
-     *       "model_inputshape": [100,100,4],
-     *       "model_zoom": 17,
-     *       "model_numparams": 563498,
-     *       "storage": true,
-     *       "classes": [
-     *           {"name": "Water", "color": "#0000FF"},
-     *       ],
-     *       "meta": {}
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
-    await schema.post('/model/:modelid/upload', {}, config.requiresAuth, async (req, res) => {
+    await schema.post('/model/:modelid/upload', {
+        res: 'res.Model.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
             await auth.is_admin(req);
@@ -1991,14 +1964,11 @@ async function server(args, config, cb) {
      *     Mark a model as inactive, and disallow subsequent instances of this model
      *     Note: this will not affect currently running instances of the model
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "status": 200,
-     *       "message": "Model deleted"
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.delete('/model/:modelid', {}, config.requiresAuth, async (req, res) => {
+    await schema.delete('/model/:modelid', {
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
             await auth.is_admin(req);
@@ -2024,25 +1994,11 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return a all information for a single model
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "created": "<date>",
-     *       "active": true,
-     *       "uid": 1,
-     *       "name": "HCMC Sentinel 2019 Unsupervised",
-     *       "model_type": "keras_example",
-     *       "model_inputshape": [100,100,4],
-     *       "model_zoom": 17,
-     *       "storage": true,
-     *       "classes": [
-     *           {"name": "Water", "color": "#0000FF"},
-     *       ],
-     *       "meta": {}
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
-    await schema.get('/model/:modelid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/model/:modelid', {
+        res: 'res.Model.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
 
@@ -2067,105 +2023,6 @@ async function server(args, config, cb) {
             await Param.int(req, 'modelid');
 
             await model.download(req.params.modelid, res);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /api/mosaic List Mosaics
-     * @apiVersion 1.0.0
-     * @apiName ListMosaic
-     * @apiGroup Mosaic
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return a list of currently supported mosaic layers
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "mosaics": [
-     *           "naip.latest"
-     *       ]
-     *   }
-     */
-    await schema.get('/mosaic', {}, async (req, res) => {
-        try {
-            return res.json(Mosaic.list());
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /api/mosaic/:layer Get TileJson
-     * @apiVersion 1.0.0
-     * @apiName GetJson
-     * @apiGroup Mosaic
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return a TileJSON object for a given mosaic layer
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "tilejson": "2.2.0",
-     *       "name": "naip.latest",
-     *       "version": "1.0.0",
-     *       "scheme": "xyz",
-     *       "tiles": [ "http://localhost:8000/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?" ],
-     *       "minzoom": 12,
-     *       "maxzoom": 18,
-     *       "bounds": [
-     *           -124.81903735821528,
-     *           24.49673997373884,
-     *           -66.93084562551495,
-     *           49.44192498524237
-     *       ],
-     *       "center": [ -95.87494149186512, 36.9693324794906, 12 ]
-     *   }
-     */
-    await schema.get('/mosaic/:layer', {}, async (req, res) => {
-        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
-
-        try {
-            req.url = req.url + '/tilejson.json';
-
-            await proxy.request(req, res);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /mosaic/:layer/tiles/:z/:x/:y.:format Get Tile
-     * @apiVersion 1.0.0
-     * @apiName GetTile
-     * @apiGroup Mosaic
-     * @apiPermission public
-     *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.tile.json} apiParam
-     *
-     * @apiParam {Integer} z Mercator Z coordinate
-     * @apiParam {Integer} x Mercator X coordinate
-     * @apiParam {Integer} y Mercator Y coordinate
-     * @apiParam {String} format Available values : png, npy, tif, jpg, jp2, webp, pngraw
-     *
-     * @apiDescription
-     *     Return an aerial imagery tile for a given set of mercator coordinates
-     *
-     */
-    await schema.get('/mosaic/:layer/tiles/:z/:x/:y.:format', {}, async (req, res) => {
-        if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
-
-        try {
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
-
-            await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }

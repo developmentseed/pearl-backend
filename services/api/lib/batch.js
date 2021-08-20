@@ -52,7 +52,7 @@ class Batch extends Generic {
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
-    static async list(pool, uid, query) {
+    static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;

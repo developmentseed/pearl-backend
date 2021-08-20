@@ -22,7 +22,7 @@ async function router(schema) {
      */
     await schema.get('/schema', {
         query: 'req.query.ListSchema.json',
-        body: 'res.ListSchema.json'
+        res: 'res.ListSchema.json'
     }, async (req, res) => {
         try {
             if (req.query.url && req.query.method) {

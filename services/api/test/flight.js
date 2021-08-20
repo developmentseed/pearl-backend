@@ -81,6 +81,7 @@ class Flight {
         const schemaurl = new URL('/api/schema', this.base);
         schemaurl.searchParams.append('method', match.split(' ')[0]);
         schemaurl.searchParams.append('url', match.split(' ')[1]);
+
         const schema = ajv.compile((await prequest({
             json: true,
             url: schemaurl

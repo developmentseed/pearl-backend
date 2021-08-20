@@ -85,7 +85,7 @@ test('GET /api/project/1/batch (empty)', async (t) => {
 
         t.deepEquals(res.body, {
             total: 0,
-            instances: []
+            batch: []
         });
     } catch (err) {
         t.error(err);
