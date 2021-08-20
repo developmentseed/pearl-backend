@@ -197,7 +197,7 @@ async function server(args, config, cb) {
     /*
      * Auth middleware
      */
-    const requiresAuth = [
+    config.requiresAuth = [
         (req, res, next) => {
             if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
                 const token = req.headers.authorization.split(' ')[1];
@@ -269,87 +269,6 @@ async function server(args, config, cb) {
     }
 
     /**
-     * @api {get} /api/token List Tokens
-     * @apiVersion 1.0.0
-     * @apiName ListTokens
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   [{
-     *       "id": 1,
-     *       "created": "<date>",
-     *       "name": "Token Name"
-     *   }]
-     */
-    await schema.get('/token', {}, requiresAuth, async (req, res) => {
-        try {
-            return res.json(await authtoken.list(req.auth));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {post} /api/token Create Token
-     * @apiVersion 1.0.0
-     * @apiName CreateToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new API token to perform API requests with
-     *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.token.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *       "email": "example@example.com",
-     *       "access": "admin",
-     *       "flags": {}
-     *   }
-     */
-    await schema.post('/token', {
-        body: './req.body.token.json'
-    }, requiresAuth, async (req, res) => {
-        try {
-            return res.json(await authtoken.generate(req.auth, req.body.name));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {delete} /api/token/:id Delete Token
-     * @apiVersion 1.0.0
-     * @apiName DeleteToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete an existing token
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "status": 200,
-     *       "message": "Token Deleted"
-     *   }
-     */
-    await schema.delete('/token/:tokenid', {}, requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'tokenid');
-
-            return res.json(await authtoken.delete(req.auth, req.params.tokenid));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
      * @api {get} /api/user List Users
      * @apiVersion 1.0.0
      * @apiName ListUsers
@@ -376,7 +295,7 @@ async function server(args, config, cb) {
      */
     await schema.get('/user', {
         query: 'req.query.user-list.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             const users = await auth.list(req.query);
 
@@ -405,75 +324,13 @@ async function server(args, config, cb) {
      *       "flags": {}
      *   }
      */
-    await schema.get('/user/me', {}, requiresAuth, async (req, res) => {
+    await schema.get('/user/me', {}, config.requiresAuth, async (req, res) => {
         return res.json({
             username: req.auth.username,
             email: req.auth.email,
             access: req.auth.access,
             flags: req.auth.flags
         });
-    });
-
-    /**
-     * @api {get} /api/project/:projectid/instance Create Instance
-     * @apiVersion 1.0.0
-     * @apiName CreateInstance
-     * @apiGroup Instance
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Instruct the GPU pool to start a new model instance and return a time limited session
-     *     token for accessing the websockets GPU API
-     *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.instance.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "created": "<date",
-     *       "project_id": 2,
-     *       "url": "ws://<websocket-connection-url>",
-     *       "token": "websocket auth token"
-     *   }
-     */
-    await schema.post('/project/:projectid/instance', {
-        body: 'req.body.instance.json'
-    }, requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await project.has_auth(req.auth, req.params.projectid);
-
-            req.body.project_id = req.params.projectid;
-            const inst = await instance.create(req.auth, req.body);
-
-            res.json(inst);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {patch} /api/project/:projectid/instance/:instance Patch Instance
-     * @apiVersion 1.0.0
-     * @apiName PatchInstance
-     * @apiGroup Instance
-     * @apiPermission admin
-     *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.instance-patch.json} apiParam
-     */
-    await schema.patch('/project/:projectid/instance/:instanceid', {
-        body: 'req.body.instance-patch.json'
-    }, requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'instanceid');
-            await auth.is_admin(req);
-
-            return res.json(await instance.patch(req.params.instanceid, req.body));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
     });
 
     /**
@@ -508,7 +365,7 @@ async function server(args, config, cb) {
      */
     await schema.get('/project', {
         query: 'req.query.project-list.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             const results = await project.list(req.auth.uid, req.query);
             if (results.projects && results.projects.length) {
@@ -554,7 +411,7 @@ async function server(args, config, cb) {
      *       "mosaic": "naip.latest"
      *   }
      */
-    await schema.get('/project/:projectid', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
 
@@ -594,7 +451,7 @@ async function server(args, config, cb) {
      */
     await schema.post('/project', {
         body: 'req.body.project.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
@@ -626,7 +483,7 @@ async function server(args, config, cb) {
      */
     await schema.patch('/project/:projectid', {
         body: 'req.body.project-patch.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
@@ -648,7 +505,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Delete a project
      */
-    await schema.delete('/project/:projectid', {}, requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
@@ -667,75 +524,6 @@ async function server(args, config, cb) {
             chkpts.checkpoints.forEach(async (c) => { await checkpoint.delete(c.id); });
 
             return res.json(await project.delete(req.params.projectid));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /api/project/:projectid/instance List Instances
-     * @apiVersion 1.0.0
-     * @apiName ListInstances
-     * @apiGroup Instance
-     * @apiPermission user
-     *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.instance-list.json} apiParam
-     *
-     * @apiDescription
-     *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
-     *     field will be pinned to their own uid. Admins can filter by any uid or none.
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "instances": [{
-     *           "id": 1,
-     *           "uid": 123,
-     *           "active": true,
-     *           "created": "<date>"
-     *       }]
-     *   }
-     */
-    await schema.get('/project/:projectid/instance', {
-        query: 'req.query.instance-list.json'
-    }, requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await project.has_auth(req.auth, req.params.projectid);
-
-            res.json(await instance.list(req.params.projectid, req.query));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /api/project/:projectid/instance/:instanceid Get Instance
-     * @apiVersion 1.0.0
-     * @apiName GetInstance
-     * @apiGroup Instance
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all information about a given instance
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "uid": 123,
-     *       "active": true,
-     *       "created": "<date>",
-     *       "token": "<instance token>"
-     *   }
-     */
-    await schema.get('/project/:projectid/instance/:instanceid', {}, requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'instanceid');
-
-            res.json(await instance.has_auth(project, req.auth, req.params.projectid, req.params.instanceid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -763,7 +551,7 @@ async function server(args, config, cb) {
      *       "bounds": { "GeoJSON "}
      *   }
      */
-    await schema.get( '/project/:projectid/aoi/:aoiid', {}, requiresAuth, async (req, res) => {
+    await schema.get( '/project/:projectid/aoi/:aoiid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -879,7 +667,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return tilejson for a given AOI
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/tiles', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/tiles', {}, config.requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
@@ -958,7 +746,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return a Tile for a given AOI
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -999,7 +787,7 @@ async function server(args, config, cb) {
      *       "bounds": { "GeoJSON "}
      *   }
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/upload', {}, requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/upload', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1077,7 +865,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return the aoi fabric geotiff
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/download/raw', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/download/raw', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1101,7 +889,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return the colourized aoi fabric geotiff - but doesn't save it to share page
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/download/color', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/download/color', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1166,7 +954,7 @@ async function server(args, config, cb) {
      */
     await schema.get('/project/:projectid/aoi', {
         query: 'req.query.aoi.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
@@ -1215,7 +1003,7 @@ async function server(args, config, cb) {
      */
     await schema.post('/project/:projectid/aoi', {
         body: 'req.body.aoi.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
@@ -1246,7 +1034,7 @@ async function server(args, config, cb) {
      *       "patches": []
      *   }
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/share', {}, requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/share', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1300,7 +1088,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Delete a Shared AOI
      */
-    await schema.delete('/project/:projectid/aoi/:aoiid/share/:shareuuid', {}, requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/aoi/:aoiid/share/:shareuuid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1339,7 +1127,7 @@ async function server(args, config, cb) {
      */
     await schema.get('/project/:projectid/share', {
         query: 'req.query.aoi.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
@@ -1360,7 +1148,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Delete an existing AOI
      */
-    await schema.delete('/project/:projectid/aoi/:aoiid', {}, requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/aoi/:aoiid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1398,7 +1186,7 @@ async function server(args, config, cb) {
      */
     await schema.patch('/project/:projectid/aoi/:aoiid', {
         body: 'req.body.aoi-patch.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1433,7 +1221,7 @@ async function server(args, config, cb) {
      *       }]
      *   }
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1466,7 +1254,7 @@ async function server(args, config, cb) {
      *       "aoi_id": 1
      *   }
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/patch', {}, requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/patch', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1493,7 +1281,7 @@ async function server(args, config, cb) {
      *   HTTP/1.1 200 OK
      *   true
      */
-    await schema.delete('/project/:projectid/aoi/:aoiid/patch/:patchid', {}, requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/aoi/:aoiid/patch/:patchid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1527,7 +1315,7 @@ async function server(args, config, cb) {
      *       "aoi": 1
      *  }
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1549,7 +1337,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Get the TileJSON for a given AOI Patch
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles', {}, config.requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
@@ -1635,7 +1423,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Download a Tiff Patch
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/download', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/download', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1669,7 +1457,7 @@ async function server(args, config, cb) {
      *       "aoi": 1
      *  }
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/patch/:patchid/upload', {}, requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/patch/:patchid/upload', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -1719,7 +1507,7 @@ async function server(args, config, cb) {
      *       "created": "<date>"
      *   }
      */
-    await schema.get('/project/:projectid/checkpoint/:checkpointid', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/checkpoint/:checkpointid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -1740,7 +1528,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return tilejson for a given Checkpoint
      */
-    await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -1775,7 +1563,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return a Tile for a given AOI
      */
-    await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -1814,7 +1602,7 @@ async function server(args, config, cb) {
      *       "created": "<date>"
      *   }
      */
-    await schema.post('/project/:projectid/checkpoint/:checkpointid/upload', {}, requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/checkpoint/:checkpointid/upload', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -1852,7 +1640,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Download a checkpoint asset from the API
      */
-    await schema.get('/project/:projectid/checkpoint/:checkpointid/download', {}, requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/checkpoint/:checkpointid/download', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -1893,7 +1681,7 @@ async function server(args, config, cb) {
      */
     await schema.get('/project/:projectid/checkpoint', {
         query: 'req.query.checkpoint.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
@@ -1932,7 +1720,7 @@ async function server(args, config, cb) {
      */
     await schema.post('/project/:projectid/checkpoint', {
         body: 'req.body.checkpoint.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await project.has_auth(req.auth, req.params.projectid);
@@ -1983,7 +1771,7 @@ async function server(args, config, cb) {
      *     Delete an existing Checkpoint
      *     NOTE: This will also delete AOIs that depend on the given checkpoint
      */
-    await schema.delete('/project/:projectid/checkpoint/:checkpointid', {}, requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/checkpoint/:checkpointid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -2025,7 +1813,7 @@ async function server(args, config, cb) {
      */
     await schema.patch('/project/:projectid/checkpoint/:checkpointid', {
         body: 'req.body.checkpoint-patch.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -2069,7 +1857,7 @@ async function server(args, config, cb) {
      */
     await schema.post('/model', {
         body: 'req.body.model.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await auth.is_admin(req);
 
@@ -2093,7 +1881,7 @@ async function server(args, config, cb) {
      */
     await schema.patch('/model/:modelid', {
         body: 'req.body.model-patch.json'
-    }, requiresAuth, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
 
@@ -2134,7 +1922,7 @@ async function server(args, config, cb) {
      *       "meta": {}
      *   }
      */
-    await schema.post('/model/:modelid/upload', {}, requiresAuth, async (req, res) => {
+    await schema.post('/model/:modelid/upload', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
             await auth.is_admin(req);
@@ -2184,7 +1972,7 @@ async function server(args, config, cb) {
      *       }]
      *   }
      */
-    await schema.get('/model', {}, requiresAuth, async (req, res) => {
+    await schema.get('/model', {}, config.requiresAuth, async (req, res) => {
         try {
             res.json(await model.list());
         } catch (err) {
@@ -2210,7 +1998,7 @@ async function server(args, config, cb) {
      *       "message": "Model deleted"
      *   }
      */
-    await schema.delete('/model/:modelid', {}, requiresAuth, async (req, res) => {
+    await schema.delete('/model/:modelid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
             await auth.is_admin(req);
@@ -2254,7 +2042,7 @@ async function server(args, config, cb) {
      *       "meta": {}
      *   }
      */
-    await schema.get('/model/:modelid', {}, requiresAuth, async (req, res) => {
+    await schema.get('/model/:modelid', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
 
@@ -2274,7 +2062,7 @@ async function server(args, config, cb) {
      * @apiDescription
      *     Return the model itself
      */
-    await schema.get('/model/:modelid/download', {}, requiresAuth, async (req, res) => {
+    await schema.get('/model/:modelid/download', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
 
@@ -2378,58 +2166,6 @@ async function server(args, config, cb) {
             await Param.int(req, 'y');
 
             await proxy.request(req, res);
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {get} /api/instance/:instanceid Self Instance
-     * @apiVersion 1.0.0
-     * @apiName SelfInstance
-     * @apiGroup Instance
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     A newly instantiated GPU Instance does not know what it's project id is. This API
-     *     allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "uid": 123,
-     *       "active": true,
-     *       "created": "<date>"
-     *       "pod": { ... }
-     *   }
-     */
-    await schema.get('/instance/:instanceid', {}, requiresAuth, async (req, res) => {
-        try {
-            await Param.int(req, 'instanceid');
-            await auth.is_admin(req);
-
-            return res.json(await instance.get(req.auth, req.params.instanceid));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    /**
-     * @api {delete} /api/instance Deactivate Instances
-     * @apiVersion 1.0.0
-     * @apiName DeactivateInstance
-     * @apiGroup Instance
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Set all instances to active: false - used by the socket server upon initial api connection
-     */
-    await schema.delete('/instance', requiresAuth, async (req, res) => {
-        try {
-            await auth.is_admin(req);
-
-            return res.json(await instance.reset());
         } catch (err) {
             return Err.respond(err, res);
         }

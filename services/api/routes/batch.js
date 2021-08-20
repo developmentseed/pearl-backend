@@ -23,7 +23,7 @@ async function router(schema, config) {
     await schema.get('/project/:projectid/batch', {
         query: 'req.query.ListBatches.json',
         res: 'res.ListBatches.json'
-    }, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
 
@@ -53,7 +53,7 @@ async function router(schema, config) {
     await schema.post('/project/:projectid/batch', {
         body: 'req.body.CreateBatch.json',
         res: 'res.Batch.json'
-    }, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
 
@@ -83,7 +83,7 @@ async function router(schema, config) {
      */
     await schema.get('/project/:projectid/batch/:batchid', {
         res: 'res.Batch.json'
-    }, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await user.is_auth(req);
             await Param.int(req, 'projectid');
@@ -113,7 +113,7 @@ async function router(schema, config) {
     await schema.patch('/project/:projectid/batch/:batchid', {
         body: 'req.body.PatchBatch.json',
         res: 'res.Batch.json'
-    }, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             await user.is_auth(req);
             await Param.int(req, 'projectid');
