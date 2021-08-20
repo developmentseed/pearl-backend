@@ -336,11 +336,11 @@ class CheckPoint {
                     ${checkpoint.name},
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
                     ${sql.array(checkpoint.retrain_geoms.map((e) => {
-                        return JSON.stringify(e);
-                    }), 'json')}::JSONB[],
+        return JSON.stringify(e);
+    }), 'json')}::JSONB[],
                     ${sql.array(checkpoint.input_geoms.map((e) => {
-                        return JSON.stringify(e);
-                    }), 'json')}::JSONB[],
+        return JSON.stringify(e);
+    }), 'json')}::JSONB[],
                     ${JSON.stringify(checkpoint.analytics ? checkpoint.analytics : null)}::JSONB
                 ) RETURNING *
             `);

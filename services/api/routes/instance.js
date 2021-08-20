@@ -4,6 +4,8 @@ const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 
 async function router(schema, config) {
+    const auth = new (require('../lib/auth').Auth)(config);
+    const project = new (require('../lib/project').Project)(config);
     const instance = new (require('../lib/instance').Instance)(config);
 
     /**
