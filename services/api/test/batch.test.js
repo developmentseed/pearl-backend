@@ -54,17 +54,6 @@ test('POST /api/project', async (t) => {
                 mosaic: 'naip.latest'
             }
         }, t);
-
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            uid: 1,
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
-        });
     } catch (err) {
         t.error(err);
     }
@@ -178,7 +167,22 @@ test('GET /api/project/1/instance/1', async (t) => {
             }
         }, t);
 
+        t.ok(res.body.last_update);
+        delete res.body.last_update;
+        t.ok(res.body.created);
+        delete res.body.created;
+        t.ok(res.body.token);
+        delete res.body.token;
+
         t.deepEquals(res.body, {
+            id: 1,
+            batch: 1,
+            project_id: 1,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: false,
+            type: 'gpu',
+            status: {}
         });
 
     } catch (err) {
