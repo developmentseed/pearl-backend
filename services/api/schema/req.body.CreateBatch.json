@@ -9,6 +9,10 @@
         "name": {
             "type": "string"
         },
+        "checkpoint_id": {
+            "type": "integer",
+            "description": "The current checkpoint loaded on the instance"
+        },
         "bounds": {
             "type": "array",
             "minItems": 4,
