@@ -21,6 +21,14 @@
                 "inactive",
                 "all"
             ]
+        },
+        "is_batch": {
+            "type": "string",
+            "description": "Filter batch instances",
+            "enum": [
+                "true",
+                "false"
+            ]
         }
     }
 }

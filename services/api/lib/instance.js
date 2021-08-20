@@ -80,6 +80,7 @@ class Instance {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
         if (!query.type) query.type = null;
+        if (!query.is_batch) query.is_batch = null;
 
         let active = null;
         if (query.status === 'active') {
@@ -88,6 +89,15 @@ class Instance {
             active = false;
         } else if (query.status === 'all') {
             active = null;
+        }
+
+        let is_batch = null;
+        if (query.is_batch === 'true') {
+            is_batch = true;
+        } else if (query.is_batch === 'false') {
+            is_batch = false;
+        } else if (query.status === 'null') {
+            is_batch = null;
         }
 
         let pgres;
@@ -106,6 +116,7 @@ class Instance {
                     project_id = ${projectid}
                     AND (${query.type}::TEXT IS NULL OR type = ${query.type})
                     AND (${active}::BOOLEAN IS NULL OR active = ${active})
+                    AND (${is_batch}::BOOLEAN IS NULL OR is_batch = ${is_batch})
                 ORDER BY
                     last_update
                 LIMIT

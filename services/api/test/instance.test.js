@@ -168,7 +168,8 @@ test('PATCH /api/project/1/instance/2', (t) => {
             Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
-            is_batch: true
+            is_batch: true,
+            active: true
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -185,8 +186,37 @@ test('PATCH /api/project/1/instance/2', (t) => {
             is_batch: true,
             aoi_id: null,
             checkpoint_id: null,
-            active: false,
+            active: true,
             type: 'gpu'
+        });
+
+        t.end();
+    });
+});
+
+test('GET /api/project/1/instance?is_batch=true', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance?is_batch=true',
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${flight.token.ingalls}`
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
+        delete res.body.instances[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            instances: [{
+                id: 2,
+                is_batch: true,
+                active: true,
+                type: 'gpu'
+            }]
         });
 
         t.end();
@@ -221,7 +251,7 @@ test('GET /api/project/1/instance (empty)', (t) => {
                 },
                 {
                     id: 2,
-                    active: false,
+                    active: true,
                     is_batch: true,
                     type: 'gpu'
                 }
@@ -267,10 +297,29 @@ test('PATCH /api/project/1/instance/1', (t) => {
     });
 });
 
+test('PATCH /api/project/1/instance/1 -- should not create a second batch instance', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${flight.token.ingalls}`
+        },
+        body: {
+            is_batch: true
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 400, 'status: 400');
+
+        t.end();
+    });
+});
+
 test('GET /api/project/1/instance?status=active', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/instance?status=active',
+        url: 'http://localhost:2000/api/project/1/instance?status=active&is_batch=false',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -318,7 +367,7 @@ test('GET /api/project/1/instance', (t) => {
             instances: [
                 {
                     id: 2,
-                    active: false,
+                    active: true,
                     is_batch: true,
                     type: 'gpu'
                 },

@@ -470,6 +470,12 @@ async function server(args, config, cb) {
             await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
+            const existing_batch = await instance.list(req.params.projectid, {'is_batch': 'true', 'status': 'active'});
+
+            if (existing_batch && existing_batch.total > 0 && req.body.is_batch) {
+                throw new Err(400, null, 'Failed to update Instance, there is already an active batch instance');
+            }
+
             return res.json(await instance.patch(req.params.instanceid, req.body));
         } catch (err) {
             return Err.respond(err, res);
