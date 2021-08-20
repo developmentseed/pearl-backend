@@ -8,99 +8,91 @@ flight.init(test);
 flight.takeoff(test);
 flight.user(test, 'ingalls', true)
 
-test('POST /api/model', (t) => {
-    request({
-        method: 'POST',
-        json: true,
-        url: 'http://localhost:2000/api/model',
-        body: {
-            name: 'NAIP Supervised',
-            active: true,
-            model_type: 'pytorch_example',
-            model_inputshape: [240,240,4],
-            model_zoom: 17,
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-            meta: {}
-        },
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    } , (err, res, body) => {
+test('POST /api/model', async (t) => {
+    try {
+        await flight.request({
+            method: 'POST',
+            json: true,
+            url: 'http://localhost:2000/api/model',
+            body: {
+                name: 'NAIP Supervised',
+                active: true,
+                model_type: 'pytorch_example',
+                model_inputshape: [240,240,4],
+                model_zoom: 17,
+                classes: [
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Tree Canopy', color: '#008000' },
+                    { name: 'Field', color: '#80FF80' },
+                    { name: 'Built', color: '#806060' }
+                ],
+                meta: {}
+            },
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+    } catch (err) {
         t.error(err, 'no error');
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.end();
-    });
+    }
+
+    t.end();
 });
 
-test('POST /api/project', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        },
-        body: {
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('POST /api/project', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test Project',
+                model_id: 1,
+                mosaic: 'naip.latest'
+            }
+        }, t);
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
+    t.end();
+});
 
-        t.deepEquals(res.body, {
-            id: 1,
-            uid: 1,
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
+test('GET /api/project/1/instance (empty)', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
         });
-
-        t.end();
-    });
-});
-
-test('GET /api/project/1/instance (empty)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
 
         t.deepEquals(res.body, {
             total: 0,
             instances: []
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('POST /api/project/1/instance', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('POST /api/project/1/instance', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
@@ -119,22 +111,23 @@ test('POST /api/project/1/instance', (t) => {
             pod: {},
             type: 'gpu'
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET /api/project/1/instance', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('GET /api/project/1/instance', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        });
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -148,55 +141,26 @@ test('GET /api/project/1/instance', (t) => {
                 type: 'gpu'
             }]
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET /api/project/1/instance (empty)', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-
-        t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
-        delete res.body.instances[0].created;
-
-        t.deepEquals(res.body, {
-            total: 1,
-            instances: [{
-                id: 1,
-                active: false,
-                batch: null,
-                type: 'gpu'
-            }]
-        });
-
-        t.end();
-    });
-});
-
-
-test('PATCH /api/project/1/instance/1', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance/1',
-        method: 'PATCH',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        },
-        body: {
-            active: true
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('PATCH /api/project/1/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                active: true
+            }
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
@@ -213,21 +177,23 @@ test('PATCH /api/project/1/instance/1', (t) => {
             type: 'gpu'
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('GET /api/project/1/instance?status=active', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance?status=active',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('GET /api/project/1/instance?status=active', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance?status=active',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        });
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -241,22 +207,23 @@ test('GET /api/project/1/instance?status=active', (t) => {
                 type: 'gpu'
             }]
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET /api/project/1/instance', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('GET /api/project/1/instance', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        });
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -270,22 +237,23 @@ test('GET /api/project/1/instance', (t) => {
                 type: 'gpu'
             }]
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET /api/project/1/instance/1', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance/1',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('GET /api/project/1/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
@@ -296,6 +264,7 @@ test('GET /api/project/1/instance/1', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            type: 'gpu',
             project_id: 1,
             batch: null,
             aoi_id: null,
@@ -304,48 +273,52 @@ test('GET /api/project/1/instance/1', (t) => {
             status: {}
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('POST /api/project/1/checkpoint', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        },
-        body: {
-            name: 'Test Checkpoint',
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.end();
-    });
+test('POST /api/project/1/checkpoint', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/checkpoint',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test Checkpoint',
+                classes: [
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Tree Canopy', color: '#008000' },
+                    { name: 'Field', color: '#80FF80' },
+                    { name: 'Built', color: '#806060' }
+                ],
+            }
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('PATCH /api/project/1/instance/1', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/instance/1',
-        method: 'PATCH',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        },
-        body: {
-            checkpoint_id: 1
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('PATCH /api/project/1/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                checkpoint_id: 1
+            }
+        });
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
@@ -360,10 +333,13 @@ test('PATCH /api/project/1/instance/1', (t) => {
             checkpoint_id: 1,
             active: true,
             type: 'gpu'
-        });
+        }, t);
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
 

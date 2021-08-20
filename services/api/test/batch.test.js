@@ -10,7 +10,7 @@ flight.user(test, 'ingalls', true)
 
 test('POST /api/model', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             method: 'POST',
             json: true,
             url: 'http://localhost:2000/api/model',
@@ -41,7 +41,7 @@ test('POST /api/model', async (t) => {
 
 test('POST /api/project', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             json: true,
             url: 'http://localhost:2000/api/project',
             method: 'POST',
@@ -139,13 +139,48 @@ test('POST /api/project/1/batch', async (t) => {
                     ]]
                 }
             }
-        });
+        }, t);
+
+        t.ok(res.body.created);
+        delete res.body.created;
+        t.ok(res.body.updated);
+        delete res.body.updated;
 
         t.deepEquals(res.body, {
-            status: 404,
-            message: 'batch not found',
-            messages: []
+            id: 1,
+            uid: 1,
+            project_id: 1,
+            aoi: null,
+            name: 'Area',
+            bounds: {
+                type: 'Polygon',
+                coordinates: [ [ [ -79.37724530696869, 38.83428180092151 ], [ -79.37677592039108, 38.83428180092151 ], [ -79.37677592039108, 38.83455550411051 ], [ -79.37724530696869, 38.83455550411051 ], [ -79.37724530696869, 38.83428180092151 ] ] ]
+            },
+            completed: false,
+            instance: 1
         });
+
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+
+test('GET /api/project/1/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.deepEquals(res.body, {
+        });
+
     } catch (err) {
         t.error(err);
     }

@@ -308,14 +308,7 @@ class Instance {
         try {
             pgres = await this.pool.query(sql`
                 SELECT
-                    id,
-                    batch,
-                    created,
-                    project_id,
-                    last_update,
-                    aoi_id,
-                    checkpoint_id,
-                    active
+                    *
                 FROM
                     instances
                 WHERE

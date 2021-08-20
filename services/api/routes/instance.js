@@ -20,19 +20,11 @@ async function router(schema, config) {
      *     token for accessing the websockets GPU API
      *
      * @apiSchema (Body) {jsonschema=./schema/req.body.instance.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "created": "<date",
-     *       "project_id": 2,
-     *       "url": "ws://<websocket-connection-url>",
-     *       "token": "websocket auth token"
-     *   }
+     * @apiSchema {jsonschema=./schema/res.Instance.json} apiSuccess
      */
     await schema.post('/project/:projectid/instance', {
-        body: 'req.body.instance.json'
+        body: 'req.body.instance.json',
+        res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -55,9 +47,11 @@ async function router(schema, config) {
      * @apiPermission admin
      *
      * @apiSchema (Body) {jsonschema=./schema/req.body.instance-patch.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Instance.json} apiSuccess
      */
     await schema.patch('/project/:projectid/instance/:instanceid', {
-        body: 'req.body.instance-patch.json'
+        body: 'req.body.instance-patch.json',
+        res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -118,17 +112,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given instance
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "uid": 123,
-     *       "active": true,
-     *       "created": "<date>",
-     *       "token": "<instance token>"
-     *   }
+     * @apiSchema {jsonschema=./schema/res.Instance.json} apiSuccess
      */
-    await schema.get('/project/:projectid/instance/:instanceid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/instance/:instanceid', {
+        res: 'res.Instance.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'instanceid');

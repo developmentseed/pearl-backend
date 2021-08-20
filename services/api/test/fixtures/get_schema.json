@@ -22,12 +22,12 @@
     "POST /project/:projectid/instance": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "PATCH /project/:projectid/instance/:instanceid": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/instance": {
         "body": false,
@@ -37,7 +37,7 @@
     "GET /project/:projectid/instance/:instanceid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /instance/:instanceid": {
         "body": false,

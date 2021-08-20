@@ -440,7 +440,7 @@ async function server(args, config, cb) {
      *     Create a new project
      *
      * @apiSchema (Body) {jsonschema=./schema/req.body.project.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Project.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.Project.json} apiSuccess
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK

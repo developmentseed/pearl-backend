@@ -98,6 +98,7 @@ class Flight {
             if (!schema.errors) return res;
 
             for (const error of schema.errors) {
+                console.error(error);
                 t.fail(`${error.schemaPath}: ${error.message}`);
             }
         } else {
