@@ -125,6 +125,74 @@ test('POST /api/project/1/instance', (t) => {
     });
 });
 
+test('POST /api/project/1/instance', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${flight.token.ingalls}`
+        },
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <str>');
+        delete res.body.created;
+        delete res.body.last_update;
+        delete res.body.token;
+
+        t.deepEquals(res.body, {
+            id: 2,
+            project_id: 1,
+            is_batch: false,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: false,
+            pod: {},
+            type: 'gpu'
+        });
+
+        t.end();
+    });
+});
+
+test('PATCH /api/project/1/instance/2', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/instance/2',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${flight.token.ingalls}`
+        },
+        body: {
+            is_batch: true
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        delete res.body.created;
+        delete res.body.last_update;
+
+        t.deepEquals(res.body, {
+            id: 2,
+            project_id: 1,
+            is_batch: true,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: false,
+            type: 'gpu'
+        });
+
+        t.end();
+    });
+});
+
 test('GET /api/project/1/instance (empty)', (t) => {
     request({
         json: true,
@@ -138,16 +206,26 @@ test('GET /api/project/1/instance (empty)', (t) => {
         t.equals(res.statusCode, 200, 'status: 200');
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
+        t.ok(res.body.instances[1].created, '.instances[1].created: <date>');
         delete res.body.instances[0].created;
+        delete res.body.instances[1].created;
 
         t.deepEquals(res.body, {
-            total: 1,
-            instances: [{
-                id: 1,
-                active: false,
-                is_batch: false,
-                type: 'gpu'
-            }]
+            total: 2,
+            instances: [
+                {
+                    id: 1,
+                    active: false,
+                    is_batch: false,
+                    type: 'gpu'
+                },
+                {
+                    id: 2,
+                    active: false,
+                    is_batch: true,
+                    type: 'gpu'
+                }
+        ]
         });
 
         t.end();
@@ -231,16 +309,26 @@ test('GET /api/project/1/instance', (t) => {
         t.equals(res.statusCode, 200, 'status: 200');
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
+        t.ok(res.body.instances[1].created, '.instances[1].created: <date>');
         delete res.body.instances[0].created;
+        delete res.body.instances[1].created;
 
         t.deepEquals(res.body, {
-            total: 1,
-            instances: [{
-                id: 1,
-                is_batch: false,
-                active: true,
-                type: 'gpu'
-            }]
+            total: 2,
+            instances: [
+                {
+                    id: 2,
+                    active: false,
+                    is_batch: true,
+                    type: 'gpu'
+                },
+                {
+                    id: 1,
+                    active: true,
+                    is_batch: false,
+                    type: 'gpu'
+                }
+        ]
         });
 
         t.end();

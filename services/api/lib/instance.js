@@ -328,6 +328,7 @@ class Instance {
      * @param {String} instance.active The state of the instance
      * @param {Number} instance.aoi_id The current AOI loaded on the instance
      * @param {Number} instance.checkpoint_id The current checkpoint loaded on the instance
+     * @param {String} instance.is_batch If this is a batch job instance
      */
     async patch(instanceid, instance) {
         let pgres;
@@ -339,6 +340,7 @@ class Instance {
                         active = COALESCE(${instance.active || null}, active),
                         aoi_id = COALESCE(${instance.aoi_id || null}, aoi_id),
                         checkpoint_id = COALESCE(${instance.checkpoint_id || null}, checkpoint_id),
+                        is_batch = COALESCE(${instance.is_batch || null}, is_batch),
                         last_update = NOW()
                     WHERE
                         id = ${instanceid}

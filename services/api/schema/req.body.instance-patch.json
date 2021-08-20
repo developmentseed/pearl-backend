@@ -13,6 +13,10 @@
         "checkpoint_id": {
             "type": "integer",
             "description": "The current checkpoint loaded on the instance"
+        },
+        "is_batch": {
+            "type": "boolean",
+            "description": "Is this instance for a batch job"
         }
     }
 }
