@@ -6,6 +6,7 @@ const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const project = new (require('../lib/project').Project)(config);
+    const instance = new (require('../lib/instance').Instance)(config);
 
     /**
      * @api {get} /api/project/:projectid/batch List Batch
@@ -58,6 +59,15 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
 
             await project.has_auth(req.auth, req.params.projectid);
+
+            const existing_batch = await instance.list(req.params.projectid, {
+                batch: 'true',
+                status: 'active'
+            });
+
+            if (existing_batch.total > 0) {
+                throw new Err(400, null, 'Failed to update Instance, there is already an active batch instance');
+            }
 
             req.body.uid = req.auth.uid;
             req.body.project_id = req.params.projectid;
