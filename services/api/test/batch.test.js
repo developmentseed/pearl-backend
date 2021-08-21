@@ -1,6 +1,7 @@
 const test = require('tape');
 const request = require('request');
 const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
@@ -192,9 +193,59 @@ test('GET /api/project/1/instance/1', async (t) => {
     t.end();
 });
 
+test('Meta: Set instance to active', async (t) => {
+    await flight.config.pool.query(sql`
+        UPDATE instances
+            SET active = True;
+    `);
+});
+
+test('POST /api/project/1/batch', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/batch',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Area',
+                bounds: {
+                    type: 'Polygon',
+                    coordinates: [[
+                        [ -79.37724530696869, 38.83428180092151 ],
+                        [ -79.37677592039108, 38.83428180092151 ],
+                        [ -79.37677592039108, 38.83455550411051 ],
+                        [ -79.37724530696869, 38.83455550411051 ],
+                        [ -79.37724530696869, 38.83428180092151 ]
+                    ]]
+                }
+            }
+        });
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'Failed to update Instance, there is already an active batch instance',
+            messages: []
+        });
+
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+
+test('Meta: Set instance to inactive', async (t) => {
+    await flight.config.pool.query(sql`
+        UPDATE instances
+            SET active = True;
+    `);
+});
+
 // TODO
 // Test instance creation with initial AOI
-// Ensure only 1 batch can be running at a time
 // Test instance filtering with batch=true, batch=false, batch=<num>
 
 flight.landing(test);
