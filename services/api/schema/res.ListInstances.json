@@ -1,0 +1,49 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "total",
+        "instances"
+    ],
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "instances": {
+            "type": "array",
+            "item": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "batch",
+                    "type",
+                    "active",
+                    "created"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "cpu",
+                            "gpu"
+                        ]
+                    },
+                    "batch": {
+                        "type": ["integer", "null"]
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "created": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}
