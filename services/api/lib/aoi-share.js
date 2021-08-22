@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('./error');
 const moment = require('moment');
@@ -226,7 +226,7 @@ class AOIShare {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
-        if (!query.aoi) query.aoi = null;
+        if (query.aoi === undefined) query.aoi = null;
 
         let pgres;
         try {

@@ -16,21 +16,7 @@
             "description": "The checkpoint ID that created this AOI"
         },
         "bounds": {
-            "type": "object",
-            "description": "GeoJSON Polygon",
-            "required": [
-                "type",
-                "coordinates"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "enum": [ "Polygon" ]
-                },
-                "coordinates": {
-                }
-            }
+            "$ref": "./util/polygon.json"
         }
     }
 }

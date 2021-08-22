@@ -1,0 +1,60 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "batch",
+        "type",
+        "active",
+        "last_update",
+        "aoi_id",
+        "checkpoint_id",
+        "created",
+        "project_id"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "cpu",
+                "gpu"
+            ]
+        },
+        "status": {
+            "type": "object"
+        },
+        "batch": {
+            "type": ["integer", "null"]
+        },
+        "active": {
+            "type": "boolean"
+        },
+        "aoi_id": {
+            "type": ["integer", "null"]
+        },
+        "checkpoint_id": {
+            "type": ["integer", "null"]
+        },
+        "created": {
+            "type": "integer"
+        },
+        "last_update": {
+            "type": "integer"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "url": {
+            "type": "string"
+        },
+        "token": {
+            "type": "string"
+        },
+        "pod": {
+            "type": "object"
+        }
+    }
+}

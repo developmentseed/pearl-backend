@@ -1,0 +1,48 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "uid",
+        "project_id",
+        "created",
+        "updated",
+        "aoi",
+        "name",
+        "completed",
+        "bounds"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "uid": {
+            "type": "integer"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "aoi": {
+            "type": ["integer", "null"]
+        },
+        "name": {
+            "type": "string"
+        },
+        "completed": {
+            "type": "boolean"
+        },
+        "instance": {
+            "type": "integer",
+            "description": "Instance ID of batch"
+        },
+        "bounds": {
+            "$ref": "./util/polygon.json"
+        }
+    }
+}

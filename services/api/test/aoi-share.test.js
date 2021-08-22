@@ -282,7 +282,8 @@ test('POST /api/project/1/aoi/1/share', (t) => {
             project_id: 1,
             aoi_id: 1,
             storage: false,
-            patches: []
+            patches: [],
+            bounds: { type: 'Polygon', coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ] }
         });
 
         t.end();

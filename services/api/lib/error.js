@@ -1,4 +1,4 @@
-'use strict';
+
 
 class PublicError {
     constructor(status, err, safe, print = true) {

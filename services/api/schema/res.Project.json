@@ -1,0 +1,38 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "uid",
+        "name",
+        "model_id",
+        "mosaic",
+        "created"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "uid": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name of the Project"
+        },
+        "model_id": {
+            "type": "integer",
+            "description": "Starter Model to use for project"
+        },
+        "model_name": {
+            "type": "string"
+        },
+        "mosaic": {
+            "type" :"string",
+            "description": "Imagery to use with model"
+        },
+        "created": {
+            "type": "integer"
+        }
+    }
+}

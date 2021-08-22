@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('./error');
 const moment = require('moment');
@@ -273,8 +273,8 @@ class AOI {
             query.sort = sql`asc`;
         }
 
-        if (!query.checkpointid) query.checkpointid = null;
-        if (!query.bookmarked) query.bookmarked = null;
+        if (query.checkpointid === undefined) query.checkpointid = null;
+        if (query.bookmarked === undefined) query.bookmarked = null;
 
         let pgres;
         try {
@@ -353,7 +353,7 @@ class AOI {
                     ${projectid},
                     ${aoi.name},
                     ${aoi.checkpoint_id},
-                    ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)}), 4326)
+                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
                 ) RETURNING *
             `);
         } catch (err) {

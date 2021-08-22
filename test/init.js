@@ -1,4 +1,4 @@
-'use strict';
+
 
 const { promisify } = require('util');
 const request = promisify(require('request'));
@@ -8,7 +8,7 @@ const Config = require('../services/api/lib/config');
 const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
-let state = {
+const state = {
     project: 1,
     token: false,
     instance: false,
@@ -305,12 +305,12 @@ function connect(test, API) {
                 'checkpoint_id',
                 'created',
                 'id',
-                'is_batch',
+                'batch',
                 'last_update',
                 'pod',
                 'project_id',
                 'token',
-                'type',
+                'type'
             ].sort(), 'expected props');
 
             t.ok(parseInt(res.body.id), 'id: <integer>');
@@ -324,7 +324,7 @@ function connect(test, API) {
 
             t.deepEquals(res.body, {
                 project_id: 1,
-                is_batch: false,
+                batch: null,
                 aoi_id: null,
                 checkpoint_id: null,
                 active: false,

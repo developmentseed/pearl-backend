@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
@@ -97,7 +97,7 @@ class CheckPoint {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
-        if (!query.bookmarked) query.bookmarked = null;
+        if (query.bookmarked === undefined) query.bookmarked = null;
         if (!query.sort || query.sort === 'desc') {
             query.sort = sql`desc`;
         } else {
@@ -336,11 +336,11 @@ class CheckPoint {
                     ${checkpoint.name},
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
                     ${sql.array(checkpoint.retrain_geoms.map((e) => {
-                        return JSON.stringify(e);
-                    }), 'json')}::JSONB[],
+        return JSON.stringify(e);
+    }), 'json')}::JSONB[],
                     ${sql.array(checkpoint.input_geoms.map((e) => {
-                        return JSON.stringify(e);
-                    }), 'json')}::JSONB[],
+        return JSON.stringify(e);
+    }), 'json')}::JSONB[],
                     ${JSON.stringify(checkpoint.analytics ? checkpoint.analytics : null)}::JSONB
                 ) RETURNING *
             `);

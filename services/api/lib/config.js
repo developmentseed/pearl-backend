@@ -1,6 +1,7 @@
-'use strict';
 
-const { sql, createPool } = require('slonik');
+
+const { sql, createPool, createTypeParserPreset } = require('slonik');
+const wkx = require('wkx');
 
 class Config {
     static async env(args = {}) {
@@ -44,7 +45,16 @@ class Config {
         let retry = 5;
         do {
             try {
-                this.pool = createPool(this.Postgres);
+                this.pool = createPool(this.Postgres, {
+                    typeParsers: [
+                        ...createTypeParserPreset(), {
+                            name: 'geometry',
+                            parse: (value) => {
+                                return wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
+                            }
+                        }
+                    ]
+                });
 
                 await this.pool.query(sql`SELECT NOW()`);
             } catch (err) {

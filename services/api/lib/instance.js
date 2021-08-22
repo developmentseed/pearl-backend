@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
@@ -48,7 +48,7 @@ class Instance {
     static json(row) {
         const inst = {
             id: parseInt(row.id),
-            is_batch: row.is_batch,
+            batch: row.batch,
             project_id: parseInt(row.project_id),
             aoi_id: parseInt(row.aoi_id),
             checkpoint_id: parseInt(row.checkpoint_id),
@@ -74,12 +74,14 @@ class Instance {
      * @param {Number} [query.page=0] - Page of users to return
      * @param {Number} [query.status=active] - Should the session be active? `active`, `inactive`, or `all`
      * @param {Number} [query.type] - Filter by type of instance. `gpu` or 'cpu'. Default all.
+     * @param {Number} [query.batch] - Filter by batch status (batch=true/false - Show/Hide batches, batch=<num> show instance with specific batch)
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.type) query.type = null;
+        if (query.type === undefined) query.type = null;
+        if (query.batch === undefined) query.batch = null;
 
         let active = null;
         if (query.status === 'active') {
@@ -90,13 +92,25 @@ class Instance {
             active = null;
         }
 
+        let batch = null;
+        let batch_id = null;
+        if (query.batch === true) {
+            batch = true;
+        } else if (query.batch === false) {
+            batch = false;
+        }
+
+        if (!isNaN(parseInt(query.batch))) {
+            batch_id = parseInt(query.batch);
+        }
+
         let pgres;
         try {
             pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
-                    is_batch,
+                    batch,
                     active,
                     created,
                     type
@@ -106,6 +120,12 @@ class Instance {
                     project_id = ${projectid}
                     AND (${query.type}::TEXT IS NULL OR type = ${query.type})
                     AND (${active}::BOOLEAN IS NULL OR active = ${active})
+                    AND (
+                        (${batch}::BOOLEAN IS NULL AND ${batch_id}::BIGINT IS NULL)
+                        OR (${batch}::BOOLEAN = True AND batch IS NOT NULL)
+                        OR (${batch}::BOOLEAN = False AND batch IS NULL)
+                        OR (${batch_id}::BIGINT IS NOT NULL AND ${batch_id}::BIGINT = batch)
+                    )
                 ORDER BY
                     last_update
                 LIMIT
@@ -122,7 +142,7 @@ class Instance {
             instances: pgres.rows.map((row) => {
                 return {
                     id: row.id,
-                    is_batch: row.is_batch,
+                    batch: row.batch,
                     active: row.active,
                     created: row.created,
                     type: row.type
@@ -176,6 +196,7 @@ class Instance {
      * @param {Object} instance - Instance Object
      * @param {Number} instance.aoi_id The current AOI loaded on the instance
      * @param {Number} instance.checkpoint_id The current checkpoint loaded on the instance
+     * @param {Number} instance.batch If the instance is a batch job, specify batch ID
      */
     async create(auth, instance) {
         if (!auth.uid) {
@@ -205,11 +226,13 @@ class Instance {
                     project_id,
                     aoi_id,
                     checkpoint_id,
+                    batch,
                     type
                 ) VALUES (
                     ${instance.project_id},
                     ${instance.aoi_id || null},
                     ${instance.checkpoint_id || null},
+                    ${instance.batch || null},
                     ${type}
                 ) RETURNING *
             `);
@@ -285,14 +308,7 @@ class Instance {
         try {
             pgres = await this.pool.query(sql`
                 SELECT
-                    id,
-                    is_batch,
-                    created,
-                    project_id,
-                    last_update,
-                    aoi_id,
-                    checkpoint_id,
-                    active
+                    *
                 FROM
                     instances
                 WHERE
