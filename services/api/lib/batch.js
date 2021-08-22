@@ -58,7 +58,7 @@ class Batch extends Generic {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.completed) query.completed = null;
+        if (query.completed === undefined) query.completed = null;
 
         if (!query.sort) query.sort = 'created';
         if (!query.order || query.order === 'asc') {

@@ -97,7 +97,7 @@ class CheckPoint {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
-        if (!query.bookmarked) query.bookmarked = null;
+        if (query.bookmarked === undefined) query.bookmarked = null;
         if (!query.sort || query.sort === 'desc') {
             query.sort = sql`desc`;
         } else {

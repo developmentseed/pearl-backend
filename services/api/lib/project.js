@@ -55,7 +55,7 @@ class Project {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.name) query.name = null;
+        if (query.name === undefined) query.name = null;
 
         if (!query.sort || query.sort === 'desc') {
             query.sort = sql`desc`;

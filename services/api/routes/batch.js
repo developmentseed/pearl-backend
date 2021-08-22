@@ -6,6 +6,7 @@ const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const project = new (require('../lib/project').Project)(config);
+    const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
     const instance = new (require('../lib/instance').Instance)(config);
 
     /**
@@ -67,6 +68,10 @@ async function router(schema, config) {
 
             if (existing_batch.total > 0) {
                 throw new Err(400, null, 'Failed to update Instance, there is already an active batch instance');
+            }
+
+            if (req.body.checkpoint_id) {
+                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.body.checkpoint_id)
             }
 
             req.body.uid = req.auth.uid;

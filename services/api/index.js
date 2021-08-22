@@ -1721,7 +1721,8 @@ async function server(args, config, cb) {
      *   }
      */
     await schema.post('/project/:projectid/checkpoint', {
-        body: 'req.body.checkpoint.json'
+        body: 'req.body.checkpoint.json',
+        res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');

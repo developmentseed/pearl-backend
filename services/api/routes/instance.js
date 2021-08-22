@@ -71,26 +71,16 @@ async function router(schema, config) {
      * @apiGroup Instance
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.instance-list.json} apiParam
-     *
      * @apiDescription
      *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
      *     field will be pinned to their own uid. Admins can filter by any uid or none.
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "instances": [{
-     *           "id": 1,
-     *           "uid": 123,
-     *           "active": true,
-     *           "created": "<date>"
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=./schema/req.query.instance-list.json} apiParam
+     * @apiSchema {jsonschema=./schema/res.ListInstances.json} apiSuccess
      */
     await schema.get('/project/:projectid/instance', {
-        query: 'req.query.instance-list.json'
+        query: 'req.query.instance-list.json',
+        res: 'res.ListInstances.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');

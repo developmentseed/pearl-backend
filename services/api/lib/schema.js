@@ -100,15 +100,22 @@ class Schemas {
     static query(schema) {
         return function (req, res, next) {
             for (const key of Object.keys(req.query)) {
-                if (schema.properties[key] && schema.properties[key].type === 'integer') {
-                    req.query[key] = parseInt(req.query[key]);
-                } else if (schema.properties[key] && schema.properties[key].type === 'number') {
-                    req.query[key] = Number(req.query[key]);
-                } else if (schema.properties[key] && schema.properties[key].type === 'boolean') {
-                    if (['true', '1'].includes(req.query[key])) {
-                        req.query[key] = true;
-                    } else if (['false', '0', null, undefined].includes(req.query[key])) {
-                        req.query[key] = false;
+                if (!schema.properties[key] || !schema.properties[key].type) continue
+
+                // For easier processing use consistent array format IE: `type: ["integer", "boolean"]` vs type: "integer"
+                if (!Array.isArray(schema.properties[key].type)) schema.properties[key].type = [ schema.properties[key].type ]
+
+                for (const type of schema.properties[key].type) {
+                    if (type === 'integer' && !isNaN(parseInt(req.query[key]))) {
+                        req.query[key] = parseInt(req.query[key]);
+                    } else if (type === 'number' && !isNaN(Number(req.query[key]))) {
+                        req.query[key] = Number(req.query[key]);
+                    } else if (type === 'boolean') {
+                        if (req.query[key] === 'true') {
+                            req.query[key] = true;
+                        } else if (req.query[key] === 'false') {
+                            req.query[key] = false;
+                        }
                     }
                 }
             }

@@ -32,7 +32,7 @@
     "GET /project/:projectid/instance": {
         "body": false,
         "query": true,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/instance/:instanceid": {
         "body": false,
@@ -272,7 +272,7 @@
     "POST /project/:projectid/checkpoint": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /project/:projectid/checkpoint/:checkpointid": {
         "body": false,

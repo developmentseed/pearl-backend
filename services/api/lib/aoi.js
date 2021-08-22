@@ -273,8 +273,8 @@ class AOI {
             query.sort = sql`asc`;
         }
 
-        if (!query.checkpointid) query.checkpointid = null;
-        if (!query.bookmarked) query.bookmarked = null;
+        if (query.checkpointid === undefined) query.checkpointid = null;
+        if (query.bookmarked === undefined) query.bookmarked = null;
 
         let pgres;
         try {

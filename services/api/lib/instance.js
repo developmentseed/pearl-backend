@@ -80,8 +80,8 @@ class Instance {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.type) query.type = null;
-        if (!query.batch) query.batch = null;
+        if (query.type === undefined) query.type = null;
+        if (query.batch === undefined) query.batch = null;
 
         let active = null;
         if (query.status === 'active') {
@@ -94,9 +94,9 @@ class Instance {
 
         let batch = null;
         let batch_id = null;
-        if (query.batch === 'true') {
+        if (query.batch === true) {
             batch = true;
-        } else if (query.batch === 'false') {
+        } else if (query.batch === false) {
             batch = false;
         }
 
