@@ -9,7 +9,8 @@
             "type": "array",
             "description": "List of supported mosaics",
             "item": {
-                "type": "string"
+                "type": "string",
+                "description": "Name of mosaic"
             }
         }
     }
