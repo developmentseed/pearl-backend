@@ -19,8 +19,8 @@ async function router(schema, config) {
      *     Instruct the GPU pool to start a new model instance and return a time limited session
      *     token for accessing the websockets GPU API
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.instance.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Instance.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.instance.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.post('/project/:projectid/instance', {
         body: 'req.body.instance.json',
@@ -46,8 +46,8 @@ async function router(schema, config) {
      * @apiGroup Instance
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.instance-patch.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Instance.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.instance-patch.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.patch('/project/:projectid/instance/:instanceid', {
         body: 'req.body.instance-patch.json',
@@ -75,8 +75,8 @@ async function router(schema, config) {
      *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
      *     field will be pinned to their own uid. Admins can filter by any uid or none.
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.instance-list.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.ListInstances.json} apiSuccess
+     * @apiSchema (Query) {jsonschema=../schema/req.query.instance-list.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListInstances.json} apiSuccess
      */
     await schema.get('/project/:projectid/instance', {
         query: 'req.query.instance-list.json',
@@ -102,7 +102,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given instance
      *
-     * @apiSchema {jsonschema=./schema/res.Instance.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.get('/project/:projectid/instance/:instanceid', {
         res: 'res.Instance.json'

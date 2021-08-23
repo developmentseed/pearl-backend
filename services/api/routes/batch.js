@@ -13,7 +13,7 @@ async function router(schema, config) {
      * @api {get} /api/project/:projectid/batch List Batch
      * @apiVersion 1.0.0
      * @apiName ListBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription
@@ -43,7 +43,7 @@ async function router(schema, config) {
      * @api {post} /api/project/:projectid/batch Create Batch
      * @apiVersion 1.0.0
      * @apiName CreateBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription
@@ -95,7 +95,7 @@ async function router(schema, config) {
      * @api {get} /api/project/:projectid/batch/:batchid Get Batch
      * @apiVersion 1.0.0
      * @apiName GetBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription
@@ -122,7 +122,7 @@ async function router(schema, config) {
      * @api {patch} /api/project/:pid Patch Batch
      * @apiVersion 1.0.0
      * @apiName PatchBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription

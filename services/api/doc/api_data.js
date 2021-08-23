@@ -659,6 +659,573 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/project/:projectid/batch",
+    "title": "Create Batch",
+    "version": "1.0.0",
+    "name": "CreateBatch",
+    "group": "Batch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new batch</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpoint_id",
+            "description": "<p>The current checkpoint loaded on the instance</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>GeoJSON Polygon</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"Polygon\""
+            ],
+            "optional": false,
+            "field": "bounds.type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds.coordinates",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique Batch ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>User ID that initiated the batch</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>The Project ID the batch is a part of</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "aoi",
+            "description": "<p>The completed AOI ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the AOI to be created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "size": "0 - 100",
+            "optional": false,
+            "field": "progress",
+            "description": "<p>The percentage of the job complete</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "completed",
+            "description": "<p>Has the batch job been completed</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "instance",
+            "description": "<p>Instance ID of batch</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>GeoJSON Polygon</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Polygon\""
+            ],
+            "optional": false,
+            "field": "bounds.type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds.coordinates",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/batch.js",
+    "groupTitle": "Batch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/batch/:batchid",
+    "title": "Get Batch",
+    "version": "1.0.0",
+    "name": "GetBatch",
+    "group": "Batch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a single batch</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique Batch ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>User ID that initiated the batch</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>The Project ID the batch is a part of</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "aoi",
+            "description": "<p>The completed AOI ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the AOI to be created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "size": "0 - 100",
+            "optional": false,
+            "field": "progress",
+            "description": "<p>The percentage of the job complete</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "completed",
+            "description": "<p>Has the batch job been completed</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "instance",
+            "description": "<p>Instance ID of batch</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>GeoJSON Polygon</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Polygon\""
+            ],
+            "optional": false,
+            "field": "bounds.type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds.coordinates",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/batch.js",
+    "groupTitle": "Batch"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/batch",
+    "title": "List Batch",
+    "version": "1.0.0",
+    "name": "ListBatch",
+    "group": "Batch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of all batches for a given user</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"desc\"",
+              "\"asc\""
+            ],
+            "optional": true,
+            "field": "order",
+            "defaultValue": "asc",
+            "description": "<p>Sort order to apply to results</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "completed",
+            "description": "<p>Filter by completed status</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"id\"",
+              "\"created\"",
+              "\"updated\"",
+              "\"aoi\"",
+              "\"name\"",
+              "\"completed\""
+            ],
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "created",
+            "description": "<p>Field to sort order by</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "batch",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.aoi",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "batch.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "batch.completed",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/batch.js",
+    "groupTitle": "Batch"
+  },
+  {
+    "type": "patch",
+    "url": "/api/project/:pid",
+    "title": "Patch Batch",
+    "version": "1.0.0",
+    "name": "PatchBatch",
+    "group": "Batch",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Update a project</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "aoi",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "progress",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "completed",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique Batch ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>User ID that initiated the batch</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>The Project ID the batch is a part of</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "aoi",
+            "description": "<p>The completed AOI ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>The name of the AOI to be created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "size": "0 - 100",
+            "optional": false,
+            "field": "progress",
+            "description": "<p>The percentage of the job complete</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "completed",
+            "description": "<p>Has the batch job been completed</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "instance",
+            "description": "<p>Instance ID of batch</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>GeoJSON Polygon</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"Polygon\""
+            ],
+            "optional": false,
+            "field": "bounds.type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "bounds.coordinates",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/batch.js",
+    "groupTitle": "Batch"
+  },
+  {
+    "type": "post",
     "url": "/api/project/:projectid/checkpoint",
     "title": "Create Checkpoint",
     "version": "1.0.0",
@@ -2166,572 +2733,5 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "User"
-  },
-  {
-    "type": "post",
-    "url": "/api/project/:projectid/batch",
-    "title": "Create Batch",
-    "version": "1.0.0",
-    "name": "CreateBatch",
-    "group": "batch",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Create a new batch</p>",
-    "parameter": {
-      "fields": {
-        "Body": [
-          {
-            "group": "Body",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Integer",
-            "optional": true,
-            "field": "checkpoint_id",
-            "description": "<p>The current checkpoint loaded on the instance</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Object",
-            "optional": false,
-            "field": "bounds",
-            "description": "<p>GeoJSON Polygon</p>"
-          },
-          {
-            "group": "Body",
-            "type": "String",
-            "allowedValues": [
-              "\"Polygon\""
-            ],
-            "optional": false,
-            "field": "bounds.type",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Unknown",
-            "optional": false,
-            "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Unique Batch ID</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "uid",
-            "description": "<p>User ID that initiated the batch</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "project_id",
-            "description": "<p>The Project ID the batch is a part of</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "created",
-            "description": "<p>The unix timestamp at which the resource was created</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "updated",
-            "description": "<p>The unix timestamp at which the resource was last updated</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer/Null",
-            "optional": false,
-            "field": "aoi",
-            "description": "<p>The completed AOI ID</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>The name of the AOI to be created</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "size": "0 - 100",
-            "optional": false,
-            "field": "progress",
-            "description": "<p>The percentage of the job complete</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "completed",
-            "description": "<p>Has the batch job been completed</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "instance",
-            "description": "<p>Instance ID of batch</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "bounds",
-            "description": "<p>GeoJSON Polygon</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "\"Polygon\""
-            ],
-            "optional": false,
-            "field": "bounds.type",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": false,
-            "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./routes/batch.js",
-    "groupTitle": "batch"
-  },
-  {
-    "type": "get",
-    "url": "/api/project/:projectid/batch/:batchid",
-    "title": "Get Batch",
-    "version": "1.0.0",
-    "name": "GetBatch",
-    "group": "batch",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Return a single batch</p>",
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Unique Batch ID</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "uid",
-            "description": "<p>User ID that initiated the batch</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "project_id",
-            "description": "<p>The Project ID the batch is a part of</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "created",
-            "description": "<p>The unix timestamp at which the resource was created</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "updated",
-            "description": "<p>The unix timestamp at which the resource was last updated</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer/Null",
-            "optional": false,
-            "field": "aoi",
-            "description": "<p>The completed AOI ID</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>The name of the AOI to be created</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "size": "0 - 100",
-            "optional": false,
-            "field": "progress",
-            "description": "<p>The percentage of the job complete</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "completed",
-            "description": "<p>Has the batch job been completed</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "instance",
-            "description": "<p>Instance ID of batch</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "bounds",
-            "description": "<p>GeoJSON Polygon</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "\"Polygon\""
-            ],
-            "optional": false,
-            "field": "bounds.type",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": false,
-            "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./routes/batch.js",
-    "groupTitle": "batch"
-  },
-  {
-    "type": "get",
-    "url": "/api/project/:projectid/batch",
-    "title": "List Batch",
-    "version": "1.0.0",
-    "name": "ListBatch",
-    "group": "batch",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Return a list of all batches for a given user</p>",
-    "parameter": {
-      "fields": {
-        "Query": [
-          {
-            "group": "Query",
-            "type": "Integer",
-            "size": "1 - 100",
-            "optional": true,
-            "field": "limit",
-            "defaultValue": "100",
-            "description": "<p>Limit number of returned items</p>"
-          },
-          {
-            "group": "Query",
-            "type": "Integer",
-            "size": "0 - ∞",
-            "optional": true,
-            "field": "page",
-            "defaultValue": "0",
-            "description": "<p>The page, based on the limit, to return</p>"
-          },
-          {
-            "group": "Query",
-            "type": "String",
-            "allowedValues": [
-              "\"desc\"",
-              "\"asc\""
-            ],
-            "optional": true,
-            "field": "order",
-            "defaultValue": "asc",
-            "description": "<p>Sort order to apply to results</p>"
-          },
-          {
-            "group": "Query",
-            "type": "Boolean",
-            "optional": true,
-            "field": "completed",
-            "description": "<p>Filter by completed status</p>"
-          },
-          {
-            "group": "Query",
-            "type": "String",
-            "allowedValues": [
-              "\"id\"",
-              "\"created\"",
-              "\"updated\"",
-              "\"aoi\"",
-              "\"name\"",
-              "\"completed\""
-            ],
-            "optional": true,
-            "field": "sort",
-            "defaultValue": "created",
-            "description": "<p>Field to sort order by</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "total",
-            "description": "<p>Total number of items</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object[]",
-            "optional": false,
-            "field": "batch",
-            "description": "<p>undefined undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "batch.id",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "batch.created",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "batch.updated",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "batch.aoi",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "batch.name",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "batch.completed",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./routes/batch.js",
-    "groupTitle": "batch"
-  },
-  {
-    "type": "patch",
-    "url": "/api/project/:pid",
-    "title": "Patch Batch",
-    "version": "1.0.0",
-    "name": "PatchBatch",
-    "group": "batch",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Update a project</p>",
-    "parameter": {
-      "fields": {
-        "Body": [
-          {
-            "group": "Body",
-            "type": "Integer",
-            "optional": true,
-            "field": "aoi",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Integer",
-            "optional": true,
-            "field": "progress",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Body",
-            "type": "Boolean",
-            "optional": true,
-            "field": "completed",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Unique Batch ID</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "uid",
-            "description": "<p>User ID that initiated the batch</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "project_id",
-            "description": "<p>The Project ID the batch is a part of</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "created",
-            "description": "<p>The unix timestamp at which the resource was created</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "updated",
-            "description": "<p>The unix timestamp at which the resource was last updated</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer/Null",
-            "optional": false,
-            "field": "aoi",
-            "description": "<p>The completed AOI ID</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>The name of the AOI to be created</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "size": "0 - 100",
-            "optional": false,
-            "field": "progress",
-            "description": "<p>The percentage of the job complete</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "completed",
-            "description": "<p>Has the batch job been completed</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "instance",
-            "description": "<p>Instance ID of batch</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "bounds",
-            "description": "<p>GeoJSON Polygon</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "\"Polygon\""
-            ],
-            "optional": false,
-            "field": "bounds.type",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": false,
-            "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./routes/batch.js",
-    "groupTitle": "batch"
   }
 ] });

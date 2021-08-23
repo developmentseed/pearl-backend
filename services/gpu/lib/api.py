@@ -65,7 +65,7 @@ class API:
         self.instance = self.instance_meta(instance_id)
 
         if type(self.instance.batch) == int:
-            self.batch = self.batch_meta(self.instance.batch)
+            self.batch = self.batch_meta(self.instance., self.instance.batch)
         else
             self.batch = False
 
