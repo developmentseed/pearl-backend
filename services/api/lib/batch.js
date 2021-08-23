@@ -77,7 +77,8 @@ class Batch extends Generic {
                     updated,
                     aoi,
                     name,
-                    completed
+                    completed,
+                    progress
                 FROM
                     batch
                 WHERE
@@ -108,7 +109,8 @@ class Batch extends Generic {
             aoi: this.aoi,
             name: this.name,
             bounds: this.bounds,
-            completed: this.completed
+            completed: this.completed,
+            progress: this.progress
         };
     }
 
@@ -119,6 +121,7 @@ class Batch extends Generic {
                     SET
                         aoi         = ${this.aoi},
                         completed   = ${this.completed},
+                        progress    = ${this.progress},
                         updated     = NOW()
                     WHERE
                         id = ${this.id}
