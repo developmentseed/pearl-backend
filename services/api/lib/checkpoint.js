@@ -242,7 +242,7 @@ class CheckPoint {
                         storage = COALESCE(${checkpoint.storage || null}, storage),
                         name = COALESCE(${checkpoint.name || null}, name),
                         bookmarked = COALESCE(${checkpoint.bookmarked || null}, bookmarked),
-                        classes = COALESCE(${JSON.stringify(checkpoint.classes || null)}::JSONB, classes)
+                        classes = COALESCE(${checkpoint.classes ? JSON.stringify(checkpoint.classes) : null}::JSONB, classes)
                     WHERE
                         id = ${checkpointid}
                     RETURNING *
@@ -336,12 +336,12 @@ class CheckPoint {
                     ${checkpoint.name},
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
                     ${sql.array(checkpoint.retrain_geoms.map((e) => {
-        return JSON.stringify(e);
-    }), 'json')}::JSONB[],
+                        return JSON.stringify(e);
+                    }), 'json')}::JSONB[],
                     ${sql.array(checkpoint.input_geoms.map((e) => {
-        return JSON.stringify(e);
-    }), 'json')}::JSONB[],
-                    ${JSON.stringify(checkpoint.analytics ? checkpoint.analytics : null)}::JSONB
+                        return JSON.stringify(e);
+                    }), 'json')}::JSONB[],
+                    ${checkpoint.analytics ? JSON.stringify(checkpoint.analytics) : null}::JSONB
                 ) RETURNING *
             `);
 

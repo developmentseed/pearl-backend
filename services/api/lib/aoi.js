@@ -197,7 +197,7 @@ class AOI {
                         name = COALESCE(${aoi.name || null}, name),
                         bookmarked = COALESCE(${aoi.bookmarked || null}, bookmarked),
                         patches = COALESCE(${aoi.patches ? sql.array(aoi.patches, sql`BIGINT[]`) : null}, patches),
-                        px_stats = COALESCE(${JSON.stringify(aoi.px_stats || null)}::JSONB, px_stats)
+                        px_stats = COALESCE(${aoi.px_stats ? JSON.stringify(aoi.px_stats) : null}::JSONB, px_stats)
                     WHERE
                         id = ${aoiid}
                     RETURNING *
