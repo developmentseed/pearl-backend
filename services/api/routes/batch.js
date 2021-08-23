@@ -92,7 +92,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {post} /api/project/:projectid/batch/:batchid Get Batch
+     * @api {get} /api/project/:projectid/batch/:batchid Get Batch
      * @apiVersion 1.0.0
      * @apiName GetBatch
      * @apiGroup batch

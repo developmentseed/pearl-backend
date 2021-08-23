@@ -64,6 +64,11 @@ class API:
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
 
+        if type(self.instance.batch) == int:
+            self.batch = self.batch_meta(self.instance.batch)
+        else
+            self.batch = False
+
         self.instance_id = instance_id
         self.project_id = self.instance["project_id"]
 
@@ -452,6 +457,17 @@ class API:
             },
             data=json.dumps(data),
         )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def batch_meta(self, instance_id):
+        url = self.url + "/api/instance/" + str(instance_id)
+
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
 
         r.raise_for_status()
 
