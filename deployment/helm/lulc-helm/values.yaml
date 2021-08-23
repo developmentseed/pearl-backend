@@ -6,8 +6,8 @@ api:
   replicaCount: 1
   containerPort: 2000
   image:
-    name: 'chartpress_replace'
-    tag: 'chartpress_replace'
+    name: 'lulcstagingacr.azurecr.io/lulc-api'
+    tag: '0.0.1-n1947.hce9c981'
   resources:
     requests:
       cpu: 1200m
@@ -19,8 +19,8 @@ socket:
   enabled: true
   containerPort: 1999
   image:
-    name: 'chartpress_replace'
-    tag: 'chartpress_replace'
+    name: 'lulcstagingacr.azurecr.io/lulc-socket'
+    tag: '0.0.1-n1626.h898d8ca'
   resources:
     requests:
       cpu: 1200m
@@ -32,8 +32,8 @@ tiles:
   enabled: true
   containerPort: 8000
   image:
-    name: 'chartpress_replace'
-    tag: 'chartpress_replace'
+    name: 'lulcstagingacr.azurecr.io/lulc-tiles'
+    tag: '0.0.1-n1928.h0692954'
   nodeSelector:
     enabled: true
     label_key: agentpool
@@ -67,8 +67,8 @@ redis:
 
 gpu:
   image:
-    name: 'chartpress_replace'
-    tag: 'chartpress_replace'
+    name: 'lulcstagingacr.azurecr.io/lulc-gpu'
+    tag: '0.0.1-n1921.h2bbdec1'
 
 placeholder:
   enabled: true
@@ -77,7 +77,7 @@ placeholder:
 
   # If isGpu is true, requests is for numGPUs
   # If false, uses the resource values from below.
-  isGpu: true 
+  isGpu: true
   numGPUs: 2
 
   resources:
@@ -100,15 +100,15 @@ ingress-azure:
   # Specify which application gateway the ingress controller will manage
   #
   appgw:
-      subscriptionId: _subscriptionId
-      resourceGroup: _resourceGroupName
-      name: _appGatewayName
-      usePrivateIP: false
+    subscriptionId: _subscriptionId
+    resourceGroup: _resourceGroupName
+    name: _appGatewayName
+    usePrivateIP: false
 
       # Setting appgw.shared to "true" will create an AzureIngressProhibitedTarget CRD.
       # This prohibits AGIC from applying config for any host/path.
       # Use "kubectl get AzureIngressProhibitedTargets" to view and change this.
-      shared: false
+    shared: false
 
   ################################################################################
   # Specify which kubernetes namespace the ingress controller will watch
@@ -125,9 +125,9 @@ ingress-azure:
   # Two authentication methods are available:
   # - Option 1: AAD-Pod-Identity (https://github.com/Azure/aad-pod-identity)
   armAuth:
-      type: aadPodIdentity
-      identityResourceID: _identityResourceId
-      identityClientID:  _identityClientId
+    type: aadPodIdentity
+    identityResourceID: _identityResourceId
+    identityClientID: _identityClientId
 
   ## Alternatively you can use Service Principal credentials
   # armAuth:
@@ -137,16 +137,15 @@ ingress-azure:
   ################################################################################
   # Specify if the cluster is RBAC enabled or not
   rbac:
-      enabled: true # true/false
+    enabled: true   # true/false
 
 nginx:
   enabled: false
   image:
-    name: 'chartpress_replace'
-    tag: 'chartpress_replace'
+    name: 'lulcstagingacr.azurecr.io/lulc-nginx'
+    tag: '0.0.1-n1900.h350e518'
   env:
     FRONTEND_DOMAIN: ''
-  
 kubejanitor:
   image:
     repository: hjacobs/kube-janitor

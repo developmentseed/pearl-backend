@@ -1,4 +1,4 @@
 apiVersion: v1
 description: "Helm Chart to deploy the LULC Infrastructure"
 name: lulc-helm
-version: 0.0.1-chartpress.replace
+version: 0.0.1-n1947.hce9c981
