@@ -242,7 +242,7 @@ class CheckPoint {
                         storage = COALESCE(${checkpoint.storage || null}, storage),
                         name = COALESCE(${checkpoint.name || null}, name),
                         bookmarked = COALESCE(${checkpoint.bookmarked || null}, bookmarked),
-                        classes = COALESCE(${JSON.stringify(checkpoint.classes || null)}::JSONB, classes)
+                        classes = COALESCE(${checkpoint.classes ? JSON.stringify(checkpoint.classes) : null}::JSONB, classes)
                     WHERE
                         id = ${checkpointid}
                     RETURNING *
