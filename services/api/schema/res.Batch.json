@@ -9,6 +9,7 @@
         "aoi",
         "name",
         "completed",
+        "progress",
         "bounds"
     ],
     "additionalProperties": false,
@@ -33,6 +34,9 @@
         },
         "name": {
             "type": "string"
+        },
+        "progress": {
+            "type": "integer"
         },
         "completed": {
             "type": "boolean"

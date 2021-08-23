@@ -140,6 +140,7 @@ test('POST /api/project/1/batch', async (t) => {
             id: 1,
             uid: 1,
             project_id: 1,
+            progress: 0,
             aoi: null,
             name: 'Area',
             bounds: {
@@ -304,6 +305,7 @@ test('POST /api/project/1/batch', async (t) => {
             id: 2,
             uid: 1,
             project_id: 1,
+            progress: 0,
             aoi: null,
             name: 'Area',
             bounds: {

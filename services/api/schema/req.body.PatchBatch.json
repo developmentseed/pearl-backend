@@ -1,19 +1,11 @@
 {
     "type": "object",
-    "required": [
-        "id",
-        "uid",
-        "project_id",
-        "created",
-        "updated",
-        "aoi",
-        "name",
-        "completed",
-        "bounds"
-    ],
     "additionalProperties": false,
     "properties": {
         "aoi": {
+            "type": "integer"
+        },
+        "progress": {
             "type": "integer"
         },
         "completed": {
