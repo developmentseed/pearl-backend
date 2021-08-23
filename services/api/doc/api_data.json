@@ -2234,68 +2234,69 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique Batch ID</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": "<p>User ID that initiated the batch</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": "<p>The Project ID the batch is a part of</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": "<p>The unix timestamp at which the resource was created</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "updated",
-            "description": "<p>undefined</p>"
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aoi",
-            "description": "<p>undefined</p>"
+            "description": "<p>The completed AOI ID</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>The name of the AOI to be created</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
+            "size": "0 - 100",
             "optional": false,
             "field": "progress",
-            "description": "<p>undefined</p>"
+            "description": "<p>The percentage of the job complete</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "completed",
-            "description": "<p>undefined</p>"
+            "description": "<p>Has the batch job been completed</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
-            "optional": true,
+            "optional": false,
             "field": "instance",
             "description": "<p>Instance ID of batch</p>"
           },
@@ -2352,68 +2353,69 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique Batch ID</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": "<p>User ID that initiated the batch</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": "<p>The Project ID the batch is a part of</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": "<p>The unix timestamp at which the resource was created</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "updated",
-            "description": "<p>undefined</p>"
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aoi",
-            "description": "<p>undefined</p>"
+            "description": "<p>The completed AOI ID</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>The name of the AOI to be created</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
+            "size": "0 - 100",
             "optional": false,
             "field": "progress",
-            "description": "<p>undefined</p>"
+            "description": "<p>The percentage of the job complete</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "completed",
-            "description": "<p>undefined</p>"
+            "description": "<p>Has the batch job been completed</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
-            "optional": true,
+            "optional": false,
             "field": "instance",
             "description": "<p>Instance ID of batch</p>"
           },
@@ -2636,68 +2638,69 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique Batch ID</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": "<p>User ID that initiated the batch</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": "<p>The Project ID the batch is a part of</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": "<p>The unix timestamp at which the resource was created</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "updated",
-            "description": "<p>undefined</p>"
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aoi",
-            "description": "<p>undefined</p>"
+            "description": "<p>The completed AOI ID</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": "<p>The name of the AOI to be created</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
+            "size": "0 - 100",
             "optional": false,
             "field": "progress",
-            "description": "<p>undefined</p>"
+            "description": "<p>The percentage of the job complete</p>"
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "completed",
-            "description": "<p>undefined</p>"
+            "description": "<p>Has the batch job been completed</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
-            "optional": true,
+            "optional": false,
             "field": "instance",
             "description": "<p>Instance ID of batch</p>"
           },

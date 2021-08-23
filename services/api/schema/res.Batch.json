@@ -10,36 +10,46 @@
         "name",
         "completed",
         "progress",
+        "instance",
         "bounds"
     ],
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Unique Batch ID"
         },
         "uid": {
-            "type": "integer"
+            "type": "integer",
+            "description": "User ID that initiated the batch"
         },
         "project_id": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The Project ID the batch is a part of"
         },
         "created": {
-            "type": "integer"
+            "$ref": "./util/created.json"
         },
         "updated": {
-            "type": "integer"
+            "$ref": "./util/updated.json"
         },
         "aoi": {
-            "type": ["integer", "null"]
+            "type": ["integer", "null"],
+            "description": "The completed AOI ID"
         },
         "name": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the AOI to be created"
         },
         "progress": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "The percentage of the job complete"
         },
         "completed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Has the batch job been completed"
         },
         "instance": {
             "type": "integer",
