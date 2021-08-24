@@ -17,7 +17,9 @@ Set the BUILD_ONLY env var to only build docker images
 }
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    chartpress
+    cd deployment/helm && chartpress
+    # cd deployment/helm && chartpress --platform linux/amd64 --builder docker-buildx
+    cd ../../
 
     if [[ -z ${BUILD_ONLY} ]]; then
         scripts/test

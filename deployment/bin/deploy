@@ -71,9 +71,6 @@ if [[ -z ${TERRAFORM_DIR} ]]; then
     exit 1
 fi
 
-require_env "IMAGE_TAG"
-require_env "GIT_COMMIT"
-
 # Directory for rendered values and templates
 CONF_DIR='/opt/conf'
 mkdir -p ${CONF_DIR}
@@ -84,7 +81,6 @@ setup_env
 # Print some information
 
 echo "===== Running Deploy ====="
-echo "IMAGE_TAG: ${IMAGE_TAG}"
 
 
 # ---- TODO: Run Chartpress ------

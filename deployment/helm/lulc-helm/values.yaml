@@ -6,8 +6,8 @@ api:
   replicaCount: 1
   containerPort: 2000
   image:
-    name: 'lulcstagingacr.azurecr.io/lulc-api'
-    tag: '0.0.1-n1947.hce9c981'
+    name: 'lulcterraformacr.azurecr.io/lulc-api'
+    tag: '0.0.1-n1961.hd9c9844'
   resources:
     requests:
       cpu: 1200m
@@ -19,8 +19,8 @@ socket:
   enabled: true
   containerPort: 1999
   image:
-    name: 'lulcstagingacr.azurecr.io/lulc-socket'
-    tag: '0.0.1-n1626.h898d8ca'
+    name: 'lulcterraformacr.azurecr.io/lulc-socket'
+    tag: '0.0.1-n1961.hd9c9844'
   resources:
     requests:
       cpu: 1200m
@@ -32,8 +32,8 @@ tiles:
   enabled: true
   containerPort: 8000
   image:
-    name: 'lulcstagingacr.azurecr.io/lulc-tiles'
-    tag: '0.0.1-n1928.h0692954'
+    name: 'lulcterraformacr.azurecr.io/lulc-tiles'
+    tag: '0.0.1-n1961.hd9c9844'
   nodeSelector:
     enabled: true
     label_key: agentpool
@@ -142,8 +142,8 @@ ingress-azure:
 nginx:
   enabled: false
   image:
-    name: 'lulcstagingacr.azurecr.io/lulc-nginx'
-    tag: '0.0.1-n1900.h350e518'
+    name: 'lulcterraformacr.azurecr.io/lulc-nginx'
+    tag: '0.0.1-n1961.hd9c9844'
   env:
     FRONTEND_DOMAIN: ''
 kubejanitor:

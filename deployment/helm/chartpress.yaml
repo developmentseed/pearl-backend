@@ -1,6 +1,6 @@
 charts:
   - name: lulc-helm
-    imagePrefix: lulcstagingacr.azurecr.io/lulc-
+    imagePrefix: lulcterraformacr.azurecr.io/lulc-
     repo:
        git: developmentseed/lulc-chart
        published: https://devseed.com/lulc-chart
@@ -18,10 +18,10 @@ charts:
         valuesPath: tiles.image
         contextPath: ../../services/tiles/
         dockerfilePath: ../../services/tiles/Dockerfile
-      gpu:
-        valuesPath: gpu.image
-        contextPath: ../../services/gpu/
-        dockerfilePath: ../../services/gpu/Dockerfile
+      # gpu:
+      #   valuesPath: gpu.image
+      #   contextPath: ../../services/gpu/
+      #   dockerfilePath: ../../services/gpu/Dockerfile
       nginx:
         valuesPath: nginx.image
         contextPath: ../../services/nginx-redirect
