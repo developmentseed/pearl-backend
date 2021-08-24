@@ -22,6 +22,6 @@ output "storage_connection_string" {
   value = azurerm_storage_account.lulc.primary_connection_string
 }
 
-output "postgresql_connection_string" {
-  value = "postgres://lulc:${azurerm_postgresql_flexible_server.administrator_password}@${azurerm_postgresql_flexible_server.name}.postgres.database.azure.com/lulc?sslmode=require"
-}
+# output "postgresql_connection_string" {
+#   value = "postgres://lulc:${azurerm_postgresql_flexible_server.administrator_login_password}@${azurerm_postgresql_flexible_server.name}.postgres.database.azure.com/lulc?sslmode=require"
+# }

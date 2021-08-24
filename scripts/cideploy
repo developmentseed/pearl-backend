@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source scripts/env
-
 set -e
 
 if [[ "${CI}" ]]; then
@@ -19,10 +17,6 @@ Deploys the staging infrastructure.
     variables; see README.
 "
 }
-
-require_env "IMAGE_TAG"
-require_env "ENVIRONMENT"
-require_env "PLANET_URL"
 
 while [[ "$#" > 0 ]]; do case $1 in
     --dev)

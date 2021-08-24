@@ -23,7 +23,7 @@ resource "azurerm_subnet" "aks" {
   name                 = "${local.prefix}-aks-subnet"
   virtual_network_name = azurerm_virtual_network.lulc-cluster.name
   resource_group_name  = azurerm_resource_group.lulc.name
-  address_prefixes     = ["10.0.0.0/16"]
+  address_prefixes     = ["10.1.0.0/16"]
 }
 
 # subnet for postgres that's delegated
@@ -31,7 +31,7 @@ resource "azurerm_subnet" "postgres" {
   name                 = "${local.prefix}-postgres-subnet"
   virtual_network_name = azurerm_virtual_network.lulc-cluster.name
   resource_group_name  = azurerm_resource_group.lulc.name
-  address_prefixes     = ["10.0.0.0/24"]
+  address_prefixes     = ["10.2.0.0/16"]
   service_endpoints = [
     "Microsoft.Storage"
   ]
@@ -48,12 +48,6 @@ resource "azurerm_subnet" "postgres" {
 }
 
 resource "azurerm_private_dns_zone" "lulc" {
-  name                = "${local.prefix}-db.postgres.database.azure.com"
+  name                = "${local.prefixnodashes}db.postgres.database.azure.com"
   resource_group_name = azurerm_resource_group.lulc.name
 }
-
-resource "azurerm_private_dns_zone" "lulc" {
-  name                = "${local.prefix}-db.postgres.database.azure.com"
-  resource_group_name = azurerm_resource_group.lulc.name
-}
-

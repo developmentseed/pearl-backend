@@ -17,7 +17,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
     node_count     = var.aks_node_count
     vnet_subnet_id = azurerm_subnet.aks.id
     enable_auto_scaling   = true
-    min_count             = 3
+    min_count             = 1
     max_count             = 8
   }
 

@@ -15,5 +15,6 @@ CI publish for this project.
 }
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    chartpress --push
+    # cd deployment/helm && chartpress --push --platform linux/amd64 --builder docker-buildx
+    cd deployment/helm && chartpress --push
 fi
