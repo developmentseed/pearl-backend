@@ -30,6 +30,12 @@ class ModelSrv:
         if api.instance.get("aoi_id") is not None:
             self.aoi = AOI.load(self.api, self.api.instance.get("aoi_id"))
 
+        if api.batch is not False:
+            prediction({
+                name: api.batch.get('name', 'Default Batch'),
+                polygon: api.batch.get('bounds')
+            }, web
+
     def abort(self, body, websocket):
         if self.processing is False:
             websocket.error(
