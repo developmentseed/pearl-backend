@@ -62,7 +62,7 @@ async function router(schema, config) {
             await project.has_auth(req.auth, req.params.projectid);
 
             const existing_batch = await instance.list(req.params.projectid, {
-                batch: 'true',
+                batch: true,
                 status: 'active'
             });
 

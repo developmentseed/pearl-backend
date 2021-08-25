@@ -91,15 +91,23 @@ async function gpu() {
                     '?url': url.split(' ')[1]
                 });
 
-                if (data.body && data.body.type === 'object') {
-                    for (const match of Object.keys(data.body.properties)) {
-                        if (inp[match]) continue;
-                        inp[match] = await term.prompt.ask(match);
+                const res = await term.prompt.ask('Read body from file? (Y/n)');
+                if (!res || res.toLowerCase() === 'y') {
+                    const f = await term.prompt.ask('File Path');
 
-                        if (data.body.properties[match].type === 'integer') inp[match] = parseInt(inp[match]);
-                        if (data.body.properties[match].type === 'number') inp[match] = Number(inp[match]);
-                        if (data.body.properties[match].type === 'object') inp[match] = JSON.parse(inp[match]);
-                        if (data.body.properties[match].type === 'array') inp[match] = JSON.parse(inp[match]);
+                    Object.assign(inp, JSON.parse(fs.readFileSync(path.resolve(f))));
+
+                } else {
+                    if (data.body && data.body.type === 'object') {
+                        for (const match of Object.keys(data.body.properties)) {
+                            if (inp[match]) continue;
+                            inp[match] = await term.prompt.ask(match);
+
+                            if (data.body.properties[match].type === 'integer') inp[match] = parseInt(inp[match]);
+                            if (data.body.properties[match].type === 'number') inp[match] = Number(inp[match]);
+                            if (data.body.properties[match].type === 'object') inp[match] = JSON.parse(inp[match]);
+                            if (data.body.properties[match].type === 'array') inp[match] = JSON.parse(inp[match]);
+                        }
                     }
                 }
             }
