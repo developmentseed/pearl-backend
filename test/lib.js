@@ -1,12 +1,19 @@
 #!/usr/bin/env node
 
-
-
 const util = require('./lib/util');
 const run = require('./lib/run');
 
+if (require.main === module) {
+    (async () => {
+        if (process.env.UPDATE) {
+            console.log('ok - updating schema');
+            this.schema = await util.schema('http://localhost:2000');
+        }
+    })();
+}
+
 /**
- * @class LULC
+ * @class
  */
 class LULC {
 
