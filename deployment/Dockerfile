@@ -10,7 +10,7 @@ RUN apt-get install -y wget unzip curl gnupg \
 
 ARG BUILDARCH
 RUN echo "Building for $BUILDARCH"
-RUN wget -O https://releases.hashicorp.com/terraform/1.0.2/terraform_1.0.2_linux_amd64.zip
+RUN wget -O terraform.zip https://releases.hashicorp.com/terraform/1.0.2/terraform_1.0.2_linux_amd64.zip
 # RUN wget -O terraform.zip https://releases.hashicorp.com/terraform/1.0.2/terraform_1.0.2_linux_arm64.zip
 
 

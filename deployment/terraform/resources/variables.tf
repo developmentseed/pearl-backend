@@ -2,6 +2,86 @@ variable "environment" {
   type = string
 }
 
+variable "domain" {
+  type = string
+  default = "lulc.ds.io"
+}
+
+variable "postgres_password" {
+  type = string
+  default = "changeme"
+}
+
+variable "signing_secret" {
+  type = string
+  default = "abcdefgh123456"
+}
+
+variable "api_node_selector_key" {
+  type = string
+  default = "agentpool"
+}
+
+variable "api_node_selector_value" {
+  type = string
+  default = "gpunodepool"
+}
+
+variable "gpu_count" {
+  type = number
+  default = 15
+}
+
+variable "tiles_debug" {
+  type = string
+  default = "false"
+}
+
+variable "mosaic_backend" {
+  type = string
+  default = "sqlite:///"
+}
+
+variable "tiles_host" {
+  type = string
+  default = "/tmp/data/mosaics.db"
+}
+
+variable "tiles_webconcurrency" {
+  type = string
+  default = "1"
+}
+
+variable "placeholder_replica_count" {
+  type = number
+  default = 1
+}
+
+variable "placeholder_node_selector_name" {
+  type = string
+  default = "gpunodepool"
+}
+
+variable "placeholder_is_gpu" {
+  type = string
+  default = "true"
+}
+
+variable "placeholder_num_gpus" {
+  type = number
+  default = 2
+}
+
+variable "nginx_enabled" {
+  type = string
+  default = "false"
+}
+
+variable "frontend_domain" {
+  type = string
+  default = ""
+}
+
 variable "region" {
   type = string
 }
