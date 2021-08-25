@@ -19,12 +19,12 @@ resource "helm_release" "lulc" {
 
   set {
     name  = "api.env.Postgres"
-    value = var.postgres
+    value = "postgres://lulc:${var.postgres_password}@${azurerm_postgresql_flexible_server_database.lulc.name}.postgres.database.azure.com/lulc?sslmode=require"
   }
 
   set {
     name  = "api.env.AZURE_STORAGE_CONNECTION_STRING"
-    value = var.azure_storage_connection_string
+    value = azurerm_storage_account.lulc.primary_connection_string
   }
 
   set {
@@ -38,7 +38,7 @@ resource "helm_release" "lulc" {
   }
 
   set {
-    name  = "api.env.GpuCount
+    name  = "api.env.GpuCount"
     value = var.gpu_count
   }
 

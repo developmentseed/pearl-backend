@@ -1,6 +1,6 @@
-resource "helm_release" "lulc" {
+resource "helm_release" "lulc-keda" {
   name             = "keda"
-  repository       = "kedacore/keda"
+  chart            = "kedacore/keda"
   namespace        = "keda"
   create_namespace = true 
 }

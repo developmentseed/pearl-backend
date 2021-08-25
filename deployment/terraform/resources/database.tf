@@ -4,7 +4,7 @@ resource "azurerm_postgresql_flexible_server" "lulc" {
   location               = azurerm_resource_group.lulc.location
   version                = "12"
   administrator_login    = "lulc"
-  administrator_password = "somepassword" #FIXME should read from env
+  administrator_password = var.postgres_password
   storage_mb             = 32768
   sku_name               = "GP_Standard_D4s_v3"
   # private_dns_zone_id    = azurerm_private_dns_zone.lulc.id
