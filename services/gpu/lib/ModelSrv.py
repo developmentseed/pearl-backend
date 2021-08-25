@@ -31,10 +31,10 @@ class ModelSrv:
             self.aoi = AOI.load(self.api, self.api.instance.get("aoi_id"))
 
         if api.batch is not False:
-            prediction({
-                name: api.batch.get('name', 'Default Batch'),
-                polygon: api.batch.get('bounds')
-            }, websocket)
+            self.prediction({
+                "name": api.batch.get('name', 'Default Batch'),
+                "polygon": api.batch.get('bounds')
+            })
 
     def abort(self, body, websocket):
         if self.processing is False:
@@ -353,7 +353,7 @@ class ModelSrv:
             websocket.error("Checkpoint Load Error", e)
             raise e
 
-    def prediction(self, body, websocket):
+    def prediction(self, body, websocket = False):
         try:
             if self.processing is True:
                 return is_processing(websocket)
@@ -382,21 +382,23 @@ class ModelSrv:
             self.aoi = AOI.create(
                 self.api, body.get("polygon"), body.get("name"), self.chk["id"]
             )
-            websocket.send(
-                json.dumps(
-                    {
-                        "message": "model#aoi",
-                        "data": {
-                            "id": self.aoi.id,
-                            "live": self.aoi.live,
-                            "name": self.aoi.name,
-                            "checkpoint_id": self.chk["id"],
-                            "bounds": self.aoi.bounds,
-                            "total": self.aoi.total,
-                        },
-                    }
+
+            if websocket is not False:
+                websocket.send(
+                    json.dumps(
+                        {
+                            "message": "model#aoi",
+                            "data": {
+                                "id": self.aoi.id,
+                                "live": self.aoi.live,
+                                "name": self.aoi.name,
+                                "checkpoint_id": self.chk["id"],
+                                "bounds": self.aoi.bounds,
+                                "total": self.aoi.total,
+                            },
+                        }
+                    )
                 )
-            )
 
             color_list = [item["color"] for item in self.model.classes]
 
@@ -431,7 +433,7 @@ class ModelSrv:
                     output.clip(self.aoi.poly)
                     LOGGER.info("ok - generated inference")
 
-                    if self.aoi.live:
+                    if self.aoi.live and websocket is not False:
                         # Create color versions of predictions
                         png = pred2png(output.data, color_list)
 
@@ -454,7 +456,7 @@ class ModelSrv:
                                 }
                             )
                         )
-                    else:
+                    elif websocket is not False:
                         websocket.send(
                             json.dumps(
                                 {
@@ -480,28 +482,36 @@ class ModelSrv:
                     self.aoi.add_to_fabric(output)
 
             if self.is_aborting is True:
-                websocket.send(
-                    json.dumps(
-                        {
-                            "message": "model#aborted",
-                        }
+                if websocket is not False:
+                    websocket.send(
+                        json.dumps(
+                            {
+                                "message": "model#aborted",
+                            }
+                        )
                     )
-                )
+                else:
+                    print('TODO');
+                    # TODO: UPDATE BATCH API WITH ABORTED
             else:
                 self.aoi.upload_fabric()
 
                 LOGGER.info("ok - done prediction")
 
-                websocket.send(
-                    json.dumps(
-                        {
-                            "message": "model#prediction#complete",
-                            "data": {
-                                "aoi": self.aoi.id,
-                            },
-                        }
+                if websocket is not False:
+                    websocket.send(
+                        json.dumps(
+                            {
+                                "message": "model#prediction#complete",
+                                "data": {
+                                    "aoi": self.aoi.id,
+                                },
+                            }
+                        )
                     )
-                )
+                else:
+                    print('TODO');
+                    # TODO: UPDATE BATCH API WITH AOI ##
 
                 done_processing(self)
         except Exception as e:
@@ -615,14 +625,15 @@ class ModelSrv:
         self.api.upload_checkpoint(checkpoint["id"])
         self.api.instance_patch(checkpoint_id=checkpoint["id"])
 
-        websocket.send(
-            json.dumps(
-                {
-                    "message": "model#checkpoint",
-                    "data": {"name": checkpoint["name"], "id": checkpoint["id"]},
-                }
+        if websocket is not False:
+            websocket.send(
+                json.dumps(
+                    {
+                        "message": "model#checkpoint",
+                        "data": {"name": checkpoint["name"], "id": checkpoint["id"]},
+                    }
+                )
             )
-        )
 
         self.chk = checkpoint
         return checkpoint
@@ -635,7 +646,9 @@ def done_processing(modelsrv):
 
 def is_processing(websocket):
     LOGGER.info("not ok  - Can't process message - busy")
-    websocket.error(
-        "GPU is Busy",
-        "The API is only capable of handling a single processing command at a time. Wait until the retraining/prediction is complete and resubmit",
-    )
+
+    if websocket is not False:
+        websocket.error(
+            "GPU is Busy",
+            "The API is only capable of handling a single processing command at a time. Wait until the retraining/prediction is complete and resubmit",
+        )

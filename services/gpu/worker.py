@@ -79,7 +79,9 @@ def main():
     model = load(args.gpu_id, api)
 
     connection(
-        "{}?token={}".format(os.environ["SOCKET"], api.token.replace("api.", "")), model
+        "{}?token={}".format(os.environ["SOCKET"], api.token.replace("api.", "")),
+        model,
+        api
     )
 
 
@@ -91,7 +93,7 @@ def placeholder(body, websocket):
     LOGGER.info("Known but unprocessed message")
 
 
-def connection(uri, model):
+def connection(uri, model, api):
     router = Router(uri)
 
     if api.batch is False:

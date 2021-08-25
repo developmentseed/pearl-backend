@@ -64,13 +64,13 @@ class API:
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
 
+        self.instance_id = instance_id
+        self.project_id = self.instance["project_id"]
+
         if type(self.instance.get('batch')) == int:
             self.batch = self.batch_meta()
         else:
             self.batch = False
-
-        self.instance_id = instance_id
-        self.project_id = self.instance["project_id"]
 
         self.token = "api." + jwt.encode(
             {"t": "admin", "p": self.project_id, "i": self.instance_id},
