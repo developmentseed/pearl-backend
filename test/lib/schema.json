@@ -15,6 +15,7 @@
             "info": "GET /project/:projectid/instance/:instanceid"
         },
         "batch": {
+            "create": "POST /project/:projectid/batch",
             "list": "GET /project/:projectid/batch",
             "get": "GET /project/:projectid/batch/:batchid"
         }
