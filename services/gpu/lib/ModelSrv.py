@@ -469,6 +469,11 @@ class ModelSrv:
                                 }
                             )
                         )
+                    else
+                        self.api.batch_patch({
+                            "progress": int(float(current) / float(self.aoi.total) * 100)
+                        })
+
 
                     current = current + 1
 
