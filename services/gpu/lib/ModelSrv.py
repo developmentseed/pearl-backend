@@ -510,8 +510,11 @@ class ModelSrv:
                         )
                     )
                 else:
-                    print('TODO');
-                    # TODO: UPDATE BATCH API WITH AOI ##
+                    self.api.batch_patch({
+                        "progress": 100,
+                        "completed": True,
+                        "aoi": self.aoi.id
+                    })
 
                 done_processing(self)
         except Exception as e:
