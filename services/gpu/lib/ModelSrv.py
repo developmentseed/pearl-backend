@@ -34,7 +34,7 @@ class ModelSrv:
             prediction({
                 name: api.batch.get('name', 'Default Batch'),
                 polygon: api.batch.get('bounds')
-            }, web
+            }, websocket)
 
     def abort(self, body, websocket):
         if self.processing is False:

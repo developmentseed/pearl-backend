@@ -64,9 +64,9 @@ class API:
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
 
-        if type(self.instance.batch) == int:
+        if type(self.instance.get('batch')) == int:
             self.batch = self.batch_meta()
-        else
+        else:
             self.batch = False
 
         self.instance_id = instance_id
