@@ -85,6 +85,25 @@ async function gpu() {
                 ':projectid': 1
             };
 
+            if (lulc.schema.schema[url].body) {
+                const data = await lulc.cmd('schema', 'list', {
+                    '?method': url.split(' ')[0],
+                    '?url': url.split(' ')[1]
+                });
+
+                if (data.body && data.body.type === 'object') {
+                    for (const match of Object.keys(data.body.properties)) {
+                        if (inp[match]) continue;
+                        inp[match] = await term.prompt.ask(match);
+
+                        if (data.body.properties[match].type === 'integer') inp[match] = parseInt(inp[match]);
+                        if (data.body.properties[match].type === 'number') inp[match] = Number(inp[match]);
+                        if (data.body.properties[match].type === 'object') inp[match] = JSON.parse(inp[match]);
+                        if (data.body.properties[match].type === 'array') inp[match] = JSON.parse(inp[match]);
+                    }
+                }
+            }
+
             if (matches) {
                 for (const match of matches) {
                     if (inp[match]) continue;
