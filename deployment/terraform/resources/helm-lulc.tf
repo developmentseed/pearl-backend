@@ -1,7 +1,7 @@
 resource "helm_release" "lulc" {
   name  = "lulc-helm"
   chart = "../../helm/lulc-helm"
-
+  wait = false
   set {
     name  = "environment"
     value = var.environment

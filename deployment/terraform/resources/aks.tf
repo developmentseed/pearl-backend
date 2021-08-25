@@ -38,7 +38,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "tiler" {
   vm_size               = "Standard_F8s_v2"
   vnet_subnet_id = azurerm_subnet.aks.id
   enable_auto_scaling   = true
-  min_count             = 2
+  min_count             = 1
   max_count             = 8
 
   tags = {
@@ -53,7 +53,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "tiler" {
 # we might have to run a Daemonset to install nvidia drivers https://docs.microsoft.com/en-us/azure/aks/gpu-cluster#manually-install-the-nvidia-device-plugin
 
 resource "azurerm_kubernetes_cluster_node_pool" "gpunodepool" {
-  name                  = "tiler"
+  name                  = "gpunodepool"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
   vm_size               = "Standard_NC12"
   vnet_subnet_id = azurerm_subnet.aks.id
