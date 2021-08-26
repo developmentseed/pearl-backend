@@ -1,5 +1,5 @@
 resource "helm_release" "lulc-letsencrypt" {
-  name             = ""
+  name             = "lulc-letsencrypt"
   chart            = "../../helm/lulc-letsencrypt"
   namespace        = "cert-manager"
   create_namespace = true
