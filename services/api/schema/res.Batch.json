@@ -8,7 +8,7 @@
         "updated",
         "aoi",
         "name",
-        "aborted",
+        "abort",
         "completed",
         "progress",
         "instance",
@@ -48,7 +48,7 @@
             "maximum": 100,
             "description": "The percentage of the job complete"
         },
-        "aborted": {
+        "abort": {
             "type": "boolean",
             "description": "Has the batch job been aborted"
         },
