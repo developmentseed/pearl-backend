@@ -208,6 +208,7 @@ class ModelSrv:
                 for i, (data, xyz) in enumerate(dataloader):
                     if self.is_aborting:
                         break
+
                     xyz = xyz.numpy()
                     outputs = self.model.run(data, True)
 
@@ -469,10 +470,13 @@ class ModelSrv:
                                 }
                             )
                         )
-                    else
-                        self.api.batch_patch({
+                    else:
+                        res = self.api.batch_patch({
                             "progress": int(float(current) / float(self.aoi.total) * 100)
                         })
+
+                        if res.get('abort') is True:
+                            self.is_aborting = True
 
 
                     current = current + 1
@@ -495,9 +499,6 @@ class ModelSrv:
                             }
                         )
                     )
-                else:
-                    print('TODO');
-                    # TODO: UPDATE BATCH API WITH ABORTED
             else:
                 self.aoi.upload_fabric()
 
