@@ -1,7 +1,6 @@
-'use strict';
+
 
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const { Auth, AuthToken } = require('../lib/auth');
 
 async function router(schema, config) {
@@ -16,7 +15,7 @@ async function router(schema, config) {
 
                 const tkn = await token.generate({
                     uid: usr.uid,
-                    type: 'auth0',
+                    type: 'auth0'
                 }, 'Test Token');
 
                 usr.token = tkn.token;

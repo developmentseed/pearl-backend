@@ -1,12 +1,11 @@
-'use strict';
+
 
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const auth = new (require('../lib/auth').Auth)(config);
 
-    /**  
+    /**
      * @api {get} /api/user List Users
      * @apiVersion 1.0.0
      * @apiName ListUsers
@@ -33,7 +32,7 @@ async function router(schema, config) {
      */
     await schema.get('/user', {
         query: 'req.query.user-list.json'
-    }, config.requiresAuth, async (req, res) => { 
+    }, config.requiresAuth, async (req, res) => {
         try {
             const users = await auth.list(req.query);
 

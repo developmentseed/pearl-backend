@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
@@ -11,7 +11,7 @@ async function router(schema, config) {
     const model = new (require('../lib/model').Model)(config);
     const instance = new (require('../lib/instance').Instance)(config);
 
-    /**  
+    /**
      * @api {post} /api/project List Projects
      * @apiVersion 1.0.0
      * @apiName ListProjects
@@ -43,7 +43,7 @@ async function router(schema, config) {
      */
     await schema.get('/project', {
         query: 'req.query.project-list.json'
-    }, config.requiresAuth, async (req, res) => { 
+    }, config.requiresAuth, async (req, res) => {
         try {
             const results = await project.list(req.auth.uid, req.query);
             if (results.projects && results.projects.length) {

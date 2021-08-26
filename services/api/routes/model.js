@@ -1,11 +1,8 @@
-'use strict';
-
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
-const Mosaic = require('../lib/mosaic');
+const Busboy = require('busboy');
 
 async function router(schema, config) {
-    const project = new (require('../lib/project').Project)(config);
     const model = new (require('../lib/model').Model)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
@@ -107,7 +104,7 @@ async function router(schema, config) {
         }
     });
 
-	    /**
+    /**
      * @api {get} /api/model List Models
      * @apiVersion 1.0.0
      * @apiName ListModel
@@ -169,7 +166,7 @@ async function router(schema, config) {
 
     /**
      * @api {get} /api/model/:modelid Get Model
-     * @apiVersion 1.0.0 
+     * @apiVersion 1.0.0
      * @apiName GetModel
      * @apiGroup Model
      * @apiPermission user
@@ -192,7 +189,7 @@ async function router(schema, config) {
     });
 
 
-    /**  
+    /**
      * @api {get} /api/model/:modelid/download Download Model
      * @apiVersion 1.0.0
      * @apiName DownloadModel
@@ -202,7 +199,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return the model itself
      */
-    await schema.get('/model/:modelid/download', {}, config.requiresAuth, async (req, res) => { 
+    await schema.get('/model/:modelid/download', {}, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'modelid');
 
@@ -210,7 +207,7 @@ async function router(schema, config) {
         } catch (err) {
             return Err.respond(err, res);
         }
-    }); 
+    });
 }
 
 module.exports = router;
