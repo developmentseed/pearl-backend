@@ -10,6 +10,7 @@ import time
 import jwt
 from lib.api import API
 from lib.ModelSessionPyTorchExample import TorchFineTuning
+from lib.ModelSessionUnet import LoadUnet
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
 from lib.utils import setup_logging
@@ -115,6 +116,8 @@ def load(gpu_id, api):
 
     if model_type == "pytorch_example":
         model = TorchFineTuning(gpu_id, api.model_dir, api.model["classes"])
+    if model_type == "unet":
+        model = LoadUnet(gpu_id, api.model_dir, api.model["classes"])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
