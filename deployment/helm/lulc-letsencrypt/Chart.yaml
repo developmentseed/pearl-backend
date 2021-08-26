@@ -1,0 +1,4 @@
+apiVersion: v1
+description: "Helm Chart to deploy Cert Manager resource"
+name: lulc-letsencrypt
+version: 0.0.1
