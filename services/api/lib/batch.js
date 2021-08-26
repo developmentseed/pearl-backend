@@ -73,6 +73,7 @@ class Batch extends Generic {
                 SELECT
                     count(*) OVER() AS count,
                     id,
+                    abort,
                     created,
                     updated,
                     aoi,
@@ -109,6 +110,7 @@ class Batch extends Generic {
             aoi: this.aoi,
             name: this.name,
             bounds: this.bounds,
+            abort: this.abort,
             completed: this.completed,
             progress: this.progress
         };
@@ -120,6 +122,7 @@ class Batch extends Generic {
                 UPDATE batch
                     SET
                         aoi         = ${this.aoi},
+                        abort       = ${this.abort},
                         completed   = ${this.completed},
                         progress    = ${this.progress},
                         updated     = NOW()

@@ -2,11 +2,11 @@ const { promisify } = require('util');
 const arequest = promisify(require('request'));
 const request = require('request');
 
-async function run(api, schema, url, payload, stream = false) {
+async function run(api, schema, method, url, payload, stream = false) {
     const req = {
         json: true,
-        url: new URL('/api' + url.split(' ')[1], api.url + '/api'),
-        method: url.split(' ')[0],
+        url: url,
+        method: method,
         headers: {}
     };
 

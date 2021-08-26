@@ -8,6 +8,9 @@
         "progress": {
             "type": "integer"
         },
+        "abort": {
+            "type": "boolean"
+        },
         "completed": {
             "type": "boolean"
         }

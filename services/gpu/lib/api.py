@@ -67,6 +67,11 @@ class API:
         self.instance_id = instance_id
         self.project_id = self.instance["project_id"]
 
+        if type(self.instance.get('batch')) == int:
+            self.batch = self.batch_meta()
+        else:
+            self.batch = False
+
         self.token = "api." + jwt.encode(
             {"t": "admin", "p": self.project_id, "i": self.instance_id},
             os.environ["SigningSecret"],
@@ -451,6 +456,35 @@ class API:
                 "content-type": "application/json",
             },
             data=json.dumps(data),
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def batch_meta(self):
+        url = self.url + "/api/project/" + str(self.project_id) + "/batch/" + str(self.instance.get('batch'))
+
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def batch_patch(self, body):
+        url = self.url + "/api/project/" + str(self.project_id) + "/batch/" + str(self.instance.get('batch'))
+
+        LOGGER.info("ok - PATCH " + url)
+        r = self.requests.patch(
+            url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json",
+            },
+            data=json.dumps(body),
         )
 
         r.raise_for_status()

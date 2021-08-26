@@ -78,7 +78,7 @@ async function router(schema, config) {
      * @apiGroup Mosaic
      * @apiPermission public
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.tile.json} apiParam
+     * @apiSchema (Query) {jsonschema=../schema/req.query.tile.json} apiParam
      *
      * @apiParam {Integer} z Mercator Z coordinate
      * @apiParam {Integer} x Mercator X coordinate
