@@ -64,13 +64,11 @@ async function server(args, config, cb) {
     const proxy = new (require('./lib/proxy').Proxy)(config);
     const auth = new (require('./lib/auth').Auth)(config);
     const authtoken = new (require('./lib/auth').AuthToken)(config);
-    const model = new (require('./lib/model').Model)(config);
     const instance = new (require('./lib/instance').Instance)(config);
     const checkpoint = new (require('./lib/checkpoint').CheckPoint)(config);
     const aoi = new (require('./lib/aoi').AOI)(config);
     const aoipatch = new (require('./lib/aoi-patch').AOIPatch)(config);
     const aoishare = new (require('./lib/aoi-share').AOIShare)(config);
-    const Mosaic = require('./lib/mosaic');
 
     app.disable('x-powered-by');
     app.use(cors({
