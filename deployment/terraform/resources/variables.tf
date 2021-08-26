@@ -82,6 +82,11 @@ variable "frontend_domain" {
   default = ""
 }
 
+variable "letsencrypt_email" {
+  type = string
+  default = "sanjay@developmentseed.org"
+}
+
 variable "region" {
   type = string
 }
