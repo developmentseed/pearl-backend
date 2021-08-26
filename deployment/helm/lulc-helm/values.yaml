@@ -7,7 +7,7 @@ api:
   containerPort: 2000
   image:
     name: 'lulcterraformacr.azurecr.io/lulc-api'
-    tag: '0.0.1-n1961.hd9c9844'
+    tag: '0.0.1-n1975.h259c242'
   resources:
     requests:
       cpu: 1200m
@@ -20,7 +20,7 @@ socket:
   containerPort: 1999
   image:
     name: 'lulcterraformacr.azurecr.io/lulc-socket'
-    tag: '0.0.1-n1961.hd9c9844'
+    tag: '0.0.1-n1962.h390a0da'
   resources:
     requests:
       cpu: 1200m
@@ -33,7 +33,7 @@ tiles:
   containerPort: 8000
   image:
     name: 'lulcterraformacr.azurecr.io/lulc-tiles'
-    tag: '0.0.1-n1961.hd9c9844'
+    tag: '0.0.1-n1962.h390a0da'
   nodeSelector:
     enabled: true
     label_key: agentpool
@@ -67,8 +67,8 @@ redis:
 
 gpu:
   image:
-    name: 'lulcstagingacr.azurecr.io/lulc-gpu'
-    tag: '0.0.1-n1921.h2bbdec1'
+    name: 'lulcterraformacr.azurecr.io/lulc-gpu'
+    tag: '0.0.1-n1962.h390a0da'
 
 placeholder:
   enabled: true
@@ -143,7 +143,7 @@ nginx:
   enabled: false
   image:
     name: 'lulcterraformacr.azurecr.io/lulc-nginx'
-    tag: '0.0.1-n1961.hd9c9844'
+    tag: '0.0.1-n1962.h390a0da'
   env:
     FRONTEND_DOMAIN: ''
 kubejanitor:
