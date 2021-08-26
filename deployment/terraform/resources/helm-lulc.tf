@@ -19,7 +19,7 @@ resource "helm_release" "lulc" {
 
   set {
     name  = "api.env.Postgres"
-    value = "postgres://lulc:${var.postgres_password}@${azurerm_postgresql_flexible_server_database.lulc.name}.postgres.database.azure.com/lulc?sslmode=require"
+    value = "postgres://lulc:${var.postgres_password}@${azurerm_postgresql_flexible_server.lulc.fqdn}/lulc?sslmode=require"
   }
 
   set {

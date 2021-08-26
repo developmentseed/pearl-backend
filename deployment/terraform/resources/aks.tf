@@ -38,7 +38,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "tiler" {
   vm_size               = "Standard_F8s_v2"
   vnet_subnet_id = azurerm_subnet.aks.id
   enable_auto_scaling   = true
-  min_count             = 2
+  min_count             = 1
   max_count             = 8
 
   tags = {
