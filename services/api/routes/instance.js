@@ -1,11 +1,9 @@
-
-
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
+const Project = require('../lib/project');
 
 async function router(schema, config) {
     const auth = new (require('../lib/auth').Auth)(config);
-    const project = new (require('../lib/project').Project)(config);
     const instance = new (require('../lib/instance').Instance)(config);
 
     /**
@@ -28,7 +26,7 @@ async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
             const inst = await instance.create(req.auth, req.body);
@@ -84,7 +82,7 @@ async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             res.json(await instance.list(req.params.projectid, req.query));
         } catch (err) {
@@ -111,7 +109,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'instanceid');
 
-            res.json(await instance.has_auth(project, req.auth, req.params.projectid, req.params.instanceid));
+            res.json(await instance.has_auth(config.pool, req.auth, req.params.projectid, req.params.instanceid));
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -1,5 +1,4 @@
-
-
+const Project = require('./project');
 const Err = require('./error');
 const { BlobServiceClient } = require('@azure/storage-blob');
 
@@ -20,13 +19,13 @@ class CheckPoint {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Project} project Instantiated Project class
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} checkpointid Checkpoint the user is attemping to access
      */
-    async has_auth(project, auth, projectid, checkpointid) {
-        const proj = await project.has_auth(auth, projectid);
+    async has_auth(pool, auth, projectid, checkpointid) {
+        const proj = await Project.has_auth(pool, auth, projectid);
         const checkpoint = await this.get(checkpointid);
 
         if (checkpoint.project_id !== proj.id) {

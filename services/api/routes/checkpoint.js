@@ -1,9 +1,9 @@
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Busboy = require('busboy');
+const Project = require('../lib/project');
 
 async function router(schema, config) {
-    const project = new (require('../lib/project').Project)(config);
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
     const aoi = new (require('../lib/aoi').AOI)(config);
     const auth = new (require('../lib/auth').Auth)(config);
@@ -34,7 +34,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
 
-            return res.json(await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid));
+            return res.json(await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -55,7 +55,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
 
-            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            const c = await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
             if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
             if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
@@ -93,7 +93,7 @@ async function router(schema, config) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            const c = await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            const c = await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
             if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
             if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
@@ -166,7 +166,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             await checkpoint.download(req.params.checkpointid, res);
         } catch (err) {
@@ -206,7 +206,7 @@ async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             return res.json(await checkpoint.list(req.params.projectid, req.query));
         } catch (err) {
@@ -246,7 +246,7 @@ async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             if (req.body.retrain_geoms && req.body.retrain_geoms.length !== req.body.classes.length) {
                 throw new Err(400, null, 'retrain_geoms array must be parallel with classes array');
@@ -298,7 +298,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
-            await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
 
             const aois = await aoi.list(req.params.projectid, { checkpointid: req.params.checkpointid });
             aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
@@ -340,7 +340,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
-            await checkpoint.has_auth(project, req.auth, req.params.projectid, req.params.checkpointid);
+            await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
 
             return res.json(await checkpoint.patch(req.params.checkpointid, req.body));
         } catch (err) {

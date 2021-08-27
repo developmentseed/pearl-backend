@@ -6,7 +6,6 @@ async function router(schema, config) {
     const aoi = new (require('../lib/aoi').AOI)(config);
     const proxy = new (require('../lib/proxy').Proxy)(config);
     const aoipatch = new (require('../lib/aoi-patch').AOIPatch)(config);
-    const project = new (require('../lib/project').Project)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     /**
@@ -37,7 +36,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             return res.json(await aoipatch.list(req.params.projectid, req.params.aoiid, req.query));
         } catch (err) {
@@ -70,7 +69,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            await aoi.has_auth(project, req.auth, req.params.projectid, req.params.aoiid);
+            await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             return res.json(await aoipatch.create(req.params.projectid, req.params.aoiid));
         } catch (err) {
@@ -98,7 +97,7 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            await aoipatch.has_auth(config.pool, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             return res.json(await aoipatch.delete(req.params.aoiid, req.params.patchid));
         } catch (err) {
@@ -132,7 +131,7 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            return res.json(await aoipatch.has_auth(project, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+            return res.json(await aoipatch.has_auth(config.pool, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -156,7 +155,7 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            const a = await aoipatch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const a = await aoipatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
             if (!a.storage) throw new Err(404, null, 'Patch has not been uploaded');
 
             const tiffurl = await aoipatch.url(req.params.aoiid, req.params.patchid);
@@ -210,7 +209,7 @@ async function router(schema, config) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            const a = await aoipatch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const a = await aoipatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
             if (!a.storage) throw new Err(404, null, 'Patch has not been uploaded');
 
             const tiffurl = await aoipatch.url(req.params.aoiid, req.params.patchid);
@@ -240,7 +239,7 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            await aoipatch.has_auth(project, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            await aoipatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             await aoipatch.download(req.params.aoiid, res);
         } catch (err) {

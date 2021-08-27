@@ -1,6 +1,5 @@
-
-
 const Err = require('./error');
+const Project = require('./project');
 const moment = require('moment');
 const {
     BlobSASPermissions,
@@ -29,8 +28,8 @@ class AOI {
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} aoiid AOI the user is attemping to access
      */
-    async has_auth(project, auth, projectid, aoiid) {
-        const proj = await project.has_auth(auth, projectid);
+    async has_auth(pool, auth, projectid, aoiid) {
+        const proj = await Project.has_auth(pool, auth, projectid);
         const aoi = await this.get(aoiid);
 
         if (aoi.project_id !== proj.id) {
