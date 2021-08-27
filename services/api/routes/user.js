@@ -12,7 +12,7 @@ async function router(schema, config) {
      * @apiGroup User
      * @apiPermission admin
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.user-list.json} apiParam
+     * @apiSchema (Query) {jsonschema=../schema/req.query.user-list.json} apiParam
      *
      * @apiDescription
      *     Return a list of users that have registered with the service

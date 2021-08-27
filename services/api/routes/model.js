@@ -13,8 +13,8 @@ async function router(schema, config) {
      * @apiGroup Model
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.model.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Model.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.model.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      *
      * @apiDescription
      *     Create a new model in the system
@@ -40,8 +40,8 @@ async function router(schema, config) {
      * @apiGroup Model
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.model-patch.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Model.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.model-patch.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      *
      * @apiDescription
      *     Update a model
@@ -71,7 +71,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Upload a new model asset to the API
      *
-     * @apiSchema {jsonschema=./schema/res.Model.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
     await schema.post('/model/:modelid/upload', {
         res: 'res.Model.json'
@@ -144,7 +144,7 @@ async function router(schema, config) {
      *     Mark a model as inactive, and disallow subsequent instances of this model
      *     Note: this will not affect currently running instances of the model
      *
-     * @apiSchema {jsonschema=./schema/res.Standard.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/model/:modelid', {
         res: 'res.Standard.json'
@@ -174,7 +174,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a all information for a single model
      *
-     * @apiSchema {jsonschema=./schema/res.Model.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
     await schema.get('/model/:modelid', {
         res: 'res.Model.json'

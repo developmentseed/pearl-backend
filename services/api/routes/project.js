@@ -18,7 +18,7 @@ async function router(schema, config) {
      * @apiGroup Projects
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=./schema/req.query.project-list.json} apiParam
+     * @apiSchema (Query) {jsonschema=../schema/req.query.project-list.json} apiParam
      *
      * @apiDescription
      *     Return a list of projects
@@ -117,8 +117,8 @@ async function router(schema, config) {
      * @apiDescription
      *     Create a new project
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.project.json} apiParam
-     * @apiSchema {jsonschema=./schema/res.Project.json} apiSuccess
+     * @apiSchema (Body) {jsonschema=../schema/req.body.project.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
@@ -151,7 +151,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Update an existing Project
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.project-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.project-patch.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK
