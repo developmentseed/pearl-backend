@@ -7,7 +7,7 @@ spec:
         # You must replace this email address with your own.
         # Let's Encrypt will use this to contact you about expiring
         # certificates, and issues related to your account.
-        email: {{ .Values.email }}
+        email: {{ .Values.adminEmail }}
         # ACME server URL for Let’s Encrypt’s staging environment.
         # The staging environment will not issue trusted certificates but is
         # used to ensure that the verification process is working properly
