@@ -1,5 +1,4 @@
-
-
+const Project = require('./project');
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const { Kube } = require('./kube');
@@ -22,13 +21,13 @@ class Instance {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Project} project Instantiated Project class
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} instanceid Instance the user is attemping to access
      */
-    async has_auth(project, auth, projectid, instanceid) {
-        const proj = await project.has_auth(auth, projectid);
+    async has_auth(pool, auth, projectid, instanceid) {
+        const proj = await Project.has_auth(pool, auth, projectid);
         const instance = await this.get(auth, instanceid);
 
         if (instance.project_id !== proj.id) {

@@ -1,11 +1,9 @@
-
-
 const Err = require('../lib/error');
 const Batch = require('../lib/batch');
 const { Param } = require('../lib/util');
+const Project = require('../lib/project');
 
 async function router(schema, config) {
-    const project = new (require('../lib/project').Project)(config);
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
     const instance = new (require('../lib/instance').Instance)(config);
 
@@ -29,7 +27,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
 
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.query.uid = req.auth.uid;
             req.query.projectid = req.params.projectid;
@@ -59,7 +57,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
 
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             const existing_batch = await instance.list(req.params.projectid, {
                 batch: true,
@@ -71,7 +69,7 @@ async function router(schema, config) {
             }
 
             if (req.body.checkpoint_id) {
-                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.body.checkpoint_id);
+                await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
             }
 
             req.body.uid = req.auth.uid;
@@ -110,7 +108,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'batchid');
 
-            const batch = await Batch.has_auth(config, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
 
             return res.json(batch.serialize());
         } catch (err) {
@@ -139,7 +137,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'batchid');
 
-            const batch = await Batch.has_auth(config, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
             batch.patch(req.body);
             await batch.commit(config.pool);
 

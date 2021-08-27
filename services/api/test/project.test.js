@@ -478,7 +478,8 @@ test('PATCH /api/project/1', (t) => {
             uid: 1,
             name: 'Renamed Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
 
         t.end();

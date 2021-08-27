@@ -54,6 +54,7 @@ class Generic {
 
             for (const row of dbrow) {
                 const single = {};
+                delete row.count;
 
                 for (const key of Object.keys(row)) {
                     single[key] = row[key];

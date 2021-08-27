@@ -1,5 +1,4 @@
-
-
+const Project = require('../lib/project');
 const Err = require('./error');
 const Generic = require('./generic');
 const { sql } = require('slonik');
@@ -22,16 +21,15 @@ class Batch extends Generic {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Object} config Server config
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} batchid Checkpoint the user is attemping to access
      */
-    static async has_auth(config, auth, projectid, batchid) {
-        const project = new (require('../lib/project').Project)(config);
+    static async has_auth(pool, auth, projectid, batchid) {
 
-        const proj = await project.has_auth(auth, projectid);
-        const batch = await this.from(config.pool, batchid);
+        const proj = await Project.has_auth(pool, auth, projectid);
+        const batch = await this.from(pool, batchid);
 
         if (batch.project_id !== proj.id) {
             throw new Err(400, null, `Batch #${batch} is not associated with project #${projectid}`);
