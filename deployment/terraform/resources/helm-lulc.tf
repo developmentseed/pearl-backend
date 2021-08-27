@@ -2,6 +2,9 @@ resource "helm_release" "lulc" {
   name  = "lulc-helm"
   chart = "../../helm/lulc-helm"
   wait = false
+  depends_on = [
+    helm_release.lulc-cert-manager
+  ]
   set {
     name  = "environment"
     value = var.environment

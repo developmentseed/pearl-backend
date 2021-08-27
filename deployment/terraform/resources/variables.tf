@@ -4,7 +4,7 @@ variable "environment" {
 
 variable "domain" {
   type = string
-  default = "lulc.ds.io"
+  default = "lulcterraformdev.ds.io"
 }
 
 variable "postgres_password" {
@@ -94,6 +94,14 @@ variable "region" {
 variable "aks_node_count" {
   type = number
   default = 1
+}
+
+variable "subscriptionId" {
+  type = string
+}
+
+variable "servicePrincipalJSON" {
+  type = string
 }
 
 # -----------------

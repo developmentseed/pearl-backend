@@ -5,4 +5,9 @@ resource "helm_release" "lulc-cert-manager" {
   version          = "v1.1.0"
   namespace        = "cert-manager"
   create_namespace = true
+
+  set {
+    name  = "installCRDs"
+    value = true
+  }
 }
