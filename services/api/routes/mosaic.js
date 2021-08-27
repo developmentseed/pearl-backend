@@ -1,12 +1,9 @@
-'use strict';
-
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
 
 async function router(schema, config) {
-    const project = new (require('../lib/project').Project)(config);
-    const instance = new (require('../lib/instance').Instance)(config);
+    const proxy = new (require('../lib/proxy').Proxy)(config);
 
     /**
      * @api {get} /api/mosaic List Mosaics

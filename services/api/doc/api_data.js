@@ -67,7 +67,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -85,7 +85,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete an existing AOI</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -103,7 +103,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return the colourized aoi fabric geotiff - but doesn't save it to share page</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -121,7 +121,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return the aoi fabric geotiff</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -148,35 +148,8 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
-  },
-  {
-    "type": "post",
-    "url": "/api/project/:projectid/aoi/:aoiid/patch/:patchid/upload",
-    "title": "Upload Patch",
-    "version": "1.0.0",
-    "name": "UploadPatch",
-    "group": "AOIGroup",
-    "permission": [
-      {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be an admin to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Upload a new AOI Patch asset to the API</p>",
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./index.js",
-    "groupTitle": "AOIGroup"
   },
   {
     "type": "get",
@@ -248,7 +221,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -302,7 +275,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -329,7 +302,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
   {
@@ -356,7 +329,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
   {
@@ -374,7 +347,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Download a Tiff Patch</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
   {
@@ -401,7 +374,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
   {
@@ -428,7 +401,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
   {
@@ -446,7 +419,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Get the TileJSON for a given AOI Patch</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
   {
@@ -464,7 +437,34 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a Tile for a given AOI Patch</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi-patch.js",
+    "groupTitle": "AOIPatch"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:projectid/aoi/:aoiid/patch/:patchid/upload",
+    "title": "Upload Patch",
+    "version": "1.0.0",
+    "name": "UploadPatch",
+    "group": "AOIPatch",
+    "permission": [
+      {
+        "name": "admin",
+        "title": "Admin",
+        "description": "<p>The user must be an admin to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upload a new AOI Patch asset to the API</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
   {
@@ -482,7 +482,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a Tile for a given AOI</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -500,7 +500,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given AOI</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -527,7 +527,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
   {
@@ -654,7 +654,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/model.js",
     "groupTitle": "AOI"
   },
   {
@@ -780,6 +780,13 @@ define({ "api": [
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
+            "field": "abort",
+            "description": "<p>Has the batch job been aborted</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
             "field": "completed",
             "description": "<p>Has the batch job been completed</p>"
           },
@@ -894,6 +901,13 @@ define({ "api": [
             "optional": false,
             "field": "progress",
             "description": "<p>The percentage of the job complete</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "abort",
+            "description": "<p>Has the batch job been aborted</p>"
           },
           {
             "group": "Success 200",
@@ -1114,6 +1128,13 @@ define({ "api": [
             "group": "Body",
             "type": "Boolean",
             "optional": true,
+            "field": "abort",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
             "field": "completed",
             "description": "<p>undefined</p>"
           }
@@ -1179,6 +1200,13 @@ define({ "api": [
             "optional": false,
             "field": "progress",
             "description": "<p>The percentage of the job complete</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "abort",
+            "description": "<p>Has the batch job been aborted</p>"
           },
           {
             "group": "Success 200",
@@ -1331,7 +1359,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1349,7 +1377,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete an existing Checkpoint NOTE: This will also delete AOIs that depend on the given checkpoint</p>",
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1367,7 +1395,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Download a checkpoint asset from the API</p>",
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1394,7 +1422,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1459,7 +1487,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1527,7 +1555,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1545,7 +1573,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a Tile for a given AOI</p>",
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1563,7 +1591,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given Checkpoint</p>",
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -1590,7 +1618,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
   {
@@ -2365,7 +2393,7 @@ define({ "api": [
       }
     },
     "description": "<p>Create a new model in the system</p>",
-    "filename": "./index.js",
+    "filename": "./routes/model.js",
     "groupTitle": "Model"
   },
   {
@@ -2403,7 +2431,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/model.js",
     "groupTitle": "Model"
   },
   {
@@ -2421,7 +2449,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return the model itself</p>",
-    "filename": "./index.js",
+    "filename": "./routes/model.js",
     "groupTitle": "Model"
   },
   {
@@ -2548,7 +2576,7 @@ define({ "api": [
         ]
       }
     },
-    "filename": "./index.js",
+    "filename": "./routes/model.js",
     "groupTitle": "Model"
   },
   {
@@ -2575,7 +2603,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/model.js",
     "groupTitle": "Model"
   },
   {
@@ -2722,7 +2750,7 @@ define({ "api": [
       }
     },
     "description": "<p>Update a model</p>",
-    "filename": "./index.js",
+    "filename": "./routes/model.js",
     "groupTitle": "Model"
   },
   {
@@ -3127,7 +3155,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete a project</p>",
-    "filename": "./index.js",
+    "filename": "./routes/project.js",
     "groupTitle": "Project"
   },
   {
@@ -3234,7 +3262,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/project.js",
     "groupTitle": "Projects"
   },
   {
@@ -3261,7 +3289,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/project.js",
     "groupTitle": "Projects"
   },
   {
@@ -3326,7 +3354,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/project.js",
     "groupTitle": "Projects"
   },
   {
@@ -3366,7 +3394,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/project.js",
     "groupTitle": "Projects"
   },
   {
@@ -3500,7 +3528,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete a Shared AOI</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
   {
@@ -3527,7 +3555,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
   {
@@ -3600,7 +3628,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
   {
@@ -3627,7 +3655,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
   {
@@ -3645,7 +3673,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return a Tile for a given AOI using uuid</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
   {
@@ -3663,7 +3691,7 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given AOI using uuid</p>",
-    "filename": "./index.js",
+    "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
   {
@@ -3813,7 +3841,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/user.js",
     "groupTitle": "User"
   },
   {
@@ -3840,7 +3868,7 @@ define({ "api": [
         }
       ]
     },
-    "filename": "./index.js",
+    "filename": "./routes/user.js",
     "groupTitle": "User"
   }
 ] });

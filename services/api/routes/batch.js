@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('../lib/error');
 const Batch = require('../lib/batch');
@@ -71,7 +71,7 @@ async function router(schema, config) {
             }
 
             if (req.body.checkpoint_id) {
-                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.body.checkpoint_id)
+                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.body.checkpoint_id);
             }
 
             req.body.uid = req.auth.uid;
