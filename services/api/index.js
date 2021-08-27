@@ -104,7 +104,7 @@ async function server(args, config, cb) {
      *       "version": "1.0.0"
      *       "limits": {
      *           "live_inference": 100000000 (m^2)
-     *           "max_inference": 100000000 (m^2)
+     *           "max_inference": 200000000 (m^2)
      *           "instance_window": 600 (m secs)
      *       }
      *   }
@@ -126,7 +126,7 @@ async function server(args, config, cb) {
             version: pkg.version,
             limits: {
                 live_inference: 100000000,
-                max_inference: 100000000,
+                max_inference: 200000000,
                 instance_window: 600,
                 total_gpus: config.GpuCount,
                 active_gpus: activePods ? activePods.length : null
