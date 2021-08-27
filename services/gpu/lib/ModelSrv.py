@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 
 import numpy as np
 import torch
@@ -521,6 +522,8 @@ class ModelSrv:
                         "completed": True,
                         "aoi": self.aoi.id
                     })
+
+                    sys.exit()
 
                 done_processing(self)
         except Exception as e:
