@@ -24,7 +24,7 @@ module "resources" {
 
 terraform {
   backend "azurerm" {
-    resource_group_name  = "pc-test-manual-resources"
+    resource_group_name  = "lulcterraformdev"
     storage_account_name = "pcdevseedtesttfstate"
     container_name       = "lulc-dev"
     key                  = "dev.terraform.tfstate"
