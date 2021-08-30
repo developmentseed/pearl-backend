@@ -22,8 +22,8 @@ jobs:
       uses: azure/docker-login@v1
       with:
         login-server: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
-        username: ${{ secrets.TERAFORM_REGISTRY_USERNAME }}
-        password: ${{ secrets.TERAFORM_REGISTRY_PASSWORD }}
+        username: ${{ secrets.TERRAFORM_REGISTRY_USERNAME }}
+        password: ${{ secrets.TERRAFORM_REGISTRY_PASSWORD }}
     - name: Setup python
       uses: actions/setup-python@v2
       with:
