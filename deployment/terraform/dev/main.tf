@@ -23,10 +23,19 @@ module "resources" {
 }
 
 terraform {
-  backend "local" {
-    path = "terraform.tfstate"
+  backend "azurerm" {
+    resource_group_name  = "pc-test-manual-resources"
+    storage_account_name = "pctesttfstate"
+    container_name       = "lulc-dev"
+    key                  = "dev.terraform.tfstate"
   }
 }
+
+# terraform {
+#   backend "local" {
+#     path = "terraform.tfstate"
+#   }
+# }
 
 output "resources" {
   value     = module.resources

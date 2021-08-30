@@ -12,6 +12,18 @@ env:
   PRODUCTION_CLUSTER_RESOURCE_GROUP: lulcProduction
   PRODUCTION_CLUSTER_NAME: lulcProductionAks
   NAMESPACE: default
+
+  TF_VAR_username: github
+  TF_VAR_servicePrincipalJSON: ${{ secrets.STAGING_SERVICE_PRINCIPAL_BASE64 }}
+  TF_VAR_subscriptionId: ${{ secrets.STAGING_APPGW_SUBSCRIPTION_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.STAGING_APPGW_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.STAGING_TENANT_ID }}
+  ARM_CLIENT_ID: ${{ secrets.STAGING_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.STAGING_CLIENT_SECRET }}
+  AZURE_TENANT_ID: ${{ secrets.STAGING_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.STAGING_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.STAGING_CLIENT_SECRET }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,9 +49,12 @@ jobs:
         pip install -v chartpress
     - name: Add ~/home/.local/bin to Github Path
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Build
+
+    - name: Build & Publish
       run: ./scripts/cipublish
 
+    - name: Deploy -- Dev
+      run: ./scripts/cideploy --dev
     # - name: Run Chartpress
     #   run: chartpress --push # should eventually --publish-chart
     #   env:
