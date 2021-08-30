@@ -14,6 +14,7 @@ services:
         - ARM_TENANT_ID=${tenantId}
         - ARM_CLIENT_ID=${servicePrincipalId}
         - ARM_CLIENT_SECRET=${servicePrincipalKey}
+        - ARM_ACCESS_KEY=${storageAccessKey}
   
         # For Azure CLI
         - AZURE_TENANT_ID=${tenantId}
