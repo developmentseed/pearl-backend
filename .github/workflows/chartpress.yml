@@ -23,6 +23,7 @@ jobs:
       tenantId: ${{ secrets.STAGING_TENANT_ID }}
       servicePrincipalId: ${{ secrets.STAGING_CLIENT_ID }}
       servicePrincipalKey: ${{ secrets.STAGING_CLIENT_SECRET }}
+      storageAccessKey: ${{ secrets.TERRAFORM_STORAGE_KEY }}
     steps:
     - uses: actions/checkout@v1
     - name: Login to Azure Container Registry
