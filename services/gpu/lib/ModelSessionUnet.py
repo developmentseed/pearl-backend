@@ -21,97 +21,209 @@ LOGGER = logging.getLogger("server")
 from typing import Optional, Union, List
 
 
-class Unet(smp.base.SegmentationModel):
-    """Unet_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
-    and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial
-    resolution (skip connections) which are used by decoder to define accurate segmentation mask. Use *concatenation*
-    for fusing decoder blocks with skip connections.
-    Args:
-        encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
-            to extract features of different spatial resolution
-        encoder_depth: A number of stages used in encoder in range [3, 5]. Each stage generate features
-            two times smaller in spatial dimensions than previous one (e.g. for depth 0 we will have features
-            with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
-            Default is 5
-        encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
-            other pretrained weights (see table with available weights for each encoder_name)
-        decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
-            Length of the list should be the same as **encoder_depth**
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
-            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
-            Available options are **True, False, "inplace"**
-        decoder_attention_type: Attention module used in decoder of the model. Available options are **None** and **scse**.
-            SCSE paper - https://arxiv.org/abs/1808.08127
-        in_channels: A number of input channels for the model, default is 3 (RGB images)
-        classes: A number of classes for output mask (or you can think as a number of channels of output mask)
-        activation: An activation function to apply after the final convolution layer.
-            Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**, **callable** and **None**.
-            Default is **None**
-        aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
-            on top of encoder if **aux_params** is not **None** (default). Supported params:
-                - classes (int): A number of classes
-                - pooling (str): One of "max", "avg". Default is "avg"
-                - dropout (float): Dropout factor in [0, 1)
-                - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
-    Returns:
-        ``torch.nn.Module``: Unet
-    .. _Unet:
-        https://arxiv.org/abs/1505.04597
-    """
-
+class Unet(nn.Module):
     def __init__(
         self,
-        encoder_name: str = "resnet34",
-        encoder_depth: int = 5,
-        encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: bool = True,
-        decoder_channels: List[int] = (256, 128, 64, 32, 16),
-        decoder_attention_type: Optional[str] = None,
-        in_channels: int = 3,
-        classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
-        aux_params: Optional[dict] = None,
+        feature_scale=1,
+        n_classes=3,
+        in_channels=3,
+        is_deconv=True,
+        is_batchnorm=False,
     ):
-        super().__init__()
+        """
+        Args:
+            feature_scale: the smallest number of filters (depth c) is 64 when feature_scale is 1,
+                           and it is 32 when feature_scale is 2
+            n_classes: number of output classes
+            in_channels: number of channels in input
+            is_deconv:
+            is_batchnorm:
+        """
 
-        self.encoder = smp.encoders.get_encoder(
-            encoder_name,
-            in_channels=in_channels,
-            depth=encoder_depth,
-            weights=encoder_weights,
-        )
+        super(Unet, self).__init__()
 
-        self.decoder = smp.unet.decoder.UnetDecoder(
-            encoder_channels=self.encoder.out_channels,
-            decoder_channels=decoder_channels,
-            n_blocks=encoder_depth,
-            use_batchnorm=decoder_use_batchnorm,
-            center=True if encoder_name.startswith("vgg") else False,
-            attention_type=decoder_attention_type,
-        )
+        self.is_deconv = is_deconv
+        self.in_channels = in_channels
+        self.is_batchnorm = is_batchnorm
+        self.feature_scale = feature_scale
 
-        self.segmentation_head = smp.base.SegmentationHead(
-            in_channels=decoder_channels[-1],
-            out_channels=classes,
-            activation=activation,
-            kernel_size=1,
-        )
+        assert (
+            64 % self.feature_scale == 0
+        ), f"feature_scale {self.feature_scale} does not work with this UNet"
 
-        if aux_params is not None:
-            self.classification_head = smp.base.ClassificationHead(
-                in_channels=self.encoder.out_channels[-1], **aux_params
+        filters = [
+            64,
+            128,
+            256,
+            512,
+            1024,
+        ]  # this is `c` in the diagram, [c, 2c, 4c, 8c, 16c]
+        filters = [int(x / self.feature_scale) for x in filters]
+        logging.info("filters used are: {}".format(filters))
+
+        # downsampling
+        self.conv1 = UnetConv2(self.in_channels, filters[0], self.is_batchnorm)
+        self.maxpool1 = nn.MaxPool2d(kernel_size=2)
+
+        self.conv2 = UnetConv2(filters[0], filters[1], self.is_batchnorm)
+        self.maxpool2 = nn.MaxPool2d(kernel_size=2)
+
+        self.conv3 = UnetConv2(filters[1], filters[2], self.is_batchnorm)
+        self.maxpool3 = nn.MaxPool2d(kernel_size=2)
+
+        self.conv4 = UnetConv2(filters[2], filters[3], self.is_batchnorm)
+        self.maxpool4 = nn.MaxPool2d(kernel_size=2)
+
+        self.center = UnetConv2(filters[3], filters[4], self.is_batchnorm)
+
+        # upsampling
+        self.up_concat4 = UnetUp(filters[4], filters[3], self.is_deconv)
+        self.up_concat3 = UnetUp(filters[3], filters[2], self.is_deconv)
+        self.up_concat2 = UnetUp(filters[2], filters[1], self.is_deconv)
+        self.up_concat1 = UnetUp(filters[1], filters[0], self.is_deconv)
+
+        # final conv (without any concat)
+        self.final = nn.Conv2d(filters[0], n_classes, kernel_size=1)
+
+    def forward(self, inputs):
+        conv1 = self.conv1(inputs)
+        maxpool1 = self.maxpool1(conv1)
+
+        conv2 = self.conv2(maxpool1)
+        maxpool2 = self.maxpool2(conv2)
+
+        conv3 = self.conv3(maxpool2)
+        maxpool3 = self.maxpool3(conv3)
+
+        conv4 = self.conv4(maxpool3)
+        maxpool4 = self.maxpool4(conv4)
+
+        center = self.center(maxpool4)
+        up4 = self.up_concat4(conv4, center)
+        up3 = self.up_concat3(conv3, up4)
+        up2 = self.up_concat2(conv2, up3)
+        up1 = self.up_concat1(conv1, up2)
+
+        final = self.final(up1)
+
+        return final
+
+    def forward_features(self, inputs):
+        conv1 = self.conv1(inputs)
+        maxpool1 = self.maxpool1(conv1)
+
+        conv2 = self.conv2(maxpool1)
+        maxpool2 = self.maxpool2(conv2)
+
+        conv3 = self.conv3(maxpool2)
+        maxpool3 = self.maxpool3(conv3)
+
+        conv4 = self.conv4(maxpool3)
+        maxpool4 = self.maxpool4(conv4)
+
+        center = self.center(maxpool4)
+        up4 = self.up_concat4(conv4, center)
+        up3 = self.up_concat3(conv3, up4)
+        up2 = self.up_concat2(conv2, up3)
+        up1 = self.up_concat1(conv1, up2)
+
+        final = self.final(up1)
+
+        return final, up1
+
+
+class UnetConv2(nn.Module):
+    def __init__(self, in_channels, out_channels, is_batchnorm):
+        super(UnetConv2, self).__init__()
+
+        if is_batchnorm:
+            self.conv1 = nn.Sequential(
+                # this amount of padding/stride/kernel_size preserves width/height
+                nn.Conv2d(
+                    in_channels, out_channels, kernel_size=3, stride=1, padding=1
+                ),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(),
+            )
+            self.conv2 = nn.Sequential(
+                nn.Conv2d(
+                    out_channels, out_channels, kernel_size=3, stride=1, padding=1
+                ),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(),
             )
         else:
-            self.classification_head = None
+            self.conv1 = nn.Sequential(
+                nn.Conv2d(
+                    in_channels, out_channels, kernel_size=3, stride=1, padding=1
+                ),
+                nn.ReLU(),
+            )
+            self.conv2 = nn.Sequential(
+                nn.Conv2d(
+                    out_channels, out_channels, kernel_size=3, stride=1, padding=1
+                ),
+                nn.ReLU(),
+            )
 
-        self.name = "u-{}".format(encoder_name)
-        self.initialize()
+    def forward(self, inputs):
+        outputs = self.conv1(inputs)
+        outputs = self.conv2(outputs)
+        return outputs
+
+
+class UnetUp(nn.Module):
+    def __init__(self, in_channels, out_channels, is_deconv):
+        """
+        is_deconv:  use transposed conv layer to upsample - parameters are learnt; otherwise use
+                    bilinear interpolation to upsample.
+        """
+        super(UnetUp, self).__init__()
+
+        self.conv = UnetConv2(in_channels, out_channels, False)
+
+        self.is_deconv = is_deconv
+        if is_deconv:
+            self.up = nn.ConvTranspose2d(
+                in_channels, out_channels, kernel_size=2, stride=2
+            )
+
+    def forward(self, inputs1, inputs2):
+        """
+        inputs1 is from the downward path, of higher resolution
+        inputs2 is from the 'lower' layer. It gets upsampled (spatial size increases) and its depth (channels) halves
+        to match the depth of inputs1, before being concatenated in the depth dimension.
+        """
+        if self.is_deconv:
+            outputs2 = self.up(inputs2)
+        else:
+            # scale_factor is the multiplier for spatial size
+            outputs2 = F.interpolate(
+                inputs2, scale_factor=2, mode="bilinear", align_corners=True
+            )
+
+        offset = outputs2.size()[2] - inputs1.size()[2]
+        padding = 2 * [offset // 2, offset // 2]
+        outputs1 = F.pad(inputs1, padding)
+
+        return self.conv(torch.cat([outputs1, outputs2], dim=1))
 
 
 class LoadUnet(ModelSession):
     """
     Initalizes Model.
     """
+
+
+    AUGMENT_MODEL = SGDClassifier(
+        loss="log",
+        shuffle=True,
+        n_jobs=-1,
+        learning_rate="constant",
+        eta0=0.001,
+        warm_start=True,
+        verbose=False,
+    )
 
     def __init__(self, gpu_id, model_dir, classes):
         """
@@ -133,12 +245,11 @@ class LoadUnet(ModelSession):
         self.output_channels = len(self.classes)
         self.output_features = 64
         self.model = Unet(
-            encoder_name="resnet18",
-            encoder_depth=3,
-            encoder_weights=None,
-            decoder_channels=(128, 64, 64),
+            feature_scale=1,
+            n_classes=len(self.classes),
             in_channels=4,
-            classes=len(self.classes),
+            is_deconv=True,
+            is_batchnorm=False,
         )
         self._init_model()
 
@@ -175,7 +286,150 @@ class LoadUnet(ModelSession):
             return self.run_model_on_tile_embedding(data)  # fix this
 
     def retrain(self, classes, **kwargs):
-        pass
+        """
+        Runs model retraining.
+        """
+        names = [x["name"] for x in classes]
+        retrain_classes = [{"name": x["name"], "color": x["color"]} for x in classes]
+
+        pixels = [x["retrain_geometry"] for x in classes]
+        counts = [len(x) for x in pixels]
+
+        # add re-training counts to classes attribute
+        for i, c in enumerate(counts):
+            retrain_classes[i]["counts"] = c
+            retrain_classes[i]["percent"] = c / sum(counts)
+
+        for i, c in enumerate(self.classes):
+            # retraing samples that are in starter model
+            if c["name"] in names:
+                self.classes[i]["counts"] = (
+                    counts[names.index(c["name"])] + self.classes[i]["counts"]
+                )
+        for i, c in enumerate(self.classes):
+            self.classes[i]["percent"] = counts[names.index(c["name"])] / sum(counts)
+
+        # combine starter model classes and retrain classes
+
+        current_class_names = [x["name"] for x in self.classes]
+
+        self.classes = self.classes + [
+            x for x in retrain_classes if not x["name"] in current_class_names
+        ]  # don't check against entire dict
+        self.augment_x_train = self.augment_x_train + [
+            item.value for sublist in pixels for item in sublist
+        ]  # get pixel values
+
+        names_retrain = []
+        for i, c in enumerate(counts):
+            names_retrain.append(list(np.repeat(names[i], c)))
+
+        names_retrain = [x for sublist in names_retrain for x in sublist]
+
+        ints_retrain = []
+        for name in names_retrain:
+            if name not in list(self.class_names_mapping.keys()):
+                self.class_names_mapping.update(
+                    {name: max(self.class_names_mapping.values()) + 1}
+                )  # to-do? this new classs name + value need to stay in the dictionary for future re-training iterations
+            ints_retrain.append(self.class_names_mapping.get(name))
+
+        self.augment_y_train = self.augment_y_train + ints_retrain
+        x_user = np.array(self.augment_x_train)
+        y_user = np.array(self.augment_y_train)
+
+        # split user submitted re-training data into test 20% and train 80%
+        x_train_user, x_test_user, y_train_user, y_test_user = train_test_split(
+            x_user, y_user, test_size=0.1, random_state=0, stratify=y_user
+        )
+        print("y user")
+        print(np.unique(y_user, return_counts=True))
+
+        print("y user test")
+        print(np.unique(y_test_user, return_counts=True))
+
+        print("y user train")
+        print(np.unique(y_train_user, return_counts=True))
+
+        # Place holder to load in seed npz
+        seed_data = np.load(self.model_dir + "/model.npz", allow_pickle=True)
+        seed_x = seed_data["embeddings"]
+        seed_y = seed_data["labels"]
+
+        x_train = np.vstack((x_train_user, seed_x))
+        y_train = np.hstack((y_train_user, seed_y))
+        print(np.unique(y_train))
+
+        self.augment_model.classes_ = np.array(list(range(len(np.unique(y_train)))))
+
+        print("augment model classes")
+        print(self.augment_model.classes_)
+
+        if x_train.shape[0] == 0:
+            return {
+                "message": "Need to add training samples in order to train",
+                "success": False,
+            }
+
+        # self.augment_model.classes_ = np.array(np.unique(y_train))
+
+        self.augment_model.fit(
+            x_train, y_train
+        )  # figure out if this is running on GPU or CPU
+
+        print("coef shape")
+        print(self.augment_model.coef_.shape)
+
+        lr_preds = self.augment_model.predict(x_test_user)
+
+        per_class_f1 = f1_score(y_test_user, lr_preds, average=None)
+
+        # add per class f1 to classes attribute
+        f1_labels = np.unique(np.concatenate((y_test_user, lr_preds)))
+        per_class_f1_final = np.zeros(len(list(self.class_names_mapping.keys())))
+
+        missing_labels = np.setdiff1d(
+            list(np.arange(len(list(self.class_names_mapping.keys())))), f1_labels
+        )
+
+        # where the unique cls id exist, fill in f1 per class
+        per_class_f1_final[f1_labels] = per_class_f1
+        # where is the missing id, fill in np.nan, but actually 0 for db to not break
+        per_class_f1_final[missing_labels] = 0
+
+        print("per class f1 final")
+        print(per_class_f1_final)
+
+        # add  retrainingper class f1-scores counts to classes attribute
+        for i, f1 in enumerate(per_class_f1_final):
+            self.classes[i].update({"retraining_f1score": f1})
+
+        global_f1 = f1_score(y_test_user, lr_preds, average="weighted")
+        print("Global f1-score: %0.4f" % (global_f1))
+
+        score = self.augment_model.score(x_test_user, y_test_user)
+        print("Fine-tuning accuracy: %0.4f" % (score))
+
+        new_weights = torch.from_numpy(
+            self.augment_model.coef_.copy().astype(np.float32)[
+                :, :, np.newaxis, np.newaxis
+            ]
+        )
+        new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
+        new_weights = new_weights.to(self.device)
+        print("new_weights shape: ")
+        print(new_weights.shape)
+        new_biases = new_biases.to(self.device)
+        print("new_biases shape: ")
+        print(new_biases.shape)
+
+        # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
+        self.model.last.weight = nn.Parameter(new_weights)
+        self.model.last.bias = nn.Parameter(new_biases)
+
+        print("last layer of pytorch model updated post retraining")
+
+        return {"message": "Accuracy Score on data: %0.2f" % (score), "success": True}
 
     def undo(self):
         """
@@ -266,14 +520,12 @@ class LoadUnet(ModelSession):
 
         self.classes = chkpt["classes"]
         self.model = Unet(
-            encoder_name="resnet18",
-            encoder_depth=3,
-            encoder_weights=None,
-            decoder_channels=(128, 64, 64),
+            feature_scale=1,
+            n_classes=len(chkpt["classes"],
             in_channels=4,
-            classes=len(self.classes),
+            is_deconv=True,
+            is_batchnorm=False,
         )
-
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
         self.model = self.model.to(self.device)
