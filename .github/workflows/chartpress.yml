@@ -18,11 +18,11 @@ jobs:
     timeout-minutes: 60
     env:
       TF_VAR_username: github
-      servicePrincipalJSON: ${{ secrets.STAGING_SERVICE_PRINCIPAL_BASE64 }}
-      subscriptionId: ${{ secrets.STAGING_APPGW_SUBSCRIPTION_ID }}
-      tenantId: ${{ secrets.STAGING_TENANT_ID }}
-      servicePrincipalId: ${{ secrets.STAGING_CLIENT_ID }}
-      servicePrincipalKey: ${{ secrets.STAGING_CLIENT_SECRET }}
+      servicePrincipalJSON: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_JSON }}
+      subscriptionId: ${{ secrets.TERRAFORM_SUBSCRIPTION_ID }}
+      tenantId: ${{ secrets.TERRAFORM_TENANT_ID }}
+      servicePrincipalId: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_ID }}
+      servicePrincipalKey: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_KEY }}
       storageAccessKey: ${{ secrets.TERRAFORM_STORAGE_KEY }}
     steps:
     - uses: actions/checkout@v1
