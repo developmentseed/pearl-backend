@@ -22,7 +22,10 @@ module "resources" {
   aks_node_count       = 1
 
   placeholder_is_gpu = false
-  placeholder_num_gpus = 1
+  placeholder_num_gpus = 2
+
+  #FIXME
+  # domain = lulc-test.ds.io
 }
 
 terraform {
