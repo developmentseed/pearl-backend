@@ -9,12 +9,10 @@ variable "domain" {
 
 variable "postgres_password" {
   type = string
-  default = "changeme"
 }
 
 variable "signing_secret" {
   type = string
-  default = "abcdefgh123456"
 }
 
 variable "api_node_selector_key" {
