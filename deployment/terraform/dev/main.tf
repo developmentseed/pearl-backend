@@ -15,11 +15,14 @@ variable "servicePrincipalJSON" {
 module "resources" {
   source = "../resources"
 
-  environment          = var.username
+  environment          = "dev"
   subscriptionId       = var.subscriptionId
   servicePrincipalJSON = var.servicePrincipalJSON
   region               = "West Europe"
   aks_node_count       = 1
+
+  placeholder_is_gpu = false
+  placeholder_num_gpus = 1
 }
 
 terraform {
