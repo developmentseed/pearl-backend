@@ -34,7 +34,7 @@ terraform {
     resource_group_name  = "lulcterraformdev"
     storage_account_name = "lulcterraformstate"
     container_name       = "lulc-dev"
-    key                  = "dev.terraform.tfstate"
+    key                  = "staging.terraform.tfstate"
   }
 }
 
