@@ -19,9 +19,6 @@ variable "signing_secret" {
   type = string
 }
 
-variable "domain" {
-  type = string
-}
 module "resources" {
   source = "../resources"
 
