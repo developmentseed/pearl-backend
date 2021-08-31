@@ -11,6 +11,13 @@ variable "servicePrincipalJSON" {
   type = string
 }
 
+var "postgres_password" {
+  type = string
+}
+
+var "signing_secret" {
+  type = string
+}
 
 module "resources" {
   source = "../resources"
