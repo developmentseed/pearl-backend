@@ -52,7 +52,7 @@ jobs:
 
     - name: Deploy -- Dev
       env:
-        postgres_password: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
+        postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
       if: startsWith(github.event.head_commit.message, '[deploy]')
       run: ./scripts/cideploy --dev
 
