@@ -21,6 +21,9 @@ module "resources" {
   region               = "West Europe"
   aks_node_count       = 1
 
+  postgres_password = var.postgres_password
+  signing_secret = var.signing_secret
+
   placeholder_is_gpu = false
   placeholder_num_gpus = 2
 

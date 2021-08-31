@@ -18,7 +18,6 @@ jobs:
     timeout-minutes: 60
     env:
       TF_VAR_username: github
-      TF_VAR_postgres_password: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
       TF_VAR_signing_secret: ${{ secrets.TERRAFORM_SIGNING_SECRET }}
       servicePrincipalJSON: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_JSON }}
       subscriptionId: ${{ secrets.TERRAFORM_SUBSCRIPTION_ID }}
@@ -52,8 +51,11 @@ jobs:
       run: ./scripts/cipublish
 
     - name: Deploy -- Dev
+      env:
+        TF_VAR_postgres_password: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
       if: startsWith(github.event.head_commit.message, '[deploy]')
       run: ./scripts/cideploy --dev
+
     # - name: Run Chartpress
     #   run: chartpress --push # should eventually --publish-chart
     #   env:
