@@ -19,6 +19,9 @@ variable "signing_secret" {
   type = string
 }
 
+variable "domain" {
+  type = string
+}
 module "resources" {
   source = "../resources"
 
@@ -35,7 +38,7 @@ module "resources" {
   placeholder_num_gpus = 2
 
   #FIXME
-  # domain = lulc-test.ds.io
+  domain = "lulc-test.ds.io"
 }
 
 terraform {
