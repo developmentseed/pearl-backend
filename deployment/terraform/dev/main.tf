@@ -11,11 +11,11 @@ variable "servicePrincipalJSON" {
   type = string
 }
 
-var "postgres_password" {
+variable "postgres_password" {
   type = string
 }
 
-var "signing_secret" {
+variable "signing_secret" {
   type = string
 }
 
