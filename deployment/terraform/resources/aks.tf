@@ -59,7 +59,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "gpunodepool" {
   enable_auto_scaling   = true
   min_count             = 1
   max_count             = 10
-  node_taints           = ["sku=gpu:NoSchedule"]
   tags = {
     Environment = var.environment
     ManagedBy   = "AI4E"
