@@ -1,7 +1,7 @@
 resource "azurerm_application_gateway" "network" {
 
   lifecycle {
-    ignore_changes = "all"
+    ignore_changes = all
   }
 
   name                = "${local.prefix}-appgateway"
