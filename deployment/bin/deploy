@@ -71,12 +71,6 @@ if [[ -z ${TERRAFORM_DIR} ]]; then
     exit 1
 fi
 
-# Directory for rendered values and templates
-CONF_DIR='/opt/conf'
-mkdir -p ${CONF_DIR}
-
-# Set up environment
-setup_env
 
 # Print some information
 
