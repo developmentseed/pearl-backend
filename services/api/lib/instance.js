@@ -347,13 +347,25 @@ class Instance {
     async patch(instanceid, instance) {
         let pgres;
 
+        if (instance.active == undefined) {
+            instance.active = null;
+        }
+
+        if (instance.aoi_id == undefined) {
+            instance.aoi_id = null;
+        }
+
+        if (instance.checkpoint_id == undefined) {
+            instance.checkpoint_id = null;
+        }
+
         try {
             pgres = await this.pool.query(sql`
                 UPDATE instances
                     SET
-                        active = COALESCE(${instance.active || null}, active),
-                        aoi_id = COALESCE(${instance.aoi_id || null}, aoi_id),
-                        checkpoint_id = COALESCE(${instance.checkpoint_id || null}, checkpoint_id),
+                        active = COALESCE(${instance.active}, active),
+                        aoi_id = COALESCE(${instance.aoi_id}, aoi_id),
+                        checkpoint_id = COALESCE(${instance.checkpoint_id}, checkpoint_id),
                         last_update = NOW()
                     WHERE
                         id = ${instanceid}
