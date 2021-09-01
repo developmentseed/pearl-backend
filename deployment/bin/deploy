@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source bin/lib
-
 set -e
 
 if [[ "${CI}" ]]; then
