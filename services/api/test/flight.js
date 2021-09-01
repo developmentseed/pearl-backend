@@ -1,5 +1,3 @@
-
-
 process.env.StackName = 'test';
 
 const { sql } = require('slonik');
@@ -17,6 +15,9 @@ const ajv = new Ajv({
     allErrors: true
 });
 
+/**
+ * @class
+ */
 class Flight {
 
     constructor() {
