@@ -1,5 +1,6 @@
 import logging
 
+import traceback
 import mercantile
 import numpy as np
 import supermercado
@@ -82,7 +83,10 @@ class AOI:
                         self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
                     else:
                         self.api.upload_aoi(self.id, self.raw_fabric)
-                except Exception:
+                except Exception as e:
+                    LOGGER.error("Error: {0}".format(e))
+                    traceback.print_exc()
+
                     continue
 
                 break
