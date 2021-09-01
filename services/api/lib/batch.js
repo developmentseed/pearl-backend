@@ -74,6 +74,7 @@ class Batch extends Generic {
                     abort,
                     created,
                     updated,
+                    error,
                     aoi,
                     name,
                     completed,
@@ -105,6 +106,7 @@ class Batch extends Generic {
             project_id: this.project_id,
             created: this.created,
             updated: this.updated,
+            error: this.error,
             aoi: this.aoi,
             name: this.name,
             bounds: this.bounds,
@@ -120,6 +122,7 @@ class Batch extends Generic {
                 UPDATE batch
                     SET
                         aoi         = ${this.aoi},
+                        error       = ${this.error},
                         abort       = ${this.abort},
                         completed   = ${this.completed},
                         progress    = ${this.progress},
