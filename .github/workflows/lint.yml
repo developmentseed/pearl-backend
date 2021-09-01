@@ -20,5 +20,5 @@ jobs:
               run: docker build -t api services/api
 
             - name: Docker API Test Run
-              run: docker run api npm install --dev && npm run lint
+              run: docker run api sh -c "npm install --include=dev && npm run lint"
 
