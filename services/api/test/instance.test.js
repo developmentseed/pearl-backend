@@ -184,6 +184,61 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     t.end();
 });
 
+test('PATCH /api/project/1/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                active: false
+            }
+        }, t);
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        delete res.body.created;
+        delete res.body.last_update;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            project_id: 1,
+            batch: null,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: false,
+            type: 'gpu'
+        });
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/project/1/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/instance/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                active: true
+            }
+        }, t);
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+    t.end();
+});
+
 test('GET /api/project/1/instance?status=active', async (t) => {
     try {
         const res = await flight.request({
