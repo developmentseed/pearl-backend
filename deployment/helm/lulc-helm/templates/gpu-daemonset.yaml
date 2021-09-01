@@ -28,10 +28,6 @@ spec:
       - key: nvidia.com/gpu
         operator: Exists
         effect: NoSchedule
-      - key: "sku"
-        operator: "Equal"
-        value: "gpu"
-        effect: "NoSchedule"
       containers:
       - image: mcr.microsoft.com/oss/nvidia/k8s-device-plugin:1.11
         name: nvidia-device-plugin-ctr
