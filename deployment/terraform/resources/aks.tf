@@ -57,6 +57,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "gpunodepool" {
   vm_size               = "Standard_NC12"
   vnet_subnet_id = azurerm_subnet.aks.id
   enable_auto_scaling   = true
+  node_taints           = "sku=gpu:NoSchedule"
   min_count             = 1
   max_count             = 10
 
