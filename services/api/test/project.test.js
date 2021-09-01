@@ -66,7 +66,7 @@ test('POST /api/model', (t) => {
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
         }
-    } , (err, res, body) => {
+    } , (err, res) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
         t.end();
@@ -147,7 +147,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ],
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -179,8 +179,8 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-           ]
+                { type: 'GeometryCollection', 'geometries': [] }
+            ]
         });
 
         t.end();
@@ -201,11 +201,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         }
@@ -227,11 +227,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         });
@@ -254,49 +254,49 @@ test('GET /api/project', (t) => {
 
         t.ok(res.body.projects[0].created, '.created: <date>');
         delete res.body.projects[0].created;
-        delete res.body.projects[0].model.created
+        delete res.body.projects[0].model.created;
 
         t.deepEquals(res.body, {
-            "total": 1,
-            "projects": [
+            'total': 1,
+            'projects': [
                 {
-                    "id": 1,
-                    "name": "Test Project",
-                    "aois": [],
-                    "checkpoints": [],
-                    "model": {
-                        "id": 1,
-                        "active": true,
-                        "uid": 1,
-                        "name": "NAIP Supervised",
-                        "model_type": "pytorch_example",
-                        "model_inputshape": [
+                    'id': 1,
+                    'name': 'Test Project',
+                    'aois': [],
+                    'checkpoints': [],
+                    'model': {
+                        'id': 1,
+                        'active': true,
+                        'uid': 1,
+                        'name': 'NAIP Supervised',
+                        'model_type': 'pytorch_example',
+                        'model_inputshape': [
                             240,
                             240,
                             4
                         ],
-                        "model_zoom": 17,
-                        "storage": false,
-                        "classes": [
+                        'model_zoom': 17,
+                        'storage': false,
+                        'classes': [
                             {
-                                "name": "Water",
-                                "color": "#0000FF"
+                                'name': 'Water',
+                                'color': '#0000FF'
                             },
                             {
-                                "name": "Tree Canopy",
-                                "color": "#008000"
+                                'name': 'Tree Canopy',
+                                'color': '#008000'
                             },
                             {
-                                "name": "Field",
-                                "color": "#80FF80"
+                                'name': 'Field',
+                                'color': '#80FF80'
                             },
                             {
-                                "name": "Built",
-                                "color": "#806060"
+                                'name': 'Built',
+                                'color': '#806060'
                             }
                         ],
-                        "meta": {},
-                        "bounds": [
+                        'meta': {},
+                        'bounds': [
                             -180,
                             -90,
                             180,
@@ -376,46 +376,46 @@ test('GET /api/project?name=lulc', (t) => {
         delete res.body.projects[0].model.created;
 
         t.deepEqual(res.body, {
-            "total": 1,
-            "projects": [
+            'total': 1,
+            'projects': [
                 {
-                    "id": 2,
-                    "name": "LULC Test Project",
-                    "aois": [],
-                    "checkpoints": [],
-                    "model": {
-                        "id": 1,
-                        "active": true,
-                        "uid": 1,
-                        "name": "NAIP Supervised",
-                        "model_type": "pytorch_example",
-                        "model_inputshape": [
+                    'id': 2,
+                    'name': 'LULC Test Project',
+                    'aois': [],
+                    'checkpoints': [],
+                    'model': {
+                        'id': 1,
+                        'active': true,
+                        'uid': 1,
+                        'name': 'NAIP Supervised',
+                        'model_type': 'pytorch_example',
+                        'model_inputshape': [
                             240,
                             240,
                             4
                         ],
-                        "model_zoom": 17,
-                        "storage": false,
-                        "classes": [
+                        'model_zoom': 17,
+                        'storage': false,
+                        'classes': [
                             {
-                                "name": "Water",
-                                "color": "#0000FF"
+                                'name': 'Water',
+                                'color': '#0000FF'
                             },
                             {
-                                "name": "Tree Canopy",
-                                "color": "#008000"
+                                'name': 'Tree Canopy',
+                                'color': '#008000'
                             },
                             {
-                                "name": "Field",
-                                "color": "#80FF80"
+                                'name': 'Field',
+                                'color': '#80FF80'
                             },
                             {
-                                "name": "Built",
-                                "color": "#806060"
+                                'name': 'Built',
+                                'color': '#806060'
                             }
                         ],
-                        "meta": {},
-                        "bounds": [
+                        'meta': {},
+                        'bounds': [
                             -180,
                             -90,
                             180,

@@ -1,12 +1,11 @@
 const test = require('tape');
-const request = require('request');
 const Flight = require('./flight');
 
 const flight = new Flight();
 
 flight.init(test);
 flight.takeoff(test);
-flight.user(test, 'ingalls', true)
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', async (t) => {
     try {
@@ -222,7 +221,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
 
 test('PATCH /api/project/1/instance/1', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             json: true,
             url: 'http://localhost:2000/api/project/1/instance/1',
             method: 'PATCH',
@@ -351,7 +350,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
                     { name: 'Tree Canopy', color: '#008000' },
                     { name: 'Field', color: '#80FF80' },
                     { name: 'Built', color: '#806060' }
-                ],
+                ]
             }
         });
     } catch (err) {

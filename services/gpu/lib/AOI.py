@@ -1,5 +1,6 @@
 import logging
 
+import traceback
 import mercantile
 import numpy as np
 import supermercado
@@ -75,10 +76,18 @@ class AOI:
     def upload_fabric(self):
         self.fabric.close()
 
-        if self.is_patch is not False:
-            self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
-        else:
-            self.api.upload_aoi(self.id, self.raw_fabric)
+        for i in range(0, 10):
+            try:
+                if self.is_patch is not False:
+                    self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
+                else:
+                    self.api.upload_aoi(self.id, self.raw_fabric)
+            except Exception as e:
+                LOGGER.error("Error: {0}".format(e))
+                traceback.print_exc()
+
+                continue
+            break
 
     @staticmethod
     def gen_fabric(bounds, zoom):

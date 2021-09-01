@@ -7,14 +7,13 @@
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
         "doc": "apidoc -i ./ -f ./routes/ -f index.js -e node_modules --private",
-        "lint": "eslint index.js lib/**.js routes/**.js",
+        "lint": "eslint index.js lib/**.js routes/**.js test/**.js",
         "prod": "node --trace-warnings ./index.js --prod",
         "dev": "nodemon ./index.js",
         "test": "tape test/**.test.js | tap-dot"
     },
     "dependencies": {
         "@azure/storage-blob": "^12.4.0",
-        "@babel/eslint-parser": "^7.15.0",
         "@kubernetes/client-node": "^0.15.0",
         "@turf/bbox": "^6.3.0",
         "@turf/bbox-polygon": "^6.3.0",
@@ -45,6 +44,10 @@
     },
     "devDependencies": {
         "apidoc-plugin-schema": "^0.1.8",
+        "@babel/eslint-parser": "^7.15.0",
+        "@babel/eslint-plugin": "^7.14.5",
+        "@babel/plugin-syntax-class-properties": "^7.12.13",
+        "@babel/preset-env": "^7.15.0",
         "eslint": "^7.24.0",
         "eslint-plugin-node": "^11.1.0",
         "nodemon": "^2.0.7",

@@ -1,5 +1,3 @@
-'use strict';
-
 process.env.StackName = 'test';
 
 const { sql } = require('slonik');
@@ -17,6 +15,9 @@ const ajv = new Ajv({
     allErrors: true
 });
 
+/**
+ * @class
+ */
 class Flight {
 
     constructor() {
@@ -146,7 +147,7 @@ class Flight {
         test.test('Create Token', async (t) => {
             try {
                 const new_user = await prequest({
-                    url: new URL(`/api/user`, this.base),
+                    url: new URL('/api/user', this.base),
                     json: true,
                     method: 'POST',
                     body: {
