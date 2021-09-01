@@ -52,14 +52,17 @@ class API:
         os.makedirs(self.tmp_model, exist_ok=True)
 
         self.requests = requests.Session()
-        self.requests.mount(
-            url,
-            HTTPAdapter(
-                max_retries=urllib3.util.Retry(
-                    total=10, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504]
-                )
-            ),
+        adapter = HTTPAdapter(
+            max_retries=urllib3.util.Retry(
+                total=10,
+                backoff_factor=0.1,
+                allowed_methods=None
+                status_forcelist=[429, 500, 502, 503, 504]
+            )
         )
+
+        self.requests.mount('https://', adapter)
+        self.requests.mount('http://', adapter)
 
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
