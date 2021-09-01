@@ -1,5 +1,4 @@
 const test = require('tape');
-const request = require('request');
 const Flight = require('./flight');
 const { sql } = require('slonik');
 
@@ -7,7 +6,7 @@ const flight = new Flight();
 
 flight.init(test);
 flight.takeoff(test);
-flight.user(test, 'ingalls', true)
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', async (t) => {
     try {
@@ -121,11 +120,11 @@ test('POST /api/project/1/batch', async (t) => {
                 bounds: {
                     type: 'Polygon',
                     coordinates: [[
-                        [ -79.37724530696869, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83428180092151 ]
+                        [-79.37724530696869, 38.83428180092151],
+                        [-79.37677592039108, 38.83428180092151],
+                        [-79.37677592039108, 38.83455550411051],
+                        [-79.37724530696869, 38.83455550411051],
+                        [-79.37724530696869, 38.83428180092151]
                     ]]
                 }
             }
@@ -146,7 +145,7 @@ test('POST /api/project/1/batch', async (t) => {
             abort: false,
             bounds: {
                 type: 'Polygon',
-                coordinates: [ [ [ -79.37724530696869, 38.83428180092151 ], [ -79.37677592039108, 38.83428180092151 ], [ -79.37677592039108, 38.83455550411051 ], [ -79.37724530696869, 38.83455550411051 ], [ -79.37724530696869, 38.83428180092151 ] ] ]
+                coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]]
             },
             completed: false,
             instance: 1
@@ -196,10 +195,16 @@ test('GET /api/project/1/instance/1', async (t) => {
 });
 
 test('Meta: Set instance to active', async (t) => {
-    await flight.config.pool.query(sql`
-        UPDATE instances
-            SET active = True;
-    `);
+    try {
+        await flight.config.pool.query(sql`
+            UPDATE instances
+                SET active = True;
+        `);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
 test('POST /api/project/1/batch', async (t) => {
@@ -216,11 +221,11 @@ test('POST /api/project/1/batch', async (t) => {
                 bounds: {
                     type: 'Polygon',
                     coordinates: [[
-                        [ -79.37724530696869, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83428180092151 ]
+                        [-79.37724530696869, 38.83428180092151],
+                        [-79.37677592039108, 38.83428180092151],
+                        [-79.37677592039108, 38.83455550411051],
+                        [-79.37724530696869, 38.83455550411051],
+                        [-79.37724530696869, 38.83428180092151]
                     ]]
                 }
             }
@@ -240,10 +245,16 @@ test('POST /api/project/1/batch', async (t) => {
 });
 
 test('Meta: Set instance to inactive', async (t) => {
-    await flight.config.pool.query(sql`
-        UPDATE instances
-            SET active = False;
-    `);
+    try {
+        await flight.config.pool.query(sql`
+            UPDATE instances
+                SET active = False;
+        `);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
 test('POST /api/project/1/checkpoint', async (t) => {
@@ -262,7 +273,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
                     { name: 'Tree Canopy', color: '#008000' },
                     { name: 'Field', color: '#80FF80' },
                     { name: 'Built', color: '#806060' }
-                ],
+                ]
             }
         }, t);
     } catch (err) {
@@ -287,11 +298,11 @@ test('POST /api/project/1/batch', async (t) => {
                 bounds: {
                     type: 'Polygon',
                     coordinates: [[
-                        [ -79.37724530696869, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83428180092151 ]
+                        [-79.37724530696869, 38.83428180092151],
+                        [-79.37677592039108, 38.83428180092151],
+                        [-79.37677592039108, 38.83455550411051],
+                        [-79.37724530696869, 38.83455550411051],
+                        [-79.37724530696869, 38.83428180092151]
                     ]]
                 }
             }
@@ -312,7 +323,7 @@ test('POST /api/project/1/batch', async (t) => {
             abort: false,
             bounds: {
                 type: 'Polygon',
-                coordinates: [ [ [ -79.37724530696869, 38.83428180092151 ], [ -79.37677592039108, 38.83428180092151 ], [ -79.37677592039108, 38.83455550411051 ], [ -79.37724530696869, 38.83455550411051 ], [ -79.37724530696869, 38.83428180092151 ] ] ]
+                coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]]
             },
             completed: false,
             instance: 2
@@ -340,16 +351,16 @@ test('POST /api/project/1/batch - invalid checkpoint', async (t) => {
                 bounds: {
                     type: 'Polygon',
                     coordinates: [[
-                        [ -79.37724530696869, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83428180092151 ],
-                        [ -79.37677592039108, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83455550411051 ],
-                        [ -79.37724530696869, 38.83428180092151 ]
+                        [-79.37724530696869, 38.83428180092151],
+                        [-79.37677592039108, 38.83428180092151],
+                        [-79.37677592039108, 38.83455550411051],
+                        [-79.37724530696869, 38.83455550411051],
+                        [-79.37724530696869, 38.83428180092151]
                     ]]
                 }
             }
         });
-        
+
         t.deepEquals(res.body, {
             status: 404, message:
             'Checkpoint not found',
@@ -373,7 +384,7 @@ test('GET /api/project/1/instance - all instances', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
-        
+
         t.ok(res.body.instances[0].created);
         delete res.body.instances[0].created;
         t.ok(res.body.instances[1].created);
@@ -405,7 +416,7 @@ test('GET /api/project/1/instance - batch: true', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
-        
+
         t.ok(res.body.instances[0].created);
         delete res.body.instances[0].created;
         t.ok(res.body.instances[1].created);
@@ -437,7 +448,7 @@ test('GET /api/project/1/instance - batch: false', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
-        
+
         t.deepEquals(res.body, {
             total: 0,
             instances: []
@@ -460,7 +471,7 @@ test('GET /api/project/1/instance - batch: 1', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
-        
+
         t.ok(res.body.instances[0].created);
         delete res.body.instances[0].created;
 

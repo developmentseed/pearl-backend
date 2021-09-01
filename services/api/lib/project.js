@@ -175,10 +175,8 @@ class Project extends Generic {
      * @param {Pool} pool Instantiated Postgres Pool
      */
     async commit(pool) {
-        let pgres;
-
         try {
-            pgres = await pool.query(sql`
+            await pool.query(sql`
                 UPDATE projects
                     SET
                         name = ${this.name}

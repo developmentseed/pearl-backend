@@ -1,4 +1,4 @@
-'use strict';
+
 
 process.env.StackName = 'test';
 
@@ -146,7 +146,7 @@ class Flight {
         test.test('Create Token', async (t) => {
             try {
                 const new_user = await prequest({
-                    url: new URL(`/api/user`, this.base),
+                    url: new URL('/api/user', this.base),
                     json: true,
                     method: 'POST',
                     body: {

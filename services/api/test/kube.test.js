@@ -1,15 +1,22 @@
 const test = require('tape');
 const { Kube } = require('../lib/kube');
+const Flight = require('./flight');
 
-//main();
+const flight = new Flight();
 
-async function main() {
-  flight.takeoff(test);
-  const kube = new Kube('default');
-  test('k8s list pods', async (t) => {
-    const pods = await kube.listPods()
-    t.pass();
+flight.init(test);
+flight.takeoff(test);
+
+test.skip('k8s list pods', async (t) => {
+    const kube = new Kube('default');
+
+    try {
+        await kube.listPods();
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
     t.end();
-  })
-  flight.landing(test);
-}
+});
+
+flight.landing(test);

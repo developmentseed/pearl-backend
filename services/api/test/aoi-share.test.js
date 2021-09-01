@@ -1,7 +1,6 @@
 const test = require('tape');
 const request = require('request');
 const Flight = require('./flight');
-const fs = require('fs');
 const { sql } = require('slonik');
 
 const flight = new Flight();
@@ -32,7 +31,7 @@ test('POST /api/model', (t) => {
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
         }
-    } , (err, res, body) => {
+    } , (err, res) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
         t.end();
@@ -86,7 +85,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ],
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -118,8 +117,8 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-           ]
+                { type: 'GeometryCollection', 'geometries': [] }
+            ]
         });
 
         t.end();
@@ -140,11 +139,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         }
@@ -166,11 +165,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         });
@@ -283,7 +282,7 @@ test('POST /api/project/1/aoi/1/share', (t) => {
             aoi_id: 1,
             storage: false,
             patches: [],
-            bounds: { type: 'Polygon', coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ] }
+            bounds: { type: 'Polygon', coordinates: [[[-79.377245307, 38.834281801], [-79.37677592, 38.834281801], [-79.37677592, 38.834555504], [-79.377245307, 38.834555504], [-79.377245307, 38.834281801]]] }
         });
 
         t.end();
@@ -353,10 +352,10 @@ test('GET /api/share/uuid', (t) => {
                 aoi_id: 1,
                 storage: false,
                 checkpoint_id: 1,
-                classes: [ { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' } ],
+                classes: [{ name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }],
                 bounds: {
-                    "type": "Polygon",
-                    "coordinates": [
+                    'type': 'Polygon',
+                    'coordinates': [
                         [
                             [
                                 -79.377245307,
@@ -383,7 +382,7 @@ test('GET /api/share/uuid', (t) => {
                 }
             });
             t.end();
-        })
+        });
     });
 });
 
@@ -424,7 +423,7 @@ test('GET /api/project/1/aoi/1', (t) => {
             ],
             bounds: {
                 type: 'Polygon',
-                coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
+                coordinates: [[[-79.377245307, 38.834281801], [-79.37677592, 38.834281801], [-79.37677592, 38.834555504], [-79.377245307, 38.834555504], [-79.377245307, 38.834281801]]]
             },
             shares: [{
                 aoi_id: 1,

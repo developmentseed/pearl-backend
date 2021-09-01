@@ -347,15 +347,15 @@ class Instance {
     async patch(instanceid, instance) {
         let pgres;
 
-        if (instance.active == undefined) {
+        if (instance.active === undefined) {
             instance.active = null;
         }
 
-        if (instance.aoi_id == undefined) {
+        if (instance.aoi_id === undefined) {
             instance.aoi_id = null;
         }
 
-        if (instance.checkpoint_id == undefined) {
+        if (instance.checkpoint_id === undefined) {
             instance.checkpoint_id = null;
         }
 
