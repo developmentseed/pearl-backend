@@ -1,4 +1,9 @@
 resource "azurerm_application_gateway" "network" {
+
+  lifecycle {
+    ignore_changes: "all"
+  }
+
   name                = "${local.prefix}-appgateway"
   resource_group_name = azurerm_resource_group.lulc.name
   location            = azurerm_resource_group.lulc.location
