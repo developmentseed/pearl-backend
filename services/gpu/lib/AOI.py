@@ -77,19 +77,17 @@ class AOI:
         self.fabric.close()
 
         for i in range(0, 10):
-            while True:
-                try:
-                    if self.is_patch is not False:
-                        self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
-                    else:
-                        self.api.upload_aoi(self.id, self.raw_fabric)
-                except Exception as e:
-                    LOGGER.error("Error: {0}".format(e))
-                    traceback.print_exc()
+            try:
+                if self.is_patch is not False:
+                    self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
+                else:
+                    self.api.upload_aoi(self.id, self.raw_fabric)
+            except Exception as e:
+                LOGGER.error("Error: {0}".format(e))
+                traceback.print_exc()
 
-                    continue
-
-                break
+                continue
+            break
 
     @staticmethod
     def gen_fabric(bounds, zoom):
