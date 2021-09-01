@@ -5,6 +5,9 @@
         "aoi": {
             "type": "integer"
         },
+        "error": {
+            "type": "string"
+        },
         "progress": {
             "type": "integer"
         },

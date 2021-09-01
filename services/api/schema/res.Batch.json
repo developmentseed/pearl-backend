@@ -4,6 +4,7 @@
         "id",
         "uid",
         "project_id",
+        "error",
         "created",
         "updated",
         "aoi",
@@ -19,6 +20,10 @@
         "id": {
             "type": "integer",
             "description": "Unique Batch ID"
+        },
+        "error": {
+            "type": ["null", "string"],
+            "description": "Will contain an error message if the instance has suffered a fatal error"
         },
         "uid": {
             "type": "integer",
