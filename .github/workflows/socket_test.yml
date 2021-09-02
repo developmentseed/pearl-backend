@@ -1,4 +1,4 @@
-name: Test
+name: Socket Test
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
       - ready_for_review
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-20.04
     if: github.event.pull_request.draft == false
     timeout-minutes: 30
@@ -23,17 +23,10 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
 
-      - name: Docker Build
-        run: docker-compose up --build -d
+      - name: Docker Socket Build
+        run: docker build -t socket services/socket
 
-      - name: Docker Test Build
-        run: docker build -t test .
+      - name: Docker Socket Lint
+        run: docker run socket sh -c "npm install --include=dev && npm run lint"
 
-      - name: Docker Network
-        run: docker network ls
 
-      - name: Docker Test Run
-        run: docker run --network lulc-infra_default test
-
-      - name: Docker Cleanup
-        run: docker-compose kill
