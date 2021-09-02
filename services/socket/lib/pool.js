@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * @class Pool
@@ -9,7 +9,7 @@
 class Pool {
     constructor(config, argv) {
         this.config = config;
-        this.argv = argv
+        this.argv = argv;
 
         this.gpus = new Map();
         this.clients = new Map();

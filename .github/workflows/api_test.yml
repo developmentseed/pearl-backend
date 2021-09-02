@@ -1,37 +1,40 @@
 name: API Test
 
 on:
-    pull_request:
-        types:
-            - opened
-            - synchronize
-            - reopened
-            - ready_for_review
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
 
 jobs:
-    build:
-        runs-on: ubuntu-20.04
-        if: github.event.pull_request.draft == false
-        timeout-minutes: 30
-        steps:
-            - uses: actions/checkout@v1
+  test:
+    runs-on: ubuntu-20.04
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
 
-            - name: Docker Pull
-              run: docker-compose pull
+      - name: Docker Pull
+        run: docker-compose pull
 
-            - name: Docker Layer Caching
-              uses: satackey/action-docker-layer-caching@v0.0.11
-              continue-on-error: true
+      - name: Docker Layer Caching
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
 
-            - name: Docker Build
-              run: docker-compose up --build -d postgis
+      - name: Docker Build
+        run: docker-compose up --build -d postgis
 
-            - name: Docker API Build
-              run: docker build -t api services/api
+      - name: Docker API Build
+        run: docker build -t api services/api
 
-            - name: Docker API Test Run
-              run: docker run --network lulc-infra_default -e "Postgres=postgres://docker:docker@postgis:5432/gis" api npm test
+      - name: Docker API Lint
+        run: docker run api sh -c "npm install --include=dev && npm run lint"
 
-            - name: Docker Cleanup
-              run: docker-compose kill
+      - name: Docker API Test
+        run: docker run --network lulc-infra_default -e "Postgres=postgres://docker:docker@postgis:5432/gis" api npm test
+
+      - name: Docker Cleanup
+        run: docker-compose kill
 

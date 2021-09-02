@@ -35,11 +35,11 @@
         "minimist": "^1.2.5",
         "moment": "^2.29.1",
         "morgan": "^1.10.0",
-        "node-fetch": "^2.6.1",
+        "node-fetch": "^3.0.0",
         "path-to-regexp": "^6.2.0",
         "pg": "^8.5.1",
         "request": "^2.88.2",
-        "slonik": "^24.0.0",
+        "slonik": "^24.0.1",
         "wkx": "^0.5.0"
     },
     "devDependencies": {
