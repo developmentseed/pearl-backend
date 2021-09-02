@@ -1,18 +1,13 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', (t) => {
     request({
@@ -34,9 +29,9 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
-    } , (err, res, body) => {
+    } , (err, res) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
         t.end();
@@ -49,7 +44,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -81,7 +76,7 @@ test('GET /api/project/1/checkpoint (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -102,7 +97,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST',
@@ -143,7 +138,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] }
             ]
         });
 
@@ -157,13 +152,13 @@ test('PATCH /api/project/1/checkpoint/1 (no class length change)', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
+                { name: 'Field', color: '#80FF80' }
             ]
         }
     }, (err, res) => {
@@ -185,7 +180,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'NEW NAME',
@@ -228,8 +223,8 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-           ]
+                { type: 'GeometryCollection', 'geometries': [] }
+            ]
         });
 
         t.end();
@@ -242,7 +237,7 @@ test('GET /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -274,8 +269,8 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-           ]
+                { type: 'GeometryCollection', 'geometries': [] }
+            ]
         });
 
         t.end();
@@ -283,8 +278,11 @@ test('GET /api/project/1/checkpoint/1', (t) => {
 });
 
 test('Set Storage: true', async (t) => {
-    await flight.pool.query(`
-        UPDATE checkpoints SET storage = True
+    await flight.config.pool.query(sql`
+        UPDATE
+            checkpoints
+        SET
+            storage = True
     `);
 
     t.end();
@@ -296,7 +294,7 @@ test('GET /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -327,7 +325,7 @@ test('GET /api/project/1/checkpoint?bookmarked=true', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint?bookmarked=true',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -358,7 +356,7 @@ test('GET /api/project/1/checkpoint?bookmarked=false', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint?bookmarked=false',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -380,7 +378,7 @@ test('POST /api/project/1/checkpoint (sort)', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST 2',
@@ -421,7 +419,7 @@ test('POST /api/project/1/checkpoint (sort)', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
+                { type: 'GeometryCollection', 'geometries': [] }
             ]
         });
 
@@ -435,7 +433,7 @@ test('GET /api/project/1/checkpoint?sort=asc', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint?sort=asc',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -454,7 +452,7 @@ test('GET /api/project/1/checkpoint/1/tiles - no geometry', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -472,7 +470,7 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0.mvt - no geometry', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles/1/0/0.mvt',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -490,7 +488,7 @@ test('POST /api/project/1/checkpoint - wrong parent', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST',
@@ -521,7 +519,7 @@ test('POST /api/project/1/checkpoint - parent', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST',
@@ -577,17 +575,11 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 400, 'status: 400');
-
-        t.deepEquals(res.body, {
-            status: 400,
-            message: 'Cannot delete checkpoint with dependants',
-            messages: []
-        });
+        t.equals(res.statusCode, 200, 'status: 200');
 
         t.end();
     });
@@ -599,7 +591,7 @@ test('DELETE /api/project/1/checkpoint/4', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/4',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -615,12 +607,11 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.deepEquals(res.body, true);
+        t.equals(res.statusCode, 404, 'status: 404');
         t.end();
     });
 });

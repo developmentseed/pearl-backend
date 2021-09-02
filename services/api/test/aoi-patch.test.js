@@ -1,19 +1,13 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
-const fs = require('fs');
+const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', (t) => {
     request({
@@ -35,9 +29,9 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
-    } , (err, res, body) => {
+    } , (err, res) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
         t.end();
@@ -50,7 +44,7 @@ test('POST /api/project/1/aoi/1/patch - no project', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -69,7 +63,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -101,7 +95,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Checkpoint',
@@ -110,7 +104,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ],
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -142,8 +136,8 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-           ]
+                { type: 'GeometryCollection', 'geometries': [] }
+            ]
         });
 
         t.end();
@@ -156,7 +150,7 @@ test('POST /api/project/1/aoi/1/patch - no aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -175,7 +169,7 @@ test('POST /api/project/1/aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test AOI',
@@ -183,11 +177,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         }
@@ -209,11 +203,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         });
@@ -228,7 +222,7 @@ test('GET /api/project/1/aoi/1/patch', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -245,7 +239,7 @@ test('POST /api/project/1/aoi/1/patch', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -270,7 +264,7 @@ test('GET /api/project/1/aoi/1/patch', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -294,7 +288,7 @@ test('GET /api/project/1/aoi/1/patch', (t) => {
 
 test('[meta] Set aoi-patch.storage: true', async (t) => {
     try {
-        await flight.pool.query(`
+        await flight.config.pool.query(sql`
             UPDATE
                 aoi_patch
             SET
@@ -313,7 +307,7 @@ test('GET /api/project/1/aoi/1/patch/1', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -334,7 +328,7 @@ test('DELETE /api/project/1/aoi/1/patch/1', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -352,7 +346,7 @@ test('PATCH /api/project/1/aoi/1', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             patches: [1]
@@ -372,7 +366,8 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             bookmarked: false,
             px_stats: {},
             patches: [1],
-            name: 'Test AOI'
+            name: 'Test AOI',
+            bounds: { type: 'Polygon', coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]] }
         });
         t.end();
     });
@@ -384,7 +379,7 @@ test('GET /api/project/1/aoi/1/patch/1', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');

@@ -1,13 +1,14 @@
-'use strict';
+
 
 const { promisify } = require('util');
 const request = promisify(require('request'));
 const Knex = require('knex');
+const Config = require('../services/api/lib/config');
 
-const { drop, genconfig } = require('../services/api/test/drop');
+const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
 
-let state = {
+const state = {
     project: 1,
     token: false,
     instance: false,
@@ -19,7 +20,7 @@ function reconnect(test, API) {
     running(test, API);
 
     test('pre-run', async (t) => {
-        const config = await genconfig();
+        const config = await Config.env();
         try {
             const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
             state.token = (await authtoken.generate({
@@ -61,6 +62,7 @@ function reconnect(test, API) {
             delete res.body.active;
 
             t.deepEquals(res.body, {
+                is_batch: false,
                 project_id: 1,
                 aoi_id: null,
                 checkpoint_id: null
@@ -81,7 +83,9 @@ function reconnect(test, API) {
 function connect(test, API) {
     test('pre-run', async (t) => {
         try {
-            const config = await drop();
+            await drop();
+
+            const config = await Config.env();
 
             KnexConfig.connection = config.Postgres;
             const knex = Knex(KnexConfig);
@@ -97,13 +101,15 @@ function connect(test, API) {
                 auth0Id: 0
             });
 
+            const user = await auth.user(1);
+
             state.token = (await authtoken.generate({
                 type: 'auth0',
-                uid: 1
+                uid: user.uid
             }, 'API Token')).token;
 
             await knex.destroy();
-            config.pool.end();
+            await config.pool.end();
         } catch (err) {
             t.error(err, 'no errors');
         }
@@ -162,7 +168,7 @@ function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
-                storage: null,
+                storage: false,
                 classes: [
                     { name: 'Water', color: '#0000FF' },
                     { name: 'Emergent Wetlands', color: '#008000' },
@@ -294,7 +300,17 @@ function connect(test, API) {
             t.equals(res.statusCode, 200, '200 status code');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'active', 'aoi_id', 'checkpoint_id', 'created', 'id', 'last_update', 'pod', 'project_id', 'token', 'type',
+                'active',
+                'aoi_id',
+                'checkpoint_id',
+                'created',
+                'id',
+                'batch',
+                'last_update',
+                'pod',
+                'project_id',
+                'token',
+                'type'
             ].sort(), 'expected props');
 
             t.ok(parseInt(res.body.id), 'id: <integer>');
@@ -308,6 +324,7 @@ function connect(test, API) {
 
             t.deepEquals(res.body, {
                 project_id: 1,
+                batch: null,
                 aoi_id: null,
                 checkpoint_id: null,
                 active: false,
@@ -386,7 +403,7 @@ function running(test, API) {
                 version: '1.0.0',
                 limits: {
                     live_inference: 100000000,
-                    max_inference: 100000000,
+                    max_inference: 200000000,
                     instance_window: 600,
                     total_gpus: 2,
                     active_gpus: null

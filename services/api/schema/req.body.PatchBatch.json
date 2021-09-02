@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "aoi": {
+            "type": "integer"
+        },
+        "error": {
+            "type": "string"
+        },
+        "progress": {
+            "type": "integer"
+        },
+        "abort": {
+            "type": "boolean"
+        },
+        "completed": {
+            "type": "boolean"
+        }
+    }
+}

@@ -1,8 +1,8 @@
-'use strict';
-
+const Project = require('./project');
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const { Kube } = require('./kube');
+const { sql } = require('slonik');
 
 /**
  * @class
@@ -21,13 +21,13 @@ class Instance {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Project} project Instantiated Project class
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} instanceid Instance the user is attemping to access
      */
-    async has_auth(project, auth, projectid, instanceid) {
-        const proj = await project.has_auth(auth, projectid);
+    async has_auth(pool, auth, projectid, instanceid) {
+        const proj = await Project.has_auth(pool, auth, projectid);
         const instance = await this.get(auth, instanceid);
 
         if (instance.project_id !== proj.id) {
@@ -47,6 +47,7 @@ class Instance {
     static json(row) {
         const inst = {
             id: parseInt(row.id),
+            batch: row.batch,
             project_id: parseInt(row.project_id),
             aoi_id: parseInt(row.aoi_id),
             checkpoint_id: parseInt(row.checkpoint_id),
@@ -72,48 +73,65 @@ class Instance {
      * @param {Number} [query.page=0] - Page of users to return
      * @param {Number} [query.status=active] - Should the session be active? `active`, `inactive`, or `all`
      * @param {Number} [query.type] - Filter by type of instance. `gpu` or 'cpu'. Default all.
+     * @param {Number} [query.batch] - Filter by batch status (batch=true/false - Show/Hide batches, batch=<num> show instance with specific batch)
      */
     async list(projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
+        if (query.type === undefined) query.type = null;
+        if (query.batch === undefined) query.batch = null;
 
-        const where = [];
-        where.push(`project_id = ${projectid}`);
-
-        if (query.type) {
-            where.push(`type='${query.type}'`);
+        let active = null;
+        if (query.status === 'active') {
+            active = true;
+        } else if (query.status === 'inactive') {
+            active = false;
+        } else if (query.status === 'all') {
+            active = null;
         }
 
-        if (query.status === 'active') {
-            where.push('active IS true');
-        } else if (query.status === 'inactive') {
-            where.push('active IS false');
+        let batch = null;
+        let batch_id = null;
+        if (query.batch === true) {
+            batch = true;
+        } else if (query.batch === false) {
+            batch = false;
+        }
+
+        if (!isNaN(parseInt(query.batch))) {
+            batch_id = parseInt(query.batch);
         }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
+                    batch,
                     active,
                     created,
                     type
                 FROM
                     instances
                 WHERE
-                    ${where.join(' AND ')}
+                    project_id = ${projectid}
+                    AND (${query.type}::TEXT IS NULL OR type = ${query.type})
+                    AND (${active}::BOOLEAN IS NULL OR active = ${active})
+                    AND (
+                        (${batch}::BOOLEAN IS NULL AND ${batch_id}::BIGINT IS NULL)
+                        OR (${batch}::BOOLEAN = True AND batch IS NOT NULL)
+                        OR (${batch}::BOOLEAN = False AND batch IS NULL)
+                        OR (${batch_id}::BIGINT IS NOT NULL AND ${batch_id}::BIGINT = batch)
+                    )
                 ORDER BY
                     last_update
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list instances');
         }
@@ -122,7 +140,8 @@ class Instance {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
             instances: pgres.rows.map((row) => {
                 return {
-                    id: parseInt(row.id),
+                    id: row.id,
+                    batch: row.batch,
                     active: row.active,
                     created: row.created,
                     type: row.type
@@ -151,20 +170,18 @@ class Instance {
 
     async activeGpuInstances() {
         try {
-            const pgres = await this.pool.query(`
-                SELECT count(*) OVER() AS count
-                FROM instances
+            const pgres = await this.pool.query(sql`
+                SELECT
+                    count(*) OVER() AS count
+                FROM
+                    instances
                 WHERE
-                    type='gpu'
+                    type = 'gpu'
                 AND
-                    active IS true
+                    active IS True
             `);
 
-            if (pgres.rows.length) {
-                return pgres.rows[0].count;
-            } else {
-                return 0;
-            }
+            return pgres.rows.length ? pgres.rows[0].count : 0;
 
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to check active GPUs');
@@ -178,6 +195,7 @@ class Instance {
      * @param {Object} instance - Instance Object
      * @param {Number} instance.aoi_id The current AOI loaded on the instance
      * @param {Number} instance.checkpoint_id The current checkpoint loaded on the instance
+     * @param {Number} instance.batch If the instance is a batch job, specify batch ID
      */
     async create(auth, instance) {
         if (!auth.uid) {
@@ -202,21 +220,21 @@ class Instance {
         console.log('# type', type);
 
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await this.pool.query(sql`
                 INSERT INTO instances (
                     project_id,
                     aoi_id,
                     checkpoint_id,
+                    batch,
                     type
                 ) VALUES (
-                    $1, $2, $3, $4
+                    ${instance.project_id},
+                    ${instance.aoi_id || null},
+                    ${instance.checkpoint_id || null},
+                    ${instance.batch || null},
+                    ${type}
                 ) RETURNING *
-            `, [
-                instance.project_id,
-                instance.aoi_id,
-                instance.checkpoint_id,
-                type
-            ]);
+            `);
 
             const instanceId = parseInt(pgres.rows[0].id);
 
@@ -264,13 +282,13 @@ class Instance {
      */
     async delete(instanceid) {
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 DELETE
                     FROM
                         instances
                     WHERE
-                        id = $1
-            `, [instanceid]);
+                        id = ${instanceid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Instance Delete Error');
         }
@@ -287,20 +305,14 @@ class Instance {
         let pgres;
 
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 SELECT
-                    id,
-                    created,
-                    project_id,
-                    last_update,
-                    aoi_id,
-                    checkpoint_id,
-                    active
+                    *
                 FROM
                     instances
                 WHERE
-                    id = $1
-            `, [instanceid]);
+                    id = ${instanceid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Instance Error');
         }
@@ -335,23 +347,30 @@ class Instance {
     async patch(instanceid, instance) {
         let pgres;
 
+        if (instance.active === undefined) {
+            instance.active = null;
+        }
+
+        if (instance.aoi_id === undefined) {
+            instance.aoi_id = null;
+        }
+
+        if (instance.checkpoint_id === undefined) {
+            instance.checkpoint_id = null;
+        }
+
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.pool.query(sql`
                 UPDATE instances
                     SET
-                        active = COALESCE($2, active),
-                        aoi_id = COALESCE($3, aoi_id),
-                        checkpoint_id = COALESCE($4, checkpoint_id),
+                        active = COALESCE(${instance.active}, active),
+                        aoi_id = COALESCE(${instance.aoi_id}, aoi_id),
+                        checkpoint_id = COALESCE(${instance.checkpoint_id}, checkpoint_id),
                         last_update = NOW()
                     WHERE
-                        id = $1
+                        id = ${instanceid}
                     RETURNING *
-            `, [
-                instanceid,
-                instance.active,
-                instance.aoi_id,
-                instance.checkpoint_id
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to update Instance');
         }
@@ -368,7 +387,7 @@ class Instance {
      */
     async reset() {
         try {
-            await this.pool.query(`
+            await this.pool.query(sql`
                 UPDATE instances
                     SET active = False
             `, []);

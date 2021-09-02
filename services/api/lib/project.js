@@ -1,39 +1,31 @@
-'use strict';
-
 const Err = require('./error');
+const { sql } = require('slonik');
+const Generic = require('./generic');
 
-class Project {
-    constructor(config) {
-        this.pool = config.pool;
-        this.config = config;
-    }
+/**
+ * @class
+ */
+class Project extends Generic {
+    static _table = 'projects';
 
-    /**
-     * Return a Row as a JSON Object
-     * @param {Object} row Postgres Database Row
-     *
-     * @returns {Object}
-     */
-    static json(row) {
-        return {
-            id: parseInt(row.id),
-            uid: parseInt(row.uid),
-            name: row.name,
-            model_id: parseInt(row.model_id),
-            model_name: row.model_name,
-            mosaic: row.mosaic,
-            created: row.created
-        };
+    constructor() {
+        super();
+
+        this._table = Project._table;
+
+        // Attributes which are allowed to be patched
+        this.attrs = Object.keys(require('../schema/req.body.PatchProject.json').properties);
     }
 
     /**
      * Ensure a user can only access their own projects (or is an admin and can access anything)
      *
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      */
-    async has_auth(auth, projectid) {
-        const proj = await this.get(projectid);
+    static async has_auth(pool, auth, projectid) {
+        const proj = await Project.from(pool, projectid);
 
         if (auth.access !== 'admin' && auth.uid !== proj.uid) {
             throw new Err(401, null, 'Cannot access a project you are not the owner of');
@@ -43,33 +35,48 @@ class Project {
     }
 
     /**
+     * Return a Row as a JSON Object
+     * @param {Object} row Postgres Database Row
+     *
+     * @returns {Object}
+     */
+    serialize() {
+        return {
+            id: this.id,
+            uid: this.uid,
+            name: this.name,
+            model_id: this.model_id,
+            model_name: this.model_name,
+            mosaic: this.mosaic,
+            created: this.created
+        };
+    }
+
+    /**
      * Return a list of projects
      *
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Number} uid - Projects related to a specific user
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
+     * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
-    async list(uid, query) {
+    static async list(pool, uid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.sort) query.sort = 'desc';
+        if (query.name === undefined) query.name = null;
 
-        if (query.sort !== 'desc' && query.sort !== 'asc') {
-            throw new Err(400, null, 'Invalid Sort');
-        }
-
-        const where = [];
-        where.push(`uid = ${uid}`);
-
-        if (query.name) {
-            where.push(`name ILIKE '${query.name}%'`);
+        if (!query.sort || query.sort === 'desc') {
+            query.sort = sql`desc`;
+        } else {
+            query.sort = sql`asc`;
         }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -79,31 +86,21 @@ class Project {
                 FROM
                     projects
                 WHERE
-                    ${where.join(' AND ')}
-                ORDER BY created ${query.sort}
+                    uid = ${uid}
+                    AND archived = false
+                    AND (${query.name}::TEXT IS NULL OR name ~* ${query.name})
+                ORDER BY
+                    created ${query.sort}
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page
-            ]);
+                    ${query.page}
+            `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list projects');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            projects: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    name: row.name,
-                    created: row.created,
-                    model_id: row.model_id
-                };
-            })
-        };
+        return this.deserialize(pgres.rows);
     }
 
     /**
@@ -115,42 +112,38 @@ class Project {
      * @param {Object} project.model_id - Model ID
      * @param {Object} project.mosaic - Mosaic String
      */
-    async create(uid, project) {
+    static async generate(pool, uid, project) {
         try {
-            const pgres = await this.pool.query(`
+            const pgres = await pool.query(sql`
                 INSERT INTO projects (
                     uid,
                     name,
                     model_id,
                     mosaic
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    $4
+                    ${uid},
+                    ${project.name},
+                    ${project.model_id},
+                    ${project.mosaic}
                 ) RETURNING *
-            `, [
-                uid,
-                project.name,
-                project.model_id,
-                project.mosaic
-            ]);
+            `);
 
-            return Project.json(pgres.rows[0]);
+            return Project.deserialize(pgres.rows[0]);
         } catch (err) {
-            throw new Err(500, err, 'Failed to create project');
+            throw new Err(500, err, 'Failed to generate project');
         }
     }
 
     /**
      * Get a specific project
      *
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Integer} projectid - Project Id to get
      */
-    async get(projectid) {
+    static async from(pool, projectid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     p.id AS id,
                     p.uid AS uid,
@@ -163,74 +156,60 @@ class Project {
                     projects p,
                     models m
                 WHERE
-                    p.id = $1
-                AND
-                    p.model_id = m.id
-            `, [
-                projectid
-            ]);
+                    p.id = ${projectid}
+                    AND p.model_id = m.id
+                    AND archived = false
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to get project');
         }
 
         if (!pgres.rows.length) throw new Err(404, null, 'No project found');
 
-        return Project.json(pgres.rows[0]);
+        return Project.deserialize(pgres.rows[0]);
     }
 
     /**
      * Update Project Properties
      *
-     * @param {Number} projectid - Specific Project id
-     * @param {Object} project - Project Object
-     * @param {String} project.name The name of the project
+     * @param {Pool} pool Instantiated Postgres Pool
      */
-    async patch(projectid, project) {
-        let pgres;
-
+    async commit(pool) {
         try {
-            pgres = await this.pool.query(`
+            await pool.query(sql`
                 UPDATE projects
                     SET
-                        name = COALESCE($2, name)
+                        name = ${this.name}
                     WHERE
-                        id = $1
-                    RETURNING *
-            `, [
-                projectid,
-                project.name
-            ]);
+                        id = ${this.id}
+            `);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update Project');
+            throw new Err(500, new Error(err), 'Failed to commit Project');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'Project not found');
-
-        return Project.json(pgres.rows[0]);
+        return this;
     }
 
     /**
      * Delete Project
      *
-     * @param {Number} projectid - Specific Project id
+     * @param {Pool} pool Instantiated Postgres Pool
      */
-    async delete(projectid) {
+    async delete(pool) {
         try {
-            await this.pool.query(`
-                DELETE FROM projects
+            await pool.query(sql`
+                UPDATE projects
+                    SET
+                        archived = true
                     WHERE
-                        id = $1
-            `, [
-                projectid
-            ]);
+                        id = ${this.id}
+            `);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to delete Project');
+            throw new Err(500, new Error(err), 'Failed to archive Project');
         }
 
         return {};
     }
 }
 
-module.exports = {
-    Project
-};
+module.exports = Project;

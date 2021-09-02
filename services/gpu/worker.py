@@ -79,7 +79,9 @@ def main():
     model = load(args.gpu_id, api)
 
     connection(
-        "{}?token={}".format(os.environ["SOCKET"], api.token.replace("api.", "")), model
+        "{}?token={}".format(os.environ["SOCKET"], api.token.replace("api.", "")),
+        model,
+        api
     )
 
 
@@ -91,14 +93,16 @@ def placeholder(body, websocket):
     LOGGER.info("Known but unprocessed message")
 
 
-def connection(uri, model):
+def connection(uri, model, api):
     router = Router(uri)
 
-    router.on_act("model#prediction", model.prediction)
-    router.on_act("model#patch", model.patch)
-    router.on_act("model#retrain", model.retrain)
-    router.on_act("model#checkpoint", model.load_checkpoint)
-    router.on_act("model#aoi", model.load_aoi)
+    if api.batch is False:
+        router.on_act("model#prediction", model.prediction)
+        router.on_act("model#patch", model.patch)
+        router.on_act("model#retrain", model.retrain)
+        router.on_act("model#checkpoint", model.load_checkpoint)
+        router.on_act("model#aoi", model.load_aoi)
+
     router.on_act("model#status", model.status)
     router.on_act("model#abort", model.abort)
 

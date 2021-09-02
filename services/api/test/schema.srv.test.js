@@ -1,13 +1,14 @@
-'use strict';
+
 
 const fs = require('fs');
 const path = require('path');
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
 
 const UPDATE = process.env.UPDATE;

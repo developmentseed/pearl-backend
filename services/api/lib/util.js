@@ -1,4 +1,4 @@
-'use strict';
+
 
 const fetch = require('node-fetch');
 const Err = require('./error');

@@ -1,12 +1,17 @@
-'use strict';
 
-const { Pool } = require('pg');
+
+const { sql, createPool, createTypeParserPreset } = require('slonik');
+const wkx = require('wkx');
 
 class Config {
     static async env(args = {}) {
         if (args.prod && !process.env.SigningSecret) {
             throw new Error('SigningSecret env var must be set in production environment');
         }
+
+        this.silent = !!args.silent;
+
+        this.test = !!args.test;
 
         this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
         if (this.AzureStorage) console.log('ok - AzureStorage: Enabled');
@@ -40,11 +45,18 @@ class Config {
         let retry = 5;
         do {
             try {
-                this.pool = new Pool({
-                    connectionString: this.Postgres
+                this.pool = createPool(this.Postgres, {
+                    typeParsers: [
+                        ...createTypeParserPreset(), {
+                            name: 'geometry',
+                            parse: (value) => {
+                                return wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
+                            }
+                        }
+                    ]
                 });
 
-                await this.pool.query('SELECT NOW()');
+                await this.pool.query(sql`SELECT NOW()`);
             } catch (err) {
                 this.pool = false;
 

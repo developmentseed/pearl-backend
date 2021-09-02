@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "required": [
+        "mosaics"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "mosaics": {
+            "type": "array",
+            "description": "List of supported mosaics",
+            "items": {
+                "type": "string",
+                "description": "Name of mosaic"
+            }
+        }
+    }
+}

@@ -1,75 +1,40 @@
 {
-    "GET /schema": {
-        "body": true,
-        "query": true,
-        "res": false
-    },
-    "GET /token": {
+    "GET /project/:projectid/aoi/:aoiid/patch": {
         "body": false,
         "query": false,
         "res": false
     },
-    "POST /token": {
-        "body": true,
-        "query": false,
-        "res": false
-    },
-    "DELETE /token/:tokenid": {
+    "POST /project/:projectid/aoi/:aoiid/patch": {
         "body": false,
         "query": false,
         "res": false
     },
-    "GET /user": {
-        "body": false,
-        "query": true,
-        "res": false
-    },
-    "GET /user/me": {
+    "DELETE /project/:projectid/aoi/:aoiid/patch/:patchid": {
         "body": false,
         "query": false,
         "res": false
     },
-    "POST /project/:projectid/instance": {
-        "body": true,
-        "query": false,
-        "res": false
-    },
-    "PATCH /project/:projectid/instance/:instanceid": {
-        "body": true,
-        "query": false,
-        "res": false
-    },
-    "GET /project": {
-        "body": false,
-        "query": true,
-        "res": false
-    },
-    "GET /project/:projectid": {
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid": {
         "body": false,
         "query": false,
         "res": false
     },
-    "POST /project": {
-        "body": true,
-        "query": false,
-        "res": false
-    },
-    "PATCH /project/:projectid": {
-        "body": true,
-        "query": false,
-        "res": false
-    },
-    "DELETE /project/:projectid": {
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles": {
         "body": false,
         "query": false,
         "res": false
     },
-    "GET /project/:projectid/instance": {
+    "GET /project/:projectid/aoi/patch/:aoiid/tiles/:z/:x/:y": {
         "body": false,
-        "query": true,
+        "query": false,
         "res": false
     },
-    "GET /project/:projectid/instance/:instanceid": {
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/download": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
         "body": false,
         "query": false,
         "res": false
@@ -79,22 +44,7 @@
         "query": false,
         "res": false
     },
-    "GET /share/:shareuuid": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
     "GET /project/:projectid/aoi/:aoiid/tiles": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /share/:shareuuid/tiles": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /share/:shareuuid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
@@ -154,40 +104,40 @@
         "query": false,
         "res": false
     },
-    "GET /project/:projectid/aoi/:aoiid/patch": {
+    "GET /share/:shareuuid": {
         "body": false,
         "query": false,
         "res": false
     },
-    "POST /project/:projectid/aoi/:aoiid/patch": {
+    "GET /share/:shareuuid/tiles": {
         "body": false,
         "query": false,
         "res": false
     },
-    "DELETE /project/:projectid/aoi/:aoiid/patch/:patchid": {
+    "GET /share/:shareuuid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
     },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid": {
+    "GET /project/:projectid/batch": {
         "body": false,
-        "query": false,
-        "res": false
+        "query": true,
+        "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles": {
-        "body": false,
+    "POST /project/:projectid/batch": {
+        "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/download": {
+    "GET /project/:projectid/batch/:batchid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
-    "POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
-        "body": false,
+    "PATCH /project/:projectid/batch/:batchid": {
+        "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/checkpoint/:checkpointid": {
         "body": false,
@@ -222,7 +172,7 @@
     "POST /project/:projectid/checkpoint": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /project/:projectid/checkpoint/:checkpointid": {
         "body": false,
@@ -234,20 +184,50 @@
         "query": false,
         "res": false
     },
+    "POST /project/:projectid/instance": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "PATCH /project/:projectid/instance/:instanceid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/instance": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /project/:projectid/instance/:instanceid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /instance/:instanceid": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "DELETE /instance": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "POST /model": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "PATCH /model/:modelid": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "POST /model/:modelid/upload": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /model": {
         "body": false,
@@ -257,12 +237,12 @@
     "DELETE /model/:modelid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /model/:modelid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /model/:modelid/download": {
         "body": false,
@@ -272,7 +252,7 @@
     "GET /mosaic": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /mosaic/:layer": {
         "body": false,
@@ -284,12 +264,62 @@
         "query": false,
         "res": false
     },
-    "GET /instance/:instanceid": {
+    "GET /project": {
+        "body": false,
+        "query": true,
+        "res": false
+    },
+    "GET /project/:projectid": {
         "body": false,
         "query": false,
         "res": false
     },
-    "DELETE /instance": {
+    "POST /project": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "PATCH /project/:projectid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /project/:projectid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /schema": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /user": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /token": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /token": {
+        "body": true,
+        "query": false,
+        "res": false
+    },
+    "DELETE /token/:tokenid": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /user": {
+        "body": false,
+        "query": true,
+        "res": false
+    },
+    "GET /user/me": {
         "body": false,
         "query": false,
         "res": false

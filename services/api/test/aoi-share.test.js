@@ -1,19 +1,13 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
-const fs = require('fs');
+const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', (t) => {
     request({
@@ -35,9 +29,9 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
-    } , (err, res, body) => {
+    } , (err, res) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
         t.end();
@@ -50,7 +44,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -82,7 +76,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Checkpoint',
@@ -91,7 +85,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ],
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -123,8 +117,8 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-           ]
+                { type: 'GeometryCollection', 'geometries': [] }
+            ]
         });
 
         t.end();
@@ -137,7 +131,7 @@ test('POST /api/project/1/aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test AOI',
@@ -145,11 +139,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         }
@@ -171,11 +165,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         });
@@ -190,7 +184,7 @@ test('GET /api/project/1/share', (t) => {
         url: 'http://localhost:2000/api/project/1/share',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -212,7 +206,7 @@ test('POST /api/project/1/aoi/1/share', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/share',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -234,7 +228,7 @@ test('POST /api/project/1/aoi/2/share', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/2/share',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -252,7 +246,7 @@ test('POST /api/project/1/aoi/2/share', (t) => {
 
 test('[meta] Set aoi.storage: true', async (t) => {
     try {
-        await flight.pool.query(`
+        await flight.config.pool.query(sql`
             UPDATE
                 aois
             SET
@@ -271,7 +265,7 @@ test('POST /api/project/1/aoi/1/share', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/share',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -287,7 +281,8 @@ test('POST /api/project/1/aoi/1/share', (t) => {
             project_id: 1,
             aoi_id: 1,
             storage: false,
-            patches: []
+            patches: [],
+            bounds: { type: 'Polygon', coordinates: [[[-79.377245307, 38.834281801], [-79.37677592, 38.834281801], [-79.37677592, 38.834555504], [-79.377245307, 38.834555504], [-79.377245307, 38.834281801]]] }
         });
 
         t.end();
@@ -302,7 +297,7 @@ test('GET /api/project/1/share', (t) => {
         url: 'http://localhost:2000/api/project/1/share',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -333,7 +328,7 @@ test('GET /api/share/uuid', (t) => {
         url: 'http://localhost:2000/api/project/1/share',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         uuid = res.body.shares[0].uuid;
@@ -342,7 +337,7 @@ test('GET /api/share/uuid', (t) => {
             url: `http://localhost:2000/api/share/${uuid}`,
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');
@@ -356,11 +351,11 @@ test('GET /api/share/uuid', (t) => {
                 project_id: 1,
                 aoi_id: 1,
                 storage: false,
-                checkpoint_id: '1',
-                classes: [ { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' } ],
+                checkpoint_id: 1,
+                classes: [{ name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }],
                 bounds: {
-                    "type": "Polygon",
-                    "coordinates": [
+                    'type': 'Polygon',
+                    'coordinates': [
                         [
                             [
                                 -79.377245307,
@@ -387,7 +382,7 @@ test('GET /api/share/uuid', (t) => {
                 }
             });
             t.end();
-        })
+        });
     });
 });
 
@@ -397,7 +392,7 @@ test('GET /api/project/1/aoi/1', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -424,11 +419,11 @@ test('GET /api/project/1/aoi/1', (t) => {
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' } 
+                { name: 'Built', color: '#806060' }
             ],
             bounds: {
                 type: 'Polygon',
-                coordinates: [ [ [ -79.377245307, 38.834281801 ], [ -79.37677592, 38.834281801 ], [ -79.37677592, 38.834555504 ], [ -79.377245307, 38.834555504 ], [ -79.377245307, 38.834281801 ] ] ]
+                coordinates: [[[-79.377245307, 38.834281801], [-79.37677592, 38.834281801], [-79.37677592, 38.834555504], [-79.377245307, 38.834555504], [-79.377245307, 38.834281801]]]
             },
             shares: [{
                 aoi_id: 1,
@@ -446,7 +441,7 @@ test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -468,7 +463,7 @@ test('DELETE /api/project/1/aoi/1/<uuid> - exists', (t) => {
         url: `http://localhost:2000/api/project/1/aoi/1/share/${uuid}`,
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');

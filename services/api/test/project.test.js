@@ -1,18 +1,12 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('GET /api/project (empty)', (t) => {
     request({
@@ -20,7 +14,7 @@ test('GET /api/project (empty)', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -41,7 +35,7 @@ test('GET /api/project/1 (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -70,9 +64,9 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
-    } , (err, res, body) => {
+    } , (err, res) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
         t.end();
@@ -85,7 +79,7 @@ test('POST /api/project (Invalid Mosaic)', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -112,7 +106,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -144,7 +138,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Checkpoint',
@@ -153,7 +147,7 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ],
+            ]
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -185,8 +179,8 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
                 { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-           ]
+                { type: 'GeometryCollection', 'geometries': [] }
+            ]
         });
 
         t.end();
@@ -199,7 +193,7 @@ test('POST /api/project/1/aoi', (t) => {
         url: 'http://localhost:2000/api/project/1/aoi',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test AOI',
@@ -207,11 +201,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         }
@@ -233,11 +227,11 @@ test('POST /api/project/1/aoi', (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.37724530696869, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83428180092151 ],
-                    [ -79.37677592039108, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83455550411051 ],
-                    [ -79.37724530696869, 38.83428180092151 ]
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
                 ]]
             }
         });
@@ -252,7 +246,7 @@ test('GET /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -260,49 +254,49 @@ test('GET /api/project', (t) => {
 
         t.ok(res.body.projects[0].created, '.created: <date>');
         delete res.body.projects[0].created;
-        delete res.body.projects[0].model.created
+        delete res.body.projects[0].model.created;
 
         t.deepEquals(res.body, {
-            "total": 1,
-            "projects": [
+            'total': 1,
+            'projects': [
                 {
-                    "id": 1,
-                    "name": "Test Project",
-                    "aois": [],
-                    "checkpoints": [],
-                    "model": {
-                        "id": 1,
-                        "active": true,
-                        "uid": 1,
-                        "name": "NAIP Supervised",
-                        "model_type": "pytorch_example",
-                        "model_inputshape": [
+                    'id': 1,
+                    'name': 'Test Project',
+                    'aois': [],
+                    'checkpoints': [],
+                    'model': {
+                        'id': 1,
+                        'active': true,
+                        'uid': 1,
+                        'name': 'NAIP Supervised',
+                        'model_type': 'pytorch_example',
+                        'model_inputshape': [
                             240,
                             240,
                             4
                         ],
-                        "model_zoom": 17,
-                        "storage": null,
-                        "classes": [
+                        'model_zoom': 17,
+                        'storage': false,
+                        'classes': [
                             {
-                                "name": "Water",
-                                "color": "#0000FF"
+                                'name': 'Water',
+                                'color': '#0000FF'
                             },
                             {
-                                "name": "Tree Canopy",
-                                "color": "#008000"
+                                'name': 'Tree Canopy',
+                                'color': '#008000'
                             },
                             {
-                                "name": "Field",
-                                "color": "#80FF80"
+                                'name': 'Field',
+                                'color': '#80FF80'
                             },
                             {
-                                "name": "Built",
-                                "color": "#806060"
+                                'name': 'Built',
+                                'color': '#806060'
                             }
                         ],
-                        "meta": {},
-                        "bounds": [
+                        'meta': {},
+                        'bounds': [
                             -180,
                             -90,
                             180,
@@ -323,7 +317,7 @@ test('POST /api/project (sort)', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'LULC Test Project',
@@ -355,7 +349,7 @@ test('GET /api/project?sort=asc', (t) => {
         url: 'http://localhost:2000/api/project?sort=asc',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -373,7 +367,7 @@ test('GET /api/project?name=lulc', (t) => {
         url: 'http://localhost:2000/api/project?name=lulc',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -382,46 +376,46 @@ test('GET /api/project?name=lulc', (t) => {
         delete res.body.projects[0].model.created;
 
         t.deepEqual(res.body, {
-            "total": 1,
-            "projects": [
+            'total': 1,
+            'projects': [
                 {
-                    "id": 2,
-                    "name": "LULC Test Project",
-                    "aois": [],
-                    "checkpoints": [],
-                    "model": {
-                        "id": 1,
-                        "active": true,
-                        "uid": 1,
-                        "name": "NAIP Supervised",
-                        "model_type": "pytorch_example",
-                        "model_inputshape": [
+                    'id': 2,
+                    'name': 'LULC Test Project',
+                    'aois': [],
+                    'checkpoints': [],
+                    'model': {
+                        'id': 1,
+                        'active': true,
+                        'uid': 1,
+                        'name': 'NAIP Supervised',
+                        'model_type': 'pytorch_example',
+                        'model_inputshape': [
                             240,
                             240,
                             4
                         ],
-                        "model_zoom": 17,
-                        "storage": null,
-                        "classes": [
+                        'model_zoom': 17,
+                        'storage': false,
+                        'classes': [
                             {
-                                "name": "Water",
-                                "color": "#0000FF"
+                                'name': 'Water',
+                                'color': '#0000FF'
                             },
                             {
-                                "name": "Tree Canopy",
-                                "color": "#008000"
+                                'name': 'Tree Canopy',
+                                'color': '#008000'
                             },
                             {
-                                "name": "Field",
-                                "color": "#80FF80"
+                                'name': 'Field',
+                                'color': '#80FF80'
                             },
                             {
-                                "name": "Built",
-                                "color": "#806060"
+                                'name': 'Built',
+                                'color': '#806060'
                             }
                         ],
-                        "meta": {},
-                        "bounds": [
+                        'meta': {},
+                        'bounds': [
                             -180,
                             -90,
                             180,
@@ -441,7 +435,7 @@ test('GET /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 200, 'status: 200');
@@ -468,7 +462,7 @@ test('PATCH /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Renamed Test Project'
@@ -484,7 +478,8 @@ test('PATCH /api/project/1', (t) => {
             uid: 1,
             name: 'Renamed Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
 
         t.end();
@@ -497,7 +492,7 @@ test('GET /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 200, 'status: 200');
@@ -524,7 +519,7 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -542,7 +537,7 @@ test('DELETE /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 200, 'status: 200');
@@ -559,7 +554,7 @@ test('GET /api/project/1', (t) => {
         url: 'http://localhost:2000/api/project/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 404, 'status: 404');
@@ -574,7 +569,7 @@ test('DELETE /api/project/3', (t) => {
         url: 'http://localhost:2000/api/project/3',
         method: 'DELETE',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.equals(res.statusCode, 404, 'status: 404');

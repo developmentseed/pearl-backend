@@ -1,18 +1,13 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('GET /api/model (empty)', (t) => {
     request({
@@ -20,7 +15,7 @@ test('GET /api/model (empty)', (t) => {
         url: 'http://localhost:2000/api/model',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -40,7 +35,7 @@ test('GET /api/model/1 (not found)', (t) => {
         url: 'http://localhost:2000/api/model/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -63,7 +58,7 @@ test('GET /api/model/1/download (not found)', (t) => {
         url: 'http://localhost:2000/api/model/1/download',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -96,7 +91,7 @@ test('POST /api/model', (t) => {
         url: 'http://localhost:2000/api/model',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'NAIP Supervised',
@@ -105,10 +100,10 @@ test('POST /api/model', (t) => {
             model_inputshape: [240,240,4],
             model_zoom: 17,
             classes: [
-                { name: 'Water', color: '#0000FF'},
-                { name: 'Tree Canopy', color: '#008000'},
-                { name: 'Field', color: '#80FF80'},
-                { name: 'Built', color: '#806060'}
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
             ],
             meta: {}
         }
@@ -116,7 +111,7 @@ test('POST /api/model', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(Object.keys(res.body).sort(), [ 'active', 'bounds', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'model_zoom', 'name', 'storage', 'uid' ], 'body');
+        t.deepEquals(Object.keys(res.body).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'model_zoom', 'name', 'storage', 'uid'], 'body');
         t.ok(res.body.id, 1, '.id: 1');
 
         t.end();
@@ -129,7 +124,7 @@ test('GET /api/model (storage: false)', (t) => {
         url: 'http://localhost:2000/api/model',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -142,8 +137,11 @@ test('GET /api/model (storage: false)', (t) => {
 });
 
 test('Set Storage: true', async (t) => {
-    await flight.pool.query(`
-        UPDATE models SET storage = True
+    await flight.config.pool.query(sql`
+        UPDATE
+            models
+        SET
+            storage = True
     `);
 
     t.end();
@@ -155,7 +153,7 @@ test('GET /api/model (storage: true)', (t) => {
         url: 'http://localhost:2000/api/model',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -185,7 +183,7 @@ test('GET /api/model/1', (t) => {
         url: 'http://localhost:2000/api/model/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -201,10 +199,10 @@ test('GET /api/model/1', (t) => {
             id: 1,
             active: true,
             uid: 1,
-            bounds: [ -180, -90, 180, 90 ],
+            bounds: [-180, -90, 180, 90],
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',
-            model_inputshape: [ 240, 240, 4 ],
+            model_inputshape: [240, 240, 4],
             model_zoom: 17,
             storage: true,
             classes: [
@@ -226,7 +224,7 @@ test('GET /api/model/1', (t) => {
         url: 'http://localhost:2000/api/model/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -242,10 +240,10 @@ test('GET /api/model/1', (t) => {
             id: 1,
             active: true,
             uid: 1,
-            bounds: [ -180, -90, 180, 90 ],
+            bounds: [-180, -90, 180, 90],
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',
-            model_inputshape: [ 240, 240, 4 ],
+            model_inputshape: [240, 240, 4],
             model_zoom: 17,
             storage: true,
             classes: [
@@ -267,7 +265,7 @@ test('PATCH /api/model/1', (t) => {
         url: 'http://localhost:2000/api/model/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             bounds: [-1, -1, 1, 1]
@@ -285,10 +283,10 @@ test('PATCH /api/model/1', (t) => {
             id: 1,
             active: true,
             uid: 1,
-            bounds: [ -1, -1, 1, 1 ],
+            bounds: [-1, -1, 1, 1],
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',
-            model_inputshape: [ 240, 240, 4 ],
+            model_inputshape: [240, 240, 4],
             model_zoom: 17,
             storage: true,
             classes: [
@@ -306,12 +304,12 @@ test('PATCH /api/model/1', (t) => {
 
 test('[meta] Set model.storage: true', async (t) => {
     try {
-        await flight.pool.query(`
+        await flight.config.pool.query(sql`
             UPDATE
                 models
             SET
                 storage = true
-        `, []);
+        `);
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -326,7 +324,7 @@ if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
             url: 'http://localhost:2000/api/model/1/download',
             method: 'GET',
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, (err, res) => {
             t.error(err, 'no errors');

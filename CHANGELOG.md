@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+# v0.5.0
+
+## Fixes
+- fix incorrect coalesce for active.false condition [`#463`](https://github.com/developmentseed/lulc-infra/pull/463)
+- Terminate after batch [`#460`](https://github.com/developmentseed/lulc-infra/pull/460)
+- Checkpoint Bug [`#454`](https://github.com/developmentseed/lulc-infra/pull/454)
+
+## Features
+- Batch Worker [`#455`](https://github.com/developmentseed/lulc-infra/pull/455)
+- Batch Progress [`#452`](https://github.com/developmentseed/lulc-infra/pull/452)
+- Batch Class [`#450`](https://github.com/developmentseed/lulc-infra/pull/450)
+- Instance Batch Mode [`#448`](https://github.com/developmentseed/lulc-infra/pull/448)
+
+## Improvements
+- Refactor Project Class [`#459`](https://github.com/developmentseed/lulc-infra/pull/459)
+- Routify Remaining Routes [`#457`](https://github.com/developmentseed/lulc-infra/pull/457)
+- make max inference 200km2 [`#458`](https://github.com/developmentseed/lulc-infra/pull/458)
+- Node-PG =&gt; Slonik [`#449`](https://github.com/developmentseed/lulc-infra/pull/449)
+- Never delete [`#444`](https://github.com/developmentseed/lulc-infra/pull/444)
+- Dynamic Route Loading [`#414`](https://github.com/developmentseed/lulc-infra/pull/414)
+
 # v0.4.1
 
 ## Fixes

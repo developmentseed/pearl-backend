@@ -1,17 +1,13 @@
 /* eslint-disable strict */
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t)).token;
-    t.end();
-});
+flight.user(test, 'ingalls');
 
 test('GET /api/user/me (valid token - 200 success)', (t) => {
     request({
@@ -19,13 +15,13 @@ test('GET /api/user/me (valid token - 200 success)', (t) => {
         url: 'http://localhost:2000/api/user/me',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(res.body, { username: 'example', email: 'example@example.com', access: 'user' });
+        t.deepEquals(res.body, { username: 'ingalls', email: 'ingalls@example.com', access: 'user' });
 
         t.end();
     });
@@ -52,7 +48,7 @@ test('POST /api/login', (t) => {
         url: 'http://localhost:2000/api/login',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -70,7 +66,7 @@ test('POST /api/token', (t) => {
         url: 'http://localhost:2000/api/token',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'API Token'

@@ -1,18 +1,13 @@
 const test = require('tape');
 const request = require('request');
-const { Flight } = require('./util');
+const Flight = require('./flight');
+const { sql } = require('slonik');
 
 const flight = new Flight();
 
+flight.init(test);
 flight.takeoff(test);
-
-let token;
-test('user', async (t) => {
-    token = (await flight.user(t, {
-        access: 'admin'
-    })).token;
-    t.end();
-});
+flight.user(test, 'ingalls', true);
 
 test('POST /api/model', (t) => {
     request({
@@ -34,9 +29,9 @@ test('POST /api/model', (t) => {
             meta: {}
         },
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
-    } , (err, res, body) => {
+    } , (err, res) => {
         t.error(err, 'no error');
         t.equals(res.statusCode, 200, 'status: 200');
         t.end();
@@ -49,7 +44,7 @@ test('POST /api/project', (t) => {
         url: 'http://localhost:2000/api/project',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'Test Project',
@@ -81,7 +76,7 @@ test('GET /api/project/1/checkpoint (empty)', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -102,7 +97,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST',
@@ -113,16 +108,16 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] }
             ],
             input_geoms: [
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}, {type: 'Feature', geometry: { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] }}] },
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]]}}]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] }} ]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}]}
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }, { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-79.38049077987671, 38.83848752076715], [-79.37873125076294, 38.83848752076715], [-79.37873125076294, 38.8397243269996], [-79.38049077987671, 38.8397243269996], [-79.38049077987671, 38.83848752076715]]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }] }
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -151,16 +146,16 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] }
             ],
             input_geoms: [
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}, {type: 'Feature', geometry: { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] }}] },
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]]}}]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] }} ]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}]}
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }, { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-79.38049077987671, 38.83848752076715], [-79.37873125076294, 38.83848752076715], [-79.37873125076294, 38.8397243269996], [-79.38049077987671, 38.8397243269996], [-79.38049077987671, 38.83848752076715]]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }] }
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -180,13 +175,13 @@ test('PATCH /api/project/1/checkpoint/1 (no class length change)', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
+                { name: 'Field', color: '#80FF80' }
             ]
         }
     }, (err, res) => {
@@ -208,7 +203,7 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'NEW NAME',
@@ -241,16 +236,16 @@ test('PATCH /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] }
             ],
             input_geoms: [
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}, {type: 'Feature', geometry: { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] }}] },
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]]}}]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] }} ]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}]}
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }, { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-79.38049077987671, 38.83848752076715], [-79.37873125076294, 38.83848752076715], [-79.37873125076294, 38.8397243269996], [-79.38049077987671, 38.8397243269996], [-79.38049077987671, 38.83848752076715]]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }] }
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -270,7 +265,7 @@ test('GET /api/project/1/checkpoint/1', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -291,19 +286,19 @@ test('GET /api/project/1/checkpoint/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
-            bounds: [ -86.8359375, 34.8859309407532, -73.828125, 51.1793429792893 ],
-            center: [ -80.33203125, 43.0326369600212 ],
+            bounds: [-86.8359375, 34.8859309407532, -73.828125, 51.1793429792893],
+            center: [-80.33203125, 43.0326369600212],
             retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] }
             ],
             input_geoms: [
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}, {type: 'Feature', geometry: { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] }}] },
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]]}}]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] }} ]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}]}
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }, { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-79.38049077987671, 38.83848752076715], [-79.37873125076294, 38.83848752076715], [-79.37873125076294, 38.8397243269996], [-79.38049077987671, 38.8397243269996], [-79.38049077987671, 38.83848752076715]]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }] }
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -318,7 +313,7 @@ test('GET /api/project/1/checkpoint/1', (t) => {
 });
 
 test('Set Storage: true', async (t) => {
-    await flight.pool.query(`
+    await flight.config.pool.query(sql`
         UPDATE checkpoints SET storage = True
     `);
 
@@ -331,7 +326,7 @@ test('GET /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -362,7 +357,7 @@ test('POST /api/project/1/checkpoint', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint',
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
             name: 'TEST',
@@ -374,16 +369,16 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] }
             ],
             input_geoms: [
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}, {type: 'Feature', geometry: { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] }}] },
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]]}}]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] }} ]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}]}
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }, { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-79.38049077987671, 38.83848752076715], [-79.37873125076294, 38.83848752076715], [-79.37873125076294, 38.8397243269996], [-79.38049077987671, 38.8397243269996], [-79.38049077987671, 38.83848752076715]]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }] }
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -412,16 +407,16 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] },
-                { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
+                { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] }
             ],
             input_geoms: [
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}, {type: 'Feature', geometry: { type: 'Polygon', coordinates: [ [ [ -79.38049077987671, 38.83848752076715 ], [ -79.37873125076294, 38.83848752076715 ], [ -79.37873125076294, 38.8397243269996 ], [ -79.38049077987671, 38.8397243269996 ], [ -79.38049077987671, 38.83848752076715 ] ] ] }}] },
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]]}}]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ], [ -73.828125, 51.17934297928927 ]] }} ]},
-                { type: 'FeatureCollection', 'features': [ {type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [ [ -86.8359375, 34.88593094075317 ]] }}]}
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }, { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-79.38049077987671, 38.83848752076715], [-79.37873125076294, 38.83848752076715], [-79.37873125076294, 38.8397243269996], [-79.38049077987671, 38.8397243269996], [-79.38049077987671, 38.83848752076715]]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] } }] },
+                { type: 'FeatureCollection', 'features': [{ type: 'Feature', geometry: { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] } }] }
             ],
             analytics: [
                 { counts: 1, f1score: 1, percent: 1 },
@@ -441,7 +436,7 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -452,9 +447,9 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', (t) => {
             name: 'checkpoint-1',
             version: '1.0.0',
             schema: 'xyz',
-            tiles: [ '/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt' ],
-            bounds: [ -86.8359375, 34.8859309407532, -73.828125, 51.1793429792893 ],
-            center: [ -80.33203125, 43.0326369600212 ]
+            tiles: ['/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt'],
+            bounds: [-86.8359375, 34.8859309407532, -73.828125, 51.1793429792893],
+            center: [-80.33203125, 43.0326369600212]
         });
 
         t.end();
@@ -467,7 +462,7 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0 - geometries', (t) => {
         url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles/1/0/0.mvt',
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${flight.token.ingalls}`
         }
     }, (err, res) => {
         t.error(err, 'no errors');
