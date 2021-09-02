@@ -534,6 +534,11 @@ class ModelSrv:
 
                 done_processing(self)
         except Exception as e:
+            self.api.batch_patch({
+                "completed": False,
+                "error": str("Processing Error: " + str(e))
+            })
+
             done_processing(self)
             websocket.error("Processing Error", e)
             raise e
