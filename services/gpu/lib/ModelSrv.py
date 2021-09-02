@@ -419,14 +419,14 @@ class ModelSrv:
             )
 
             current = 0
+            progress = 0
+
             for i, (data, xyz) in enumerate(dataloader):
                 if self.is_aborting:
                     break
 
                 xyz = xyz.numpy()
                 outputs = self.model.run(data, True)
-
-                progress = 0
 
                 for c, output in enumerate(outputs):
                     output = MemRaster(output, "epsg:3857", tuple(xyz[c]), True)
