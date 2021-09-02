@@ -200,7 +200,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a Tile for a given AOI Patch
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', {}, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/patch/:aoiid/tiles/:z/:x/:y', {}, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
