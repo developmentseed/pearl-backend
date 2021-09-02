@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-'use strict';
+
 
 const express = require('express');
 const WebSocket = require('ws');
@@ -53,12 +53,6 @@ async function server(argv, config, cb) {
     srv.keepAliveTimeout = 0;
     srv.on('request', app);
 
-    srv.on('upgrade', (request, socket, head) => {
-        wss.handleUpgrade(request, socket, head, (ws) => {
-            wss.emit('connection', ws, request);
-        });
-    });
-
     const wss = new WebSocket.Server({
         noServer: true,
         verifyClient: ({ req }, cb) => {
@@ -74,6 +68,12 @@ async function server(argv, config, cb) {
                 return cb(true);
             });
         }
+    });
+
+    srv.on('upgrade', (request, socket, head) => {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            wss.emit('connection', ws, request);
+        });
     });
 
     const timeout = new Timeout(config, pool);
