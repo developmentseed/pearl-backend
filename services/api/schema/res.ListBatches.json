@@ -20,12 +20,16 @@
                     "updated",
                     "aoi",
                     "name",
-                    "completed"
+                    "completed",
+                    "error"
                 ],
                 "additionalProperties": false,
                 "properties": {
                     "id": {
                         "type": "integer"
+                    },
+                    "error": {
+                        "type": ["null", "string"]
                     },
                     "created": {
                         "type": "integer"

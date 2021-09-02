@@ -1,5 +1,4 @@
-
-
+const Project = require('./project');
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const { Kube } = require('./kube');
@@ -22,13 +21,13 @@ class Instance {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Project} project Instantiated Project class
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} instanceid Instance the user is attemping to access
      */
-    async has_auth(project, auth, projectid, instanceid) {
-        const proj = await project.has_auth(auth, projectid);
+    async has_auth(pool, auth, projectid, instanceid) {
+        const proj = await Project.has_auth(pool, auth, projectid);
         const instance = await this.get(auth, instanceid);
 
         if (instance.project_id !== proj.id) {
@@ -348,13 +347,25 @@ class Instance {
     async patch(instanceid, instance) {
         let pgres;
 
+        if (instance.active === undefined) {
+            instance.active = null;
+        }
+
+        if (instance.aoi_id === undefined) {
+            instance.aoi_id = null;
+        }
+
+        if (instance.checkpoint_id === undefined) {
+            instance.checkpoint_id = null;
+        }
+
         try {
             pgres = await this.pool.query(sql`
                 UPDATE instances
                     SET
-                        active = COALESCE(${instance.active || null}, active),
-                        aoi_id = COALESCE(${instance.aoi_id || null}, aoi_id),
-                        checkpoint_id = COALESCE(${instance.checkpoint_id || null}, checkpoint_id),
+                        active = COALESCE(${instance.active}, active),
+                        aoi_id = COALESCE(${instance.aoi_id}, aoi_id),
+                        checkpoint_id = COALESCE(${instance.checkpoint_id}, checkpoint_id),
                         last_update = NOW()
                     WHERE
                         id = ${instanceid}

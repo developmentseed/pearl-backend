@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
@@ -39,7 +39,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Create a new API token to perform API requests with
      *
-     * @apiSchema (Body) {jsonschema=./schema/req.body.token.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.token.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK

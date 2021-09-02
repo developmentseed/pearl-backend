@@ -100,10 +100,10 @@ class Schemas {
     static query(schema) {
         return function (req, res, next) {
             for (const key of Object.keys(req.query)) {
-                if (!schema.properties[key] || !schema.properties[key].type) continue
+                if (!schema.properties[key] || !schema.properties[key].type) continue;
 
                 // For easier processing use consistent array format IE: `type: ["integer", "boolean"]` vs type: "integer"
-                if (!Array.isArray(schema.properties[key].type)) schema.properties[key].type = [ schema.properties[key].type ]
+                if (!Array.isArray(schema.properties[key].type)) schema.properties[key].type = [schema.properties[key].type];
 
                 for (const type of schema.properties[key].type) {
                     if (type === 'integer' && !isNaN(parseInt(req.query[key]))) {

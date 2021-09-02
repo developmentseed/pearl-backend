@@ -1,39 +1,39 @@
 name: Test
 
 on:
-    pull_request:
-        types:
-            - opened
-            - synchronize
-            - reopened
-            - ready_for_review
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
 
 jobs:
-    build:
-        runs-on: ubuntu-20.04
-        if: github.event.pull_request.draft == false
-        timeout-minutes: 30
-        steps:
-            - uses: actions/checkout@v1
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
 
-            - name: Docker Pull
-              run: docker-compose pull
+      - name: Docker Pull
+        run: docker-compose pull
 
-            - name: Docker Layer Caching
-              uses: satackey/action-docker-layer-caching@v0.0.11
-              continue-on-error: true
+      - name: Docker Layer Caching
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
 
-            - name: Docker Build
-              run: docker-compose up --build -d
+      - name: Docker Build
+        run: docker-compose up --build -d
 
-            - name: Docker Test Build
-              run: docker build -t test .
+      - name: Docker Test Build
+        run: docker build -t test .
 
-            - name: Docker Network
-              run: docker network ls
+      - name: Docker Network
+        run: docker network ls
 
-            - name: Docker Test Run
-              run: docker run --network lulc-infra_default test
+      - name: Docker Test Run
+        run: docker run --network lulc-infra_default test
 
-            - name: Docker Cleanup
-              run: docker-compose kill
+      - name: Docker Cleanup
+        run: docker-compose kill

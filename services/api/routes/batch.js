@@ -1,11 +1,9 @@
-'use strict';
-
 const Err = require('../lib/error');
 const Batch = require('../lib/batch');
 const { Param } = require('../lib/util');
+const Project = require('../lib/project');
 
 async function router(schema, config) {
-    const project = new (require('../lib/project').Project)(config);
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
     const instance = new (require('../lib/instance').Instance)(config);
 
@@ -13,7 +11,7 @@ async function router(schema, config) {
      * @api {get} /api/project/:projectid/batch List Batch
      * @apiVersion 1.0.0
      * @apiName ListBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription
@@ -29,7 +27,7 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
 
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.query.uid = req.auth.uid;
             req.query.projectid = req.params.projectid;
@@ -43,7 +41,7 @@ async function router(schema, config) {
      * @api {post} /api/project/:projectid/batch Create Batch
      * @apiVersion 1.0.0
      * @apiName CreateBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription
@@ -59,10 +57,10 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
 
-            await project.has_auth(req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             const existing_batch = await instance.list(req.params.projectid, {
-                batch: 'true',
+                batch: true,
                 status: 'active'
             });
 
@@ -71,7 +69,7 @@ async function router(schema, config) {
             }
 
             if (req.body.checkpoint_id) {
-                await checkpoint.has_auth(project, req.auth, req.params.projectid, req.body.checkpoint_id)
+                await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
             }
 
             req.body.uid = req.auth.uid;
@@ -92,10 +90,10 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {post} /api/project/:projectid/batch/:batchid Get Batch
+     * @api {get} /api/project/:projectid/batch/:batchid Get Batch
      * @apiVersion 1.0.0
      * @apiName GetBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription
@@ -110,7 +108,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'batchid');
 
-            const batch = await Batch.has_auth(config, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
 
             return res.json(batch.serialize());
         } catch (err) {
@@ -122,7 +120,7 @@ async function router(schema, config) {
      * @api {patch} /api/project/:pid Patch Batch
      * @apiVersion 1.0.0
      * @apiName PatchBatch
-     * @apiGroup batch
+     * @apiGroup Batch
      * @apiPermission user
      *
      * @apiDescription
@@ -139,7 +137,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'batchid');
 
-            const batch = await Batch.has_auth(config, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
             batch.patch(req.body);
             await batch.commit(config.pool);
 

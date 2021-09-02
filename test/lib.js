@@ -1,12 +1,19 @@
 #!/usr/bin/env node
 
-
-
 const util = require('./lib/util');
 const run = require('./lib/run');
 
+if (require.main === module) {
+    (async () => {
+        if (process.env.UPDATE) {
+            console.log('ok - updating schema');
+            this.schema = await util.schema('http://localhost:2000');
+        }
+    })();
+}
+
 /**
- * @class LULC
+ * @class
  */
 class LULC {
 
@@ -44,20 +51,30 @@ class LULC {
         if (!this.schema.cli[cmd][subcmd]) throw new Error('Subcommand Not Found');
         if (!this.schema.schema[this.schema.cli[cmd][subcmd]]) throw new Error('API not found for Subcommand');
 
-        let url = this.schema.cli[cmd][subcmd];
-        const matches = url.match(/:[a-z]+/g);
+        let _url = this.schema.cli[cmd][subcmd];
+        const matches = _url.match(/:[a-z]+/g);
 
         if (matches) {
             for (const match of matches) {
                 if (!payload[match]) throw new Error(`"${match}" is required in body`);
-                url = url.replace(match, payload[match]);
+                _url = _url.replace(match, payload[match]);
                 delete payload[match];
+            }
+        }
+
+        const url = new URL('/api' +  _url.split(' ')[1], this.url);
+        const method = _url.split(' ')[0];
+
+        for (const key of Object.keys(payload)) {
+            if (key[0] === '?') {
+                url.searchParams.append(key.split('?')[1], payload[key]);
+                delete payload[key];
             }
         }
 
         const schema = this.schema.schema[this.schema.cli[cmd][subcmd]];
 
-        return await run(this, schema, url, payload, stream);
+        return await run(this, schema, method, url, payload, stream);
     }
 }
 

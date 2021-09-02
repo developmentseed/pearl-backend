@@ -1,4 +1,4 @@
-'use strict';
+
 
 const Err = require('../lib/error');
 

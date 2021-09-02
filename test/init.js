@@ -403,7 +403,7 @@ function running(test, API) {
                 version: '1.0.0',
                 limits: {
                     live_inference: 100000000,
-                    max_inference: 100000000,
+                    max_inference: 200000000,
                     instance_window: 600,
                     total_gpus: 2,
                     active_gpus: null

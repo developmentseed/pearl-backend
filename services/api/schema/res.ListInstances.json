@@ -12,7 +12,7 @@
         },
         "instances": {
             "type": "array",
-            "item": {
+            "items": {
                 "type": "object",
                 "required": [
                     "id",

@@ -8,8 +8,9 @@
         "mosaics": {
             "type": "array",
             "description": "List of supported mosaics",
-            "item": {
-                "type": "string"
+            "items": {
+                "type": "string",
+                "description": "Name of mosaic"
             }
         }
     }
