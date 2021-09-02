@@ -106,7 +106,7 @@ class Unet(smp.base.SegmentationModel):
         self.name = "u-{}".format(encoder_name)
         self.initialize()
 
-    def forward(self,x):
+    def forward(self, x):
         """Sequentially pass `x` trough model`s encoder, decoder and heads"""
         features = self.encoder(x)
         decoder_output = self.decoder(*features)
@@ -119,10 +119,11 @@ class Unet(smp.base.SegmentationModel):
 
         return masks
 
-    def forward_features(self,x):
+    def forward_features(self, x):
         features = self.encoder(x)
         decoder_output = self.decoder(*features)
         return decoder_output
+
 
 class LoadUnet(ModelSession):
     """
