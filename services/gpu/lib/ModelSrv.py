@@ -426,6 +426,8 @@ class ModelSrv:
                 xyz = xyz.numpy()
                 outputs = self.model.run(data, True)
 
+                progress = 0
+
                 for c, output in enumerate(outputs):
                     output = MemRaster(output, "epsg:3857", tuple(xyz[c]), True)
 
@@ -472,9 +474,14 @@ class ModelSrv:
                             )
                         )
                     else:
-                        res = self.api.batch_patch({
-                            "progress": int(float(current) / float(self.aoi.total) * 100)
-                        })
+                        new_prog = int(float(current) / float(self.aoi.total) * 100)
+
+                        if progress != new_prog:
+                            res = self.api.batch_patch({
+                                "progress": new_prog
+                            })
+
+                            progress = new_prog
 
                         if res.get('abort') is True:
                             self.is_aborting = True
