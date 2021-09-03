@@ -17,20 +17,34 @@ const worker = new Worker(test, {
 
 worker.start();
 
-test('gpu connection', async (t) => {
+test('gpu connection', (t) => {
     state.connected = false;
+    let close = false;
 
     const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
 
-    ws.on('open', () => {
-        ws.send(JSON.stringify(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json'))));
+    ws.on('message', (msg) => {
+        msg = JSON.parse(msg);
+
+        if (msg.message === 'info#connected') {
+            t.ok('Sending model#prediction');
+            console.error(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
+            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
+        } else {
+            console.error(msg);
+        }
     });
 
-    ws.on('message', (msg) => {
-        console.error(JSON.parse(msg));
+    ws.on('error', (err) => {
+        t.error(err, 'no errors');
     });
 
     ws.on('close', () => {
-        console.error('ENDED');
+        if (close) {
+            t.end();
+        } else {
+            t.notOk('Failed to satisfy test flow');
+            t.end();
+        }
     });
 });
