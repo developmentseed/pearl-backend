@@ -155,7 +155,7 @@ async function gpu() {
 
     if (argv.interactive) {
         ws.on('message', async (msg) => {
-            msg = JSON.parse(msg);
+            msg = JSON.parse(String(msg));
             if (argv.debug) term.log(JSON.stringify(msg, null, 4));
 
             if (msg.message === 'info#connected') {
