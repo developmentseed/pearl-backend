@@ -87,6 +87,7 @@ async function server(argv, config, cb) {
         });
 
         ws.on('message', (payload) => {
+            console.log('! payload', payload);
             if (payload.split('#')[0] === 'ping') return ws.send(`pong#${payload.split('#')[1]}`);
 
             pool.route(ws, payload);
