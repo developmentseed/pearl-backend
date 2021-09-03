@@ -29,12 +29,15 @@ class Worker {
      */
     async start() {
         this.test('Starting Worker', (t) => {
-            this.worker = CP.spawn('docker', ['run', '--network', 'lulc-infra_default', 'gpu'], {
-                env: {
-                    API: this.opts.api,
-                    SOCKET: this.opts.socket,
-                    INSTANCE_ID: this.opts.instance
-                },
+
+            this.worker = CP.spawn('docker', [
+                'run',
+                '--network', 'lulc-infra_default',
+                '--env', `INSTANCE_ID=${this.opts.instance}`,
+                '--env', `API=${this.opts.api}`,
+                '--env', `SOCKET=${this.opts.socket}`,
+                'gpu',
+            ], {
                 detached: true
             });
 
