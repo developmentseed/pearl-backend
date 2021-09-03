@@ -1,9 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const WebSocket = require('ws');
 const test = require('tape');
 
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'ws://localhost:1999';
-const LULC = require('./lib');
 
 const { connect } = require('./init');
 const Worker = require('./worker');
@@ -21,11 +22,15 @@ test('gpu connection', async (t) => {
 
     const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
 
-    const lulc = new LULC({
-        token: state.token
+    ws.on('open', () => {
+        ws.send(JSON.stringify(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json'))));
     });
 
-    t.end();
-});
+    ws.on('message', (msg) => {
+        console.error(JSON.parse(msg));
+    });
 
-worker.stop();
+    ws.on('close', () => {
+        console.error('ENDED');
+    });
+});
