@@ -8,9 +8,13 @@ const LULC = require('./lib');
 const { connect } = require('./init');
 const Worker = require('./worker');
 
-const worker = new Worker(test);
-
 state = connect(test, API);
+
+const worker = new Worker(test, {
+    instance: 1
+});
+
+worker.start();
 
 test('gpu connection', async (t) => {
     state.connected = false;
@@ -23,3 +27,5 @@ test('gpu connection', async (t) => {
 
     t.end();
 });
+
+worker.stop();
