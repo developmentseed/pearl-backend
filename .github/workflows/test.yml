@@ -26,11 +26,11 @@ jobs:
       - name: Docker Build
         run: docker-compose up --build -d
 
-      - name: Docker Test Build
+      - name: Docker Root Build
         run: docker build -t test .
 
-      - name: Docker Network
-        run: docker network ls
+      - name: Docker GPU Build
+        run: docker build -t gpu services/gpu
 
       - name: Docker Test Run
         run: docker run --network lulc-infra_default test
