@@ -1,6 +1,4 @@
-
-
-const { Term } = require('./term');
+const { Term } = require('./lib/term');
 const WebSocket = require('ws');
 const test = require('tape');
 const API = process.env.API || 'http://localhost:2000';
