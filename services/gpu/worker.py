@@ -66,6 +66,7 @@ def main():
     os.environ["INSTANCE_ID"] = arg(
         [os.environ.get("INSTANCE_ID"), args.instance_id, "1"]
     )
+
     os.environ["API"] = arg([os.environ.get("API"), args.api], "http://localhost:2000")
 
     os.environ["SOCKET"] = arg(

@@ -11,9 +11,13 @@ class Worker {
      * @param {Object} test Tape Runner
      * @param {Object} opts Options Object
      * @param {Number} [opts.instance=1] Instance ID to register worker as
+     * @param {String} [opts.socket='ws://socket:1999'] Socket to connect to
+     * @param {String} [opts.api='http://api:2000'] API to connect to
      */
     constructor(test, opts = {}) {
         if (!opts.instance) opts.instance = 1;
+        if (!opts.socket) opts.socket = 'ws://socket:1999';
+        if (!opts.api) opts.api = 'http://api:2000';
 
         this.test = test;
         this.opts = opts;
@@ -25,7 +29,12 @@ class Worker {
      */
     async start() {
         this.test('Starting Worker', (t) => {
-            this.worker = CP.spawn('docker', ['run', 'gpu'], {
+            this.worker = CP.spawn('docker', ['run', '--network', 'lulc-infra_default', 'gpu'], {
+                env: {
+                    API: this.opts.api,
+                    SOCKET: this.opts.socket,
+                    INSTANCE_ID: this.opts.instance
+                },
                 detached: true
             });
 
@@ -43,7 +52,7 @@ class Worker {
     async stop() {
         this.test('Stopping Worker', (t) => {
             if (!this.worker.kill()) throw new Error('Failed to kill worker');
-
+            t.ok('Killed Worker');
             t.end();
         });
     }
