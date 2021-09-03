@@ -19,10 +19,6 @@ jobs:
       - name: Docker Pull
         run: docker-compose pull
 
-      - name: Docker Layer Caching
-        uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
-
       - name: Docker GPU Build
         run: docker build -t gpu services/gpu
 

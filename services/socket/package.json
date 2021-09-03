@@ -11,6 +11,7 @@
         "lint": "eslint index.js lib/**.js"
     },
     "dependencies": {
+        "@babel/core": "^7.15.4",
         "express": "^4.17.1",
         "jsonwebtoken": "^8.5.1",
         "minimist": "^1.2.5",
@@ -18,13 +19,13 @@
         "ws": "^7.5.4"
     },
     "devDependencies": {
-        "nodemon": "^2.0.12",
         "@babel/eslint-parser": "^7.15.0",
         "@babel/eslint-plugin": "^7.14.5",
         "@babel/plugin-syntax-class-properties": "^7.12.13",
         "@babel/preset-env": "^7.15.0",
         "eslint": "^7.32.0",
         "eslint-plugin-node": "^11.1.0",
+        "nodemon": "^2.0.12",
         "tap-dot": "^2.0.0",
         "tape": "^5.1.1"
     }
