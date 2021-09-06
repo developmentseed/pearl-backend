@@ -59,8 +59,14 @@ jobs:
     - name: Deploy -- Staging
       env:
         postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
-      if: startsWith(github.event.head_commit.message, '[staging]')
+      if: github.ref == 'refs/heads/develop'
       run: ./scripts/cideploy --staging
+
+    - name: Deploy -- Staging
+      env:
+        postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
+      if: github.ref == 'refs/heads/main'
+      run: ./scripts/cideploy --production
 
     # - name: Run Chartpress
     #   run: chartpress --push # should eventually --publish-chart
