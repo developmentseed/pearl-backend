@@ -20,7 +20,15 @@ Deploys the staging infrastructure.
 
 while [[ "$#" > 0 ]]; do case $1 in
     --dev)
-        DEV_DEPLOY=1
+        ENVIRONMENT=dev
+        shift
+        ;;
+    --staging)
+        ENVIRONMENT=staging
+        shift
+        ;;
+    --production)
+        ENVIRONMENT=production
         shift
         ;;
     --help)
@@ -37,16 +45,9 @@ while [[ "$#" > 0 ]]; do case $1 in
 
 DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml"
 
-# Set terraform to deploy to dev or staging
-if [ "${DEV_DEPLOY}" = "1" ]; then
-    TERRAFORM_DIR=/opt/src/terraform/dev
-else
-    if [[ "${CI}" != "1" ]]; then
-        echo "Only CI can deploy to staging!"
-        exit 1
-    fi
-    TERRAFORM_DIR=/opt/src/terraform/${ENVIRONMENT}
-fi
+echo "Setting terraform directory to $ENVIRONMENT"
+
+TERRAFORM_DIR=/opt/src/terraform/${ENVIRONMENT}
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
