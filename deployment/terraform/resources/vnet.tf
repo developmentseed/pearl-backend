@@ -51,3 +51,10 @@ resource "azurerm_private_dns_zone" "lulc" {
   name                = "${local.prefixnodashes}.postgres.database.azure.com"
   resource_group_name = azurerm_resource_group.lulc.name
 }
+
+resource "azurerm_private_dns_zone_virtual_network_link" "lulc" {
+  name                  = "${local.prefixnodashes}.postgres.database.azure.com"
+  private_dns_zone_name = azurerm_private_dns_zone.lulc.name
+  virtual_network_id    = azurerm_virtual_network.lulc-cluster.id
+  resource_group_name   = azurerm_resource_group.lulc.name
+}

@@ -9,7 +9,7 @@ resource "azurerm_postgresql_flexible_server" "lulc" {
   sku_name               = "GP_Standard_D4s_v3"
   private_dns_zone_id    = azurerm_private_dns_zone.lulc.id
   delegated_subnet_id    = azurerm_subnet.postgres.id
-  depends_on = [azurerm_private_dns_zone.lulc]
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.lulc]
 }
 
 resource "azurerm_postgresql_flexible_server_database" "lulc" {
