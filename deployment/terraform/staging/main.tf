@@ -11,6 +11,13 @@ variable "servicePrincipalJSON" {
   type = string
 }
 
+variable "postgres_password" {
+  type = string
+}
+
+variable "signing_secret" {
+  type = string
+}
 
 module "resources" {
   source = "../resources"
@@ -21,12 +28,14 @@ module "resources" {
   region               = "West Europe"
   aks_node_count       = 1
 
+  postgres_password = var.postgres_password
+  signing_secret = var.signing_secret
+
   gpu_count = 2
   placeholder_is_gpu = true
   placeholder_num_gpus = 2
 
-  # FIXME
-  # domain = "lulc-staging.ds.io"
+  domain = "lulc-staging.ds.io"
 }
 
 terraform {
