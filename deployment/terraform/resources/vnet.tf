@@ -47,7 +47,7 @@ resource "azurerm_subnet" "postgres" {
   }
 }
 
-# resource "azurerm_private_dns_zone" "lulc" {
-#   name                = "${local.prefixnodashes}db.postgres.database.azure.com"
-#   resource_group_name = azurerm_resource_group.lulc.name
-# }
+resource "azurerm_private_dns_zone" "lulc" {
+  name                = "${local.prefixnodashes}db.postgres.database.azure.com"
+  resource_group_name = azurerm_resource_group.lulc.name
+}
