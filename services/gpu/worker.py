@@ -117,9 +117,6 @@ def connection(uri, model, api):
 
 def load(gpu_id, api):
     model_type = api.model["model_type"]
-
-    print(model_type)
-
     if model_type == "pytorch_example":
         model = TorchFineTuning(gpu_id, api.model_dir, api.model["classes"])
     elif model_type == "unet":
