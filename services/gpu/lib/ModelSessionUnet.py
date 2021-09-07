@@ -166,7 +166,7 @@ class LoadUnet(ModelSession):
             encoder_weights=None,
             decoder_channels=(128, 64, 64),
             in_channels=4,
-            classes=classes,
+            classes=len(self.classes),
         )
         self._init_model()
 
