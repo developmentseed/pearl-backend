@@ -22,8 +22,6 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     export AZURE_STORAGE_CONNECTION_STRING=${TEST_AZURE_STORAGE_CONNECTION_STRING}
 
     docker-compose up --build -d
-    docker build --platform=linux/amd64 -t test .
-    docker network ls
-    docker run --platform=linux/amd64 --rm --network lulc-infra_default test
+    npm test
     docker-compose kill
 fi
