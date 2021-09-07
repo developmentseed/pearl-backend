@@ -2,7 +2,6 @@ variable "username" {
   type = string
 }
 
-
 variable "subscriptionId" {
   type = string
 }
@@ -27,15 +26,12 @@ module "resources" {
   servicePrincipalJSON = var.servicePrincipalJSON
   region               = "West Europe"
   aks_node_count       = 1
-
-  postgres_password = var.postgres_password
-  signing_secret = var.signing_secret
-
-  placeholder_is_gpu = false
+  admin_email          = "sanjay@developmentseed.org"
+  postgres_password    = var.postgres_password
+  signing_secret       = var.signing_secret
+  placeholder_is_gpu   = false
   placeholder_num_gpus = 2
-
-  #FIXME
-  domain = "lulc-test.ds.io"
+  domain               = "lulc-test.ds.io"
 }
 
 terraform {
