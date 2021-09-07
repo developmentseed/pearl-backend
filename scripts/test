@@ -7,6 +7,8 @@ if [[ "${CI}" ]]; then
 fi
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    export AZURE_STORAGE_CONNECTION_STRING=${TEST_AZURE_STORAGE_CONNECTION_STRING}
+
     docker-compose up --build -d
     docker build --platform=linux/amd64 -t test .
     docker network ls
