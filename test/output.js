@@ -17,7 +17,13 @@ class Output {
         this.fixtures = [];
 
         for (const d of this.schema.data) {
-            this.fixtures.push(d);
+            if (!d.items) d.items = 1;
+
+            if (d.data['$ref']) d.data = JSON.parse(fs.readFileSync(path.resolve(__dirname, d.data['$ref'])));
+
+            for (const i = 0; i < d.items; i++) {
+                this.fixtures.push(d);
+            }
         }
 
         this.fixtures.reverse();
@@ -28,7 +34,14 @@ class Output {
 
         let expected = this.fixtures.pop();
 
-        this.t.deepEquals(expected, returned);
+        if (expected.type === 'static') {
+            this.t.deepEquals(expected, returned);
+        } else if (expected.type === 'schema') {
+            console.error('AJV compare');
+        } else {
+            throw new Error('Unsupported Output Type');
+        }
+
     }
 }
 

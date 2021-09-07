@@ -1,19 +1,31 @@
 {
     "data": [{
-        "message": "model#checkpoint",
+        "type": "static",
         "data": {
-            "name": "Seneca Rocks, WV",
-            "id": 1
+            "message": "model#checkpoint",
+            "data": {
+                "name": "Seneca Rocks, WV",
+                "id": 1
+            }
         }
     },{
-        "message": "model#aoi",
+        "type": "static",
         "data": {
-            "id": 1,
-            "live": true,
-            "name": "Seneca Rocks, WV",
-            "checkpoint_id": 1,
-            "bounds": [ -79.38446044921875, 38.82901019751964, -79.3707275390625, 38.83756825896614 ],
-            "total": 20
+            "message": "model#aoi",
+            "data": {
+                "id": 1,
+                "live": true,
+                "name": "Seneca Rocks, WV",
+                "checkpoint_id": 1,
+                "bounds": [ -79.38446044921875, 38.82901019751964, -79.3707275390625, 38.83756825896614 ],
+                "total": 20
+            }
+        }
+    },{
+        "type": "schema",
+        "items": 20,
+        "data": {
+            "$ref": "./refs/model#prediction.json"
         }
     }]
 }
