@@ -29,7 +29,7 @@ class Worker {
     /**
      * Start a GPU worker in the background
      */
-    async start() {
+    start() {
         this.test('Starting Worker', (t) => {
 
             this.worker = CP.spawn('docker', [
@@ -55,7 +55,7 @@ class Worker {
         });
     }
 
-    async stop() {
+    stop() {
         this.test('Stopping Worker', (t) => {
             if (!this.worker.kill()) throw new Error('Failed to kill worker');
             t.ok('Killed Worker');
