@@ -32,10 +32,12 @@ class ModelSrv:
             self.aoi = AOI.load(self.api, self.api.instance.get("aoi_id"))
 
         if api.batch is not False:
-            self.prediction({
-                "name": api.batch.get('name', 'Default Batch'),
-                "polygon": api.batch.get('bounds')
-            })
+            self.prediction(
+                {
+                    "name": api.batch.get("name", "Default Batch"),
+                    "polygon": api.batch.get("bounds"),
+                }
+            )
 
     def abort(self, body, websocket):
         if self.processing is False:
@@ -205,7 +207,7 @@ class ModelSrv:
                     pin_memory=True,
                 )
 
-                current = 0
+                current = 1
                 for i, (data, xyz) in enumerate(dataloader):
                     if self.is_aborting:
                         break
@@ -355,7 +357,7 @@ class ModelSrv:
             websocket.error("Checkpoint Load Error", e)
             raise e
 
-    def prediction(self, body, websocket = False):
+    def prediction(self, body, websocket=False):
         try:
             if self.processing is True:
                 return is_processing(websocket)
@@ -418,7 +420,7 @@ class ModelSrv:
                 pin_memory=True,
             )
 
-            current = 0
+            current = 1
             progress = 0
 
             for i, (data, xyz) in enumerate(dataloader):
@@ -477,15 +479,12 @@ class ModelSrv:
                         new_prog = int(float(current) / float(self.aoi.total) * 100)
 
                         if progress != new_prog:
-                            res = self.api.batch_patch({
-                                "progress": new_prog
-                            })
+                            res = self.api.batch_patch({"progress": new_prog})
 
                             progress = new_prog
 
-                        if res.get('abort') is True:
+                        if res.get("abort") is True:
                             self.is_aborting = True
-
 
                     current = current + 1
 
@@ -524,20 +523,17 @@ class ModelSrv:
                         )
                     )
                 else:
-                    self.api.batch_patch({
-                        "progress": 100,
-                        "completed": True,
-                        "aoi": self.aoi.id
-                    })
+                    self.api.batch_patch(
+                        {"progress": 100, "completed": True, "aoi": self.aoi.id}
+                    )
 
                     sys.exit()
 
                 done_processing(self)
         except Exception as e:
-            self.api.batch_patch({
-                "completed": False,
-                "error": str("Processing Error: " + str(e))
-            })
+            self.api.batch_patch(
+                {"completed": False, "error": str("Processing Error: " + str(e))}
+            )
 
             done_processing(self)
             websocket.error("Processing Error", e)

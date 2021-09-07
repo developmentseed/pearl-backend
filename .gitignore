@@ -193,6 +193,14 @@ ENV/
 # mypy
 .mypy_cache/
 
+# Terraform
+
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
+terraform.tfstate
+terraform.tfstate.backup
+
+
 services/tiles/data/*.gz
 services/tiles/data/*.geojson
 services/tiles/data/*.p
