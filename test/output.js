@@ -36,13 +36,13 @@ class Output {
     compare(returned) {
         if (!this.fixtures.length) throw new Error('No more fixtures to pop()');
 
-        let expected = this.fixtures.pop();
+        const expected = this.fixtures.pop();
 
         if (expected.type === 'static') {
             this.t.deepEquals(expected.data, returned);
         } else if (expected.type === 'schema') {
-             const schema = ajv.compile(expected.data);
-             schema(returned);
+            const schema = ajv.compile(expected.data);
+            schema(returned);
 
             if (!schema.errors) return this.t.ok('JSON Schema Matches');
 
@@ -60,7 +60,7 @@ class Output {
      * @returns {boolean}
      */
     done() {
-        return !this.fixtures.length
+        return !this.fixtures.length;
     }
 }
 
