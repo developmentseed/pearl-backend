@@ -124,8 +124,8 @@ jobs:
       uses: azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
-        container-registry-username: ${{ secrets.STAGING_REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.STAGING_REGISTRY_PASSWORD }}
+        container-registry-username: ${{ secrets.TERRAFORM_REGISTRY_USERNAME }}
+        container-registry-password: ${{ secrets.TERRAFORM_REGISTRY_PASSWORD }}
         secret-name: ${{ env.STAGING_REGISTRY_NAME }}-registry-connection
         namespace: ${{ env.NAMESPACE }}
 
