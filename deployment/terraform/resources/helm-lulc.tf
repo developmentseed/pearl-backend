@@ -16,6 +16,11 @@ resource "helm_release" "lulc" {
   }
 
   set {
+    name = "adminEmail"
+    value = var.admin_email
+  }
+  
+  set {
     name  = "api.env.SigningSecret"
     value = var.signing_secret 
   }

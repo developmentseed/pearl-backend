@@ -6,8 +6,8 @@ api:
   replicaCount: 1
   containerPort: 2000
   image:
-    name: 'lulcterraformacr.azurecr.io/lulc-api'
-    tag: '0.0.1-n1975.h259c242'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
   resources:
     requests:
       cpu: 1200m
@@ -19,8 +19,8 @@ socket:
   enabled: true
   containerPort: 1999
   image:
-    name: 'lulcterraformacr.azurecr.io/lulc-socket'
-    tag: '0.0.1-n1962.h390a0da'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
   resources:
     requests:
       cpu: 1200m
@@ -32,8 +32,8 @@ tiles:
   enabled: true
   containerPort: 8000
   image:
-    name: 'lulcterraformacr.azurecr.io/lulc-tiles'
-    tag: '0.0.1-n1962.h390a0da'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
   nodeSelector:
     enabled: true
     label_key: agentpool
@@ -67,8 +67,8 @@ redis:
 
 gpu:
   image:
-    name: 'lulcterraformacr.azurecr.io/lulc-gpu'
-    tag: '0.0.1-n1962.h390a0da'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
 
 placeholder:
   enabled: true
@@ -91,8 +91,8 @@ placeholder:
 nginx:
   enabled: false
   image:
-    name: 'lulcterraformacr.azurecr.io/lulc-nginx'
-    tag: '0.0.1-n1962.h390a0da'
+    name: 'chartpress_replace'
+    tag: 'chartpress_replace'
   env:
     FRONTEND_DOMAIN: ''
 kubejanitor:

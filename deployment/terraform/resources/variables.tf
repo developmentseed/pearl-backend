@@ -7,6 +7,10 @@ variable "domain" {
   default = "lulcterraformdev.ds.io"
 }
 
+variable "admin_email" {
+  type = string
+}
+
 variable "postgres_password" {
   type = string
 }
