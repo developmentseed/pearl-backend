@@ -42,18 +42,25 @@ class Output {
             this.t.deepEquals(expected.data, returned);
         } else if (expected.type === 'schema') {
              const schema = ajv.compile(expected.data);
-             schema(expected);
+             schema(returned);
 
-            if (!schema.errors) t.ok('JSON Schema Matches');
+            if (!schema.errors) return this.t.ok('JSON Schema Matches');
 
             for (const error of schema.errors) {
                 console.error(error);
-                t.fail(`${error.schemaPath}: ${error.message}`);
+                this.t.fail(`${error.schemaPath}: ${error.message}`);
             }
         } else {
             throw new Error('Unsupported Output Type');
         }
+    }
 
+    /**
+     * Has the fixture list been exhausted
+     * @returns {boolean}
+     */
+    done() {
+        return !this.fixtures.length
     }
 }
 

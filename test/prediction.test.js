@@ -40,6 +40,11 @@ test('gpu connection', (t) => {
             ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
         } else {
             output.compare(msg);
+
+            if (msg.message === 'model#prediction#complete') {
+                t.ok('Ending Connection');
+                ws.close();
+            }
         }
     });
 
@@ -48,11 +53,13 @@ test('gpu connection', (t) => {
     });
 
     ws.on('close', () => {
-        if (close) {
+        if (!output.done()) {
+            t.notOk('Failed to satisfy test flow');
             t.end();
         } else {
-            t.notOk('Failed to satisfy test flow');
             t.end();
         }
     });
 });
+
+worker.stop();
