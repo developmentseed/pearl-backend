@@ -1,5 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const Ajv = require('ajv');
+const ajv = new Ajv({
+    allErrors: true
+});
 
 /**
  * @class
@@ -37,7 +41,15 @@ class Output {
         if (expected.type === 'static') {
             this.t.deepEquals(expected.data, returned);
         } else if (expected.type === 'schema') {
-            console.error('AJV compare');
+             const schema = ajv.compile(expected.data);
+             schema(expected);
+
+            if (!schema.errors) t.ok('JSON Schema Matches');
+
+            for (const error of schema.errors) {
+                console.error(error);
+                t.fail(`${error.schemaPath}: ${error.message}`);
+            }
         } else {
             throw new Error('Unsupported Output Type');
         }
