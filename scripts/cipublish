@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+CI publish for this project.
+
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    # cd deployment/helm && chartpress --push --platform linux/amd64 --builder docker-buildx
+    cd deployment/helm && chartpress --push
+fi

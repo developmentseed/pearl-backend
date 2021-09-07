@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${CI}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0") --dev
+Destroy the infrastructure.
+
+--dev: Include this flag to destroy a dev stack.
+    To do so you'll need to set the necessary environment
+    variables; see README.
+"
+}
+
+while [[ "$#" > 0 ]]; do case $1 in
+    --dev)
+        DEV_DEPLOY=1
+        shift
+        ;;
+    --help)
+        usage
+        exit 0
+        shift
+        ;;
+    *)
+        usage "Unknown parameter passed: $1"
+        shift
+        shift
+        ;;
+    esac done
+
+DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml"
+
+# Set terraform to deploy to dev or staging
+if [ "${DEV_DEPLOY}" = "1" ]; then
+    TERRAFORM_DIR=/opt/src/terraform/dev
+else
+    echo "Can't destroy any other stack than dev!"
+    exit 1
+fi
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+
+    (
+        # Build deployment container
+        ${DOCKER_COMPOSE} build
+
+        # Run deployment script
+        ${DOCKER_COMPOSE} run --rm \
+            deploy bin/deploy --destroy \
+            -t "${TERRAFORM_DIR}"
+    )
+fi

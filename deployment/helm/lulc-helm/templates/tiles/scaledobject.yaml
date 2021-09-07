@@ -1,0 +1,19 @@
+{{- if .Values.tiles.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-tiles-scaler
+spec:
+  scaleTargetRef:
+    name: {{ template "lulc-helm.fullname" . }}-tiles
+  minReplicaCount: 18
+  maxReplicaCount: 48
+  cooldownPeriod: 300
+  pollingInterval: 20
+  triggers:
+  - type: cpu
+    metadata:
+      type: Utilization
+      value: "30"
+
+{{- end }}

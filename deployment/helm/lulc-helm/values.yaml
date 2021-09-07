@@ -77,7 +77,7 @@ placeholder:
 
   # If isGpu is true, requests is for numGPUs
   # If false, uses the resource values from below.
-  isGpu: true 
+  isGpu: true
   numGPUs: 2
 
   resources:
@@ -88,57 +88,6 @@ placeholder:
       cpu: 2
       memory: 2Gi
 
-
-ingress-azure:
-  # This section contains the essential configs for the ingress controller helm chart
-  # See: https://raw.githubusercontent.com/Azure/application-gateway-kubernetes-ingress/master/docs/examples/sample-helm-config.yaml
-
-  # Verbosity level of the App Gateway Ingress Controller
-  verbosityLevel: 3
-
-  ################################################################################
-  # Specify which application gateway the ingress controller will manage
-  #
-  appgw:
-      subscriptionId: _subscriptionId
-      resourceGroup: _resourceGroupName
-      name: _appGatewayName
-      usePrivateIP: false
-
-      # Setting appgw.shared to "true" will create an AzureIngressProhibitedTarget CRD.
-      # This prohibits AGIC from applying config for any host/path.
-      # Use "kubectl get AzureIngressProhibitedTargets" to view and change this.
-      shared: false
-
-  ################################################################################
-  # Specify which kubernetes namespace the ingress controller will watch
-  # Default value is "default"
-  # Leaving this variable out or setting it to blank or empty string would
-  # result in Ingress Controller observing all acessible namespaces.
-  #
-  # kubernetes:
-  #   watchNamespace: <namespace>
-
-  ################################################################################
-  # Specify the authentication with Azure Resource Manager
-  #
-  # Two authentication methods are available:
-  # - Option 1: AAD-Pod-Identity (https://github.com/Azure/aad-pod-identity)
-  armAuth:
-      type: aadPodIdentity
-      identityResourceID: _identityResourceId
-      identityClientID:  _identityClientId
-
-  ## Alternatively you can use Service Principal credentials
-  # armAuth:
-  #    type: servicePrincipal
-  #    secretJSON: <<Generate this value with: "az ad sp create-for-rbac --subscription <subscription-uuid> --sdk-auth | base64 -w0" >>
-
-  ################################################################################
-  # Specify if the cluster is RBAC enabled or not
-  rbac:
-      enabled: true # true/false
-
 nginx:
   enabled: false
   image:
@@ -146,7 +95,6 @@ nginx:
     tag: 'chartpress_replace'
   env:
     FRONTEND_DOMAIN: ''
-  
 kubejanitor:
   image:
     repository: hjacobs/kube-janitor
