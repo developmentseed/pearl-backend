@@ -23,17 +23,5 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
 
-      - name: Docker Build
-        run: docker-compose up --build -d
-
-      - name: Docker Test Build
-        run: docker build -t test .
-
-      - name: Docker Network
-        run: docker network ls
-
-      - name: Docker Test Run
-        run: docker run --network lulc-infra_default test
-
-      - name: Docker Cleanup
-        run: docker-compose kill
+      - name: Run Test
+        run: ./scripts/test
