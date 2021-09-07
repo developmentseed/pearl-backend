@@ -39,7 +39,7 @@ class Output {
         const expected = this.fixtures.pop();
 
         if (expected.type === 'static') {
-            this.t.deepEquals(expected.data, returned);
+            this.t.deepEquals(returned, expected.data);
         } else if (expected.type === 'schema') {
             const schema = ajv.compile(expected.data);
             schema(returned);
