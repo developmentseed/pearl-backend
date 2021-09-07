@@ -20,6 +20,7 @@ LOGGER = logging.getLogger("server")
 
 from typing import Optional, Union, List
 
+
 class Unet(smp.base.SegmentationModel):
     """Unet_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
     and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial
@@ -160,9 +161,13 @@ class LoadUnet(ModelSession):
         self.output_channels = len(self.classes)
         self.output_features = 64
         self.model = Unet(
-        encoder_name='resnet18', encoder_depth=3, encoder_weights=None,
-        decoder_channels=(128, 64, 64), in_channels=4, classes=classes
-    )
+            encoder_name="resnet18",
+            encoder_depth=3,
+            encoder_weights=None,
+            decoder_channels=(128, 64, 64),
+            in_channels=4,
+            classes=classes,
+        )
         self._init_model()
 
         for param in self.model.parameters():
@@ -178,6 +183,13 @@ class LoadUnet(ModelSession):
         self.class_names_mapping = {
             k: v for v, k in enumerate(x["name"] for x in self.classes)
         }  # map class name to integer value
+
+    @property
+    def last_tile(self):
+        """
+        Acccesses last tile
+        """
+        return self._last_tile
 
     def _init_model(self):
         """
@@ -446,7 +458,7 @@ class LoadUnet(ModelSession):
         self.classes = chkpt["classes"]
         self.model = Unet(
             feature_scale=1,
-            n_classes=len(chkpt["classes"],
+            n_classes=len(chkpt["classes"]),
             in_channels=4,
             is_deconv=True,
             is_batchnorm=False,
