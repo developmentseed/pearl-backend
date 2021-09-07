@@ -62,7 +62,7 @@ jobs:
       if: github.ref == 'refs/heads/develop'
       run: ./scripts/cideploy --staging
 
-    - name: Deploy -- Staging
+    - name: Deploy -- Production
       env:
         postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
       if: github.ref == 'refs/heads/main'
