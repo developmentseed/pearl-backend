@@ -6,9 +6,6 @@ if [[ "${CI}" ]]; then
     set -x
 fi
 
-export API=http://api:2000
-export SOCKET=ws://socket:1999
-export Postgres='postgres://docker:docker@postgis:5432/gis'
 export AZURE_STORAGE_CONNECTION_STRING=${TEST_AZURE_STORAGE_CONNECTION_STRING}
 
 export NODEV='16.1.0' \
