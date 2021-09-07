@@ -173,7 +173,7 @@ class LoadUnet(ModelSession):
         for param in self.model.parameters():
             param.requires_grad = False
 
-        # self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+        self.augment_model = sklearn.base.clone(LoadUnet.AUGMENT_MODEL)
 
         self._last_tile = None
 
