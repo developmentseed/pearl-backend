@@ -19,9 +19,9 @@ class Output {
         for (const d of this.schema.data) {
             if (!d.items) d.items = 1;
 
-            if (d.data['$ref']) d.data = JSON.parse(fs.readFileSync(path.resolve(__dirname, d.data['$ref'])));
+            if (d.data['$ref']) d.data = JSON.parse(fs.readFileSync(path.resolve(__dirname, './outputs', d.data['$ref'])));
 
-            for (const i = 0; i < d.items; i++) {
+            for (let i = 0; i < d.items; i++) {
                 this.fixtures.push(d);
             }
         }
@@ -35,7 +35,7 @@ class Output {
         let expected = this.fixtures.pop();
 
         if (expected.type === 'static') {
-            this.t.deepEquals(expected, returned);
+            this.t.deepEquals(expected.data, returned);
         } else if (expected.type === 'schema') {
             console.error('AJV compare');
         } else {
