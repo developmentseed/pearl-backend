@@ -39,7 +39,7 @@ class Worker {
                 '--env', `API=${this.opts.api}`,
                 '--env', `SOCKET=${this.opts.socket}`,
                 '--env', `TileUrl=${this.opts.tiler}`,
-                'gpu',
+                'gpu'
             ], {
                 detached: true
             });
