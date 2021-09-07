@@ -82,7 +82,7 @@ def main():
     connection(
         "{}?token={}".format(os.environ["SOCKET"], api.token.replace("api.", "")),
         model,
-        api
+        api,
     )
 
 
@@ -118,9 +118,11 @@ def connection(uri, model, api):
 def load(gpu_id, api):
     model_type = api.model["model_type"]
 
+    print(model_type)
+
     if model_type == "pytorch_example":
         model = TorchFineTuning(gpu_id, api.model_dir, api.model["classes"])
-    if model_type == "unet":
+    elif model_type == "unet":
         model = LoadUnet(gpu_id, api.model_dir, api.model["classes"])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
