@@ -22,7 +22,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     export AZURE_STORAGE_CONNECTION_STRING=${TEST_AZURE_STORAGE_CONNECTION_STRING}
 
     docker-compose up --build -d
-    docker build -t gpu ../services/gpu 
+    docker build -t gpu $(pwd)/../services/gpu
     npm test
     docker-compose kill
 fi
