@@ -6,6 +6,18 @@ if [[ "${CI}" ]]; then
     set -x
 fi
 
+export API=http://api:2000
+export SOCKET=ws://socket:1999
+export Postgres='postgres://docker:docker@postgis:5432/gis'
+
+export NODEV='16.1.0' \
+    && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xzv \
+    && cp ./node-v${NODEV}-linux-x64/bin/node /usr/bin/ \
+    && ./node-v${NODEV}-linux-x64/bin/npm install -g npm@7
+
+npm install \
+npm --prefix ./services/api/ install
+
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     export AZURE_STORAGE_CONNECTION_STRING=${TEST_AZURE_STORAGE_CONNECTION_STRING}
 
