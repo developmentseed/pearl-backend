@@ -6,10 +6,21 @@ if [[ "${CI}" ]]; then
     set -x
 fi
 
-if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    docker-compose up --build -d
-    docker build --platform=linux/amd64 -t test .
-    docker network ls
-    docker run --platform=linux/amd64 --rm --network lulc-infra_default test
-    docker-compose kill
+if [[ -z $AZURE_STORAGE_CONNECTION_STRING ]]; then
+    echo "AZURE_STORAGE_CONNECTION_STRING not set"
+    exit 1
 fi
+
+export NODEV='16.1.0' \
+    && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xz \
+    && cp ./node-v${NODEV}-linux-x64/bin/node /usr/bin/ \
+    && ./node-v${NODEV}-linux-x64/bin/npm install -g npm@7
+
+docker-compose up --build -d
+docker build -t gpu $(pwd)/services/gpu
+
+npm install --include=dev
+npm --prefix ./services/api/ install --include=dev
+npm test
+
+docker-compose kill
