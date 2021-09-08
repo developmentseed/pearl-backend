@@ -6,8 +6,6 @@ if [[ "${CI}" ]]; then
     set -x
 fi
 
-export AZURE_STORAGE_CONNECTION_STRING=$LULCDATA_ASCS
-
 if [[ -z $AZURE_STORAGE_CONNECTION_STRING ]]; then
     echo "AZURE_STORAGE_CONNECTION_STRING not set"
     exit 1
