@@ -80,7 +80,7 @@ def geom2px(geom, modelsrv):
 
         in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat="npy")
 
-        _, retrain = modelsrv.model.run(in_memraster.data)
+        retrain = modelsrv.model.run(in_memraster.data)
         retrain = retrain[32:288, 32:288, :]
 
         value = retrain[pixels[0], pixels[1]]
