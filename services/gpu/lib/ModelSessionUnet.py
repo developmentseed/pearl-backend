@@ -244,6 +244,10 @@ class LoadUnet(ModelSession):
             item.value for sublist in pixels for item in sublist
         ]  # get pixel values
 
+        print("self.classes")
+
+        print(self.classes)
+
         names_retrain = []
         for i, c in enumerate(counts):
             names_retrain.append(list(np.repeat(names[i], c)))
@@ -348,8 +352,11 @@ class LoadUnet(ModelSession):
         print(new_biases.shape)
 
         # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
-        self.model.last.weight = nn.Parameter(new_weights)
-        self.model.last.bias = nn.Parameter(new_biases)
+        # to-do fix
+        # self.model.last.weight = nn.Parameter(new_weights)
+        # self.model.last.bias = nn.Parameter(new_biases)
+        self.model.segmentation_head[0].weight = nn.Parameter(new_weights)
+        self.model.segmentation_head[0].bias = nn.Parameter(new_biases)
 
         print("last layer of pytorch model updated post retraining")
 
