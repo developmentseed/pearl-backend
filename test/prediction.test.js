@@ -27,22 +27,29 @@ test('gpu connection', (t) => {
     const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
     const output = new Output(t, './outputs/prediction.test.json');
 
+    const sent = {
+        connected: 0,
+        prediction: 0
+    };
+
     ws.on('message', (msg) => {
         msg = JSON.parse(String(msg));
 
-        if (msg.message === 'info#disconnected') {
-            return;
-        } else if (msg.message === 'info#connected') {
-            sent = true;
-            t.ok('Sending model#prediction');
-            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
-        } else {
+        if (msg.message.split('#') !== 'info') {
             output.compare(msg);
+        }
 
-            if (msg.message === 'model#prediction#complete') {
-                t.ok('Ending Connection');
-                ws.close();
-            }
+        if (msg.message === 'info#connected' && sent.connected === 0) {
+            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
+            sent.connected = 1;
+        } else if (msg.message === 'model#prediction#complete' && sent.prediction === 0) {
+            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#retrain.json')));
+            sent.prediction = 1;
+        } else if (msg.message === 'model#retrain#complete') {
+            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
+        } else if (msg.message === 'model#prediction#complete' && sent.prediction === 1) {
+            t.ok('Ending Connection');
+            ws.close();
         }
     });
 
