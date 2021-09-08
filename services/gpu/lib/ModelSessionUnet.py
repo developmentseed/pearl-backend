@@ -457,10 +457,12 @@ class LoadUnet(ModelSession):
 
         self.classes = chkpt["classes"]
         self.model = Unet(
-            n_classes=len(chkpt["classes"]),
+            classes=len(chkpt["classes"]),
+            encoder_name="resnet18",
+            encoder_depth=3,
+            encoder_weights=None,
+            decoder_channels=(128, 64, 64),
             in_channels=4,
-            is_deconv=True,
-            is_batchnorm=False,
         )
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
