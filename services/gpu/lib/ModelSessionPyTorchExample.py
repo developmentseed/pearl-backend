@@ -71,8 +71,8 @@ class FCN(nn.Module):
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
         z = F.relu(self.conv5(x))
-        y = self.last(z)
-        return y, z
+        # y = self.last(z)
+        return z
 
 
 class TorchFineTuning(ModelSession):
