@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.event.pull_request.draft == false
     timeout-minutes: 30
+    env:
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.LULCDATA_ASCS }}
     steps:
       - uses: actions/checkout@v2
 
