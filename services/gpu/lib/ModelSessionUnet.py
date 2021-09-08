@@ -457,7 +457,6 @@ class LoadUnet(ModelSession):
 
         self.classes = chkpt["classes"]
         self.model = Unet(
-            feature_scale=1,
             n_classes=len(chkpt["classes"]),
             in_channels=4,
             is_deconv=True,
