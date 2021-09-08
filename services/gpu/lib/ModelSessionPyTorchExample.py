@@ -339,16 +339,11 @@ class TorchFineTuning(ModelSession):
         data = tile_img.to(self.device)
 
         with torch.no_grad():
-            predictions, features = self.model.forward_features(data[None, ...])
+            features = self.model.forward_features(data[None, ...])
             # insert singleton "batch" dimension to input data for pytorch to be happy
-            predictions = (
-                F.softmax(predictions, dim=1).cpu().numpy()
-            )  # this is giving us the highest probability class per pixel
-
         # get embeddings
         features = np.rollaxis(features.squeeze().cpu().numpy(), 0, 3)
-        predictions = predictions[0].argmax(axis=0).astype(np.uint8)
-        return predictions, features
+        return features
 
     def run_model_on_tile(self, tile):
         """
