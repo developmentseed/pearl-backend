@@ -35,8 +35,12 @@ test('gpu connection', (t) => {
     ws.on('message', (msg) => {
         msg = JSON.parse(String(msg));
 
-        if (msg.message.split('#') !== 'info') {
-            output.compare(msg);
+        if (msg.message.split('#')[0] !== 'info') {
+            try {
+                output.compare(msg);
+            } catch (err) {
+                console.error(JSON.stringify(msg, null, 4));
+            }
         }
 
         if (msg.message === 'info#connected' && sent.connected === 0) {
