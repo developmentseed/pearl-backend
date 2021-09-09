@@ -62,6 +62,24 @@ class Worker {
             t.end();
         });
     }
+
+    /**
+     * Ensure all workers are terminated, including workers from prior unrelated runs
+     *
+     * This is important as otherwise existing workers can connect to your test server
+     * and influence their results incidentally
+     */
+    static dalek() {
+        const list = String(CP.execSync('docker ps --filter ancestor=gpu'))
+            .split('\n')
+            .slice(1)
+            .filter(e => !!e.trim().length)
+            .forEach((e) => {
+                e = e.split(' ')[0];
+
+                CP.execSync(`docker kill ${e}`);
+            });
+    }
 }
 
 module.exports = Worker;
