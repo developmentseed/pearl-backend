@@ -30,11 +30,6 @@
     },{
         "type": "static",
         "data": {
-            "message": "model#retrain#complete"
-        }
-    },{
-        "type": "static",
-        "data": {
             "message": "model#prediction#complete",
             "data": {
                 "aoi": 1
@@ -48,6 +43,11 @@
                 "name": "Seneca Rocks, WV Corrected",
                 "id": 2
             }
+        }
+    },{
+        "type": "static",
+        "data": {
+            "message": "model#retrain#complete"
         }
     },{
         "type": "static",
