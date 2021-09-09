@@ -38,16 +38,16 @@
     },{
         "type": "static",
         "data": {
-            "message": "model#retrain#complete"
-        }
-    },{
-        "type": "static",
-        "data": {
             "message": "model#checkpoint",
             "data": {
                 "name": "Seneca Rocks, WV Corrected",
                 "id": 2
             }
+        }
+    },{
+        "type": "static",
+        "data": {
+            "message": "model#retrain#complete"
         }
     },{
         "type": "static",

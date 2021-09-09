@@ -13,6 +13,8 @@ const { connect } = require('./init');
 const Worker = require('./worker');
 const Output = require('./output');
 
+Worker.dalek();
+
 const state = connect(test, API);
 
 const worker = new Worker(test, {
@@ -44,12 +46,15 @@ test('gpu connection', (t) => {
         }
 
         if (msg.message === 'info#connected' && sent.connected === 0) {
+            t.ok('Sending: model#prediction (1)');
             ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
             sent.connected = 1;
         } else if (msg.message === 'model#prediction#complete' && sent.prediction === 0) {
+            t.ok('Sending: model#retrain (1)');
             ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#retrain.json')));
             sent.prediction = 1;
         } else if (msg.message === 'model#retrain#complete') {
+            t.ok('Sending: model#prediction (2)');
             ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
         } else if (msg.message === 'model#prediction#complete' && sent.prediction === 1) {
             t.ok('Ending Connection');
