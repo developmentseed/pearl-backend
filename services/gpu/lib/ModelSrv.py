@@ -565,8 +565,6 @@ class ModelSrv:
 
             LOGGER.info("ok - done retrain")
 
-            websocket.send(json.dumps({"message": "model#retrain#complete"}))
-
             if self.chk is None:
                 parent = None
             else:
@@ -591,6 +589,8 @@ class ModelSrv:
                 },
                 websocket,
             )
+
+            websocket.send(json.dumps({"message": "model#retrain#complete"}))
 
             if self.is_aborting is True:
                 websocket.send(
