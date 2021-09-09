@@ -70,15 +70,12 @@ class Worker {
      * and influence their results incidentally
      */
     static dalek() {
-        const list = String(CP.execSync('docker ps --filter ancestor=gpu'))
+        String(CP.execSync('docker ps --filter ancestor=gpu'))
             .split('\n')
             .slice(1)
             .filter(e => !!e.trim().length)
-            .forEach((e) => {
-                e = e.split(' ')[0];
-
-                CP.execSync(`docker kill ${e}`);
-            });
+            .map(e => e.split(' ')[0])
+            .forEach(e => CP.execSync(`docker kill ${e}`))
     }
 }
 

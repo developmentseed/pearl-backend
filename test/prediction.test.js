@@ -53,9 +53,6 @@ test('gpu connection', (t) => {
             t.ok('Sending: model#retrain (1)');
             ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#retrain.json')));
             sent.prediction = 1;
-        } else if (msg.message === 'model#retrain#complete') {
-            t.ok('Sending: model#prediction (2)');
-            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
         } else if (msg.message === 'model#prediction#complete' && sent.prediction === 1) {
             t.ok('Ending Connection');
             ws.close();
