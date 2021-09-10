@@ -1,5 +1,3 @@
-"""Infernece and Retraining with Pytorch FCN starter models"""
-
 import logging
 import os
 import sys
@@ -10,6 +8,7 @@ import sklearn.base
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import segmentation_models_pytorch as smp
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
@@ -19,65 +18,117 @@ from .ModelSessionAbstract import ModelSession
 sys.path.append("..")
 LOGGER = logging.getLogger("server")
 
+from typing import Optional, Union, List
 
-class FCN(nn.Module):
+
+class Unet(smp.base.SegmentationModel):
+    """Unet_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
+    and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial
+    resolution (skip connections) which are used by decoder to define accurate segmentation mask. Use *concatenation*
+    for fusing decoder blocks with skip connections.
+    Args:
+        encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
+            to extract features of different spatial resolution
+        encoder_depth: A number of stages used in encoder in range [3, 5]. Each stage generate features
+            two times smaller in spatial dimensions than previous one (e.g. for depth 0 we will have features
+            with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
+            Default is 5
+        encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
+            other pretrained weights (see table with available weights for each encoder_name)
+        decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
+            Length of the list should be the same as **encoder_depth**
+        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
+            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
+            Available options are **True, False, "inplace"**
+        decoder_attention_type: Attention module used in decoder of the model. Available options are **None** and **scse**.
+            SCSE paper - https://arxiv.org/abs/1808.08127
+        in_channels: A number of input channels for the model, default is 3 (RGB images)
+        classes: A number of classes for output mask (or you can think as a number of channels of output mask)
+        activation: An activation function to apply after the final convolution layer.
+            Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**, **callable** and **None**.
+            Default is **None**
+        aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
+            on top of encoder if **aux_params** is not **None** (default). Supported params:
+                - classes (int): A number of classes
+                - pooling (str): One of "max", "avg". Default is "avg"
+                - dropout (float): Dropout factor in [0, 1)
+                - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
+    Returns:
+        ``torch.nn.Module``: Unet
+    .. _Unet:
+        https://arxiv.org/abs/1505.04597
     """
-    Initalize Fully Connected Neural Net that was used during initial model training.
+
+    def __init__(
+        self,
+        encoder_name: str = "resnet34",
+        encoder_depth: int = 5,
+        encoder_weights: Optional[str] = "imagenet",
+        decoder_use_batchnorm: bool = True,
+        decoder_channels: List[int] = (256, 128, 64, 32, 16),
+        decoder_attention_type: Optional[str] = None,
+        in_channels: int = 3,
+        classes: int = 1,
+        activation: Optional[Union[str, callable]] = None,
+        aux_params: Optional[dict] = None,
+    ):
+        super().__init__()
+
+        self.encoder = smp.encoders.get_encoder(
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
+        )
+
+        self.decoder = smp.unet.decoder.UnetDecoder(
+            encoder_channels=self.encoder.out_channels,
+            decoder_channels=decoder_channels,
+            n_blocks=encoder_depth,
+            use_batchnorm=decoder_use_batchnorm,
+            center=True if encoder_name.startswith("vgg") else False,
+            attention_type=decoder_attention_type,
+        )
+
+        self.segmentation_head = smp.base.SegmentationHead(
+            in_channels=decoder_channels[-1],
+            out_channels=classes,
+            activation=activation,
+            kernel_size=1,
+        )
+
+        if aux_params is not None:
+            self.classification_head = smp.base.ClassificationHead(
+                in_channels=self.encoder.out_channels[-1], **aux_params
+            )
+        else:
+            self.classification_head = None
+
+        self.name = "u-{}".format(encoder_name)
+        self.initialize()
+
+    def forward(self, x):
+        """Sequentially pass `x` trough model`s encoder, decoder and heads"""
+        features = self.encoder(x)
+        decoder_output = self.decoder(*features)
+
+        masks = self.segmentation_head(decoder_output)
+
+        if self.classification_head is not None:
+            labels = self.classification_head(features[-1])
+            return masks, labels
+
+        return masks
+
+    def forward_features(self, x):
+        features = self.encoder(x)
+        decoder_output = self.decoder(*features)
+        return decoder_output
+
+
+class LoadUnet(ModelSession):
     """
-
-    def __init__(self, num_input_channels, num_output_classes, num_filters=64):
-        """
-        Make FCN model.
-        """
-        super(FCN, self).__init__()
-
-        self.conv1 = nn.Conv2d(
-            num_input_channels, num_filters, kernel_size=3, stride=1, padding=1
-        )
-        self.conv2 = nn.Conv2d(
-            num_filters, num_filters, kernel_size=3, stride=1, padding=1
-        )
-        self.conv3 = nn.Conv2d(
-            num_filters, num_filters, kernel_size=3, stride=1, padding=1
-        )
-        self.conv4 = nn.Conv2d(
-            num_filters, num_filters, kernel_size=3, stride=1, padding=1
-        )
-        self.conv5 = nn.Conv2d(
-            num_filters, num_filters, kernel_size=3, stride=1, padding=1
-        )
-        self.last = nn.Conv2d(
-            num_filters, num_output_classes, kernel_size=1, stride=1, padding=0
-        )
-
-    def forward(self, inputs):
-        """
-        Returns last layer of network.
-        """
-        x = F.relu(self.conv1(inputs))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        x = F.relu(self.conv5(x))
-        x = self.last(x)
-        return x
-
-    def forward_features(self, inputs):
-        """
-        Returns last layer of network and embedding features.
-        """
-        x = F.relu(self.conv1(inputs))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        z = F.relu(self.conv5(x))
-        # y = self.last(z)
-        return z
-
-
-class TorchFineTuning(ModelSession):
-    """
-    Initalizes Retraining Layer.
+    Initalizes Model.
     """
 
     AUGMENT_MODEL = SGDClassifier(
@@ -109,15 +160,20 @@ class TorchFineTuning(ModelSession):
         # will need to figure out for re-training
         self.output_channels = len(self.classes)
         self.output_features = 64
-        self.model = FCN(
-            num_input_channels=4, num_output_classes=len(self.classes), num_filters=64
+        self.model = Unet(
+            encoder_name="resnet18",
+            encoder_depth=3,
+            encoder_weights=None,
+            decoder_channels=(128, 64, 64),
+            in_channels=4,
+            classes=len(self.classes),
         )
         self._init_model()
 
         for param in self.model.parameters():
             param.requires_grad = False
 
-        self.augment_model = sklearn.base.clone(TorchFineTuning.AUGMENT_MODEL)
+        self.augment_model = sklearn.base.clone(LoadUnet.AUGMENT_MODEL)
 
         self._last_tile = None
 
@@ -187,6 +243,10 @@ class TorchFineTuning(ModelSession):
         self.augment_x_train = self.augment_x_train + [
             item.value for sublist in pixels for item in sublist
         ]  # get pixel values
+
+        print("self.classes")
+
+        print(self.classes)
 
         names_retrain = []
         for i, c in enumerate(counts):
@@ -292,8 +352,11 @@ class TorchFineTuning(ModelSession):
         print(new_biases.shape)
 
         # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
-        self.model.last.weight = nn.Parameter(new_weights)
-        self.model.last.bias = nn.Parameter(new_biases)
+        # to-do fix
+        # self.model.last.weight = nn.Parameter(new_weights)
+        # self.model.last.bias = nn.Parameter(new_biases)
+        self.model.segmentation_head[0].weight = nn.Parameter(new_weights)
+        self.model.segmentation_head[0].bias = nn.Parameter(new_biases)
 
         print("last layer of pytorch model updated post retraining")
 
@@ -331,6 +394,7 @@ class TorchFineTuning(ModelSession):
         """
         Gets embeddings for retraining
         """
+
         tile = np.moveaxis(tile, -1, 0)  # go from channels last to channels first
         tile = tile / 255.0
         tile = tile.astype(np.float32)
@@ -399,10 +463,13 @@ class TorchFineTuning(ModelSession):
         self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
         self.classes = chkpt["classes"]
-        self.model = FCN(
-            num_input_channels=4,
-            num_output_classes=len(chkpt["classes"]),
-            num_filters=64,
+        self.model = Unet(
+            classes=len(chkpt["classes"]),
+            encoder_name="resnet18",
+            encoder_depth=3,
+            encoder_weights=None,
+            decoder_channels=(128, 64, 64),
+            in_channels=4,
         )
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
