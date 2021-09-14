@@ -351,10 +351,6 @@ class LoadUnet(ModelSession):
         print("new_biases shape: ")
         print(new_biases.shape)
 
-        # this updates starter pytorch model with weights from re-training, so when the inference(s) follwing re-training run they run on the GPU
-        # to-do fix
-        # self.model.last.weight = nn.Parameter(new_weights)
-        # self.model.last.bias = nn.Parameter(new_biases)
         self.model.segmentation_head[0].weight = nn.Parameter(new_weights)
         self.model.segmentation_head[0].bias = nn.Parameter(new_biases)
 
