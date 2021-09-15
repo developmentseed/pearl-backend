@@ -75,7 +75,7 @@ class DeepLabv3Plus(smp.base.SegmentationModel):
                 )
             )
 
-        self.encoder = smp.encoder.get_encoder(
+        self.encoder = smp.encoders.get_encoder(
             encoder_name,
             in_channels=in_channels,
             depth=encoder_depth,
