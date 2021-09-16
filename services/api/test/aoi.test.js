@@ -181,6 +181,7 @@ test('POST /api/project/1/aoi', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            bookmarked_at: null,
             patches: [],
             name: 'Test AOI',
             px_stats: {},
@@ -220,6 +221,7 @@ test('GET /api/project/1/aoi/1', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            bookmarked_at: null,
             patches: [],
             shares:  [],
             name: 'Test AOI',
@@ -373,7 +375,9 @@ test('PATCH /api/project/1/aoi/1', (t) => {
         t.equals(res.statusCode, 200, 'status: 200');
 
         t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.bookmarked_at, '.bookmarked_at: <date>');
         delete res.body.created;
+        delete res.body.bookmarked_at;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -443,6 +447,7 @@ test('POST /api/project/1/aoi', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            bookmarked_at: null,
             patches: [],
             name: 'Test AOI 2',
             px_stats: {},
