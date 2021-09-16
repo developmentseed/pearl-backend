@@ -33,6 +33,12 @@ To run tests, halt the development server, close any connections to the database
 npm run test
 ```
 
+In order to use the database started by `docker-compose`, set that environment variable in your shell terminal:
+
+```sh
+Postgres=postgres://docker:docker@localhost:5433/gis
+```
+
 ## API Documentation
 
 It is generally recommended to run the bootstrap scripts described in the main project README
