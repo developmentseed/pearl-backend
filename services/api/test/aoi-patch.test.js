@@ -197,6 +197,7 @@ test('POST /api/project/1/aoi', (t) => {
             project_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
+            bookmarked_at: null,
             patches: [],
             name: 'Test AOI',
             px_stats: {},
@@ -349,26 +350,72 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             Authorization: `Bearer ${flight.token.ingalls}`
         },
         body: {
-            patches: [1]
+            patches: [1],
+            bookmarked: true
         }
     }, (err, res) => {
         t.error(err, 'no errors');
 
         t.equals(res.statusCode, 200, 'status: 200');
         t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.bookmarked_at);
         delete res.body.created;
+        delete res.body.bookmarked_at;
 
         t.deepEquals(res.body, {
             id: 1,
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
-            bookmarked: false,
+            bookmarked: true,
             px_stats: {},
             patches: [1],
             name: 'Test AOI',
             bounds: { type: 'Polygon', coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]] }
         });
+        t.end();
+    });
+});
+
+test('PATCH /api/project/1/aoi/1 - update the name and check if the bookmarked value is not reset', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${flight.token.ingalls}`
+        },
+        body: {
+            name: 'New test AOI'
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.ok(res.body.bookmarked_at);
+        t.equals(res.body.bookmarked, true);
+        t.equals(res.body.name, 'New test AOI');
+        t.end();
+    });
+});
+
+test('PATCH /api/project/1/aoi/1 - unbookmarking', (t) => {
+    request({
+        json: true,
+        url: 'http://localhost:2000/api/project/1/aoi/1',
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${flight.token.ingalls}`
+        },
+        body: {
+            bookmarked: false
+        }
+    }, (err, res) => {
+        t.error(err, 'no errors');
+
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.equals(res.body.bookmarked, false);
+        t.equals(res.body.bookmarked_at, null);
         t.end();
     });
 });

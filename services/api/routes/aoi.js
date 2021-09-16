@@ -85,7 +85,8 @@ async function router(schema, config) {
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
      *       "storage": true,
-     *       "bookmarked": false
+     *       "bookmarked": false,
+     *       "bookmarked_at": "<date>",
      *       "created": "<date>",
      *       "bounds": { "GeoJSON "}
      *   }
