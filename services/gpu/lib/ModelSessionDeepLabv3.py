@@ -82,7 +82,7 @@ class DeepLabv3Plus(smp.base.SegmentationModel):
             weights=encoder_weights,
         )
 
-        self.decoder = smp.deeplabv3.decoder(
+        self.decoder = smp.deeplabv3.decoder.DeepLabV3PlusDecoder(
             encoder_channels=self.encoder.out_channels,
             out_channels=decoder_channels,
             atrous_rates=decoder_atrous_rates,
