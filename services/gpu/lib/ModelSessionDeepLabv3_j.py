@@ -101,6 +101,31 @@ class LoadDeepLabv3_j(ModelSession):
         self.model = models.segmentation.segmentation._segm_model(
             "deeplabv3", "resnet50", len(self.classes), False, pretrained_backbone=True
         )
+
+        old_conv = self.model.backbone.conv1
+        old_conv_args = {
+            "out_channels": old_conv.out_channels,
+            "kernel_size": old_conv.kernel_size,
+            "stride": old_conv.stride,
+            "padding": old_conv.padding,
+            "dilation": old_conv.dilation,
+            "groups": old_conv.groups,
+            "bias": old_conv.bias,
+        }
+
+        # new_conv_channels = input_channels - old_conv.in_channels 4-3 = 1
+        new_conv_channels = 1
+        new_conv = nn.Conv2d(in_channels=new_conv_channels, **old_conv_args)
+        self.model.backbone.conv1 = nn.Sequential(
+            # split input along channel dim
+            SplitTensor((old_conv.in_channels, new_conv_channels), dim=1),
+            # each split goes to its respective conv layer
+            Parallel(old_conv, new_conv),
+            # sum the parallel outputs
+            AddTensors(),
+        )
+        print(" LoadDeepLabv3_j")
+        print(type(self.model))
         self._init_model()
 
         for param in self.model.parameters():
@@ -130,33 +155,13 @@ class LoadDeepLabv3_j(ModelSession):
         Initalizes starter model
         """
 
-        old_conv = self.model.backbone.conv1
-        old_conv_args = {
-            "out_channels": old_conv.out_channels,
-            "kernel_size": old_conv.kernel_size,
-            "stride": old_conv.stride,
-            "padding": old_conv.padding,
-            "dilation": old_conv.dilation,
-            "groups": old_conv.groups,
-            "bias": old_conv.bias,
-        }
-
-        # new_conv_channels = input_channels - old_conv.in_channels 4-3 = 1
-        new_conv_channels = 1
-        new_conv = nn.Conv2d(in_channels=new_conv_channels, **old_conv_args)
-        self.model.backbone.conv1 = nn.Sequential(
-            # split input along channel dim
-            SplitTensor((old_conv.in_channels, new_conv_channels), dim=1),
-            # each split goes to its respective conv layer
-            Parallel(old_conv, new_conv),
-            # sum the parallel outputs
-            AddTensors(),
-        )
-
         checkpoint = torch.load(self.model_dir + "/model.pt", map_location=self.device)
         self.model.load_state_dict(checkpoint)
+        print("loaded checkpoint")
         self.model.eval()
         self.model = self.model.to(self.device)
+
+        print(type(self.model))
 
     def run(self, data, inference_mode=False):
         """
