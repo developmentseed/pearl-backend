@@ -30,8 +30,8 @@ LOGGER = logging.getLogger("server")
 
 
 class SplitTensor(nn.Module):
-    """ source RasterVision
-    Wrapper around `torch.split` """
+    """source RasterVision
+    Wrapper around `torch.split`"""
 
     def __init__(self, size_or_sizes, dim):
         super().__init__()
@@ -43,8 +43,10 @@ class SplitTensor(nn.Module):
 
 
 class Parallel(nn.ModuleList):
-     """ source: RasterVision: Passes inputs through multiple `nn.Module`s in parallel.
-        Returns a tuple of outputs."""
+    """Passes inputs through multiple `nn.Module`s in parallel.
+    Returns a tuple of outputs.
+    """
+
     def __init__(self, *args):
         super().__init__(args)
 
@@ -56,10 +58,11 @@ class Parallel(nn.ModuleList):
 
 
 class AddTensors(nn.Module):
-    """ source: RasterVision Adds all its inputs together. """
+    """source: RasterVision Adds all its inputs together."""
 
     def forward(self, xs):
         return sum(xs)
+
 
 class LoadDeepLabv3_j(ModelSession):
     """
@@ -96,12 +99,8 @@ class LoadDeepLabv3_j(ModelSession):
         self.output_channels = len(self.classes)
         self.output_features = 64
         self.model = models.segmentation.segmentation._segm_model(
-                    'deeplabv3',
-                    'resnet50',
-                    len(self.classes),
-                    False,
-                    pretrained_backbone=True
-                )
+            "deeplabv3", "resnet50", len(self.classes), False, pretrained_backbone=True
+        )
         self._init_model()
 
         for param in self.model.parameters():
@@ -126,33 +125,33 @@ class LoadDeepLabv3_j(ModelSession):
         return self._last_tile
 
     def _init_model(self):
-        #to-do will this work for retraining?
+        # to-do will this work for retraining?
         """
         Initalizes starter model
         """
 
         old_conv = self.model.backbone.conv1
         old_conv_args = {
-            'out_channels': old_conv.out_channels,
-            'kernel_size': old_conv.kernel_size,
-            'stride': old_conv.stride,
-            'padding': old_conv.padding,
-            'dilation': old_conv.dilation,
-            'groups': old_conv.groups,
-            'bias': old_conv.bias
+            "out_channels": old_conv.out_channels,
+            "kernel_size": old_conv.kernel_size,
+            "stride": old_conv.stride,
+            "padding": old_conv.padding,
+            "dilation": old_conv.dilation,
+            "groups": old_conv.groups,
+            "bias": old_conv.bias,
         }
 
-        #new_conv_channels = input_channels - old_conv.in_channels 4-3 = 1
+        # new_conv_channels = input_channels - old_conv.in_channels 4-3 = 1
         new_conv_channels = 1
-        new_conv = nn.Conv2d(
-            in_channels=new_conv_channels, **old_conv_args)
+        new_conv = nn.Conv2d(in_channels=new_conv_channels, **old_conv_args)
         self.model.backbone.conv1 = nn.Sequential(
             # split input along channel dim
             SplitTensor((old_conv.in_channels, new_conv_channels), dim=1),
             # each split goes to its respective conv layer
             Parallel(old_conv, new_conv),
             # sum the parallel outputs
-            AddTensors())
+            AddTensors(),
+        )
 
         checkpoint = torch.load(self.model_dir + "/model.pt", map_location=self.device)
         self.model.load_state_dict(checkpoint)
@@ -414,10 +413,10 @@ class LoadDeepLabv3_j(ModelSession):
         self.model_fs = os.path.join(chkpt_fs, "retraining_checkpoint.pt")
 
         self.classes = chkpt["classes"]
-        self.model = FCN(
-            num_input_channels=4,
-            num_output_classes=len(chkpt["classes"]),
-            num_filters=64,
+
+        # to-do confirm this is okay
+        self.model = models.segmentation.segmentation._segm_model(
+            "deeplabv3", "resnet50", len(self.classes), False, pretrained_backbone=True
         )
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
