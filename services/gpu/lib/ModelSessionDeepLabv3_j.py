@@ -363,6 +363,7 @@ class LoadDeepLabv3_j(ModelSession):
         """
         Gets model predicted classes per tile
         """
+        print("in run model on tile")
         output_preds = []
         data = tile.to(self.device)
         with torch.no_grad():
@@ -374,6 +375,7 @@ class LoadDeepLabv3_j(ModelSession):
         for pred in predictions:
             output_preds.append(pred.argmax(axis=0).astype(np.uint8))
 
+        print(np.array(output_preds).shape)
         return np.array(output_preds)
 
     def save_state_to(self, directory):
