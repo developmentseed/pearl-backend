@@ -728,6 +728,13 @@ define({ "api": [
           },
           {
             "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Will contain an error message if the instance has suffered a fatal error</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
@@ -851,6 +858,13 @@ define({ "api": [
             "optional": false,
             "field": "id",
             "description": "<p>Unique Batch ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Will contain an error message if the instance has suffered a fatal error</p>"
           },
           {
             "group": "Success 200",
@@ -1053,6 +1067,13 @@ define({ "api": [
           },
           {
             "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "batch.error",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "batch.created",
@@ -1119,6 +1140,13 @@ define({ "api": [
           },
           {
             "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "error",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
             "type": "Integer",
             "optional": true,
             "field": "progress",
@@ -1150,6 +1178,13 @@ define({ "api": [
             "optional": false,
             "field": "id",
             "description": "<p>Unique Batch ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Will contain an error message if the instance has suffered a fatal error</p>"
           },
           {
             "group": "Success 200",
@@ -3154,7 +3189,62 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Delete a project</p>",
+    "description": "<p>Archive a project</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the Project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_id",
+            "description": "<p>Starter Model to use for project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "model_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "mosaic",
+            "description": "<p>Imagery to use with model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/project.js",
     "groupTitle": "Project"
   },
@@ -3253,14 +3343,7 @@ define({ "api": [
             "description": "<p>undefined</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      }
     },
     "filename": "./routes/project.js",
     "groupTitle": "Projects"
@@ -3386,13 +3469,59 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the Project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_id",
+            "description": "<p>Starter Model to use for project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "model_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "mosaic",
+            "description": "<p>Imagery to use with model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/project.js",
     "groupTitle": "Projects"
@@ -3505,7 +3634,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 100000000 (m^2)\n        \"max_inference\": 100000000 (m^2)\n        \"instance_window\": 600 (m secs)\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 100000000 (m^2)\n        \"max_inference\": 200000000 (m^2)\n        \"instance_window\": 600 (m secs)\n    }\n}",
           "type": "json"
         }
       ]
