@@ -372,9 +372,9 @@ class LoadDeepLabv3_j(ModelSession):
         output_preds = []
         data = tile.to(self.device)
         with torch.no_grad():
-            predictions["out"] = self.model(data)
+            predictions = self.model(data)
             predictions = (
-                F.softmax(predictions, dim=1).detach().numpy()
+                F.softmax(predictions["out"], dim=1).detach().numpy()
             )  # this is giving us the highest probability class per pixel
 
         for pred in predictions:
