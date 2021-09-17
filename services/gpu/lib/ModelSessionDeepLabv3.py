@@ -198,13 +198,18 @@ class LoadDeepLabv3Plus(ModelSession):
         """
         Initalizes starter model
         """
-        checkpoint = torch.load(
-            self.model_dir + "/model.ckpt", map_location=self.device
-        )
-        self.model.load_state_dict(trim_state_dict(checkpoint))
+        # checkpoint = torch.load(
+        #     self.model_dir + "/model.ckpt", map_location=self.device
+        # )
+        # self.model.load_state_dict(trim_state_dict(checkpoint))
+        # self.model.eval()
+        # for param in model.parameters():
+        #     param.requires_grad = False
+        # self.model = self.model.to(self.device)
+
+        checkpoint = torch.load(self.model_dir + "/model.pt", map_location=self.device)
+        self.model.load_state_dict(checkpoint)
         self.model.eval()
-        for param in model.parameters():
-            param.requires_grad = False
         self.model = self.model.to(self.device)
 
     def run(self, data, inference_mode=False):
@@ -401,7 +406,6 @@ class LoadDeepLabv3Plus(ModelSession):
         tile = np.moveaxis(tile, -1, 0)  # go from channels last to channels first
         tile = tile / 255.0
         tile = tile.astype(np.float32)
-        tile_img = torch.from_numpy(tile)
         tile_img = torch.from_numpy(tile)
         data = tile_img.to(self.device)
 
