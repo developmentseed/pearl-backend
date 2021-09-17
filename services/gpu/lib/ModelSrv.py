@@ -483,8 +483,8 @@ class ModelSrv:
 
                             progress = new_prog
 
-                        if res.get("abort") is True:
-                            self.is_aborting = True
+                            if res.get("abort") is True:
+                                self.is_aborting = True
 
                     current = current + 1
 
