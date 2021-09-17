@@ -104,13 +104,6 @@ async function server(args, config, cb) {
             podList = await instance.kube.listPods();
         }
 
-        let activePods;
-        if (podList.length) {
-            activePods = podList.filter((p) => {
-                return p.status.phase === 'Running';
-            });
-        }
-
         return res.json({
             version: pkg.version,
             limits: {
@@ -118,7 +111,7 @@ async function server(args, config, cb) {
                 max_inference: 200000000,
                 instance_window: 600,
                 total_gpus: config.GpuCount,
-                active_gpus: activePods ? activePods.length : null
+                active_gpus: podList.filter((p) => p.status.phase === 'Running').length
             }
         });
     });

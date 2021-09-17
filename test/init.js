@@ -392,7 +392,7 @@ function running(test, API) {
             const res = await request({
                 method: 'GET',
                 json: true,
-                url: API + '/api'
+                url: `${API}/api`
             });
 
             t.equals(res.statusCode, 200);
@@ -404,7 +404,7 @@ function running(test, API) {
                     max_inference: 200000000,
                     instance_window: 600,
                     total_gpus: 2,
-                    active_gpus: null
+                    active_gpus: 0
                 }
             });
 
