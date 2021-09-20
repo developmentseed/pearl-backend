@@ -685,7 +685,7 @@ async function router(schema, config) {
      * @apiVersion 1.0.0
      * @apiName DownloadRawAOI
      * @apiGroup Share
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return the aoi fabric geotiff
@@ -695,7 +695,7 @@ async function router(schema, config) {
             const a = await aoishare.get(req.params.shareuuid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            await aoi.download(req.params.aoiid, res);
+            await aoi.download(a.id, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -706,7 +706,7 @@ async function router(schema, config) {
      * @apiVersion 1.0.0
      * @apiName DownloadColorAOI
      * @apiGroup Share
-     * @apiPermission user
+     * @apiPermission public
      *
      * @apiDescription
      *     Return the colourized aoi fabric geotiff
@@ -726,8 +726,8 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                await aoipatch.has_auth(config.pool, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
-                patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
+                await aoipatch.has_auth(config.pool, aoi, req.auth, a.project_id, a.id, patchid);
+                patchurls.push(await aoipatch.url(a.id, patchid));
             }
 
             req.method = 'POST';
