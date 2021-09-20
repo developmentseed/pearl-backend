@@ -3662,6 +3662,42 @@
   },
   {
     "type": "get",
+    "url": "/api/share/:shareuuid/download/color",
+    "title": "Download Color AOI",
+    "version": "1.0.0",
+    "name": "DownloadColorAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return the colourized aoi fabric geotiff</p>",
+    "filename": "./routes/aoi.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/share/:shareuuid/download/raw",
+    "title": "Download Raw AOI",
+    "version": "1.0.0",
+    "name": "DownloadRawAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return the aoi fabric geotiff</p>",
+    "filename": "./routes/aoi.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
     "url": "/api/share/:shareuuid",
     "title": "Get AOI",
     "version": "1.0.0",
