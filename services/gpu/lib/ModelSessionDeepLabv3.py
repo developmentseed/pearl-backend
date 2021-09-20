@@ -69,7 +69,7 @@ class LoadDeepLabv3Plus(ModelSession):
         # will need to figure out for re-training
         self.output_channels = len(self.classes)
         self.output_features = 64
-        self.model = smp.DeepLabV3Plus(
+        self.model = SMPModelWrapper.model(  # smp.DeepLabV3Plus
             encoder_name="resnet18",
             encoder_weights=None,
             in_channels=4,
