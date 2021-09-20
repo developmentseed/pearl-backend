@@ -21,18 +21,29 @@ LOGGER = logging.getLogger("server")
 
 
 class SMPModelWrapper(nn.Module):
-    def __init__(self, model: smp.DeepLabV3Plus):
-        self.model = model
+    def __init__(
+        self,
+        model=smp.DeepLabV3Plus,
+        in_channels=4,
+        encoder_weights=None,
+        encoder_name="resnet18",
+        classes=7,
+    ):
+        super().__init__()
+        self.model = model(
+            encoder_name=encoder_name,
+            encoder_weights=encoder_weights,
+            in_channels=in_channels,
+            classes=classes,
+        )
 
+    def forward(self, x):
+        self.model(x)
 
-def forward(self, x):
-    self.model(x)
-
-
-def foward_features(self, x):
-    features = self.encoder(x)
-    decoder_output = self.decoder(*features)
-    return decoder_output
+    def foward_features(self, x):
+        features = self.encoder(x)
+        decoder_output = self.decoder(*features)
+        return decoder_output
 
 
 class LoadDeepLabv3Plus(ModelSession):
@@ -69,12 +80,11 @@ class LoadDeepLabv3Plus(ModelSession):
         # will need to figure out for re-training
         self.output_channels = len(self.classes)
         self.output_features = 64
-        self.model = SMPModelWrapper.model(  # smp.DeepLabV3Plus
+        self.model = SMPModelWrapper(  # smp.DeepLabV3Plus
             encoder_name="resnet18",
             encoder_weights=None,
             in_channels=4,
-            classes=len(self.classes),
-        )
+            classes=len(self.classes)).model
         self._init_model()
 
         for param in self.model.parameters():
