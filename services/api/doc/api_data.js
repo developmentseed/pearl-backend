@@ -3662,6 +3662,42 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/share/:shareuuid/download/color",
+    "title": "Download Color AOI",
+    "version": "1.0.0",
+    "name": "DownloadColorAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return the colourized aoi fabric geotiff</p>",
+    "filename": "./routes/aoi.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/share/:shareuuid/download/raw",
+    "title": "Download Raw AOI",
+    "version": "1.0.0",
+    "name": "DownloadRawAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return the aoi fabric geotiff</p>",
+    "filename": "./routes/aoi.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
     "url": "/api/share/:shareuuid",
     "title": "Get AOI",
     "version": "1.0.0",
