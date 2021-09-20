@@ -106,7 +106,6 @@ def connection(uri, model, api):
         router.on_act("model#aoi", model.load_aoi)
 
     router.on_act("model#status", model.status)
-    router.on_act("model#abort", model.abort)
 
     router.on_msg("info#connected", placeholder)
     router.on_msg("info#disconnected", placeholder)
