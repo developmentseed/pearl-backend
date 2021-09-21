@@ -8,7 +8,6 @@ services:
       environment:
         # For Terraform
         - TF_VAR_username=${USER}
-        - TF_VAR_servicePrincipalJSON=${servicePrincipalJSON}
         - TF_VAR_subscriptionId=${subscriptionId}
         - TF_VAR_postgres_password=${postgresPassword}
         - TF_VAR_signing_secret=${signingSecret}
