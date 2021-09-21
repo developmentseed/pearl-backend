@@ -42,7 +42,7 @@
     "GET /project/:projectid/aoi/:aoiid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/aoi/:aoiid/tiles": {
         "body": false,
@@ -72,12 +72,12 @@
     "GET /project/:projectid/aoi": {
         "body": false,
         "query": true,
-        "res": false
+        "res": true
     },
     "POST /project/:projectid/aoi": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "POST /project/:projectid/aoi/:aoiid/share": {
         "body": false,
@@ -102,7 +102,7 @@
     "PATCH /project/:projectid/aoi/:aoiid": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /share/:shareuuid": {
         "body": false,

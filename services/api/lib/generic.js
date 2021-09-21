@@ -7,8 +7,14 @@ const { sql } = require('slonik');
  * @class
  */
 class Generic {
+    constructor() {
+        this._table = this.constructor._table;
+        this._res = this.constructor._res;
+        this._patch = this.constructor._patch;
+    }
+
     patch(patch) {
-        for (const attr of this.attrs) {
+        for (const attr of this._patch) {
             if (patch[attr] !== undefined) {
                 this[attr] = patch[attr];
             }
@@ -37,6 +43,19 @@ class Generic {
         }
 
         return this.deserialize(pgres.rows[0]);
+    }
+
+    serialize() {
+        if (!this._res) throw new Err(500, null, 'Internal: Res not defined');
+        if (this._res.type !== 'object') throw new Err(500, null, 'Only Object Serialization Supported');
+
+        const res = {};
+
+        for (const key of Object.keys(this._res.properties)) {
+            if (this[key] !== undefined) res[key] = this[key];
+        }
+
+        return res;
     }
 
     static deserialize(dbrow, alias) {

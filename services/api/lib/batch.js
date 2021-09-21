@@ -8,14 +8,11 @@ const { sql } = require('slonik');
  */
 class Batch extends Generic {
     static _table = 'batch';
+    static _patch = Object.keys(require('../schema/req.body.PatchBatch.json').properties);
+    static _res = require('../schema/res.Batch.json')
 
     constructor() {
         super();
-
-        this._table = Batch._table;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchBatch.json').properties);
     }
 
     /**
@@ -97,23 +94,6 @@ class Batch extends Generic {
         }
 
         return this.deserialize(pgres.rows);
-    }
-
-    serialize() {
-        return {
-            id: this.id,
-            uid: this.uid,
-            project_id: this.project_id,
-            created: this.created,
-            updated: this.updated,
-            error: this.error,
-            aoi: this.aoi,
-            name: this.name,
-            bounds: this.bounds,
-            abort: this.abort,
-            completed: this.completed,
-            progress: this.progress
-        };
     }
 
     async commit(pool) {
