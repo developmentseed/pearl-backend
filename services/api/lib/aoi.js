@@ -13,6 +13,8 @@ class AOI extends Generic {
     static _table = 'aois';
 
     constructor() {
+        super();
+
         this._table = this.constructor._table;
         console.error(this._table);
     }
@@ -47,7 +49,7 @@ class AOI extends Generic {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     a.id AS id,
@@ -87,6 +89,7 @@ class AOI extends Generic {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Project} project Instantiated Project class
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
@@ -121,15 +124,19 @@ class AOI extends Generic {
     /**
      * Return a sharing URL that can be used to titiler
      *
-     * @param {Number} aoiid AOI ID to get a share URL for
+     * @param {Config} config
      */
-    async url(aoiid) {
-        const url = new URL(await this.container_client.generateSasUrl({
+    async url(config) {
+        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const client = this.#blob(config);
+
+        const url = new URL(await client.generateSasUrl({
             permissions: BlobSASPermissions.parse('r').toString(),
             expiresOn: moment().add(365, 'days')
         }));
 
-        url.pathname = `/aois/aoi-${aoiid}.tiff`;
+        url.pathname = `/aois/aoi-${this.id}.tiff`;
 
         return url;
     }
@@ -167,23 +174,24 @@ class AOI extends Generic {
     /**
      * Upload an AOI geotiff and mark the AOI storage property as true
      *
-     * @param {Number} aoiid AOI ID to upload to
+     * @param {Config} config
      * @param {Object} file File Stream to upload
      */
-    async upload(aoiid, file) {
-        const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
+    async upload(config, file) {
+        const client = this.#blob(config);
+
+        const blob = client.getBlockBlobClient(`aoi-${this.id}.tiff`);
 
         try {
-            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
+            await blob.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
                 blobHTTPHeaders: { blobContentType: 'image/tiff' }
             });
         } catch (err) {
             throw new Err(500, err, 'Failed to upload AOI');
         }
 
-        return await this.patch(aoiid, {
-            storage: true
-        });
+        this.storage = true;
+        return await this.commit(config.pool);
     }
 
     /**
@@ -194,9 +202,9 @@ class AOI extends Generic {
     async exists(config) {
         if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-        const client = this.blob(config);
+        const client = this.#blob(config);
 
-        const blob = this.client.getBlockBlobClient(`aoi-${this.id}.tiff`);
+        const blob = client.getBlockBlobClient(`aoi-${this.id}.tiff`);
         return await blob.exists();
     }
 
@@ -209,7 +217,7 @@ class AOI extends Generic {
     async download(config, res) {
         if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-        const client = this.blob(config);
+        const client = this.#blob(config);
 
         const blob = client.getBlockBlobClient(`aoi-${this.id}.tiff`);
         const dwn = await blob.download(0);
@@ -225,7 +233,7 @@ class AOI extends Generic {
     async delete(pool) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 UPDATE aois
                     SET
                         archived = true
@@ -247,27 +255,28 @@ class AOI extends Generic {
      * @param {Pool} pool - Instantiated Postgres Pool
      */
     async commit(pool) {
+        let bookmarked_at;
+        if (this.bookmarked && !this.bookmarked_at) {
+            bookmarked_at = sql`NOW()`;
+        } else if (this.bookmarked) {
+            bookmarked_at = this.bookmarked_at;
+        } else {
+            bookmarked_at = null;
+        }
+
         let pgres;
         try {
-            let bookmarked_at;
-            if (aoi.bookmarked !== undefined) {
-                if (aoi.bookmarked) {
-                    bookmarked_at = sql`NOW()`;
-                } else {
-                    bookmarked_at = null;
-                }
-            }
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 UPDATE aois
                     SET
-                        storage = COALESCE(${aoi.storage || null}, storage),
-                        name = COALESCE(${aoi.name || null}, name),
-                        bookmarked = ${aoi.bookmarked !== undefined ? aoi.bookmarked : sql`COALESCE(bookmarked)`},
-                        bookmarked_at = ${bookmarked_at !== undefined ? bookmarked_at : sql`COALESCE(bookmarked_at)`},
-                        patches = COALESCE(${aoi.patches ? sql.array(aoi.patches, sql`BIGINT[]`) : null}, patches),
-                        px_stats = COALESCE(${aoi.px_stats ? JSON.stringify(aoi.px_stats) : null}::JSONB, px_stats)
+                        storage = ${this.storage},
+                        name = ${this.name},
+                        bookmarked = ${this.bookmarked},
+                        bookmarked_at = ${bookmarked_at},
+                        patches = ${this.patches ? sql.array(this.patches, sql`BIGINT[]`) : null},
+                        px_stats = ${this.px_stats ? JSON.stringify(this.px_stats) : null}::JSONB
                     WHERE
-                        id = ${aoiid}
+                        id = ${this.id}
                     RETURNING
                         *
             `);
@@ -328,21 +337,22 @@ class AOI extends Generic {
      *
      * @param {Number} projectid - AOIS related to a specific project
      * @param {Object} aoi - AOI Object
-     * @param {Object} aoi.bounds - Bounds GeoJSON
-     * @param {Number} aoi.checkpoint_id - Checkpoint ID
+     * @param {Object} aoi.project_id - Project the AOI is part of
      * @param {String} aoi.name - Human Readable Name
+     * @param {Number} aoi.checkpoint_id - Checkpoint ID
+     * @param {Object} aoi.bounds - Bounds GeoJSON
      */
-    async generate(projectid, aoi) {
+    async generate(pool, aoi) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 INSERT INTO aois (
                     project_id,
                     name,
                     checkpoint_id,
                     bounds
                 ) VALUES (
-                    ${projectid},
+                    ${aoi.project_id},
                     ${aoi.name},
                     ${aoi.checkpoint_id},
                     ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
