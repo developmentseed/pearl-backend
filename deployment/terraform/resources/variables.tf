@@ -102,9 +102,6 @@ variable "subscriptionId" {
   type = string
 }
 
-variable "servicePrincipalJSON" {
-  type = string
-}
 
 # -----------------
 # Attach ACR
