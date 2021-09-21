@@ -2,10 +2,10 @@ const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Busboy = require('busboy');
 const Project = require('../lib/project');
+const AOI = require('../lib/aoi');
 
 async function router(schema, config) {
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
-    const aoi = new (require('../lib/aoi').AOI)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     /**
@@ -300,8 +300,14 @@ async function router(schema, config) {
             await Param.int(req, 'checkpointid');
             await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
 
-            const aois = await aoi.list(req.params.projectid, { checkpointid: req.params.checkpointid });
-            aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
+            const aois = await AOI.list(config.pool, req.params.projectid, {
+                checkpointid: req.params.checkpointid
+            });
+
+            aois.aois.forEach(async (a) => {
+                const aoi = await AOI.from(config.pool, a.id);
+                await aoi.delete(config.pool);
+            });
 
             return res.json(await checkpoint.delete(req.params.checkpointid));
         } catch (err) {
