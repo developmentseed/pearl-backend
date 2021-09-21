@@ -2,9 +2,9 @@ const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
 const Project = require('../lib/project');
+const AOI = require('../lib/aoi');
 
 async function router(schema, config) {
-    const aoi = new (require('../lib/aoi').AOI)(config);
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
     const model = new (require('../lib/model').Model)(config);
     const instance = new (require('../lib/instance').Instance)(config);
@@ -47,7 +47,7 @@ async function router(schema, config) {
             if (results.projects && results.projects.length) {
                 for (let index = 0; index < results.projects.length; index++) {
                     const p = results.projects[index];
-                    const aois = await aoi.list(p.id, { bookmarked: 'true' });
+                    const aois = await AOI.list(config.pool, p.id, { bookmarked: 'true' });
                     const checkpoints = await checkpoint.list(p.id, { bookmarked: 'true' });
                     // remove reduntant project id
                     delete aois.project_id;
@@ -189,8 +189,11 @@ async function router(schema, config) {
             }
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
-            const aois = await aoi.list(req.params.projectid);
-            aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
+            const aois = await AOI.list(config.pool, req.params.projectid);
+            aois.aois.forEach(async (a) => {
+                const aoi = await AOI.from(config.pool, a.id);
+                await aoi.delete(config.pool);
+            });
 
             const chkpts = await checkpoint.list(req.params.projectid);
             chkpts.checkpoints.forEach(async (c) => { await checkpoint.delete(c.id); });
