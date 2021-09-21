@@ -2,17 +2,17 @@ const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Busboy = require('busboy');
 const Project = require('../lib/project');
+const AOI = require('../lib/aoi');
 
 async function router(schema, config) {
-    const aoi = new (require('../lib/aoi').AOI)(config);
     const proxy = new (require('../lib/proxy').Proxy)(config);
     const aoishare = new (require('../lib/aoi-share').AOIShare)(config);
     const aoipatch = new (require('../lib/aoi-patch').AOIPatch)(config);
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
-    const getAoiTileJSON = async (theAoi, req) => {
-        const tiffurl = theAoi.uuid ? await aoishare.url(theAoi.uuid) : await aoi.url(theAoi.id);
+    const getAoiTileJSON = async (aoi, req) => {
+        const tiffurl = aoi.uuid ? await aoishare.url(aoi.uuid) : await aoi.url(config);
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -21,7 +21,7 @@ async function router(schema, config) {
 
 
         let tj, tiles;
-        if (theAoi.uuid) {
+        if (aoi.uuid) {
             const response = await proxy.request(req);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
@@ -30,10 +30,10 @@ async function router(schema, config) {
 
             // this is a share
             tiles = [
-                `/api/share/${theAoi.uuid}/tiles/{z}/{x}/{y}`
+                `/api/share/${aoi.uuid}/tiles/{z}/{x}/{y}`
             ];
         } else {
-            const chkpt = await checkpoint.get(theAoi.checkpoint_id);
+            const chkpt = await checkpoint.get(aoi.checkpoint_id);
             const cmap = {};
             for (let i = 0; i < chkpt.classes.length; i++) {
                 cmap[i] = chkpt.classes[i].color;
@@ -52,7 +52,7 @@ async function router(schema, config) {
             ];
         }
 
-        const aoiTileName = theAoi.aoi_id ? `aoi-${theAoi.aoi_id}` : `aoi-${theAoi.id}`;
+        const aoiTileName = aoi.aoi_id ? `aoi-${aoi.aoi_id}` : `aoi-${aoi.id}`;
 
         return {
             tilejson: tj.tilejson,
@@ -96,7 +96,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            const a = await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             const shares = await aoishare.list(req.params.projectid, {
                 aoi_id: a.id
@@ -127,7 +127,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            const a = await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             res.json(await getAoiTileJSON(a, req));
@@ -154,10 +154,9 @@ async function router(schema, config) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            const a = await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            const tiffurl = await aoi.url(a.id);
+            const tiffurl = await a.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
@@ -194,22 +193,26 @@ async function router(schema, config) {
             await auth.is_admin(req);
 
             const busboy = new Busboy({
-                headers: req.headers
+                headers: req.headers,
+                limits: {
+                    files: 1
+                }
             });
+
+            const a = await AOI.from(config.pool, req.params.aoiid);
 
             const files = [];
 
             busboy.on('file', (fieldname, file) => {
-                files.push(aoi.upload(req.params.aoiid, file));
+                files.push(a.upload(config, file));
             });
 
             busboy.on('finish', async () => {
                 try {
                     await Promise.all(files);
 
-                    const tiffurl = await aoi.url(req.params.aoiid);
+                    const tiffurl = await a.url(config);
 
-                    const a = await aoi.get(req.params.aoiid);
                     const chkpt = await checkpoint.get(a.checkpoint_id);
 
                     const histo = [];
@@ -217,7 +220,7 @@ async function router(schema, config) {
                         histo[i] = i + 1;
                     }
 
-                    if (!(await aoi.exists(req.params.aoiid))) throw new Err(500, null, 'AOI is not on Azure?!');
+                    if (!(await a.exists(config))) throw new Err(500, null, 'AOI is not on Azure?!');
 
                     const pres = await proxy.request({
                         url: '/cog/statistics',
@@ -241,9 +244,13 @@ async function router(schema, config) {
                         console.log('PX_Stats Error:', JSON.stringify(pres.body));
                     }
 
-                    return res.json(await aoi.patch(a.id, {
+                    a.patch({
                         px_stats
-                    }));
+                    });
+
+                    await a.commit(config.pool);
+
+                    return res.json(a.serialize());
                 } catch (err) {
                     Err.respond(err, res);
                 }
@@ -270,10 +277,9 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            const a = await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            await aoi.download(req.params.aoiid, res);
+            await a.download(config, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -294,10 +300,9 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            const a = await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            const tiffurl = await aoi.url(a.id);
+            const tiffurl = await a.url(config);
 
             const chkpt = await checkpoint.get(a.checkpoint_id);
             const cmap = {};
@@ -307,7 +312,7 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                await aoipatch.has_auth(config.pool, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
                 patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
             }
 
@@ -359,7 +364,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            const aois = await aoi.list(req.params.projectid, req.query);
+            const aois = await AOI.list(config.pool, req.params.projectid, req.query);
 
             for (const a of aois.aois) {
                 const shares = await aoishare.list(req.params.projectid, {
@@ -409,7 +414,7 @@ async function router(schema, config) {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
-            const a = await aoi.generate(config.pool, req.body);
+            const a = await AOI.generate(config.pool, req.body);
 
             return res.json(a.serialize());
         } catch (err) {
@@ -442,7 +447,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            const a = await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             const chkpt = await checkpoint.get(a.checkpoint_id);
@@ -453,14 +458,14 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                await aoipatch.has_auth(config.pool, aoi, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
                 patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
             }
 
             const share = await aoishare.create(a);
 
             if (config.TileUrl) {
-                const tiffurl = await aoi.url(a.id);
+                const tiffurl = await a.url(config);
                 req.method = 'POST';
                 req.url = '/cog/cogify';
 
@@ -555,9 +560,9 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
-            await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            return res.json(await aoi.delete(req.params.aoiid));
+            return res.json(await a.delete(config.pool));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -593,9 +598,13 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
-            await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            return res.json(await aoi.patch(req.params.aoiid, req.body));
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+
+            a.patch(req.body);
+            await a.commit(config.pool);
+
+            return res.json(a.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -699,7 +708,8 @@ async function router(schema, config) {
             const a = await aoishare.get(req.params.shareuuid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            await aoi.download(a.id, res);
+            const aoi = await AOI.from(config.pool, a.aoi_id);
+            await aoi.download(config, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -720,7 +730,8 @@ async function router(schema, config) {
             const a = await aoishare.get(req.params.shareuuid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const tiffurl = await aoi.url(a.id);
+            const aoi = await AOI.from(config.pool, a.aoi_id);
+            const tiffurl = await aoi.url(config);
 
             const chkpt = await checkpoint.get(a.checkpoint_id);
             const cmap = {};
@@ -730,7 +741,7 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                await aoipatch.has_auth(config.pool, aoi, req.auth, a.project_id, a.id, patchid);
+                await aoipatch.has_auth(config.pool, req.auth, a.project_id, a.id, patchid);
                 patchurls.push(await aoipatch.url(a.id, patchid));
             }
 
