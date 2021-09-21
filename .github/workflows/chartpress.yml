@@ -19,7 +19,6 @@ jobs:
     env:
       TF_VAR_username: github
       signingSecret: ${{ secrets.TERRAFORM_SIGNING_SECRET }}
-      servicePrincipalJSON: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_JSON }}
       subscriptionId: ${{ secrets.TERRAFORM_SUBSCRIPTION_ID }}
       tenantId: ${{ secrets.TERRAFORM_TENANT_ID }}
       servicePrincipalId: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_ID }}
