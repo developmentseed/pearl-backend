@@ -234,7 +234,7 @@ class AOI extends Generic {
         if (this.bookmarked && !this.bookmarked_at) {
             bookmarked_at = sql`NOW()`;
         } else if (this.bookmarked) {
-            bookmarked_at = this.bookmarked_at;
+            bookmarked_at = sql`bookmarked_at`;
         } else {
             bookmarked_at = null;
         }
