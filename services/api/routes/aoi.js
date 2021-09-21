@@ -691,7 +691,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return the aoi fabric geotiff
      */
-    await schema.get('/share/:shareuuid/download/raw', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/share/:shareuuid/download/raw', {}, async (req, res) => {
         try {
             const a = await aoishare.get(req.params.shareuuid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
@@ -712,7 +712,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return the colourized aoi fabric geotiff
      */
-    await schema.get('/share/:shareuuid/download/color', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/share/:shareuuid/download/color', {}, async (req, res) => {
         try {
             const a = await aoishare.get(req.params.shareuuid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
@@ -727,7 +727,6 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                await aoipatch.has_auth(config.pool, aoi, req.auth, a.project_id, a.id, patchid);
                 patchurls.push(await aoipatch.url(a.id, patchid));
             }
 
