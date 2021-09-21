@@ -11,12 +11,11 @@ const { sql } = require('slonik');
 
 class AOI extends Generic {
     static _table = 'aois';
+    static _res = require('../schema/res.AOI.json');
+    static _patch = Object.keys(require('../schema/req.body.PatchAOI.json').properties);
 
     constructor() {
         super();
-
-        this._table = this.constructor._table;
-        console.error(this._table);
     }
 
     /**
@@ -54,10 +53,12 @@ class AOI extends Generic {
                     count(*) OVER() AS count,
                     a.id AS id,
                     a.name AS name,
+                    a.patches AS patches,
                     a.px_stats AS px_stats,
                     a.bookmarked AS bookmarked,
                     a.bookmarked_at AS bookmarked_at,
-                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
+                    a.bounds AS bounds,
+                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
                     a.created AS created,
                     a.storage AS storage,
                     a.checkpoint_id AS checkpoint_id,
@@ -83,14 +84,16 @@ class AOI extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOIs');
         }
 
-        return AOI.deserialize(pgres.rows);
+        const list = AOI.deserialize(pgres.rows);
+        list.project_id = projectid;
+
+        return list;
     }
 
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Project} project Instantiated Project class
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} aoiid AOI the user is attemping to access
@@ -110,6 +113,7 @@ class AOI extends Generic {
      * Return an Azure Container Client
      *
      * @param {Config} config
+     * @returns {Object} Azure Container Client
      */
     #blob(config) {
         // don't access these services unless AzureStorage is truthy
@@ -139,36 +143,6 @@ class AOI extends Generic {
         url.pathname = `/aois/aoi-${this.id}.tiff`;
 
         return url;
-    }
-
-    /**
-     * Return a Row as a JSON Object
-     *
-     * @param {Object} row Postgres Database Row
-     *
-     * @returns {Object}
-     */
-    static serialize(row) {
-        const def = {
-            id: row.id,
-            area: row.area,
-            bounds: row.bounds,
-            name: row.name,
-            created: row.created,
-            storage: row.storage,
-            bookmarked: row.bookmarked,
-            bookmarked_at: row.bookmarked_at,
-            project_id: row.project_id,
-            checkpoint_id: row.checkpoint_id,
-            patches: row.patches,
-            px_stats: row.px_stats ? row.px_stats : {}
-        };
-
-        if (row.classes) {
-            def['classes'] = row.classes;
-        }
-
-        return def;
     }
 
     /**
@@ -239,6 +213,7 @@ class AOI extends Generic {
                         archived = true
                     WHERE
                         id = ${this.id}
+                    RETURNING *
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to delete AOI');
@@ -286,7 +261,9 @@ class AOI extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
 
-        return AOI.deserialize(pgres.rows[0]);
+        this.bookmarked_at = pgres.rows[0].bookmarked_at;
+
+        return this;
     }
 
     /**
@@ -295,7 +272,7 @@ class AOI extends Generic {
      * @param {Pool} pool - Instantiated Postgres Pool
      * @param {Number} id - Specific AOI id
      */
-    async from(pool, id) {
+    static async from(pool, id) {
         let pgres;
         try {
             pgres = await pool.query(sql`
@@ -303,7 +280,7 @@ class AOI extends Generic {
                     a.id AS id,
                     a.name AS name,
                     a.bounds AS bounds,
-                    ST_Area(a.bounds::GEOGRAPHY) AS area,
+                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
                     a.project_id AS project_id,
                     a.bookmarked AS bookmarked,
                     a.bookmarked_at AS bookmarked_at,
@@ -342,7 +319,7 @@ class AOI extends Generic {
      * @param {Number} aoi.checkpoint_id - Checkpoint ID
      * @param {Object} aoi.bounds - Bounds GeoJSON
      */
-    async generate(pool, aoi) {
+    static async generate(pool, aoi) {
         let pgres;
         try {
             pgres = await pool.query(sql`
@@ -356,7 +333,19 @@ class AOI extends Generic {
                     ${aoi.name},
                     ${aoi.checkpoint_id},
                     ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
-                ) RETURNING *
+                ) RETURNING
+                    id,
+                    name,
+                    bounds,
+                    Round(ST_Area(bounds::GEOGRAPHY)) AS area,
+                    project_id,
+                    bookmarked,
+                    bookmarked_at,
+                    checkpoint_id,
+                    created,
+                    storage,
+                    patches,
+                    px_stats
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create AOI');

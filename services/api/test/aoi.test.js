@@ -139,7 +139,7 @@ test('GET /api/project/1/aoi (empty)', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        }, t);
+        }, false);
 
         t.deepEquals(res.body, {
             total: 0,
@@ -183,6 +183,7 @@ test('POST /api/project/1/aoi', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
@@ -226,6 +227,17 @@ test('GET /api/project/1/aoi/1', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
+                ]]
+            },
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
@@ -235,10 +247,6 @@ test('GET /api/project/1/aoi/1', async (t) => {
             shares:  [],
             name: 'Test AOI',
             px_stats: {},
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[[-79.377245307, 38.834281801], [-79.37677592, 38.834281801], [-79.37677592, 38.834555504], [-79.377245307, 38.834555504], [-79.377245307, 38.834281801]]]
-            },
             classes: [
                 { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }
             ]
@@ -292,11 +300,11 @@ test('GET /api/project/1/aoi', async (t) => {
         t.deepEquals(res.body.aois[0].bounds, {
             type: 'Polygon',
             coordinates: [[
-                [-79.377245307, 38.834281801],
-                [-79.37677592, 38.834281801],
-                [-79.37677592, 38.834555504],
-                [-79.377245307, 38.834555504],
-                [-79.377245307, 38.834281801]
+                [-79.37724530696869, 38.83428180092151],
+                [-79.37677592039108, 38.83428180092151],
+                [-79.37677592039108, 38.83455550411051],
+                [-79.37724530696869, 38.83455550411051],
+                [-79.37724530696869, 38.83428180092151]
             ]]
         });
 
@@ -399,6 +407,7 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
             storage: true,
             project_id: 1,
             patches: [],
@@ -406,7 +415,22 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             checkpoint_id: 1,
             bookmarked: true,
             name: 'RENAMED',
-            bounds: { type: 'Polygon', coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]] }
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
+                ]]
+            },
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -465,6 +489,7 @@ test('POST /api/project/1/aoi', async (t) => {
 
         t.deepEquals(res.body, {
             id: 2,
+            area: 1238,
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
@@ -523,7 +548,10 @@ test('DELETE /api/project/1/aoi/1', async (t) => {
             }
         }, t);
 
-        t.deepEquals(res.body, true);
+        t.deepEquals(res.body, {
+            status: 200,
+            message: 'AOI Deleted'
+        });
     } catch (err) {
         t.error(err, 'no errors');
     }

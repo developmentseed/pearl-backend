@@ -78,20 +78,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given AOI
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "name": "I'm an AOI",
-     *       "checkpoint_id": 1,
-     *       "storage": true,
-     *       "bookmarked": false,
-     *       "bookmarked_at": "<date>",
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON "}
-     *   }
+     * @apiSchema {jsonschema=../schema/res.ListBatches.json} apiSuccess
      */
-    await schema.get( '/project/:projectid/aoi/:aoiid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid', {
+        res: 'res.AOI.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -102,9 +93,10 @@ async function router(schema, config) {
                 aoi_id: a.id
             });
 
-            a.shares = shares.shares;
+            const a_json = a.serialize();
+            a_json.shares = shares.shares;
 
-            return res.json(a);
+            return res.json(a_json);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -177,16 +169,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Upload a new GeoTiff to the API
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "storage": true,
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON "}
-     *   }
+     * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/upload', {}, config.requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/upload', {
+        res: 'res.AOI.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -342,23 +329,11 @@ async function router(schema, config) {
      *     Return all aois for a given instance
      *
      * @apiSchema (Query) {jsonschema=../schema/req.query.aoi.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "project_id": 123,
-     *       "aois": [{
-     *           "id": 1432,
-     *           "storage": true,
-     *           "bookmarked": false,
-     *           "created": "<date>",
-     *           "bounds": { "GeoJSON "}
-     *       }]
-     *   }
+     * @apiSchema {jsonschema=../schema/res.ListAOIs.json} apiSuccess
      */
     await schema.get('/project/:projectid/aoi', {
-        query: 'req.query.aoi.json'
+        query: 'req.query.aoi.json',
+        res: 'res.ListAOIs.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -391,23 +366,12 @@ async function router(schema, config) {
      *     Create a new AOI during an instance
      *     Note: this is an internal API that is called by the websocket GPU
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.aoi.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "project_id": 1,
-     *       "name": "I'm an AOI",
-     *       "checkpoint_id": 1,
-     *       "storage": true,
-     *       "bookmarked": false,
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON" }
-     *   }
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateAOI.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
      */
     await schema.post('/project/:projectid/aoi', {
-        body: 'req.body.aoi.json'
+        body: 'req.body.CreateAOI.json',
+        res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -555,14 +519,24 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Delete an existing AOI
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.delete('/project/:projectid/aoi/:aoiid', {}, config.requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/aoi/:aoiid', {
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
+
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            return res.json(await a.delete(config.pool));
+            await a.delete(config.pool);
+
+            return res.json({
+                status: 200,
+                message: 'AOI Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -579,21 +553,11 @@ async function router(schema, config) {
      *     Update an AOI
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.aoi-patch.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "project_id": 1,
-     *       "name": "I'm an AOI",
-     *       "checkpoint_id": 1,
-     *       "bookmarked": false,
-     *       "storage": true,
-     *       "created": "<date>"
-     *   }
+     * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
      */
     await schema.patch('/project/:projectid/aoi/:aoiid', {
-        body: 'req.body.aoi-patch.json'
+        body: 'req.body.PatchAOI.json',
+        res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
