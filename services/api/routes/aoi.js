@@ -552,7 +552,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Update an AOI
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.aoi-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchAOI.json} apiParam
      * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
      */
     await schema.patch('/project/:projectid/aoi/:aoiid', {
