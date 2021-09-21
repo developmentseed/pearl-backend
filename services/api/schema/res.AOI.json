@@ -75,7 +75,10 @@
             }
         },
         "shares": {
-            "type": "array"
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         }
     }
 }
