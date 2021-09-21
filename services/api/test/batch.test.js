@@ -92,7 +92,7 @@ test('GET /api/project/1/batch/1 (does not exist)', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, false);
 
         t.deepEquals(res.body, {
             status: 404,
@@ -230,7 +230,7 @@ test('POST /api/project/1/batch', async (t) => {
                     ]]
                 }
             }
-        });
+        }, false);
 
         t.deepEquals(res.body, {
             status: 400,
@@ -361,7 +361,7 @@ test('POST /api/project/1/batch - invalid checkpoint', async (t) => {
                     ]]
                 }
             }
-        });
+        }, false);
 
         t.deepEquals(res.body, {
             status: 404, message:

@@ -57,7 +57,7 @@
     "POST /project/:projectid/aoi/:aoiid/upload": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/aoi/:aoiid/download/raw": {
         "body": false,
@@ -97,7 +97,7 @@
     "DELETE /project/:projectid/aoi/:aoiid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "PATCH /project/:projectid/aoi/:aoiid": {
         "body": true,

@@ -69,7 +69,7 @@ test('GET /api/project/1/instance (empty)', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.deepEquals(res.body, {
             total: 0,
@@ -126,7 +126,7 @@ test('GET /api/project/1/instance', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -247,7 +247,7 @@ test('GET /api/project/1/instance?status=active', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -277,7 +277,7 @@ test('GET /api/project/1/instance', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -352,7 +352,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
                     { name: 'Built', color: '#806060' }
                 ]
             }
-        });
+        }, t);
     } catch (err) {
         t.error(err, 'no error');
     }
@@ -372,7 +372,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             body: {
                 checkpoint_id: 1
             }
-        });
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');

@@ -155,6 +155,7 @@ test('POST /api/project/1/aoi', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
@@ -237,7 +238,7 @@ test('POST /api/project/1/aoi/2/share', (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'AOI not found',
+            message: 'aoi not found',
             messages: []
         });
 
@@ -283,7 +284,16 @@ test('POST /api/project/1/aoi/1/share', (t) => {
             aoi_id: 1,
             storage: false,
             patches: [],
-            bounds: { type: 'Polygon', coordinates: [[[-79.377245307, 38.834281801], [-79.37677592, 38.834281801], [-79.37677592, 38.834555504], [-79.377245307, 38.834555504], [-79.377245307, 38.834281801]]] }
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
+                ]]
+            }
         });
 
         t.end();
@@ -409,6 +419,7 @@ test('GET /api/project/1/aoi/1', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
             name: 'Test AOI',
             storage: true,
             bookmarked: false,
@@ -424,8 +435,14 @@ test('GET /api/project/1/aoi/1', (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             bounds: {
-                type: 'Polygon',
-                coordinates: [[[-79.377245307, 38.834281801], [-79.37677592, 38.834281801], [-79.37677592, 38.834555504], [-79.377245307, 38.834555504], [-79.377245307, 38.834281801]]]
+                 type: 'Polygon',
+                 coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
             },
             shares: [{
                 aoi_id: 1,
