@@ -408,7 +408,10 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            return res.json(await aoi.create(req.params.projectid, req.body));
+            req.body.project_id = req.params.projectid;
+            const a = await aoi.generate(config.pool, req.body);
+
+            return res.json(a.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
