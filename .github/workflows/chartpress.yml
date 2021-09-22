@@ -64,7 +64,7 @@ jobs:
     - name: Deploy -- Production
       env:
         postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/prepare-prod'
       run: ./scripts/cideploy --production
 
     # - name: Run Chartpress
