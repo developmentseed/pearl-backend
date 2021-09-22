@@ -1,12 +1,5 @@
-
-
 const Err = require('./error');
-const moment = require('moment');
-const {
-    BlobSASPermissions,
-    BlobServiceClient
-} = require('@azure/storage-blob');
-
+const Storage = require('./storage');
 const { sql } = require('slonik');
 
 class AOIShare {
