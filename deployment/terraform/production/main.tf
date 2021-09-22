@@ -7,6 +7,14 @@ variable "subscriptionId" {
   type = string
 }
 
+variable "postgres_password" {
+  type = string
+}
+
+variable "signing_secret" {
+  type = string
+}
+
 module "resources" {
   source = "../resources"
 
