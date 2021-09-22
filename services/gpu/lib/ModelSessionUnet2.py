@@ -243,7 +243,6 @@ class LoadUnet2(ModelSession):
         print("# is cuda available?", torch.cuda.is_available())
         print("# GPU or CPU?", self.device)
 
-        # will need to figure out for re-training
         self.output_channels = len(self.classes)
         self.output_features = 64
         self.model = Unet2(
@@ -344,7 +343,7 @@ class LoadUnet2(ModelSession):
             if name not in list(self.class_names_mapping.keys()):
                 self.class_names_mapping.update(
                     {name: max(self.class_names_mapping.values()) + 1}
-                )  # to-do? this new classs name + value need to stay in the dictionary for future re-training iterations
+                )
             ints_retrain.append(self.class_names_mapping.get(name))
 
         self.augment_y_train = self.augment_y_train + ints_retrain
@@ -386,9 +385,7 @@ class LoadUnet2(ModelSession):
 
         # self.augment_model.classes_ = np.array(np.unique(y_train))
 
-        self.augment_model.fit(
-            x_train, y_train
-        )  # figure out if this is running on GPU or CPU
+        self.augment_model.fit(x_train, y_train)
 
         print("coef shape")
         print(self.augment_model.coef_.shape)
