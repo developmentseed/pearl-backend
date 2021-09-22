@@ -15,6 +15,14 @@ variable "signing_secret" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "region" {
+  type = string
+}
+
 module "resources" {
   source = "../resources"
 
