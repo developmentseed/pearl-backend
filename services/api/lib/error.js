@@ -5,7 +5,7 @@ class PublicError {
         // Wrap postgres errors to ensure stack trace (line nums) are returned
         if (err && err.severity) err = new Error(err);
 
-        if (print && ![400, 401, 404].includes(status)) console.error(err ? err : 'Error: ' + safe);
+        if (print && ![400, 401, 403, 404].includes(status)) console.error(err ? err : 'Error: ' + safe);
 
         this.status = status;
         this.err = err;
