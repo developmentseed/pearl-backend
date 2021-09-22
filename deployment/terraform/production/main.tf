@@ -15,6 +15,11 @@ variable "signing_secret" {
   type = string
 }
 
+locals {
+  storage               = "${local.stack_id}tf${var.environment}"
+}
+
+
 module "resources" {
   source = "../resources"
 
