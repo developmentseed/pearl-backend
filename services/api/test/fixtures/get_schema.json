@@ -119,6 +119,16 @@
         "query": false,
         "res": false
     },
+    "GET /share/:shareuuid/download/raw": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /share/:shareuuid/download/color": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /project/:projectid/batch": {
         "body": false,
         "query": true,

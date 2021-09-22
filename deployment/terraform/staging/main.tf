@@ -7,10 +7,6 @@ variable "subscriptionId" {
   type = string
 }
 
-variable "servicePrincipalJSON" {
-  type = string
-}
-
 variable "postgres_password" {
   type = string
 }
@@ -24,14 +20,13 @@ module "resources" {
 
   environment          = "staging"
   subscriptionId       = var.subscriptionId
-  servicePrincipalJSON = var.servicePrincipalJSON
   region               = "West Europe"
   aks_node_count       = 1
 
   postgres_password    = var.postgres_password
   signing_secret       = var.signing_secret
   admin_email          = "sanjay@developmentseed.org"
-  gpu_count            = 2
+  gpu_count            = 10
   placeholder_is_gpu   = true
   placeholder_num_gpus = 2
 

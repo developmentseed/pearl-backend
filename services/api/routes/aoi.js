@@ -85,7 +85,8 @@ async function router(schema, config) {
      *       "name": "I'm an AOI",
      *       "checkpoint_id": 1,
      *       "storage": true,
-     *       "bookmarked": false
+     *       "bookmarked": false,
+     *       "bookmarked_at": "<date>",
      *       "created": "<date>",
      *       "bounds": { "GeoJSON "}
      *   }
@@ -673,6 +674,70 @@ async function router(schema, config) {
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
+
+            await proxy.request(req, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/share/:shareuuid/download/raw Download Raw AOI
+     * @apiVersion 1.0.0
+     * @apiName DownloadRawAOI
+     * @apiGroup Share
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Return the aoi fabric geotiff
+     */
+    await schema.get('/share/:shareuuid/download/raw', {}, async (req, res) => {
+        try {
+            const a = await aoishare.get(req.params.shareuuid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            await aoi.download(a.id, res);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/share/:shareuuid/download/color Download Color AOI
+     * @apiVersion 1.0.0
+     * @apiName DownloadColorAOI
+     * @apiGroup Share
+     * @apiPermission public
+     *
+     * @apiDescription
+     *     Return the colourized aoi fabric geotiff
+     */
+    await schema.get('/share/:shareuuid/download/color', {}, async (req, res) => {
+        try {
+            const a = await aoishare.get(req.params.shareuuid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            const tiffurl = await aoi.url(a.id);
+
+            const chkpt = await checkpoint.get(a.checkpoint_id);
+            const cmap = {};
+            for (let i = 0; i < chkpt.classes.length; i++) {
+                cmap[i] = chkpt.classes[i].color;
+            }
+
+            const patchurls = [];
+            for (const patchid of a.patches) {
+                patchurls.push(await aoipatch.url(a.id, patchid));
+            }
+
+            req.method = 'POST';
+            req.url = '/cog/cogify';
+
+            req.body = {
+                input: tiffurl,
+                patches: patchurls,
+                colormap: cmap
+            };
 
             await proxy.request(req, res);
         } catch (err) {

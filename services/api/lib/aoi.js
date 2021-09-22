@@ -71,6 +71,7 @@ class AOI {
             created: row.created,
             storage: row.storage,
             bookmarked: row.bookmarked,
+            bookmarked_at: row.bookmarked_at,
             project_id: parseInt(row.project_id),
             checkpoint_id: parseInt(row.checkpoint_id),
             patches: row.patches.map((patch) => { return parseInt(patch); }),
@@ -189,12 +190,21 @@ class AOI {
     async patch(aoiid, aoi) {
         let pgres;
         try {
+            let bookmarked_at;
+            if (aoi.bookmarked !== undefined) {
+                if (aoi.bookmarked) {
+                    bookmarked_at = sql`NOW()`;
+                } else {
+                    bookmarked_at = null;
+                }
+            }
             pgres = await this.pool.query(sql`
                 UPDATE aois
                     SET
                         storage = COALESCE(${aoi.storage || null}, storage),
                         name = COALESCE(${aoi.name || null}, name),
-                        bookmarked = COALESCE(${aoi.bookmarked || null}, bookmarked),
+                        bookmarked = ${aoi.bookmarked !== undefined ? aoi.bookmarked : sql`COALESCE(bookmarked)`},
+                        bookmarked_at = ${bookmarked_at !== undefined ? bookmarked_at : sql`COALESCE(bookmarked_at)`},
                         patches = COALESCE(${aoi.patches ? sql.array(aoi.patches, sql`BIGINT[]`) : null}, patches),
                         px_stats = COALESCE(${aoi.px_stats ? JSON.stringify(aoi.px_stats) : null}::JSONB, px_stats)
                     WHERE
@@ -225,6 +235,7 @@ class AOI {
                     ST_AsGeoJSON(a.bounds)::JSON AS bounds,
                     a.project_id AS project_id,
                     a.bookmarked AS bookmarked,
+                    a.bookmarked_at AS bookmarked_at,
                     a.checkpoint_id AS checkpoint_id,
                     a.created AS created,
                     a.storage AS storage,
@@ -284,6 +295,7 @@ class AOI {
                     a.name AS name,
                     a.px_stats AS px_stats,
                     a.bookmarked AS bookmarked,
+                    a.bookmarked_at AS bookmarked_at,
                     ST_AsGeoJSON(a.bounds)::JSON AS bounds,
                     a.created AS created,
                     a.storage AS storage,
@@ -318,6 +330,7 @@ class AOI {
                     id: parseInt(row.id),
                     name: row.name,
                     bookmarked: row.bookmarked,
+                    bookmarked_at: row.bookmarked_at,
                     bounds: row.bounds,
                     px_stats: row.px_stats,
                     created: row.created,
