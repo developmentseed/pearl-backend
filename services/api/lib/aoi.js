@@ -1,12 +1,7 @@
 const Err = require('./error');
 const Project = require('./project');
-const moment = require('moment');
 const Generic = require('./generic');
-const {
-    BlobSASPermissions,
-    BlobServiceClient
-} = require('@azure/storage-blob');
-
+const Storage = require('./storage');
 const { sql } = require('slonik');
 
 class AOI extends Generic {
@@ -110,22 +105,6 @@ class AOI extends Generic {
     }
 
     /**
-     * Return an Azure Container Client
-     *
-     * @param {Config} config
-     * @returns {Object} Azure Container Client
-     */
-    #blob(config) {
-        // don't access these services unless AzureStorage is truthy
-        if (!config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
-
-        const blob_client = BlobServiceClient.fromConnectionString(config.AzureStorage);
-        const container_client = blob_client.getContainerClient('aois');
-
-        return container_client;
-    }
-
-    /**
      * Return a sharing URL that can be used to titiler
      *
      * @param {Config} config
@@ -133,16 +112,8 @@ class AOI extends Generic {
     async url(config) {
         if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-        const client = this.#blob(config);
-
-        const url = new URL(await client.generateSasUrl({
-            permissions: BlobSASPermissions.parse('r').toString(),
-            expiresOn: moment().add(365, 'days')
-        }));
-
-        url.pathname = `/aois/aoi-${this.id}.tiff`;
-
-        return url;
+        const storage = new Storage(config, 'aois');
+        return await storage.url(`aoi-${this.id}.tiff`);
     }
 
     /**
@@ -152,19 +123,12 @@ class AOI extends Generic {
      * @param {Object} file File Stream to upload
      */
     async upload(config, file) {
-        const client = this.#blob(config);
+        if (this.storage) throw new Err(404, null, 'AOI has already been uploaded');
 
-        const blob = client.getBlockBlobClient(`aoi-${this.id}.tiff`);
-
-        try {
-            await blob.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
-                blobHTTPHeaders: { blobContentType: 'image/tiff' }
-            });
-        } catch (err) {
-            throw new Err(500, err, 'Failed to upload AOI');
-        }
-
+        const storage = new Storage(config, 'aois');
+        await storage.upload(file, `aoi-${this.id}.tiff`);
         this.storage = true;
+
         return await this.commit(config.pool);
     }
 
@@ -176,10 +140,8 @@ class AOI extends Generic {
     async exists(config) {
         if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-        const client = this.#blob(config);
-
-        const blob = client.getBlockBlobClient(`aoi-${this.id}.tiff`);
-        return await blob.exists();
+        const storage = new Storage(config, 'aois');
+        return await storage.exists(`aoi-${this.id}.tiff`);
     }
 
     /**
@@ -191,12 +153,8 @@ class AOI extends Generic {
     async download(config, res) {
         if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-        const client = this.#blob(config);
-
-        const blob = client.getBlockBlobClient(`aoi-${this.id}.tiff`);
-        const dwn = await blob.download(0);
-
-        dwn.readableStreamBody.pipe(res);
+        const storage = new Storage(config, 'aois');
+        return await storage.download(`aoi-${this.id}.tiff`, res);
     }
 
     /**
