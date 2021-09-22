@@ -42,7 +42,7 @@ locals {
   location              = lower(replace(var.region, " ", ""))
   prefix                = "${local.stack_id}-${var.environment}"
   prefixnodashes        = "${local.stack_id}${var.environment}"
-  storage               = "${local.stack_id}${var.environment}"
+  storage               = "${local.stack_id}tf${var.environment}"
   deploy_secrets_prefix = "${local.stack_id}-${var.environment}"
 }
 
