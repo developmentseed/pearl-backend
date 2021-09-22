@@ -15,6 +15,10 @@ variable "signing_secret" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 module "resources" {
   source = "../resources"
 
@@ -34,7 +38,12 @@ module "resources" {
 }
 
 locals {
-  storage               = "${local.stack_id}tf${var.environment}"
+  stack_id              = "lulc"
+  location              = lower(replace(var.region, " ", ""))
+  prefix                = "${local.stack_id}-${var.environment}"
+  prefixnodashes        = "${local.stack_id}${var.environment}"
+  storage               = "${local.stack_id}${var.environment}"
+  deploy_secrets_prefix = "${local.stack_id}-${var.environment}"
 }
 
 terraform {
