@@ -15,11 +15,6 @@ variable "signing_secret" {
   type = string
 }
 
-locals {
-  storage               = "${local.stack_id}tf${var.environment}"
-}
-
-
 module "resources" {
   source = "../resources"
 
@@ -36,6 +31,10 @@ module "resources" {
   placeholder_num_gpus = 2
 
   domain = "lulc-production.ds.io"
+}
+
+locals {
+  storage               = "${local.stack_id}tf${var.environment}"
 }
 
 terraform {
