@@ -40,7 +40,7 @@ class Storage {
             expiresOn: moment().add(365, 'days')
         }));
 
-        url.pathname = `${this.type}/${path}`;
+        url.pathname = `${this.type}/${this.config.AzurePrefix}${path}`;
 
         return url;
     }
@@ -53,6 +53,8 @@ class Storage {
      * @param {String} [mime='image/tiff'] Mime type of file
      */
     async upload(file, path, mime = 'image/tiff') {
+        path = this.config.AzurePrefix + path;
+
         const blob = this.client.getBlockBlobClient(path);
 
         try {
@@ -74,6 +76,8 @@ class Storage {
      * @param {String} path Partial path fragment to file ie: aoi-1.tiff
      */
     async exists(path) {
+        path = this.config.AzurePrefix + path;
+
         const blob = this.client.getBlockBlobClient(path);
 
         return await blob.exists();
@@ -82,10 +86,13 @@ class Storage {
     /**
      * Download a file from Azure
      *
+     * @param {String} path Partial path fragment to file ie: aoi-1.tiff
      * @param {Stream} res Stream to pipe geotiff to (usually express response object)
      */
-    async download(res) {
-        const blob = this.client.getBlockBlobClient(`aoi-${this.id}.tiff`);
+    async download(path, res) {
+        path = this.config.AzurePrefix + path;
+
+        const blob = this.client.getBlockBlobClient(path);
         const dwn = await blob.download(0);
 
         dwn.readableStreamBody.pipe(res);

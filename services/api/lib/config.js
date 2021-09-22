@@ -14,7 +14,7 @@ class Config {
         this.test = !!args.test;
 
         if (this.test) {
-            this.AzurePrefix = Math.random().toString(36).substring(2, 15);
+            this.AzurePrefix = Math.random().toString(36).substring(2, 15) + '-';
         } else {
             this.AzurePrefix = '';
         }
