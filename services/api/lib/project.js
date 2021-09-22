@@ -28,7 +28,7 @@ class Project extends Generic {
         const proj = await Project.from(pool, projectid);
 
         if (auth.access !== 'admin' && auth.uid !== proj.uid) {
-            throw new Err(401, null, 'Cannot access a project you are not the owner of');
+            throw new Err(403, null, 'Cannot access a project you are not the owner of');
         }
 
         return proj;

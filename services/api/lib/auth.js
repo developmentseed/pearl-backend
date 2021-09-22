@@ -1,8 +1,5 @@
-
-
 const Err = require('./error');
 const jwt = require('jsonwebtoken');
-
 const { sql } = require('slonik');
 
 class Auth {
@@ -19,7 +16,7 @@ class Auth {
         await this.is_auth(req);
 
         if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin') {
-            throw new Err(401, null, `${flag} flag required`);
+            throw new Err(403, null, `${flag} flag required`);
         }
 
         return true;
@@ -27,7 +24,7 @@ class Auth {
 
     async is_admin(req) {
         if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
-            throw new Err(401, null, 'Admin token required');
+            throw new Err(403, null, 'Admin token required');
         }
 
         return true;
@@ -55,7 +52,7 @@ class Auth {
                     RETURNING *
             `);
         } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
+            throw new Err(500, err, 'Internal error');
         }
 
         const row = pgres.rows[0];
@@ -104,7 +101,7 @@ class Auth {
                     ${query.page}
             `);
         } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
+            throw new Err(500, err, 'Internal error');
         }
 
         return {
@@ -137,7 +134,7 @@ class Auth {
                     ${sql.identifier(['users', idField])} = ${uid}
             `);
         } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
+            throw new Err(500, err, 'Internal Error');
         }
 
         if (pgres.rows.length === 0) {
