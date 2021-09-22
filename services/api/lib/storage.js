@@ -13,6 +13,10 @@ class Storage {
         if (!config) throw new Error('config param required');
         if (!type) throw new Error('type param required');
 
+        if (!['aois', 'checkpoints', 'models'].includes(type)) {
+            throw new Error('Unknown type param');
+        }
+
         this.type = type;
         this.config = config;
 
@@ -99,6 +103,18 @@ class Storage {
         const dwn = await blob.download(0);
 
         dwn.readableStreamBody.pipe(res);
+    }
+
+    /**
+     * Remove a file from azure storage
+     *
+     * @param {String} path Partial path fragment to file ie: aoi-1.tiff
+     */
+    async delete(path) {
+        path = this.config.AzurePrefix + path;
+
+        const blob = this.client.getBlockBlobClient(path);
+        await blob.delete();
     }
 }
 

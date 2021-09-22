@@ -8,12 +8,6 @@ class Model {
     constructor(config) {
         this.pool = config.pool;
         this.config = config;
-
-        // don't access these services unless AzureStorage is truthy
-        if (this.config.AzureStorage) {
-            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
-            this.container_client = this.blob_client.getContainerClient('models');
-        }
     }
 
     /**
@@ -105,17 +99,10 @@ class Model {
      * @param {Object} file File stream to upload
      */
     async upload(modelid, file) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
+        if (this.storage) throw new Err(404, null, 'Model has already been uploaded');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`model-${modelid}.zip`);
-
-        try {
-            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
-                blobHTTPHeaders: { blobContentType: 'application/zip' }
-            });
-        } catch (err) {
-            throw new Err(500, err, 'Failed to uploda Model');
-        }
+        const storage = new Storage(this.config, 'models');
+        await storage.upload(file, `model-${modelid}.zip`, 'application/zip');
 
         return await this.patch(modelid, {
             storage: true
@@ -172,16 +159,12 @@ class Model {
      * @param {Stream} res Stream to pipe model to (usually express response object)
      */
     async download(modelid, res) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
-
         const model = await this.get(modelid);
         if (!model.storage) throw new Err(404, null, 'Model has not been uploaded');
         if (!model.active) throw new Err(410, null, 'Model is set as inactive');
 
-        const blob_client = this.container_client.getBlockBlobClient(`model-${modelid}.zip`);
-        const dwn = await blob_client.download(0);
-
-        dwn.readableStreamBody.pipe(res);
+        const storage = new Storage(this.config, 'models');
+        await storage.download(`model-${modelid}.zip`, res);
     }
 
     /**
