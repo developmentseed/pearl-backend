@@ -10,6 +10,9 @@ const {
  */
 class Storage {
     constructor(config, type) {
+        if (!config) throw new Error('config param required');
+        if (!type) throw new Error('type param required');
+
         this.type = type;
         this.config = config;
 
