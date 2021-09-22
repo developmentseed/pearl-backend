@@ -1,7 +1,5 @@
-
-
 const Err = require('./error');
-const { BlobServiceClient } = require('@azure/storage-blob');
+const Storage = require('./storage');
 const poly = require('@turf/bbox-polygon').default;
 const bbox = require('@turf/bbox').default;
 const { sql } = require('slonik');

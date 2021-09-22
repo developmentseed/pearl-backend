@@ -1,7 +1,6 @@
 const Project = require('./project');
 const Err = require('./error');
-const { BlobServiceClient } = require('@azure/storage-blob');
-
+const Storage = require('./storage');
 const { sql } = require('slonik');
 
 class CheckPoint {
