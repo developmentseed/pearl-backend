@@ -188,7 +188,7 @@ class CheckPoint {
                 blobHTTPHeaders: { blobContentType: 'application/octet-stream' }
             });
         } catch (err) {
-            throw new Err(500, err, 'Failed to uploda Checkpoint');
+            throw new Err(500, err, 'Failed to upload Checkpoint');
         }
 
         return await this.patch(checkpointid, {
