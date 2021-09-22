@@ -6,12 +6,6 @@ class AOIShare {
     constructor(config) {
         this.pool = config.pool;
         this.config = config;
-
-        // don't access these services unless AzureStorage is truthy
-        if (this.config.AzureStorage) {
-            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
-            this.container_client = this.blob_client.getContainerClient('aois');
-        }
     }
 
     /**
@@ -20,16 +14,10 @@ class AOIShare {
      * @param {string} uuid UUID of share tiff
      */
     async url(uuid) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI Share storage not configured');
+        if (!this.storage) throw new Err(404, null, 'AOI Share has not been uploaded');
 
-        const url = new URL(await this.container_client.generateSasUrl({
-            permissions: BlobSASPermissions.parse('r').toString(),
-            expiresOn: moment().add(365, 'days')
-        }));
-
-        url.pathname = `/aois/share-${uuid}.tiff`;
-
-        return url;
+        const storage = new Storage(this.config, 'aois');
+        return await storage.url(`share-${uuid}.tiff`);
     }
 
     /**
@@ -71,23 +59,14 @@ class AOIShare {
      * @param {Object} file File Stream to upload
      */
     async upload(shareuuid, file) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
+        if (this.storage) throw new Err(404, null, 'AOI Share has already been uploaded');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`share-${shareuuid}.tiff`);
+        const storage = new Storage(this.config, 'aois');
+        await storage.upload(file, `share-${shareuuid}.tiff`);
 
-        try {
-            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
-                blobHTTPHeaders: { blobContentType: 'image/tiff' }
-            });
-        } catch (err) {
-            throw new Err(500, err, 'Failed to upload AOI Share');
-        }
-
-        const patch = await this.patch(shareuuid, {
+        return await this.patch(shareuuid, {
             storage: true
         });
-
-        return patch;
     }
 
     /**
@@ -97,15 +76,11 @@ class AOIShare {
      * @param {Stream} res Stream to pipe geotiff to (usually express response object)
      */
     async download(shareuuid, res) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI Share storage not configured');
-
         const aoi = await this.get(shareuuid);
         if (!aoi.storage) throw new Err(404, null, 'AOI Share has not been uploaded');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`share-${shareuuid}.tiff`);
-        const dwn = await blockBlobClient.download(0);
-
-        dwn.readableStreamBody.pipe(res);
+        const storage = new Storage(this.config, 'aois');
+        await storage.download(`share-${shareuuid}.tiff`, res);
     }
 
     /**
@@ -133,8 +108,8 @@ class AOIShare {
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
         if (pgres.rows[0].storage && this.config.AzureStorage) {
-            const blob_client = this.container_client.getBlockBlobClient(`share-${shareuuid}.tiff`);
-            await blob_client.delete();
+            const storage = new Storage(this.config, 'aois');
+            await storage.delete(`share-${shareuuid}.tiff`);
         }
 
         return true;
