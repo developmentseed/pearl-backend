@@ -40,7 +40,7 @@ class SMPModelWrapper(nn.Module):
     def forward(self, x):
         self.model(x)
 
-    def foward_features(self, x):
+    def forward_features(self, x):
         features = self.encoder(x)
         decoder_output = self.decoder(*features)
         return decoder_output
@@ -80,11 +80,12 @@ class LoadDeepLabv3Plus(ModelSession):
         # will need to figure out for re-training
         self.output_channels = len(self.classes)
         self.output_features = 64
-        self.model = SMPModelWrapper(  # smp.DeepLabV3Plus
+        self.model = SMPModelWrapper(
             encoder_name="resnet18",
             encoder_weights=None,
             in_channels=4,
-            classes=len(self.classes)).model
+            classes=len(self.classes),
+        ).model
         self._init_model()
 
         for param in self.model.parameters():
