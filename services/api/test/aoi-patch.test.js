@@ -156,7 +156,7 @@ test('POST /api/project/1/aoi/1/patch - no aoi', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 404, 'status: 404');
         t.deepEquals(res.body, {
-            status: 404, message: 'AOI not found', messages: []
+            status: 404, message: 'aoi not found', messages: []
         });
 
         t.end();
@@ -193,6 +193,7 @@ test('POST /api/project/1/aoi', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
@@ -364,6 +365,7 @@ test('PATCH /api/project/1/aoi/1', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
             storage: false,
             project_id: 1,
             checkpoint_id: 1,
@@ -371,7 +373,22 @@ test('PATCH /api/project/1/aoi/1', (t) => {
             px_stats: {},
             patches: [1],
             name: 'Test AOI',
-            bounds: { type: 'Polygon', coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]] }
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
+                ]]
+            },
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
         });
         t.end();
     });

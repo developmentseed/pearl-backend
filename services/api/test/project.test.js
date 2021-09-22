@@ -217,6 +217,7 @@ test('POST /api/project/1/aoi', (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            area: 1238,
             storage: false,
             project_id: 1,
             patches: [],

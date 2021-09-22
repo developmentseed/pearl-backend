@@ -1,0 +1,93 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "project_id",
+        "aois"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "project_id": {
+            "type": "integer",
+            "description": "Id of the associated project"
+        },
+        "aois": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "bounds",
+                    "area",
+                    "bookmarked",
+                    "bookmarked_at",
+                    "checkpoint_id",
+                    "created",
+                    "storage",
+                    "patches",
+                    "px_stats",
+                    "checkpoint_name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "checkpoint_name": {
+                        "type": "string"
+                    },
+                    "bounds": {
+                        "type": "object"
+                    },
+                    "area": {
+                        "type": "integer"
+                    },
+                    "bookmarked": {
+                        "type": ["boolean", "null"]
+                    },
+                    "bookmarked_at": {
+                        "type": ["integer", "null"]
+                    },
+                    "checkpoint_id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "storage": {
+                        "type": "boolean"
+                    },
+                    "patches": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "px_stats": {
+                        "type": "object"
+                    },
+                    "classes": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "shares": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

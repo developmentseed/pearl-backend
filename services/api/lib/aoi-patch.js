@@ -1,6 +1,5 @@
-
-
 const Err = require('./error');
+const AOI = require('./aoi');
 const moment = require('moment');
 const {
     BlobSASPermissions,
@@ -24,15 +23,14 @@ class AOIPatch {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Project} project Instantiated Project class
-     * @param {Project} aoi Instantiated AOI class
+     * @param {Pool} pool Instantiated Postgres Pool
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} aoiid AOI the user is attemping to access
      * @param {Number} patchid AOI the user is attemping to access
      */
-    async has_auth(project, aoi, auth, projectid, aoiid, patchid) {
-        const a = await aoi.has_auth(project, auth, projectid, aoiid);
+    async has_auth(pool, auth, projectid, aoiid, patchid) {
+        const a = await AOI.has_auth(pool, auth, projectid, aoiid);
         const patch = await this.get(patchid);
 
         if (patch.aoi_id !== a.id) {
