@@ -72,11 +72,11 @@ test('GET /api/model/1/download (not found)', (t) => {
                 messages: []
             }, 'body');
         } else {
-            t.equals(res.statusCode, 424, 'status: 424');
+            t.equals(res.statusCode, 404, 'status: 404');
 
             t.deepEquals(res.body, {
-                status: 424,
-                message: 'Model storage not configured',
+                status: 404,
+                message: 'No model found',
                 messages: []
             }, 'body');
         }

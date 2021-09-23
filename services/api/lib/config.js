@@ -13,6 +13,12 @@ class Config {
 
         this.test = !!args.test;
 
+        if (this.test) {
+            this.AzurePrefix = Math.random().toString(36).substring(2, 15) + '-';
+        } else {
+            this.AzurePrefix = '';
+        }
+
         this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
         if (this.AzureStorage) console.log('ok - AzureStorage: Enabled');
 

@@ -1,19 +1,12 @@
 const Project = require('./project');
 const Err = require('./error');
-const { BlobServiceClient } = require('@azure/storage-blob');
-
+const Storage = require('./storage');
 const { sql } = require('slonik');
 
 class CheckPoint {
     constructor(config) {
         this.pool = config.pool;
         this.config = config;
-
-        // don't access these services unless AzureStorage is truthy
-        if (this.config.AzureStorage) {
-            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
-            this.container_client = this.blob_client.getContainerClient('checkpoints');
-        }
     }
 
     /**
@@ -179,17 +172,10 @@ class CheckPoint {
      * @param {Object} file File stream to upload
      */
     async upload(checkpointid, file) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'Checkpoint storage not configured');
+        if (this.storage) throw new Err(404, null, 'Checkpoint has already been uploaded');
 
-        const blockBlobClient = this.container_client.getBlockBlobClient(`checkpoint-${checkpointid}`);
-
-        try {
-            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
-                blobHTTPHeaders: { blobContentType: 'application/octet-stream' }
-            });
-        } catch (err) {
-            throw new Err(500, err, 'Failed to upload Checkpoint');
-        }
+        const storage = new Storage(this.config, 'checkpoints');
+        await storage.upload(file, `checkpoint-${checkpointid}`, 'application/octet-stream');
 
         return await this.patch(checkpointid, {
             storage: true
@@ -203,15 +189,11 @@ class CheckPoint {
      * @param {Stream} res Stream to pipe model to (usually express response object)
      */
     async download(checkpointid, res) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'Model storage not configured');
-
         const checkpoint = await this.get(checkpointid);
         if (!checkpoint.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
 
-        const blob_client = this.container_client.getBlockBlobClient(`checkpoint-${checkpointid}`);
-        const dwn = await blob_client.download(0);
-
-        dwn.readableStreamBody.pipe(res);
+        const storage = new Storage(this.config, 'checkpoints');
+        await storage.download(`checkpoint-${checkpointid}`, res);
     }
 
     /**

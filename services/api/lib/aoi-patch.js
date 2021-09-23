@@ -1,23 +1,12 @@
 const Err = require('./error');
 const AOI = require('./aoi');
-const moment = require('moment');
-const {
-    BlobSASPermissions,
-    BlobServiceClient
-} = require('@azure/storage-blob');
-
+const Storage = require('./storage');
 const { sql } = require('slonik');
 
 class AOIPatch {
     constructor(config) {
         this.pool = config.pool;
         this.config = config;
-
-        // don't access these services unless AzureStorage is truthy
-        if (this.config.AzureStorage) {
-            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
-            this.container_client = this.blob_client.getContainerClient('aois');
-        }
     }
 
     /**
@@ -47,16 +36,10 @@ class AOIPatch {
      * @param {Number} patchid AOI Patch ID to get a share URL for
      */
     async url(aoiid, patchid) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI Patch storage not configured');
+        if (!this.storage) throw new Err(404, null, 'AOI Patch has not been uploaded');
 
-        const url = new URL(await this.container_client.generateSasUrl({
-            permissions: BlobSASPermissions.parse('r').toString(),
-            expiresOn: moment().add(365, 'days')
-        }));
-
-        url.pathname = `/aois/aoi-${aoiid}-patch-${patchid}.tiff`;
-
-        return url;
+        const storage = new Storage(this.config, 'aois');
+        return await storage.url(`aoi-${aoiid}-patch-${patchid}.tiff`);
     }
 
     /**
@@ -86,17 +69,8 @@ class AOIPatch {
      * @param {Object} file File Stream to upload
      */
     async upload(aoiid, patchid, file) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
-
-        const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}-patch-${patchid}.tiff`);
-
-        try {
-            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
-                blobHTTPHeaders: { blobContentType: 'image/tiff' }
-            });
-        } catch (err) {
-            throw new Err(500, err, 'Failed to upload AOI Patch');
-        }
+        const storage = new Storage(this.config, 'aois');
+        await storage.upload(file, `aoi-${aoiid}-patch-${patchid}.tiff`);
 
         return await this.patch(patchid, {
             storage: true
@@ -111,15 +85,11 @@ class AOIPatch {
      * @param {Stream} res Stream to pipe geotiff to (usually express response object)
      */
     async download(aoiid, patchid, res) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
-
         const aoi = await this.get(aoiid);
         if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}-patch-${patchid}.tiff`);
-        const dwn = await blob_client.download(0);
-
-        dwn.readableStreamBody.pipe(res);
+        const storage = new Storage(this.config, 'aois');
+        await storage.download(`aoi-${aoiid}-patch-${patchid}.tiff`, res);
     }
 
     /**
@@ -146,8 +116,8 @@ class AOIPatch {
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
 
         if (pgres.rows[0].storage && this.config.AzureStorage) {
-            const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}-patch-${patchid}.tiff`);
-            await blob_client.delete();
+            const storage = new Storage(this.config, 'aois');
+            await storage.delete(`aoi-${aoiid}-patch-${patchid}.tiff`);
         }
 
         return true;
