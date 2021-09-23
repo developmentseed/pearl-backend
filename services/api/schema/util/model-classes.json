@@ -1,0 +1,20 @@
+{
+    "type": "array",
+    "description": "Named output classes & their associated colours",
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "name",
+            "color"
+        ],  
+        "properties": {
+            "name": {
+                "type": "string"
+            },
+            "color": {
+                "type": "string"
+            }   
+        }   
+    }   
+}
