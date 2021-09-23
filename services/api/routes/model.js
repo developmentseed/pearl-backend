@@ -1,9 +1,10 @@
-const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Busboy = require('busboy');
 
+const Err = require('../lib/error');
+const { Param } = require('../lib/util');
+const Model = require('../lib/model');
+
 async function router(schema, config) {
-    const model = new (require('../lib/model').Model)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     /**
@@ -13,20 +14,23 @@ async function router(schema, config) {
      * @apiGroup Model
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.model.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateModel.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      *
      * @apiDescription
      *     Create a new model in the system
      */
     await schema.post('/model', {
-        body: 'req.body.model.json',
+        body: 'req.body.CreateModel.json',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await auth.is_admin(req);
 
-            res.json(await model.create(req.body, req.auth));
+            req.body.uid = req.auth.uid;
+            const model = await Model.generate(config.pool, req.body);
+
+            return res.json(model.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -40,14 +44,14 @@ async function router(schema, config) {
      * @apiGroup Model
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.model-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchModel.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      *
      * @apiDescription
      *     Update a model
      */
     await schema.patch('/model/:modelid', {
-        body: 'req.body.model-patch.json',
+        body: 'req.body.PatchModel.json',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -55,7 +59,11 @@ async function router(schema, config) {
 
             await auth.is_admin(req);
 
-            res.json(await model.patch(req.params.modelid, req.body));
+            const model = await Model.from(config.pool, req.params.modelid);
+            model.patch(req.body);
+            model.commit(config.pool);
+
+            res.json(model.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -80,19 +88,25 @@ async function router(schema, config) {
             await Param.int(req, 'modelid');
             await auth.is_admin(req);
 
-            await model.get(req.params.modelid);
+            const busboy = new Busboy({
+                headers: req.headers,
+                limits: {
+                    files: 1
+                }
+            });
 
-            const busboy = new Busboy({ headers: req.headers });
+            const model = await Model.from(config.pool, req.params.modelid);
 
             const files = [];
-
             busboy.on('file', (fieldname, file) => {
-                files.push(model.upload(req.params.modelid, file));
+                files.push(model.upload(config, file));
             });
 
             busboy.on('finish', async () => {
                 try {
-                    return res.json(await model.get(req.params.modelid));
+                    await Promise.all(files);
+
+                    return res.json(model.serialize());
                 } catch (err) {
                     Err.respond(err, res);
                 }
@@ -114,20 +128,13 @@ async function router(schema, config) {
      * @apiDescription
      *     List information about a set of models
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "models": [{
-     *           "id": 1,
-     *           "created": "<date>",
-     *           "active": true,
-     *           "name": "NA Model"
-     *       }]
-     *   }
+     * @apiSchema {jsonschema=../schema/res.ListModels.json} apiSuccess
      */
-    await schema.get('/model', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/model', {
+        res: 'res.ListModels.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
-            res.json(await model.list());
+            res.json(await Model.list(config.pool));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -182,7 +189,9 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'modelid');
 
-            res.json(await model.get(req.params.modelid));
+            const model = await Model.from(config.pool, req.params.modelid);
+
+            return res.json(model.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -203,7 +212,8 @@ async function router(schema, config) {
         try {
             await Param.int(req, 'modelid');
 
-            await model.download(req.params.modelid, res);
+            const model = await Model.from(config.pool, req.params.modelid);
+            await model.download(config, res);
         } catch (err) {
             return Err.respond(err, res);
         }

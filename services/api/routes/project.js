@@ -3,10 +3,10 @@ const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
 const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
+const Model = require('../lib/model');
 
 async function router(schema, config) {
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
-    const model = new (require('../lib/model').Model)(config);
     const instance = new (require('../lib/instance').Instance)(config);
 
     /**
@@ -56,7 +56,7 @@ async function router(schema, config) {
                     p['checkpoints'] = checkpoints.checkpoints;
                     p['model'] = {};
                     if (p.model_id) {
-                        p['model'] = await model.get(p.model_id);
+                        p['model'] = await Model.from(config.pool, p.model_id);
                         delete p.model_id;
                     }
                 }
