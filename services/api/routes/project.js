@@ -56,7 +56,7 @@ async function router(schema, config) {
                     p['checkpoints'] = checkpoints.checkpoints;
                     p['model'] = {};
                     if (p.model_id) {
-                        p['model'] = await Model.from(config.pool, p.model_id);
+                        p['model'] = (await Model.from(config.pool, p.model_id)).serialize();
                         delete p.model_id;
                     }
                 }
