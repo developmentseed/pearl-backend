@@ -12,7 +12,7 @@ test('GET /api/model (empty)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -34,7 +34,7 @@ test('GET /api/model/1 (not found)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model/1',
+            url: '/api/model/1',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -60,7 +60,7 @@ test('GET /api/model/1/download (not found)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model/1/download',
+            url: '/api/model/1/download',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -85,7 +85,7 @@ test('POST /api/model', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             method: 'POST',
             auth: {
                 bearer: flight.token.ingalls
@@ -119,7 +119,7 @@ test('GET /api/model (storage: false)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -156,7 +156,7 @@ test('GET /api/model (storage: true)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -187,7 +187,7 @@ test('GET /api/model/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model/1',
+            url: '/api/model/1',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -229,7 +229,7 @@ test('GET /api/model/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model/1',
+            url: '/api/model/1',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -268,7 +268,7 @@ test('PATCH /api/model/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model/1',
+            url: '/api/model/1',
             method: 'PATCH',
             auth: {
                 bearer: flight.token.ingalls
@@ -327,7 +327,7 @@ if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
         try {
             const res = await flight.request({
                 json: true,
-                url: 'http://localhost:2000/api/model/1/download',
+                url: '/api/model/1/download',
                 method: 'GET',
                 auth: {
                     bearer: flight.token.ingalls
@@ -348,7 +348,7 @@ test('DELETE /api/model/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/model/1',
+            url: '/api/model/1',
             method: 'DELETE',
             auth: {
                 bearer: flight.token.ingalls
