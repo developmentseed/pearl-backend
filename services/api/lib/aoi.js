@@ -270,7 +270,8 @@ class AOI extends Generic {
     /**
      * Create a new AOI
      *
-     * @param {Number} projectid - AOIS related to a specific project
+     * @param {Pool} pool - Instantiated Postgres Pool
+     *
      * @param {Object} aoi - AOI Object
      * @param {Object} aoi.project_id - Project the AOI is part of
      * @param {String} aoi.name - Human Readable Name
