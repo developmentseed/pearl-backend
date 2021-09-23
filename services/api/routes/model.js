@@ -160,7 +160,8 @@ async function router(schema, config) {
             await Param.int(req, 'modelid');
             await auth.is_admin(req);
 
-            await model.delete(req.params.modelid);
+            const model = await Model.from(config.pool, req.params.modelid);
+            await model.delete(config.pool);
 
             return res.status(200).json({
                 status: 200,
