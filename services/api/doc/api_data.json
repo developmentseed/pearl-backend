@@ -1087,13 +1087,6 @@
           },
           {
             "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
@@ -1105,6 +1098,13 @@
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -2860,13 +2860,6 @@
           },
           {
             "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
@@ -2878,6 +2871,13 @@
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -3044,13 +3044,6 @@
           },
           {
             "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
@@ -3062,6 +3055,13 @@
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -3153,13 +3153,94 @@
     ],
     "description": "<p>List information about a set of models</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"models\": [{\n        \"id\": 1,\n        \"created\": \"<date>\",\n        \"active\": true,\n        \"name\": \"NA Model\"\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "models",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "models.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "models.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "models.active",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "models.uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "models.name",
+            "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]/Null",
+            "optional": false,
+            "field": "models.bounds",
+            "description": "<p>Recommended geographic area on which this model can be used</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "models.meta",
+            "description": "<p>Generic key/value store for additional model metadata</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "models.classes",
+            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "models.classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "models.classes.color",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/model.js",
     "groupTitle": "Model"
@@ -3217,13 +3298,6 @@
           },
           {
             "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
@@ -3235,6 +3309,13 @@
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
