@@ -433,8 +433,8 @@ class LoadUnet2(ModelSession):
         print("new_biases shape: ")
         print(new_biases.shape)
 
-        self.model.segmentation_head[0].weight = nn.Parameter(new_weights)
-        self.model.segmentation_head[0].bias = nn.Parameter(new_biases)
+        self.model.final.weights = nn.Parameter(new_weights)
+        self.model.final.bias = nn.Parameter(new_biases)
 
         print("last layer of pytorch model updated post retraining")
 
