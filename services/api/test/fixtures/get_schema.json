@@ -242,7 +242,7 @@
     "GET /model": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /model/:modelid": {
         "body": false,
