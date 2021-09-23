@@ -31,7 +31,8 @@ module "resources" {
   placeholder_is_gpu   = true
   placeholder_num_gpus = 2
 
-  domain = "lulc-production.ds.io"
+  # domain = "lulc-production.ds.io"
+  domain = "lulcterraformdev.ds.io"
 }
 
 terraform {
