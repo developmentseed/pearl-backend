@@ -123,7 +123,7 @@ test('GET /api/model (storage: false)', async (t) => {
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, t);
 
         t.deepEquals(res.body, {
@@ -160,7 +160,7 @@ test('GET /api/model (storage: true)', async (t) => {
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, t);
 
         t.equals(res.body.total, 1, '1 model');
@@ -191,7 +191,7 @@ test('GET /api/model/1', async (t) => {
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, t);
 
         t.deepEquals(Object.keys(res.body).sort(), [
@@ -233,7 +233,7 @@ test('GET /api/model/1', async (t) => {
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, t);
 
         t.ok(res.body.created);
@@ -331,7 +331,7 @@ if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
                 method: 'GET',
                 auth: {
                     bearer: flight.token.ingalls
-                },
+                }
             }, false);
 
             t.equals(res.statusCode, 200, 'status: 200');
@@ -343,5 +343,28 @@ if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
         t.end();
     });
 }
+
+test('DELETE /api/model/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/model/1',
+            method: 'DELETE',
+            auth: {
+                bearer: flight.token.ingalls
+            },
+        }, t);
+
+        t.deepEquals(res.body, {
+            status: 200,
+            message: 'Model deleted'
+        });
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
 
 flight.landing(test);

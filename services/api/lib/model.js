@@ -11,7 +11,7 @@ class Model extends Generic {
     static _patch = Object.keys(require('../schema/req.body.PatchModel.json').properties);
 
     constructor() {
-        super()
+        super();
     }
 
     serialize() {
@@ -218,12 +218,12 @@ class Model extends Generic {
      *
      * @param {Pool} pool Instantiated Postgres Pool
      */
-    async delete(modelid) {
+    async delete(pool) {
         let pgres;
         try {
             pgres = await pool.query(sql`
                 UPDATE
-                    model
+                    models
                 SET
                     active = false
                 WHERE
