@@ -352,7 +352,7 @@ test('DELETE /api/model/1', async (t) => {
             method: 'DELETE',
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, t);
 
         t.deepEquals(res.body, {
