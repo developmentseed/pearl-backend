@@ -12,7 +12,6 @@ from lib.api import API
 from lib.ModelSessionPyTorchExample import TorchFineTuning
 from lib.ModelSessionUnet import LoadUnet
 from lib.ModelSessionDeepLabv3 import LoadDeepLabv3Plus
-from lib.ModelSessionDeepLabv3_j import LoadDeepLabv3_j
 from lib.ModelSessionUnet2 import LoadUnet2
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
