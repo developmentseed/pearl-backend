@@ -39,6 +39,8 @@ class Instance extends Generic {
     /**
      * Return a list of instances
      *
+     * @param {Pool} pool - Instantianted Postgres Pool
+     *
      * @param {Number} projectid - Project ID
      *
      * @param {Object} query - Query Object
@@ -48,7 +50,7 @@ class Instance extends Generic {
      * @param {Number} [query.type] - Filter by type of instance. `gpu` or 'cpu'. Default all.
      * @param {Number} [query.batch] - Filter by batch status (batch=true/false - Show/Hide batches, batch=<num> show instance with specific batch)
      */
-    static async list(projectid, query) {
+    static async list(pool, projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -78,7 +80,7 @@ class Instance extends Generic {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -167,7 +169,7 @@ class Instance extends Generic {
         console.log('# type', type);
 
         try {
-            const pgres = await this.pool.query(sql`
+            const pgres = await config.pool.query(sql`
                 INSERT INTO instances (
                     project_id,
                     aoi_id,
