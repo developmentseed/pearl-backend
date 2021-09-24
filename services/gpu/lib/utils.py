@@ -81,7 +81,11 @@ def geom2px(geom, modelsrv):
         in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat="npy")
 
         retrain = modelsrv.model.run(in_memraster.data)
+        print("retrain shape")
+        print(retrain.shape)
         retrain = retrain[32:288, 32:288, :]
+        print("retrain shape post buffer")
+        print(retrain.shape)
 
         value = retrain[pixels[0], pixels[1]]
 
