@@ -4,10 +4,10 @@ const Mosaic = require('../lib/mosaic');
 const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
 const Model = require('../lib/model');
+const Instance = require('../lib/instance');
 
 async function router(schema, config) {
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
-    const instance = new (require('../lib/instance').Instance)(config);
 
     /**
      * @api {post} /api/project List Projects
@@ -182,10 +182,13 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            const insts = await instance.list(req.params.projectid);
+            const insts = await Instance.list(config.pool, req.params.projectid);
             for (const inst of insts.instances) {
                 if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
-                await instance.delete(inst.id);
+
+                const instance = new Instance();
+                instance.id = inst.id;
+                await instance.delete(config.pool);
             }
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features

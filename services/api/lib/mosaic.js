@@ -1,5 +1,6 @@
-
-
+/**
+ * @class
+ */
 class Mosaic {
     static list() {
         return {
