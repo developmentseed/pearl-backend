@@ -142,7 +142,7 @@ async function router(schema, config) {
             await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
-            const instance = Instance.from(config, req.auth, req.params.instanceid);
+            const instance = await Instance.from(config, req.auth, req.params.instanceid);
 
             return res.json(instance.serialize());
         } catch (err) {
