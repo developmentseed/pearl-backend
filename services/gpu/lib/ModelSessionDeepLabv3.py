@@ -23,7 +23,10 @@ LOGGER = logging.getLogger("server")
 def forward_features(model, x):
     features = model.encoder(x)
     decoder_output = model.decoder(*features)
-    return decoder_output
+    return F.interpolate(
+        decoder_output,
+        scale_factor=4,
+    )
 
 
 class SMPModelWrapper(nn.Module):
