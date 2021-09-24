@@ -81,7 +81,7 @@ async function router(schema, config) {
 
 
             req.body.uid = req.auth.uid;
-            const inst = await Instance.generate(config.pool, req.body);
+            const inst = await Instance.generate(config, req.body);
 
             const batch_json = batch.serialize();
             batch_json.instance = inst.id;

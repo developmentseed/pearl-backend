@@ -152,6 +152,7 @@ class Instance extends Generic {
         const kube = new Kube(config, 'default');
 
         let podList = [];
+
         if (config.Environment !== 'local') {
             podList = await kube.listPods();
         }
