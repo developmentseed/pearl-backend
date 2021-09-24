@@ -129,8 +129,6 @@ def load(gpu_id, api):
         model = LoadUnet2(gpu_id, api.model_dir, api.model["classes"])
     elif model_type == "deeplabv3plus":
         model = LoadDeepLabv3Plus(gpu_id, api.model_dir, api.model["classes"])
-    elif model_type == "jerome":
-        model = LoadDeepLabv3_j(gpu_id, api.model_dir, api.model["classes"])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
