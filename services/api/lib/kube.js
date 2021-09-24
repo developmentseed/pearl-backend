@@ -195,6 +195,4 @@ class Kube {
     }
 }
 
-module.exports = {
-    Kube
-};
+module.exports = Kube;
