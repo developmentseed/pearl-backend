@@ -73,9 +73,9 @@ class Worker {
         String(CP.execSync('docker ps --filter ancestor=gpu'))
             .split('\n')
             .slice(1)
-            .filter(e => !!e.trim().length)
-            .map(e => e.split(' ')[0])
-            .forEach(e => CP.execSync(`docker kill ${e}`))
+            .filter((e) => !!e.trim().length)
+            .map((e) => e.split(' ')[0])
+            .forEach((e) => CP.execSync(`docker kill ${e}`));
     }
 }
 
