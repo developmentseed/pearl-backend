@@ -704,8 +704,8 @@ async function router(schema, config) {
             }
 
             const patchurls = [];
-            for (const patchid of a.patches) {
-                patchurls.push(await aoipatch.url(a.id, patchid));
+            for (const patchid of aoi.patches) {
+                patchurls.push(await aoipatch.url(aoi.id, patchid));
             }
 
             req.method = 'POST';
