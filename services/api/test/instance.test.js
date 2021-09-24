@@ -12,7 +12,7 @@ test('POST /api/model', async (t) => {
         await flight.request({
             method: 'POST',
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             body: {
                 name: 'NAIP Supervised',
                 active: true,
@@ -42,7 +42,7 @@ test('POST /api/project', async (t) => {
     try {
         await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project',
+            url: '/api/project',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -64,7 +64,7 @@ test('GET /api/project/1/instance (empty)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -86,7 +86,7 @@ test('POST /api/project/1/instance', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -121,7 +121,7 @@ test('GET /api/project/1/instance', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -151,7 +151,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -187,7 +187,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -223,7 +223,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -242,7 +242,7 @@ test('GET /api/project/1/instance?status=active', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance?status=active',
+            url: '/api/project/1/instance?status=active',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -272,7 +272,7 @@ test('GET /api/project/1/instance', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -302,7 +302,7 @@ test('GET /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -338,7 +338,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
     try {
         await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -364,7 +364,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
