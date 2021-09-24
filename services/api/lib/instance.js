@@ -213,7 +213,11 @@ class Instance extends Generic {
             }
 
             const inst = Instance.deserialize(pgres.rows[0]);
-            inst.token = this.token(instance.uid, pgres.rows[0].project_id, pgres.rows[0].id);
+
+            if (config.Environment !== 'local') {
+                inst.token = inst.token(instance.uid, pgres.rows[0].project_id, pgres.rows[0].id);
+            }
+
             inst.pod = pod;
 
             return inst;
