@@ -29,6 +29,7 @@ async function router(schema, config) {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
+            req.body.uid = req.auth.uid;
             const inst = await Instance.generate(config, req.body);
 
             res.json(inst);
