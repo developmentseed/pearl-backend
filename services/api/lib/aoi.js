@@ -273,7 +273,7 @@ class AOI extends Generic {
      * @param {Pool} pool - Instantiated Postgres Pool
      *
      * @param {Object} aoi - AOI Object
-     * @param {Object} aoi.project_id - Project the AOI is part of
+     * @param {Number} aoi.project_id - Project the AOI is part of
      * @param {String} aoi.name - Human Readable Name
      * @param {Number} aoi.checkpoint_id - Checkpoint ID
      * @param {Object} aoi.bounds - Bounds GeoJSON

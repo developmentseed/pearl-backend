@@ -14,7 +14,7 @@ test('POST /api/model', async (t) => {
         await flight.request({
             method: 'POST',
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             auth: {
                 bearer: flight.token.ingalls
             },
@@ -44,7 +44,7 @@ test('POST /api/project', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project',
+            url: '/api/project',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -77,7 +77,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -134,7 +134,7 @@ test('GET /api/project/1/aoi (empty)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi',
+            url: '/api/project/1/aoi',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -157,7 +157,7 @@ test('POST /api/project/1/aoi', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi',
+            url: '/api/project/1/aoi',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -215,7 +215,7 @@ test('GET /api/project/1/aoi/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -277,7 +277,7 @@ test('GET /api/project/1/aoi', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi',
+            url: '/api/project/1/aoi',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -322,7 +322,7 @@ test('GET /api/project/1/aoi?bookmarked=false', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi?bookmarked=false',
+            url: '/api/project/1/aoi?bookmarked=false',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -346,7 +346,7 @@ test.skip('GET /api/project/1/aoi/1/tiles', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/tiles',
+            url: '/api/project/1/aoi/1/tiles',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -367,7 +367,7 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000' + url.replace('{z}', 9).replace('{x}', '143').replace('{y}', '195'),
+            url: '' + url.replace('{z}', 9).replace('{x}', '143').replace('{y}', '195'),
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -389,7 +389,7 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1',
             method: 'PATCH',
             body: {
                 bookmarked: true,
@@ -443,7 +443,7 @@ test('GET /api/project/1/aoi?bookmarked=true', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi?bookmarked=true',
+            url: '/api/project/1/aoi?bookmarked=true',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -463,7 +463,7 @@ test('POST /api/project/1/aoi', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi',
+            url: '/api/project/1/aoi',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -520,7 +520,7 @@ test('GET /api/project/1/aoi?sort=asc', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi?sort=asc',
+            url: '/api/project/1/aoi?sort=asc',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -541,7 +541,7 @@ test('DELETE /api/project/1/aoi/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1',
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -564,7 +564,7 @@ test('GET /api/project/1/aoi?sort=asc', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi?sort=asc',
+            url: '/api/project/1/aoi?sort=asc',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

@@ -131,9 +131,7 @@ class Flight {
                 t.ok(config, 'config object returned');
 
                 this.srv = srv;
-
                 this.base = `http://localhost:${config.Port}`;
-
                 this.config = config;
 
                 t.end();
