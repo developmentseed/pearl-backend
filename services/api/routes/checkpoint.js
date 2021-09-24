@@ -18,18 +18,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a given checkpoint for a given instance
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "name": "Checkpoint Name",
-     *       "parent": 123,
-     *       "classes": [ ... ],
-     *       "storage": true,
-     *       "created": "<date>"
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
      */
-    await schema.get('/project/:projectid/checkpoint/:checkpointid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/checkpoint/:checkpointid', {
+        res: 'res.Checkpoint.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -49,8 +42,12 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Return tilejson for a given Checkpoint
+     *
+     * @apiSchema {jsonschema=../schema/res.CheckpointTilejson.json} apiSuccess
      */
-    await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles', {
+        res: 'res.CheckpointTilejson.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
@@ -114,23 +111,22 @@ async function router(schema, config) {
      * @apiDescription
      *     Upload a new checkpoint asset to the API
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "name": "Checkpoint Name",
-     *       "classes": [ ... ],
-     *       "storage": true,
-     *       "created": "<date>"
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
      */
-    await schema.post('/project/:projectid/checkpoint/:checkpointid/upload', {}, config.requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/checkpoint/:checkpointid/upload', {
+        res: 'res.Checkpoint.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
             await auth.is_admin(req);
 
-            const busboy = new Busboy({ headers: req.headers });
+            const busboy = new Busboy({
+                headers: req.headers
+                limits: {
+                    files: 1
+                }
+            });
 
             const files = [];
 
@@ -140,6 +136,8 @@ async function router(schema, config) {
 
             busboy.on('finish', async () => {
                 try {
+                    await Promise.all(files);
+
                     return res.json(await checkpoint.get(req.params.checkpointid));
                 } catch (err) {
                     Err.respond(err, res);
@@ -185,24 +183,11 @@ async function router(schema, config) {
      *     Return all checkpoints for a given instance
      *
      * @apiSchema (Query) {jsonschema=../schema/req.query.checkpoint.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "instance_id": 123,
-     *       "checkpoints": [{
-     *           "id": 1432,
-     *           "parent": 123,
-     *           "name": "Checkpoint Name",
-     *           "storage": true,
-     *           "created": "<date>",
-     *           "bookmarked": false
-     *       }]
-     *   }
+     * @apiSchema {jsonschema=../schema/res.ListCheckpoints.json} apiSuccess
      */
     await schema.get('/project/:projectid/checkpoint', {
-        query: 'req.query.checkpoint.json'
+        query: 'req.query.checkpoint.json',
+        res: 'res.ListCheckpoints.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -225,20 +210,8 @@ async function router(schema, config) {
      *     Create a new Checkpoint during an instance
      *     Note: this is an internal API that is called by the websocket GPU
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.checkpoint.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "parent": 123,
-     *       "instance_id": 124,
-     *       "storage": true,
-     *       "classes": [ ... ],
-     *       "name": "Named Checkpoint",
-     *       "bookmarked": false,
-     *       "created": "<date>"
-     *   }
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateCheckpoint.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
      */
     await schema.post('/project/:projectid/checkpoint', {
         body: 'req.body.checkpoint.json',
@@ -293,6 +266,8 @@ async function router(schema, config) {
      * @apiDescription
      *     Delete an existing Checkpoint
      *     NOTE: This will also delete AOIs that depend on the given checkpoint
+     *
+     * * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:projectid/checkpoint/:checkpointid', {}, config.requiresAuth, async (req, res) => {
         try {
@@ -309,7 +284,12 @@ async function router(schema, config) {
                 await aoi.delete(config.pool);
             });
 
-            return res.json(await checkpoint.delete(req.params.checkpointid));
+            await checkpoint.delete(req.params.checkpointid);
+
+            return res.json({
+                status: 200,
+                message: 'Checkpoint deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -327,21 +307,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Update a checkpoint
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "instance_id": 124,
-     *       "parent": 123,
-     *       "storage": true,
-     *       "classes": [ ... ],
-     *       "name": "Named Checkpoint",
-     *       "bookmarked": false,
-     *       "created": "<date>"
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.body.PatchCheckpoint.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
      */
     await schema.patch('/project/:projectid/checkpoint/:checkpointid', {
-        body: 'req.body.checkpoint-patch.json'
+        body: 'req.body.PatchCheckpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');

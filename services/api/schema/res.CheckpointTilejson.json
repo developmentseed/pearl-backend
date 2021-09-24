@@ -1,0 +1,54 @@
+{
+    "type": "object",
+    "required": [
+        "tilejson",
+        "name",
+        "version",
+        "schema",
+        "tiles",
+        "bounds",
+        "center"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "tilejson": {
+            "type": "string",
+            "enum": [ "2.2.0" ],
+            "description": "TileJSON Spec Version"
+        },
+        "name": {
+            "type": "string",
+            "description": "Unique name of layer"
+        },
+        "version": {
+            "type": "string",
+            "description": "Style Version",
+            "enum": [ "1.0.0" ]
+        },
+        "schema": {
+            "type": "string",
+            "enum": [ "xyz" ],
+            "description": "Tile format"
+        },
+        "tiles": {
+            "type": "array",
+            "description": "Array of tile URLs",
+            "items": {
+                "type": "string",
+                "description": "Tile URL"
+            }
+        },
+        "bounds": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+        "center": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}
