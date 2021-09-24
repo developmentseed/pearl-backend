@@ -58,12 +58,16 @@ class Flight {
      * Request data from the API & Ensure the output schema matches the response
      *
      * @param {Object} req Request Object
-     * @param {Object} t Options test argument - if not present doesn't test API response
+     * @param {Object|false} t Tape argument - if set to false doesn't test API response
      */
     async request(req, t) {
         req.url = new URL(req.url, this.base);
 
-        if (!t) return await prequest(req);
+        if (t === undefined) {
+            throw new Error('flight.request requires two arguments - pass (<req>, false) to disable schema testing');
+        } else if (!t) {
+            return await prequest(req);
+        }
 
         let match = false;
         const spath = `${req.method.toUpperCase()} ${req.url.pathname}/`;
@@ -127,9 +131,7 @@ class Flight {
                 t.ok(config, 'config object returned');
 
                 this.srv = srv;
-
                 this.base = `http://localhost:${config.Port}`;
-
                 this.config = config;
 
                 t.end();

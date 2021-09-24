@@ -1,270 +1,25 @@
 const Err = require('./error');
 const Project = require('./project');
-const moment = require('moment');
-const {
-    BlobSASPermissions,
-    BlobServiceClient
-} = require('@azure/storage-blob');
-
+const Generic = require('./generic');
+const Storage = require('./storage');
 const { sql } = require('slonik');
 
-class AOI {
-    constructor(config) {
-        this.pool = config.pool;
-        this.config = config;
+class AOI extends Generic {
+    static _table = 'aois';
+    static _res = require('../schema/res.AOI.json');
+    static _patch = Object.keys(require('../schema/req.body.PatchAOI.json').properties);
 
-        // don't access these services unless AzureStorage is truthy
-        if (this.config.AzureStorage) {
-            this.blob_client = BlobServiceClient.fromConnectionString(this.config.AzureStorage);
-            this.container_client = this.blob_client.getContainerClient('aois');
-        }
-    }
-
-    /**
-     * Ensure a user can only access their own project assets (or is an admin and can access anything)
-     *
-     * @param {Project} project Instantiated Project class
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} aoiid AOI the user is attemping to access
-     */
-    async has_auth(pool, auth, projectid, aoiid) {
-        const proj = await Project.has_auth(pool, auth, projectid);
-        const aoi = await this.get(aoiid);
-
-        if (aoi.project_id !== proj.id) {
-            throw new Err(400, null, `AOI #${aoiid} is not associated with project #${projectid}`);
-        }
-
-        return aoi;
-    }
-
-    /**
-     * Return a sharing URL that can be used to titiler
-     *
-     * @param {Number} aoiid AOI ID to get a share URL for
-     */
-    async url(aoiid) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
-
-        const url = new URL(await this.container_client.generateSasUrl({
-            permissions: BlobSASPermissions.parse('r').toString(),
-            expiresOn: moment().add(365, 'days')
-        }));
-
-        url.pathname = `/aois/aoi-${aoiid}.tiff`;
-
-        return url;
-    }
-
-    /**
-     * Return a Row as a JSON Object
-     *
-     * @param {Object} row Postgres Database Row
-     *
-     * @returns {Object}
-     */
-    static json(row) {
-        const def = {
-            id: parseInt(row.id),
-            name: row.name,
-            created: row.created,
-            storage: row.storage,
-            bookmarked: row.bookmarked,
-            bookmarked_at: row.bookmarked_at,
-            project_id: parseInt(row.project_id),
-            checkpoint_id: parseInt(row.checkpoint_id),
-            patches: row.patches.map((patch) => { return parseInt(patch); }),
-            px_stats: row.px_stats ? row.px_stats : {}
-        };
-
-        if (row.classes) {
-            def['classes'] = row.classes;
-        }
-
-        if (typeof row.bounds === 'object') {
-            def.bounds = row.bounds;
-        } else {
-            try {
-                def.bounds = JSON.parse(row.bounds);
-            } catch (err) {
-                // Ignore Errors
-            }
-        }
-
-        return def;
-    }
-
-    /**
-     * Upload an AOI geotiff and mark the AOI storage property as true
-     *
-     * @param {Number} aoiid AOI ID to upload to
-     * @param {Object} file File Stream to upload
-     */
-    async upload(aoiid, file) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
-
-        const blockBlobClient = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
-
-        try {
-            await blockBlobClient.uploadStream(file, 1024 * 1024 * 4, 1024 * 1024 * 20, {
-                blobHTTPHeaders: { blobContentType: 'image/tiff' }
-            });
-        } catch (err) {
-            throw new Err(500, err, 'Failed to upload AOI');
-        }
-
-        return await this.patch(aoiid, {
-            storage: true
-        });
-    }
-
-    /**
-     * Download an AOI geotiff fabric
-     *
-     * @param {Number} aoiid AOI ID to check for existance
-     */
-    async exists(aoiid) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
-
-        const aoi = await this.get(aoiid);
-        if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
-
-        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
-        return await blob_client.exists();
-    }
-
-    /**
-     * Download an AOI geotiff fabric
-     *
-     * @param {Number} aoiid AOI ID to download
-     * @param {Stream} res Stream to pipe geotiff to (usually express response object)
-     */
-    async download(aoiid, res) {
-        if (!this.config.AzureStorage) throw new Err(424, null, 'AOI storage not configured');
-
-        const aoi = await this.get(aoiid);
-        if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
-
-        const blob_client = this.container_client.getBlockBlobClient(`aoi-${aoiid}.tiff`);
-        const dwn = await blob_client.download(0);
-
-        dwn.readableStreamBody.pipe(res);
-    }
-
-    /**
-     * Delete an AOI
-     *
-     * @param {Number} aoiid - Specific AOI id
-     */
-    async delete(aoiid) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(sql`
-                UPDATE aois
-                    SET
-                        archived = true
-                    WHERE
-                        id = ${aoiid}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to delete AOI');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
-
-        return true;
-    }
-
-    /**
-     * Update AOI properties
-     *
-     * @param {Number} aoiid - Specific AOI id
-     * @param {Object} aoi AOI Object
-     * @param {Boolean} aoi.storage Has the storage been uploaded
-     * @param {String} aoi.name - Human Readable Name
-     * @param {Boolean} aoi.bookmarked Has the aoi been bookmarked by the user
-     * @param {Number[]} aoi.patches List of patches in order of application on export
-     */
-    async patch(aoiid, aoi) {
-        let pgres;
-        try {
-            let bookmarked_at;
-            if (aoi.bookmarked !== undefined) {
-                if (aoi.bookmarked) {
-                    bookmarked_at = sql`NOW()`;
-                } else {
-                    bookmarked_at = null;
-                }
-            }
-            pgres = await this.pool.query(sql`
-                UPDATE aois
-                    SET
-                        storage = COALESCE(${aoi.storage || null}, storage),
-                        name = COALESCE(${aoi.name || null}, name),
-                        bookmarked = ${aoi.bookmarked !== undefined ? aoi.bookmarked : sql`COALESCE(bookmarked)`},
-                        bookmarked_at = ${bookmarked_at !== undefined ? bookmarked_at : sql`COALESCE(bookmarked_at)`},
-                        patches = COALESCE(${aoi.patches ? sql.array(aoi.patches, sql`BIGINT[]`) : null}, patches),
-                        px_stats = COALESCE(${aoi.px_stats ? JSON.stringify(aoi.px_stats) : null}::JSONB, px_stats)
-                    WHERE
-                        id = ${aoiid}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update AOI');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
-
-        return AOI.json(pgres.rows[0]);
-    }
-
-    /**
-     * Return a single aoi
-     *
-     * @param {Number} aoiid - Specific AOI id
-     */
-    async get(aoiid) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(sql`
-               SELECT
-                    a.id AS id,
-                    a.name AS name,
-                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
-                    a.project_id AS project_id,
-                    a.bookmarked AS bookmarked,
-                    a.bookmarked_at AS bookmarked_at,
-                    a.checkpoint_id AS checkpoint_id,
-                    a.created AS created,
-                    a.storage AS storage,
-                    a.patches AS patches,
-                    a.px_stats AS px_stats,
-                    c.classes as classes
-                FROM
-                    aois a,
-                    checkpoints c
-                WHERE
-                    a.id = ${aoiid}
-                AND
-                    a.checkpoint_id = c.id
-                AND
-                    a.archived = false
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to get AOI');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
-
-        return AOI.json(pgres.rows[0]);
+    constructor() {
+        super();
     }
 
     /**
      * Return a list of aois
      *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     *
      * @param {Number} projectid - AOIS related to a specific project
+     *
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
@@ -272,7 +27,7 @@ class AOI {
      * @param {String} [query.bookmarked] - Only return AOIs of this bookmarked state. Allowed true or false. By default returns all.
      * @param {String} [query.sort] - Sort AOI list by ascending or descending order of the created timestamp. Allowed asc or desc. Default desc.
      */
-    async list(projectid, query) {
+    static async list(pool, projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -288,15 +43,17 @@ class AOI {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     a.id AS id,
                     a.name AS name,
+                    a.patches AS patches,
                     a.px_stats AS px_stats,
                     a.bookmarked AS bookmarked,
                     a.bookmarked_at AS bookmarked_at,
-                    ST_AsGeoJSON(a.bounds)::JSON AS bounds,
+                    a.bounds AS bounds,
+                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
                     a.created AS created,
                     a.storage AS storage,
                     a.checkpoint_id AS checkpoint_id,
@@ -316,67 +73,245 @@ class AOI {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to list aois');
+            throw new Err(500, new Error(err), 'Failed to list AOIs');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            project_id: projectid,
-            aois: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    name: row.name,
-                    bookmarked: row.bookmarked,
-                    bookmarked_at: row.bookmarked_at,
-                    bounds: row.bounds,
-                    px_stats: row.px_stats,
-                    created: row.created,
-                    storage: row.storage,
-                    checkpoint_id: row.checkpoint_id,
-                    checkpoint_name: row.checkpoint_name,
-                    classes: row.classes
-                };
-            })
-        };
+        const list = AOI.deserialize(pgres.rows);
+        list.project_id = projectid;
+
+        return list;
+    }
+
+    /**
+     * Ensure a user can only access their own project assets (or is an admin and can access anything)
+     *
+     * @param {Pool} pool Instantiated Postgres Pool
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     * @param {Number} aoiid AOI the user is attemping to access
+     */
+    static async has_auth(pool, auth, projectid, aoiid) {
+        const proj = await Project.has_auth(pool, auth, projectid);
+        const aoi = await AOI.from(pool, aoiid);
+
+        if (aoi.project_id !== proj.id) {
+            throw new Err(400, null, `AOI #${aoiid} is not associated with project #${projectid}`);
+        }
+
+        return aoi;
+    }
+
+    /**
+     * Return a sharing URL that can be used to titiler
+     *
+     * @param {Config} config
+     */
+    async url(config) {
+        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        return await storage.url(`aoi-${this.id}.tiff`);
+    }
+
+    /**
+     * Upload an AOI geotiff and mark the AOI storage property as true
+     *
+     * @param {Config} config
+     * @param {Object} file File Stream to upload
+     */
+    async upload(config, file) {
+        if (this.storage) throw new Err(404, null, 'AOI has already been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        await storage.upload(file, `aoi-${this.id}.tiff`);
+        this.storage = true;
+
+        return await this.commit(config.pool);
+    }
+
+    /**
+     * Download an AOI geotiff fabric
+     *
+     * @param {Config} config
+     */
+    async exists(config) {
+        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        return await storage.exists(`aoi-${this.id}.tiff`);
+    }
+
+    /**
+     * Download an AOI geotiff fabric
+     *
+     * @param {Config} config
+     * @param {Stream} res Stream to pipe geotiff to (usually express response object)
+     */
+    async download(config, res) {
+        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        return await storage.download(`aoi-${this.id}.tiff`, res);
+    }
+
+    /**
+     * Delete an AOI
+     *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     */
+    async delete(pool) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+                UPDATE aois
+                    SET
+                        archived = true
+                    WHERE
+                        id = ${this.id}
+                    RETURNING *
+            `);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to delete AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+
+        return true;
+    }
+
+    /**
+     * Update AOI properties
+     *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     */
+    async commit(pool) {
+        let bookmarked_at;
+        if (this.bookmarked && !this.bookmarked_at) {
+            bookmarked_at = sql`NOW()`;
+        } else if (this.bookmarked) {
+            bookmarked_at = sql`bookmarked_at`;
+        } else {
+            bookmarked_at = null;
+        }
+
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+                UPDATE aois
+                    SET
+                        storage = ${this.storage},
+                        name = ${this.name},
+                        bookmarked = ${this.bookmarked},
+                        bookmarked_at = ${bookmarked_at},
+                        patches = ${this.patches ? sql.array(this.patches, sql`BIGINT[]`) : null},
+                        px_stats = ${this.px_stats ? JSON.stringify(this.px_stats) : null}::JSONB
+                    WHERE
+                        id = ${this.id}
+                    RETURNING
+                        *
+            `);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to update AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
+
+        this.bookmarked_at = pgres.rows[0].bookmarked_at;
+
+        return this;
+    }
+
+    /**
+     * Return a single aoi
+     *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     * @param {Number} id - Specific AOI id
+     */
+    static async from(pool, id) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+               SELECT
+                    a.id AS id,
+                    a.name AS name,
+                    a.bounds AS bounds,
+                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
+                    a.project_id AS project_id,
+                    a.bookmarked AS bookmarked,
+                    a.bookmarked_at AS bookmarked_at,
+                    a.checkpoint_id AS checkpoint_id,
+                    a.created AS created,
+                    a.storage AS storage,
+                    a.patches AS patches,
+                    a.px_stats AS px_stats,
+                    c.classes as classes
+                FROM
+                    aois a,
+                    checkpoints c
+                WHERE
+                    a.id = ${id}
+                AND
+                    a.checkpoint_id = c.id
+                AND
+                    a.archived = false
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to get AOI');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'aoi not found');
+
+        return AOI.deserialize(pgres.rows[0]);
     }
 
     /**
      * Create a new AOI
      *
-     * @param {Number} projectid - AOIS related to a specific project
+     * @param {Pool} pool - Instantiated Postgres Pool
+     *
      * @param {Object} aoi - AOI Object
-     * @param {Object} aoi.bounds - Bounds GeoJSON
-     * @param {Number} aoi.checkpoint_id - Checkpoint ID
+     * @param {Number} aoi.project_id - Project the AOI is part of
      * @param {String} aoi.name - Human Readable Name
+     * @param {Number} aoi.checkpoint_id - Checkpoint ID
+     * @param {Object} aoi.bounds - Bounds GeoJSON
      */
-    async create(projectid, aoi) {
+    static async generate(pool, aoi) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 INSERT INTO aois (
                     project_id,
                     name,
                     checkpoint_id,
                     bounds
                 ) VALUES (
-                    ${projectid},
+                    ${aoi.project_id},
                     ${aoi.name},
                     ${aoi.checkpoint_id},
                     ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
-                ) RETURNING *
+                ) RETURNING
+                    id,
+                    name,
+                    bounds,
+                    Round(ST_Area(bounds::GEOGRAPHY)) AS area,
+                    project_id,
+                    bookmarked,
+                    bookmarked_at,
+                    checkpoint_id,
+                    created,
+                    storage,
+                    patches,
+                    px_stats
             `);
         } catch (err) {
-            throw new Err(500, err, 'Failed to create aoi');
+            throw new Err(500, err, 'Failed to create AOI');
         }
 
-        pgres.rows[0].bounds = aoi.bounds;
-        return AOI.json(pgres.rows[0]);
+        return AOI.deserialize(pgres.rows[0]);
     }
 }
 
-module.exports = {
-    AOI
-};
+module.exports = AOI;

@@ -3,6 +3,7 @@ resource "helm_release" "lulc" {
   chart = "../../helm/lulc-helm"
   wait = false
   depends_on = [
+    helm_release.lulc-ingress-nginx,
     helm_release.lulc-cert-manager
   ]
   set {

@@ -1,9 +1,9 @@
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Busboy = require('busboy');
+const AOI = require('../lib/aoi');
 
 async function router(schema, config) {
-    const aoi = new (require('../lib/aoi').AOI)(config);
     const proxy = new (require('../lib/proxy').Proxy)(config);
     const aoipatch = new (require('../lib/aoi-patch').AOIPatch)(config);
     const auth = new (require('../lib/auth').Auth)(config);
@@ -36,7 +36,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             return res.json(await aoipatch.list(req.params.projectid, req.params.aoiid, req.query));
         } catch (err) {
@@ -69,7 +69,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
-            await aoi.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             return res.json(await aoipatch.create(req.params.projectid, req.params.aoiid));
         } catch (err) {
@@ -97,7 +97,7 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            await aoipatch.has_auth(config.pool, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             return res.json(await aoipatch.delete(req.params.aoiid, req.params.patchid));
         } catch (err) {
@@ -131,7 +131,7 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            return res.json(await aoipatch.has_auth(config.pool, aoi, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+            return res.json(await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
         } catch (err) {
             return Err.respond(err, res);
         }
