@@ -20,6 +20,12 @@ sys.path.append("..")
 LOGGER = logging.getLogger("server")
 
 
+def forward_features(model, x):
+    features = model.encoder(x)
+    decoder_output = model.decoder(*features)
+    return decoder_output
+
+
 class SMPModelWrapper(nn.Module):
     def __init__(
         self,
@@ -328,7 +334,7 @@ class LoadDeepLabv3Plus(ModelSession):
         data = tile_img.to(self.device)
 
         with torch.no_grad():
-            features = self.model.forward_features(data[None, ...])
+            features = forward_features(self.model, data[None, ...])
             # insert singleton "batch" dimension to input data for pytorch to be happy
         # get embeddings
         features = np.rollaxis(features.squeeze().cpu().numpy(), 0, 3)
