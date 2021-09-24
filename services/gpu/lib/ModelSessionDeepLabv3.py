@@ -279,8 +279,10 @@ class LoadDeepLabv3Plus(ModelSession):
         print("new_biases shape: ")
         print(new_biases.shape)
 
-        self.model.segmentation_head[0].weight = nn.Parameter(new_weights)
-        self.model.segmentation_head[0].bias = nn.Parameter(new_biases)
+        list(self.model.segmentation_head.children())[0].weight = nn.Parameter(
+            new_weights
+        )
+        list(self.model.segmentation_head.children())[0].bias = nn.Parameter(new_biases)
 
         print("last layer of pytorch model updated post retraining")
 
