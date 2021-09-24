@@ -5,7 +5,7 @@ resource "helm_release" "lulc-ingress-nginx" {
   namespace        = "ingress-nginx"
   create_namespace = true
   depends_on       = [
-    "azurerm_public_ip.lulc"
+    azurerm_public_ip.lulc
   ]
 
   set {
