@@ -32,7 +32,7 @@ async function router(schema, config) {
             req.body.uid = req.auth.uid;
             const inst = await Instance.generate(config, req.body);
 
-            res.json(inst);
+            res.json(inst.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
