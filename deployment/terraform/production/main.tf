@@ -7,6 +7,15 @@ variable "subscriptionId" {
   type = string
 }
 
+variable "postgres_password" {
+  type = string
+}
+
+variable "signing_secret" {
+  type = string
+}
+
+
 module "resources" {
   source = "../resources"
 
@@ -18,7 +27,7 @@ module "resources" {
   postgres_password    = var.postgres_password
   signing_secret       = var.signing_secret
   admin_email          = "sanjay@developmentseed.org"
-  gpu_count            = 2
+  gpu_count            = 16
   placeholder_is_gpu   = true
   placeholder_num_gpus = 2
 
