@@ -9,6 +9,11 @@ resource "helm_release" "lulc-ingress-nginx" {
   ]
 
   set {
+    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
+    value = azurerm_resource_group.lulc.name
+  }
+
+  set {
     name = "controller.service.loadBalancerIP"
     value = azurerm_public_ip.lulc.ip_address
   }
