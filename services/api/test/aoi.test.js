@@ -393,7 +393,11 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             method: 'PATCH',
             body: {
                 bookmarked: true,
-                name: 'RENAMED'
+                name: 'RENAMED',
+                px_stats: {
+                    0: 100,
+                    1: 0
+                }
             },
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -411,7 +415,10 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             storage: true,
             project_id: 1,
             patches: [],
-            px_stats: {},
+            px_stats: {
+                0: 100,
+                1: 0
+            },
             checkpoint_id: 1,
             bookmarked: true,
             name: 'RENAMED',
