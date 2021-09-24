@@ -70,7 +70,7 @@ spec:
             - name: TileUrl
               value: http://{{ template "lulc-helm.fullname" . }}-tiles
             - name: ApiUrl
-              value: https://api.{{ .Values.domain }}
+              value: http://{{ template "lulc-helm.fullname" . }}-api
             - name: SocketUrl
               value: ws://{{ template "lulc-helm.fullname" . }}-socket
             - name: nodeSelectorKey
