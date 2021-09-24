@@ -46,14 +46,6 @@ class SMPModelWrapper(nn.Module):
             classes=classes,
         )
 
-    def forward(self, x):
-        self.model(x)
-
-    def forward_features(self, x):
-        features = self.encoder(x)
-        decoder_output = self.decoder(*features)
-        return decoder_output
-
 
 class LoadDeepLabv3Plus(ModelSession):
     """
