@@ -2,11 +2,18 @@ const Project = require('./project');
 const Err = require('./error');
 const Storage = require('./storage');
 const { sql } = require('slonik');
+const Generic = require('./generic');
 
-class CheckPoint {
-    constructor(config) {
-        this.pool = config.pool;
-        this.config = config;
+/**
+ * @class
+ */
+class CheckPoint extends Generic {
+    static _table = 'checkpoints';
+    static _res = require('../schema/res.Checkpoint.json');
+    static _patch = Object.keys(require('../schema/req.body.PatchCheckPoint.json').properties);
+
+    constructor() {
+        super();
     }
 
     /**
@@ -17,7 +24,7 @@ class CheckPoint {
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} checkpointid Checkpoint the user is attemping to access
      */
-    async has_auth(pool, auth, projectid, checkpointid) {
+    static async has_auth(pool, auth, projectid, checkpointid) {
         const proj = await Project.has_auth(pool, auth, projectid);
         const checkpoint = await this.get(checkpointid);
 
@@ -77,6 +84,8 @@ class CheckPoint {
     /**
      * Return a list of checkpoints for a given instance
      *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     *
      * @param {Number} projectid Project ID to list checkpoints for
      *
      * @param {Object} query - Query Object
@@ -84,7 +93,7 @@ class CheckPoint {
      * @param {Number} [query.page=0] - Page to return
      * @param {String} [query.bookmarked] - Optional. Allowed true or false
      */
-    async list(projectid, query) {
+    async list(pool, projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -98,7 +107,7 @@ class CheckPoint {
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -124,36 +133,25 @@ class CheckPoint {
             throw new Err(500, new Error(err), 'Failed to list checkpoints');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            project_id: projectid,
-            checkpoints: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    parent: parseInt(row.parent),
-                    name: row.name,
-                    created: row.created,
-                    storage: row.storage,
-                    bookmarked: row.bookmarked
-                };
-            })
-        };
+        const list = CheckPoint.deserialize(pgres.rows);
+        list.project_id = projectid;
+        return list;
     }
 
     /**
      * Delete a Checkpoint
      *
-     * @param {Number} checkpointid - Checkpoint ID
+     * @param {Pool} pool - Instantiated Postgres Pool
      */
-    async delete(checkpointid) {
+    async delete(pool) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 UPDATE checkpoints
                     SET
                         archived = true
                     WHERE
-                        id = ${checkpointid}
+                        id = ${this.id}
                     RETURNING *
             `);
         } catch (err) {
@@ -168,45 +166,38 @@ class CheckPoint {
     /**
      * Upload a Checkpoint and mark the Checkpoint storage property as true
      *
-     * @param {Number} checkpointid Checkpoint ID to upload to
+     * @param {Config} config
      * @param {Object} file File stream to upload
      */
-    async upload(checkpointid, file) {
+    async upload(config, file) {
         if (this.storage) throw new Err(404, null, 'Checkpoint has already been uploaded');
 
-        const storage = new Storage(this.config, 'checkpoints');
-        await storage.upload(file, `checkpoint-${checkpointid}`, 'application/octet-stream');
+        const storage = new Storage(config, 'checkpoints');
+        await storage.upload(file, `checkpoint-${this.id}`, 'application/octet-stream');
 
-        return await this.patch(checkpointid, {
-            storage: true
-        });
+        this.storage = true;
+        return await this.commit(config.pool);
     }
 
     /**
      * Download a Checkpoint Asset
      *
-     * @param {Number} checkpointid Checkpoint ID to download
+     * @param {Config} config
      * @param {Stream} res Stream to pipe model to (usually express response object)
      */
-    async download(checkpointid, res) {
-        const checkpoint = await this.get(checkpointid);
-        if (!checkpoint.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
+    async download(config, res) {
+        if (!this.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
 
-        const storage = new Storage(this.config, 'checkpoints');
-        await storage.download(`checkpoint-${checkpointid}`, res);
+        const storage = new Storage(config, 'checkpoints');
+        await storage.download(`checkpoint-${this.id}`, res);
     }
 
     /**
      * Update Checkpoint Properties
      *
-     * @param {Number} checkpointid - Checkpoint ID
-     * @param {Object} checkpoint - Checkpoint Object
-     * @param {Boolean} checkpoint.storage Has the storage been uploaded
-     * @param {String} checkpoint.name The name of the checkpoint
-     * @param {Array} checkpoint.classes Class list to update (only name & color changes - cannot change length)
-     * @param {Boolean} checkpoint.bookmarked Has the checkpoint been bookmarked by the user
+     * @param {Pool} pool - Instantiated Postgres Pool
      */
-    async patch(checkpointid, checkpoint) {
+    async commit(pool) {
         let pgres;
 
         if (checkpoint.classes) {
@@ -217,7 +208,7 @@ class CheckPoint {
         }
 
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 UPDATE checkpoints
                     SET
                         storage = COALESCE(${checkpoint.storage || null}, storage),
@@ -240,12 +231,13 @@ class CheckPoint {
     /**
      * Return a single checkpoint
      *
-     * @param {Number} checkpointid Checkpoint ID to get
+     * @param {Pool} - Instantiated Postgres Pool
+     * @param {Number} checkpointid - Checkpoint ID to get
      */
-    async get(checkpointid) {
+    static async from(pool, checkpointid) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     checkpoints.id,
                     checkpoints.name,
@@ -286,7 +278,7 @@ class CheckPoint {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
 
-        return CheckPoint.json(pgres.rows[0]);
+        return CheckPoint.deserialize(pgres.rows[0]);
     }
 
     /**
@@ -336,15 +328,15 @@ class CheckPoint {
     /**
      * Return a Mapbox Vector Tile of the checkpoint Geom
      *
-     * @param {Number} checkpointid - Checkpoint ID
+     * @param {Pool} pool - Instantiated Postgres Pool
      * @param {Number} z - Z Tile Coordinate
      * @param {Number} x - X Tile Coordinate
      * @param {Number} y - Y Tile Coordinate
      */
-    async mvt(checkpointid, z, x, y) {
+    async mvt(pool, z, x, y) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
                 FROM (
@@ -370,7 +362,7 @@ class CheckPoint {
                                     FROM
                                         checkpoints
                                     WHERE
-                                        id = ${checkpointid}
+                                        id = ${this.id}
                                 UNION ALL
                                     SELECT
                                         checkpoints.id,
@@ -404,6 +396,4 @@ class CheckPoint {
     }
 }
 
-module.exports = {
-    CheckPoint
-};
+module.exports = CheckPoint;
