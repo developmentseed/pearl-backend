@@ -9,8 +9,9 @@ class Config {
             throw new Error('SigningSecret env var must be set in production environment');
         }
 
-        this.silent = !!args.silent;
+        this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
+        this.silent = !!args.silent;
         this.test = !!args.test;
 
         if (this.test) {
@@ -28,8 +29,6 @@ class Config {
         this.Postgres = process.env.Postgres || 'postgres://postgres@localhost:5432/lulc';
 
         this.TileUrl = process.env.TileUrl || args.tileurl || false;
-
-        this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
         this.Port = args.port || 2000;
 

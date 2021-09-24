@@ -20,14 +20,14 @@ class Instance extends Generic {
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
-     * @param {Pool} pool Instantiated Postgres Pool
+     * @param {Config} config
      * @param {Object} auth req.auth object
      * @param {Number} projectid Project the user is attempting to access
      * @param {Number} instanceid Instance the user is attemping to access
      */
-    static async has_auth(pool, auth, projectid, instanceid) {
-        const proj = await Project.has_auth(pool, auth, projectid);
-        const instance = await Instance.from(pool, auth, instanceid);
+    static async has_auth(config, auth, projectid, instanceid) {
+        const proj = await Project.has_auth(config.pool, auth, projectid);
+        const instance = await Instance.from(config, auth, instanceid);
 
         if (instance.project_id !== proj.id) {
             throw new Err(400, null, `Instance #${instanceid} is not associated with project #${projectid}`);
@@ -122,7 +122,7 @@ class Instance extends Generic {
      *
      * @returns {String} Auth Token
      */
-    token(config, auth) {
+    gen_token(config, auth) {
         return jwt.sign({
             t: 'inst',
             u: auth.uid,
@@ -213,11 +213,7 @@ class Instance extends Generic {
             }
 
             const inst = Instance.deserialize(pgres.rows[0]);
-
-            if (config.Environment !== 'local') {
-                inst.token = inst.token(instance.uid, pgres.rows[0].project_id, pgres.rows[0].id);
-            }
-
+            inst.token = inst.gen_token(config, instance.uid);
             inst.pod = pod;
 
             return inst;
@@ -286,10 +282,11 @@ class Instance extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
-        pgres.rows[0].token = this.token(auth, pgres.rows[0].project_id, pgres.rows[0].id);
-        pgres.rows[0].status = podStatus && podStatus.status ? podStatus.status : {};
+        const inst = Instance.deserialize(pgres.rows[0]);
+        inst.token = inst.gen_token(config, auth);
+        inst.status = podStatus && podStatus.status ? podStatus.status : {};
 
-        return Instance.deserialize(pgres.rows);
+        return inst;
     }
 
     /**

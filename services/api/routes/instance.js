@@ -57,7 +57,7 @@ async function router(schema, config) {
             await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
-            const instance = await Instance.from(config.pool, req.params.instanceid);
+            const instance = await Instance.from(config, req.auth, req.params.instanceid);
             instance.patch(req.body);
             await instance.commit(config.pool);
 
@@ -114,7 +114,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'instanceid');
 
-            const instance = await Instance.has_auth(config.pool, req.auth, req.params.projectid, req.params.instanceid);
+            const instance = await Instance.has_auth(config, req.auth, req.params.projectid, req.params.instanceid);
 
             return res.json(instance.serialize());
         } catch (err) {
