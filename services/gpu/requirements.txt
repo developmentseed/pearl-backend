@@ -40,4 +40,3 @@ plumbum==1.6.9
 scipy==1.4.1
 segmentation-models-pytorch==0.2.0
 pre-commit==2.13.0
-pytorch-lightning==1.4.7
