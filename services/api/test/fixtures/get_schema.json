@@ -217,7 +217,7 @@
     "GET /instance/:instanceid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /instance": {
         "body": false,

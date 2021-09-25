@@ -163,8 +163,10 @@ test('PATCH /api/project/1/instance/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <string>');
         delete res.body.created;
         delete res.body.last_update;
+        delete res.body.token;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -172,6 +174,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             batch: null,
             aoi_id: null,
             checkpoint_id: null,
+            status: {},
             active: true,
             type: 'gpu'
         });
@@ -199,11 +202,14 @@ test('PATCH /api/project/1/instance/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <string>');
         delete res.body.created;
         delete res.body.last_update;
+        delete res.body.token;
 
         t.deepEquals(res.body, {
             id: 1,
+            status: {},
             project_id: 1,
             batch: null,
             aoi_id: null,
@@ -334,6 +340,42 @@ test('GET /api/project/1/instance/1', async (t) => {
     t.end();
 });
 
+test('GET /api/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/instance/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <str>');
+        delete res.body.created;
+        delete res.body.last_update;
+        delete res.body.token;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            type: 'gpu',
+            project_id: 1,
+            batch: null,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: true,
+            status: {}
+        });
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
 test('POST /api/project/1/checkpoint', async (t) => {
     try {
         await flight.request({
@@ -376,12 +418,15 @@ test('PATCH /api/project/1/instance/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <string>');
         delete res.body.created;
         delete res.body.last_update;
+        delete res.body.token;
 
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
+            status: {},
             batch: null,
             aoi_id: null,
             checkpoint_id: 1,
