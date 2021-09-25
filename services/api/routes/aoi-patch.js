@@ -274,7 +274,12 @@ async function router(schema, config) {
             await Param.int(req, 'patchid');
             await auth.is_admin(req);
 
-            const busboy = new Busboy({ headers: req.headers });
+            const busboy = new Busboy({
+                headers: req.headers,
+                limits: {
+                    files: 1
+                }
+            });
 
             const files = [];
 

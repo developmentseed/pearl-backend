@@ -10,7 +10,7 @@ const Generic = require('./generic');
 class CheckPoint extends Generic {
     static _table = 'checkpoints';
     static _res = require('../schema/res.Checkpoint.json');
-    static _patch = Object.keys(require('../schema/req.body.PatchCheckPoint.json').properties);
+    static _patch = Object.keys(require('../schema/req.body.PatchCheckpoint.json').properties);
 
     constructor() {
         super();

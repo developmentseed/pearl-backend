@@ -24,7 +24,7 @@
             "type": "string"
         },
         "parent": {
-            "type": ["integer, "null"],
+            "type": ["integer", "null"],
             "description": "If the checkpoint was derived from a parent checkpoint will contain the ID of the parent"
         },
         "classes": {
