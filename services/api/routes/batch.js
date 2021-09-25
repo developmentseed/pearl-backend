@@ -2,10 +2,10 @@ const Err = require('../lib/error');
 const Batch = require('../lib/batch');
 const { Param } = require('../lib/util');
 const Project = require('../lib/project');
+const Instance = require('../lib/instance');
 
 async function router(schema, config) {
     const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
-    const instance = new (require('../lib/instance').Instance)(config);
 
     /**
      * @api {get} /api/project/:projectid/batch List Batch
@@ -59,7 +59,7 @@ async function router(schema, config) {
 
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            const existing_batch = await instance.list(req.params.projectid, {
+            const existing_batch = await Instance.list(config.pool, req.params.projectid, {
                 batch: true,
                 status: 'active'
             });
@@ -78,7 +78,10 @@ async function router(schema, config) {
 
             req.body.project_id = req.params.projectid;
             req.body.batch = batch.id;
-            const inst = await instance.create(req.auth, req.body);
+
+
+            req.body.uid = req.auth.uid;
+            const inst = await Instance.generate(config, req.body);
 
             const batch_json = batch.serialize();
             batch_json.instance = inst.id;
