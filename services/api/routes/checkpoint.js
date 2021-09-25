@@ -122,7 +122,7 @@ async function router(schema, config) {
             await auth.is_admin(req);
 
             const busboy = new Busboy({
-                headers: req.headers
+                headers: req.headers,
                 limits: {
                     files: 1
                 }
@@ -269,7 +269,9 @@ async function router(schema, config) {
      *
      * * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.delete('/project/:projectid/checkpoint/:checkpointid', {}, config.requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/checkpoint/:checkpointid', {
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');

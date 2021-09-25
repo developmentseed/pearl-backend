@@ -3,12 +3,12 @@ const { Param } = require('../lib/util');
 const Busboy = require('busboy');
 const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
+const Checkpoint = require('../lib/checkpoint');
 
 async function router(schema, config) {
     const proxy = new (require('../lib/proxy').Proxy)(config);
     const aoishare = new (require('../lib/aoi-share').AOIShare)(config);
     const aoipatch = new (require('../lib/aoi-patch').AOIPatch)(config);
-    const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     const getAoiTileJSON = async (aoi, req) => {
@@ -33,7 +33,7 @@ async function router(schema, config) {
                 `/api/share/${aoi.uuid}/tiles/{z}/{x}/{y}`
             ];
         } else {
-            const chkpt = await checkpoint.get(aoi.checkpoint_id);
+            const chkpt = await Checkpoint.from(config.pool, aoi.checkpoint_id);
             const cmap = {};
             for (let i = 0; i < chkpt.classes.length; i++) {
                 cmap[i] = chkpt.classes[i].color;
@@ -200,7 +200,7 @@ async function router(schema, config) {
 
                     const tiffurl = await a.url(config);
 
-                    const chkpt = await checkpoint.get(a.checkpoint_id);
+                    const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
 
                     const histo = [];
                     for (let i = 0; i <= chkpt.classes.length; i++) {
@@ -291,7 +291,7 @@ async function router(schema, config) {
 
             const tiffurl = await a.url(config);
 
-            const chkpt = await checkpoint.get(a.checkpoint_id);
+            const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
             const cmap = {};
             for (let i = 0; i < chkpt.classes.length; i++) {
                 cmap[i] = chkpt.classes[i].color;
@@ -414,7 +414,7 @@ async function router(schema, config) {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const chkpt = await checkpoint.get(a.checkpoint_id);
+            const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
             const cmap = {};
             for (let i = 0; i < chkpt.classes.length; i++) {
                 cmap[i] = chkpt.classes[i].color;
@@ -697,7 +697,7 @@ async function router(schema, config) {
             const aoi = await AOI.from(config.pool, a.aoi_id);
             const tiffurl = await aoi.url(config);
 
-            const chkpt = await checkpoint.get(a.checkpoint_id);
+            const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
             const cmap = {};
             for (let i = 0; i < chkpt.classes.length; i++) {
                 cmap[i] = chkpt.classes[i].color;

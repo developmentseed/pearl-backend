@@ -3,9 +3,9 @@ const Batch = require('../lib/batch');
 const { Param } = require('../lib/util');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
+const Checkpoint = require('../lib/checkpoint');
 
 async function router(schema, config) {
-    const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
 
     /**
      * @api {get} /api/project/:projectid/batch List Batch
@@ -69,7 +69,7 @@ async function router(schema, config) {
             }
 
             if (req.body.checkpoint_id) {
-                await checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
+                await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
             }
 
             req.body.uid = req.auth.uid;
