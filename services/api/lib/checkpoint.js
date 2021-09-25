@@ -211,12 +211,12 @@ class CheckPoint extends Generic {
             pgres = await pool.query(sql`
                 UPDATE checkpoints
                     SET
-                        storage = COALESCE(${checkpoint.storage || null}, storage),
-                        name = COALESCE(${checkpoint.name || null}, name),
-                        bookmarked = COALESCE(${checkpoint.bookmarked || null}, bookmarked),
-                        classes = COALESCE(${checkpoint.classes ? JSON.stringify(checkpoint.classes) : null}::JSONB, classes)
+                        storage = ${this.storage},
+                        name = ${this.name},
+                        bookmarked = ${this.bookmarked},
+                        classes = ${checkpoint.classes ? JSON.stringify(checkpoint.classes) : null}::JSONB
                     WHERE
-                        id = ${checkpointid}
+                        id = ${this.id}
                     RETURNING *
             `);
         } catch (err) {
@@ -225,7 +225,7 @@ class CheckPoint extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
 
-        return CheckPoint.json(pgres.rows[0]);
+        return this;
     }
 
     /**
@@ -284,17 +284,18 @@ class CheckPoint extends Generic {
     /**
      * Create a new Checkpoint
      *
-     * @param {Number} projectid - Project ID the checkpoint is a part of
+     * @param {Pool} pool - Instantiated Postgres Pool
      * @param {Object} checkpoint - Checkpoint Object
+     * @param {Number} checkpoint.project_id - Project the checkpoint belongs to
      * @param {String} checkpoint.name - Human readable name
      * @param {Number} checkpoint.parent - Parent Checkpoint ID
      * @param {Object[]} checkpoint.classes - Checkpoint Class names
      * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
      * @param {Object} checkpoint.analytics - Checkpoint Analytics
      */
-    async create(projectid, checkpoint) {
+    async generate(pool, checkpoint) {
         try {
-            const pgres = await this.pool.query(sql`
+            const pgres = await pool.query(sql`
                 INSERT INTO checkpoints (
                     project_id,
                     parent,
@@ -304,7 +305,7 @@ class CheckPoint extends Generic {
                     input_geoms,
                     analytics
                 ) VALUES (
-                    ${projectid},
+                    ${checkpoint.project_id},
                     ${checkpoint.parent ? checkpoint.parent : null},
                     ${checkpoint.name},
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
@@ -318,7 +319,7 @@ class CheckPoint extends Generic {
                 ) RETURNING *
             `);
 
-            return CheckPoint.json(pgres.rows[0]);
+            return CheckPoint.deserialize(pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23503') throw new Err(400, err, 'Parent does not exist');
             throw new Err(500, err, 'Failed to create checkpoint');
