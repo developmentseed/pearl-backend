@@ -200,11 +200,9 @@ class CheckPoint extends Generic {
     async commit(pool) {
         let pgres;
 
-        if (checkpoint.classes) {
-            const current = await this.get(checkpointid);
-            if (current.classes.length !== checkpoint.classes.length) {
-                throw new Err(400, null, 'Cannot change the number of classes once a checkpoint is created');
-            }
+        const current = await CheckPoint.from(pool, this.id);
+        if (current.classes.length !== this.classes.length) {
+            throw new Err(400, null, 'Cannot change the number of classes once a checkpoint is created');
         }
 
         try {
@@ -214,7 +212,7 @@ class CheckPoint extends Generic {
                         storage = ${this.storage},
                         name = ${this.name},
                         bookmarked = ${this.bookmarked},
-                        classes = ${checkpoint.classes ? JSON.stringify(checkpoint.classes) : null}::JSONB
+                        classes = ${this.classes ? JSON.stringify(this.classes) : null}::JSONB
                     WHERE
                         id = ${this.id}
                     RETURNING *

@@ -217,7 +217,7 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
      */
     await schema.post('/project/:projectid/checkpoint', {
-        body: 'req.body.checkpoint.json',
+        body: 'req.body.CreateCheckpoint.json',
         res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {

@@ -5,9 +5,9 @@ const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
 const Model = require('../lib/model');
 const Instance = require('../lib/instance');
+const Checkpoint = require('../lib/checkpoint');
 
 async function router(schema, config) {
-    const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
 
     /**
      * @api {post} /api/project List Projects
@@ -47,8 +47,8 @@ async function router(schema, config) {
             if (results.projects && results.projects.length) {
                 for (let index = 0; index < results.projects.length; index++) {
                     const p = results.projects[index];
-                    const aois = await AOI.list(config.pool, p.id, { bookmarked: 'true' });
-                    const checkpoints = await checkpoint.list(p.id, { bookmarked: 'true' });
+                    const aois = await AOI.list(config.pool, p.id, { bookmarked: true });
+                    const checkpoints = await Checkpoint.list(config.pool, p.id, { bookmarked: true });
                     // remove reduntant project id
                     delete aois.project_id;
                     delete checkpoints.project_id;
@@ -95,7 +95,7 @@ async function router(schema, config) {
 
             delete proj.uid;
 
-            const checkpoints = await checkpoint.list(req.params.projectid, { bookmarked: 'true' });
+            const checkpoints = await Checkpoint.list(config.pool, req.params.projectid, { bookmarked: true });
             // remove reduntant project id
             delete checkpoints.project_id;
             proj['checkpoints'] = checkpoints.checkpoints;
@@ -198,8 +198,11 @@ async function router(schema, config) {
                 await aoi.delete(config.pool);
             });
 
-            const chkpts = await checkpoint.list(req.params.projectid);
-            chkpts.checkpoints.forEach(async (c) => { await checkpoint.delete(c.id); });
+            const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
+            chkpts.checkpoints.forEach(async (c) => {
+                const ch = await Checkpoint.from(config.pool, c.id);
+                await ch.delete(config.pool);
+            });
 
             await proj.delete(config.pool);
             return res.json({});
