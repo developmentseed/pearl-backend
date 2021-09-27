@@ -35,50 +35,28 @@ class CheckPoint extends Generic {
         return checkpoint;
     }
 
-    /**
-     * Return a Row as a JSON Object
-     *
-     * @param {Object} row Postgres Database Row
-     *
-     * @returns {Object}
-     */
-    static json(row) {
-        const chpt = {
-            id: parseInt(row.id),
-            project_id: parseInt(row.project_id),
-            parent: parseInt(row.parent),
-            name: row.name,
-            bookmarked: row.bookmarked,
-            classes: row.classes,
-            created: row.created,
-            storage: row.storage,
-            analytics: row.analytics
-        };
+    serialize() {
+        const res = super.serialize();
 
-        if (row.retrain_geoms) {
-            chpt.retrain_geoms = row.retrain_geoms;
-            chpt.input_geoms = row.input_geoms;
+        console.error(res);
 
-            const counts = row.retrain_geoms.filter((geom) => {
+        if (res.retrain_geoms) {
+            const counts = res.retrain_geoms.filter((geom) => {
                 if (!geom) return false;
                 if (!geom.coordinates.length) return false;
                 return true;
             }).length;
 
-            if (counts && row.bounds) {
-                chpt.bounds = row.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ').map((cd) => {
-                    return Number(cd);
-                });
+            if (counts && this.bounds) {
+                res.bounds = this.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ').map(cd => Number(cd));
             }
 
-            if (counts && row.center) {
-                chpt.center = row.center.replace(/(POINT|\(|\))/g, '').split(' ').map((cd) => {
-                    return Number(cd);
-                });
+            if (counts && this.center) {
+                res.center = this.center.replace(/(POINT|\(|\))/g, '').split(' ').map(cd => Number(cd));
             }
         }
 
-        return chpt;
+        return res;
     }
 
     /**
@@ -307,12 +285,8 @@ class CheckPoint extends Generic {
                     ${checkpoint.parent ? checkpoint.parent : null},
                     ${checkpoint.name},
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
-                    ${sql.array(checkpoint.retrain_geoms.map((e) => {
-        return JSON.stringify(e);
-    }), 'json')}::JSONB[],
-                    ${sql.array(checkpoint.input_geoms.map((e) => {
-        return JSON.stringify(e);
-    }), 'json')}::JSONB[],
+                    ${sql.array(checkpoint.retrain_geoms.map(e => JSON.stringify(e)), 'json')}::JSONB[],
+                    ${sql.array(checkpoint.input_geoms.map(e => JSON.stringify(e)), 'json')}::JSONB[],
                     ${checkpoint.analytics ? JSON.stringify(checkpoint.analytics) : null}::JSONB
                 ) RETURNING *
             `);
