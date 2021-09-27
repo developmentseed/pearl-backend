@@ -291,7 +291,7 @@ class CheckPoint extends Generic {
      * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
      * @param {Object} checkpoint.analytics - Checkpoint Analytics
      */
-    async generate(pool, checkpoint) {
+    static async generate(pool, checkpoint) {
         try {
             const pgres = await pool.query(sql`
                 INSERT INTO checkpoints (
