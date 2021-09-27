@@ -93,7 +93,7 @@ class CheckPoint extends Generic {
      * @param {Number} [query.page=0] - Page to return
      * @param {String} [query.bookmarked] - Optional. Allowed true or false
      */
-    async list(pool, projectid, query) {
+    static async list(pool, projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
