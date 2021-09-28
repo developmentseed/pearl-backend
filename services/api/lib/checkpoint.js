@@ -46,11 +46,11 @@ class CheckPoint extends Generic {
             }).length;
 
             if (counts && this.bounds) {
-                res.bounds = this.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ').map(cd => Number(cd));
+                res.bounds = this.bounds.replace(/(BOX|\(|\))/g, '').split(',').join(' ').split(' ').map((cd) => Number(cd));
             }
 
             if (counts && this.center) {
-                res.center = this.center.replace(/(POINT|\(|\))/g, '').split(' ').map(cd => Number(cd));
+                res.center = this.center.replace(/(POINT|\(|\))/g, '').split(' ').map((cd) => Number(cd));
             }
         }
 
@@ -286,8 +286,8 @@ class CheckPoint extends Generic {
                     ${checkpoint.parent ? checkpoint.parent : null},
                     ${checkpoint.name},
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
-                    ${sql.array(checkpoint.retrain_geoms.map(e => JSON.stringify(e)), 'json')}::JSONB[],
-                    ${sql.array(checkpoint.input_geoms.map(e => JSON.stringify(e)), 'json')}::JSONB[],
+                    ${sql.array(checkpoint.retrain_geoms.map((e) => JSON.stringify(e)), 'json')}::JSONB[],
+                    ${sql.array(checkpoint.input_geoms.map((e) => JSON.stringify(e)), 'json')}::JSONB[],
                     ${checkpoint.analytics ? JSON.stringify(checkpoint.analytics) : null}::JSONB
                 ) RETURNING *
             `);
