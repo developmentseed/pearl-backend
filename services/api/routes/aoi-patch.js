@@ -2,43 +2,36 @@ const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Busboy = require('busboy');
 const AOI = require('../lib/aoi');
+const AOIPatch = require('../lib/aoi-patch');
 
 async function router(schema, config) {
     const proxy = new (require('../lib/proxy').Proxy)(config);
-    const aoipatch = new (require('../lib/aoi-patch').AOIPatch)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid/patch List Patches
      * @apiVersion 1.0.0
-     * @apiName ListPatch
+     * @apiName ListPatches
      * @apiGroup AOIPatch
      * @apiPermission user
      *
      * @apiDescription
      *     Return all patches for a given API
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "project_id": 123,
-     *       "aoi_id": 123
-     *       "patches": [{
-     *           "id": 1432,
-     *           "storage": true,
-     *           "created": "<date>"
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListPatches.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListPatches.json} apiSuccess
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch', {
+        query: 'req.query.ListPatches.json',
+        res: 'res.ListPatches.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
             await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            return res.json(await aoipatch.list(req.params.projectid, req.params.aoiid, req.query));
+            return res.json(await AOIPatch.list(req.params.projectid, req.params.aoiid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -54,24 +47,25 @@ async function router(schema, config) {
      * @apiDescription
      *     Create a new Patch
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "storage": true,
-     *       "created": "<date>"
-     *       "project_id": 1,
-     *       "aoi_id": 1
-     *   }
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreatePatch.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/patch', {}, config.requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/patch', {
+        body: 'req.body.CreatePatch.json',
+        res: 'res.Patch.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
 
             await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            return res.json(await aoipatch.create(req.params.projectid, req.params.aoiid));
+            const patch = await AOIPatch.generate(config.pool, {
+                project_id: req.params.projectid,
+                aoi_id: req.params.aoiid
+            });
+
+            return res.json(patch.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -87,19 +81,23 @@ async function router(schema, config) {
      * @apiDescription
      *     Delete a given patch
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   true
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.delete('/project/:projectid/aoi/:aoiid/patch/:patchid', {}, config.requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/aoi/:aoiid/patch/:patchid', {
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            await patch.delete(config);
 
-            return res.json(await aoipatch.delete(req.params.aoiid, req.params.patchid));
+            return res.json({
+                status: 200,
+                message: 'AOI Patch Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -115,23 +113,19 @@ async function router(schema, config) {
      * @apiDescription
      *     Get a specific patch
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "storage": true,
-     *       "created": "<date>"
-     *       "project_id": 1,
-     *       "aoi": 1
-     *  }
+     * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid', {
+        res: 'res.Patch.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            return res.json(await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+            const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+
+            return res.json(patch.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -146,8 +140,12 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Get the TileJSON for a given AOI Patch
+     *
+     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles', {
+        res: 'res.TileJSON.json'
+    }, config.requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
@@ -155,10 +153,8 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            const a = await aoipatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
-            if (!a.storage) throw new Err(404, null, 'Patch has not been uploaded');
-
-            const tiffurl = await aoipatch.url(req.params.aoiid, req.params.patchid);
+            const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const tiffurl = await a.url(config);
 
             req.url = '/cog/tilejson.json';
             req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -257,17 +253,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Upload a new AOI Patch asset to the API
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "storage": true,
-     *       "created": "<date>"
-     *       "project_id": 1,
-     *       "aoi": 1
-     *  }
+     * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/patch/:patchid/upload', {}, config.requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/patch/:patchid/upload', {
+        res: 'res.Patch.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -300,8 +290,6 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
-
-
 }
 
 module.exports = router;

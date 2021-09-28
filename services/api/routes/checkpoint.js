@@ -45,10 +45,10 @@ async function router(schema, config) {
      * @apiDescription
      *     Return tilejson for a given Checkpoint
      *
-     * @apiSchema {jsonschema=../schema/res.CheckpointTilejson.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
      */
     await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles', {
-        res: 'res.CheckpointTilejson.json'
+        res: 'res.TileJSON.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');

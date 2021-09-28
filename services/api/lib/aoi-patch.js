@@ -78,14 +78,13 @@ class AOIPatch extends Generic {
     /**
      * Return a sharing URL that can be used to titiler
      *
-     * @param {Number} aoiid AOI ID to get a share URL for
-     * @param {Number} patchid AOI Patch ID to get a share URL for
+     * @param {Config} config
      */
-    async url(aoiid, patchid) {
+    async url(config) {
         if (!this.storage) throw new Err(404, null, 'AOI Patch has not been uploaded');
 
-        const storage = new Storage(this.config, 'aois');
-        return await storage.url(`aoi-${aoiid}-patch-${patchid}.tiff`);
+        const storage = new Storage(config, 'aois');
+        return await storage.url(`aoi-${this.aoi_id}-patch-${this.id}.tiff`);
     }
 
     /**
