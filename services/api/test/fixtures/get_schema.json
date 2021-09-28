@@ -152,12 +152,12 @@
     "GET /project/:projectid/checkpoint/:checkpointid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/checkpoint/:checkpointid/tiles": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt": {
         "body": false,
@@ -167,7 +167,7 @@
     "POST /project/:projectid/checkpoint/:checkpointid/upload": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/checkpoint/:checkpointid/download": {
         "body": false,
@@ -177,7 +177,7 @@
     "GET /project/:projectid/checkpoint": {
         "body": false,
         "query": true,
-        "res": false
+        "res": true
     },
     "POST /project/:projectid/checkpoint": {
         "body": true,
@@ -187,12 +187,12 @@
     "DELETE /project/:projectid/checkpoint/:checkpointid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "PATCH /project/:projectid/checkpoint/:checkpointid": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "POST /project/:projectid/instance": {
         "body": true,

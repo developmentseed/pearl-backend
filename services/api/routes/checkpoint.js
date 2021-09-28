@@ -27,7 +27,9 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
 
-            return res.json(await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid));
+            const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+
+            return res.json(checkpoint.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -320,7 +322,8 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
      */
     await schema.patch('/project/:projectid/checkpoint/:checkpointid', {
-        body: 'req.body.PatchCheckpoint.json'
+        body: 'req.body.PatchCheckpoint.json',
+        res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');

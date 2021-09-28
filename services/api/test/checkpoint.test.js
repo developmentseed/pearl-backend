@@ -252,9 +252,8 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
-        t.equals(res.statusCode, 200, 'status: 200');
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -608,7 +607,7 @@ test('POST /api/project/1/checkpoint - parent', async (t) => {
 
 test('DELETE /api/project/1/checkpoint/1', async (t) => {
     try {
-        await flight.request({
+        const res = await flight.request({
             json: true,
             url: 'http://localhost:2000/api/project/1/checkpoint/1',
             method: 'DELETE',
@@ -616,6 +615,11 @@ test('DELETE /api/project/1/checkpoint/1', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
+
+        t.deepEquals(res.body, {
+            status: 200,
+            message: 'Checkpoint deleted'
+        });
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -634,7 +638,10 @@ test('DELETE /api/project/1/checkpoint/4', async (t) => {
             }
         }, t);
 
-        t.deepEquals(res.body, true);
+        t.deepEquals(res.body, {
+            status: 200,
+            message: 'Checkpoint deleted'
+        });
     } catch (err) {
         t.error(err, 'no errors');
     }

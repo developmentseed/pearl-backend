@@ -54,6 +54,9 @@ class CheckPoint extends Generic {
             }
         }
 
+        if (!res.bounds) delete res.bounds;
+        if (!res.center || res.center === 'POINT EMPTY') delete res.center;
+
         return res;
     }
 
