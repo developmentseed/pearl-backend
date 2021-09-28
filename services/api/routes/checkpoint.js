@@ -54,7 +54,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'checkpointid');
 
-            const c = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+            const c = (await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid)).serialize();
             if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
             if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 

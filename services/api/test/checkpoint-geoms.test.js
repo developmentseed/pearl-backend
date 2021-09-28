@@ -239,6 +239,8 @@ test('PATCH /api/project/1/checkpoint/1', async (t) => {
             storage: false,
             bookmarked: true,
             parent: null,
+            center: [ -80.33203125, 43.032636960021215 ],
+            bounds: [ -86.8359375, 34.88593094075317, -73.828125, 51.17934297928927 ],
             classes: [
                 { name: 'Water', color: '#FF00FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -298,8 +300,8 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
-            bounds: [-86.8359375, 34.8859309407532, -73.828125, 51.1793429792893],
-            center: [-80.33203125, 43.0326369600212],
+            bounds: [ -86.8359375, 34.88593094075317, -73.828125, 51.17934297928927 ],
+            center: [ -80.33203125, 43.032636960021215 ],
             retrain_geoms: [
                 { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
                 { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
@@ -468,8 +470,8 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', async (t) => {
             version: '1.0.0',
             schema: 'xyz',
             tiles: ['/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt'],
-            bounds: [-86.8359375, 34.8859309407532, -73.828125, 51.1793429792893],
-            center: [-80.33203125, 43.0326369600212]
+            bounds: [ -86.8359375, 34.88593094075317, -73.828125, 51.17934297928927 ],
+            center: [ -80.33203125, 43.032636960021215 ]
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -487,7 +489,7 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0 - geometries', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        }, t);
+        }, false);
 
         t.deepEquals(Buffer.from(res.body).toString('hex'), '1aefbfbd010a0464617461120f0801120200001801220509efbfbd21efbfbd3212130801120200011801220911efbfbd21efbfbd32efbfbd04efbfbd0712130801120200021801220911efbfbd21efbfbd32efbfbd04efbfbd07120f0801120200031801220509efbfbd21efbfbd32120f0802120200001801220509efbfbd21efbfbd3212130802120200011801220911efbfbd21efbfbd32efbfbd04efbfbd0712130802120200021801220911efbfbd21efbfbd32efbfbd04efbfbd07120f0802120200031801220509efbfbd21efbfbd321a05636c6173732202280122022802220228032202280428efbfbd207802');
     } catch (err) {
