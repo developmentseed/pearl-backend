@@ -26,7 +26,7 @@ class CheckPoint extends Generic {
      */
     static async has_auth(pool, auth, projectid, checkpointid) {
         const proj = await Project.has_auth(pool, auth, projectid);
-        const checkpoint = await this.get(checkpointid);
+        const checkpoint = await CheckPoint.from(pool, checkpointid);
 
         if (checkpoint.project_id !== proj.id) {
             throw new Err(400, null, `Checkpoint #${checkpointid} is not associated with project #${projectid}`);
@@ -37,8 +37,6 @@ class CheckPoint extends Generic {
 
     serialize() {
         const res = super.serialize();
-
-        console.error(res);
 
         if (res.retrain_geoms) {
             const counts = res.retrain_geoms.filter((geom) => {
