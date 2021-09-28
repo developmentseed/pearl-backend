@@ -11,9 +11,7 @@
         "project_id",
         "analytics",
         "retrain_geoms",
-        "input_geoms",
-        "center",
-        "bounds"
+        "input_geoms"
     ],
     "additionalProperties": false,
     "properties": {
