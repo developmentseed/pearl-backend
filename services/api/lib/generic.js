@@ -1,5 +1,3 @@
-
-
 const Err = require('./error');
 const { sql } = require('slonik');
 

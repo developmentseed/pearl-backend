@@ -5,6 +5,9 @@ const bbox = require('@turf/bbox').default;
 const { sql } = require('slonik');
 const Generic = require('./generic');
 
+/**
+ * @class
+ */
 class Model extends Generic {
     static _table = 'models';
     static _res = require('../schema/res.Model.json');

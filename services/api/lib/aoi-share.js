@@ -2,6 +2,9 @@ const Err = require('./error');
 const Storage = require('./storage');
 const { sql } = require('slonik');
 
+/**
+ * @class
+ */
 class AOIShare {
     constructor(config) {
         this.pool = config.pool;
