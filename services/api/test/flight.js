@@ -92,7 +92,7 @@ class Flight {
             url: schemaurl
         });
 
-        if (!rawschema.body.res) throw new Err('Cannot validate resultant schema - no result schema defined');
+        if (!rawschema.body.res) throw new Error('Cannot validate resultant schema - no result schema defined');
 
         const schema = ajv.compile(rawschema.body.res);
 
