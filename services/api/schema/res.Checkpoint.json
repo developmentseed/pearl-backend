@@ -1,3 +1,68 @@
 {
-    "type": "object"
+    "type": "object",
+    "required": [
+        "id",
+        "name",
+        "parent",
+        "classes",
+        "created",
+        "storage",
+        "bookmarked",
+        "project_id",
+        "analytics",
+        "retrain_geoms",
+        "input_geoms"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "parent": {
+            "type": ["integer", "null"],
+            "description": "If the checkpoint was derived from a parent checkpoint will contain the ID of the parent"
+        },
+        "classes": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        },
+        "created": {
+            "$ref": "./util/created.json"
+        },
+        "storage": {
+            "type": "boolean"
+        },
+        "bookmarked": {
+            "type": "boolean"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "analytics": {
+
+        },
+        "retrain_geoms": {
+
+        },
+        "input_geoms": {
+
+        },
+        "center": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+        "bounds": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    }
 }
