@@ -111,8 +111,12 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Return tilejson for a given AOI
+     *
+     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/tiles', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/tiles', {
+        res: 'res.TileJSON.json'
+    }, config.requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
@@ -613,8 +617,12 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Return tilejson for a given AOI using uuid
+     *
+     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
      */
-    await schema.get('/share/:shareuuid/tiles', {}, async (req, res) => {
+    await schema.get('/share/:shareuuid/tiles', {
+        res: 'res.TileJSON.json'
+    }, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
