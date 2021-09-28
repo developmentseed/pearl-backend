@@ -313,8 +313,6 @@ async function router(schema, config) {
      * @apiGroup Checkpoints
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.checkpoint-patch.json} apiParam
-     *
      * @apiDescription
      *     Update a checkpoint
      *
