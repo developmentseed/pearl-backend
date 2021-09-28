@@ -123,7 +123,7 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid));
+            const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             return res.json(patch.serialize());
         } catch (err) {
@@ -205,10 +205,9 @@ async function router(schema, config) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            const a = await aoipatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
-            if (!a.storage) throw new Err(404, null, 'Patch has not been uploaded');
+            const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
-            const tiffurl = await aoipatch.url(req.params.aoiid, req.params.patchid);
+            const tiffurl = await a.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
@@ -235,9 +234,9 @@ async function router(schema, config) {
             await Param.int(req, 'aoiid');
             await Param.int(req, 'patchid');
 
-            await aoipatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
-            await aoipatch.download(req.params.aoiid, res);
+            await a.download(config, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -272,14 +271,15 @@ async function router(schema, config) {
             });
 
             const files = [];
+            const patch = AOIPatch.from(config.pool, req.params.patchid);
 
             busboy.on('file', (fieldname, file) => {
-                files.push(aoipatch.upload(req.params.aoiid, req.params.patchid, file));
+                files.push(patch.upload(config, file));
             });
 
             busboy.on('finish', async () => {
                 try {
-                    return res.json(await aoipatch.get(req.params.patchid));
+                    return res.json(patch.serialize());
                 } catch (err) {
                     Err.respond(err, res);
                 }
