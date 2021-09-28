@@ -4,6 +4,9 @@ const Generic = require('./generic');
 const Storage = require('./storage');
 const { sql } = require('slonik');
 
+/**
+ * @class
+ */
 class AOI extends Generic {
     static _table = 'aois';
     static _res = require('../schema/res.AOI.json');
