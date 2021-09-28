@@ -10,7 +10,7 @@ flight.user(test, 'ingalls', true);
 
 test('POST /api/model', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             method: 'POST',
             json: true,
             url: 'http://localhost:2000/api/model',
@@ -239,8 +239,8 @@ test('PATCH /api/project/1/checkpoint/1', async (t) => {
             storage: false,
             bookmarked: true,
             parent: null,
-            center: [ -80.33203125, 43.032636960021215 ],
-            bounds: [ -86.8359375, 34.88593094075317, -73.828125, 51.17934297928927 ],
+            center: [-80.33203125, 43.032636960021215],
+            bounds: [-86.8359375, 34.88593094075317, -73.828125, 51.17934297928927],
             classes: [
                 { name: 'Water', color: '#FF00FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -300,8 +300,8 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
-            bounds: [ -86.8359375, 34.88593094075317, -73.828125, 51.17934297928927 ],
-            center: [ -80.33203125, 43.032636960021215 ],
+            bounds: [-86.8359375, 34.88593094075317, -73.828125, 51.17934297928927],
+            center: [-80.33203125, 43.032636960021215],
             retrain_geoms: [
                 { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
                 { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
@@ -470,8 +470,8 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', async (t) => {
             version: '1.0.0',
             schema: 'xyz',
             tiles: ['/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt'],
-            bounds: [ -86.8359375, 34.88593094075317, -73.828125, 51.17934297928927 ],
-            center: [ -80.33203125, 43.032636960021215 ]
+            bounds: [-86.8359375, 34.88593094075317, -73.828125, 51.17934297928927],
+            center: [-80.33203125, 43.032636960021215]
         });
     } catch (err) {
         t.error(err, 'no errors');
