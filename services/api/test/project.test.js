@@ -527,7 +527,10 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
         t.error(err, 'no errors');
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.deepEquals(res.body, true);
+        t.deepEquals(res.body, {
+            status: 200,
+            message: 'Checkpoint deleted'
+        });
 
         t.end();
     });
