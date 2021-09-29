@@ -11,15 +11,13 @@ flight.takeoff(test);
 
 const UPDATE = process.env.UPDATE;
 
-test('GET: api/schema', (t) => {
-    request({
-        url: 'http://localhost:2000/api/schema',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
-
-        t.equals(res.statusCode, 200, 'http: 200');
+test('GET: api/schema', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:2000/api/schema',
+            method: 'GET',
+            json: true
+        }, t);
 
         const fixture = path.resolve(__dirname, './fixtures/get_schema.json');
         if (UPDATE) {
@@ -28,17 +26,20 @@ test('GET: api/schema', (t) => {
 
         t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('GET: api/schema?method=FAKE', (t) => {
-    request({
-        url: 'http://localhost:2000/api/schema?method=fake',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?method=FAKE', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:2000/api/schema?method=fake',
+            method: 'GET',
+            json: true
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {
@@ -46,18 +47,20 @@ test('GET: api/schema?method=FAKE', (t) => {
             message: 'validation error',
             messages: []
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET: api/schema?method=GET', (t) => {
-    request({
-        url: 'http://localhost:2000/api/schema?method=GET',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?method=GET', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:2000/api/schema?method=GET',
+            method: 'GET',
+            json: true
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {
@@ -65,18 +68,20 @@ test('GET: api/schema?method=GET', (t) => {
             message: 'url & method params must be used together',
             messages: []
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET: api/schema?url=123', (t) => {
-    request({
-        url: 'http://localhost:2000/api/schema?url=123',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?url=123', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:2000/api/schema?url=123',
+            method: 'GET',
+            json: true
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {
@@ -84,20 +89,22 @@ test('GET: api/schema?url=123', (t) => {
             message: 'url & method params must be used together',
             messages: []
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+
+    t.end();
 });
 
-test('GET: api/schema?method=POST&url=/token', (t) => {
-    request({
-        url: 'http://localhost:2000/api/schema?method=POST&url=/token',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?method=POST&url=/token', async (t) => {
+    try {
+        const res = await flight.request({
+            url: 'http://localhost:2000/api/schema?method=POST&url=/token',
+            method: 'GET',
+            json: true
+        }, t);
 
-        t.equals(res.statusCode, 200, 'http: 200');
         t.deepEquals(res.body, {
             body: {
                 type: 'object',
@@ -111,8 +118,11 @@ test('GET: api/schema?method=POST&url=/token', (t) => {
             res: null
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
 
