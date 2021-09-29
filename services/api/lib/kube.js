@@ -123,7 +123,8 @@ class Kube {
                     'janitor/ttl': '40m'
                 },
                 labels: {
-                    type: type
+                    type: type,
+                    app: 'lulc-helm'
                 }
             },
             spec: {
