@@ -53,7 +53,6 @@ function configure(args = {}, cb) {
  */
 
 /**
- * @param {Object} args - Command Line Args
  * @param {Config} config
  * @param {function} cb
  */
@@ -261,24 +260,10 @@ async function server(args, config, cb) {
 
     schema.router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {
-            let errs = [];
-
-            if (err.validationErrors.body) {
-                errs = errs.concat(err.validationErrors.body.map((e) => {
-                    return { message: e.message };
-                }));
-            }
-
-            if (err.validationErrors.query) {
-                errs = errs.concat(err.validationErrors.query.map((e) => {
-                    return { message: e.message };
-                }));
-            }
-
             return Err.respond(
                 new Err(400, null, 'validation error'),
                 res,
-                errs
+                err.validationErrors.body
             );
         } else {
             next(err);

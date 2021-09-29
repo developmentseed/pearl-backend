@@ -1,9 +1,8 @@
+
+
 const fetch = require('node-fetch');
 const Err = require('./error');
 
-/**
- * @class
- */
 class Param {
     static async int(req, name) {
         req.params[name] = Number(req.params[name]);

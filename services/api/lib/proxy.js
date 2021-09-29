@@ -1,3 +1,5 @@
+
+
 const request = require('request');
 const { promisify } = require('util');
 const arequest = promisify(request);
@@ -58,4 +60,6 @@ class Proxy {
     }
 }
 
-module.exports = Proxy;
+module.exports = {
+    Proxy
+};
