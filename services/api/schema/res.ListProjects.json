@@ -1,0 +1,42 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "projects"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer"
+        },
+        "projects": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "model_id",
+                    "created"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "$ref": "./util/id.json"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the Project"
+                    },
+                    "model_id": {
+                        "type": "integer",
+                        "description": "Starter Model to use for project"
+                    },
+                    "created": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

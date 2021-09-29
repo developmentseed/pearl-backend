@@ -9,51 +9,52 @@ flight.init(test);
 flight.takeoff(test);
 flight.user(test, 'ingalls', true);
 
-test('POST /api/model', (t) => {
-    request({
-        method: 'POST',
-        json: true,
-        url: 'http://localhost:2000/api/model',
-        body: {
-            name: 'NAIP Supervised',
-            active: true,
-            model_type: 'pytorch_example',
-            model_inputshape: [240,240,4],
-            model_zoom: 17,
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-            meta: {}
-        },
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    } , (err, res) => {
+test('POST /api/model', async (t) => {
+    try {
+        const res = await flight.request({
+            method: 'POST',
+            json: true,
+            url: 'http://localhost:2000/api/model',
+            body: {
+                name: 'NAIP Supervised',
+                active: true,
+                model_type: 'pytorch_example',
+                model_inputshape: [240,240,4],
+                model_zoom: 17,
+                classes: [
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Tree Canopy', color: '#008000' },
+                    { name: 'Field', color: '#80FF80' },
+                    { name: 'Built', color: '#806060' }
+                ],
+                meta: {}
+            },
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+    } catch (err) {
         t.error(err, 'no error');
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.end();
-    });
+    }
+
+    t.end();
 });
 
-test('POST /api/project', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        },
-        body: {
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('POST /api/project', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test Project',
+                model_id: 1,
+                mosaic: 'naip.latest'
+            }
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
@@ -65,31 +66,33 @@ test('POST /api/project', (t) => {
             model_id: 1,
             mosaic: 'naip.latest'
         });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('POST /api/project/1/checkpoint', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        },
-        body: {
-            name: 'Test Checkpoint',
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ]
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('POST /api/project/1/checkpoint', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/checkpoint',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test Checkpoint',
+                classes: [
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Tree Canopy', color: '#008000' },
+                    { name: 'Field', color: '#80FF80' },
+                    { name: 'Built', color: '#806060' }
+                ]
+            }
+        }, t);
+
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -120,36 +123,38 @@ test('POST /api/project/1/checkpoint', (t) => {
                 { type: 'GeometryCollection', 'geometries': [] }
             ]
         });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('POST /api/project/1/aoi', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        },
-        body: {
-            name: 'Test AOI',
-            checkpoint_id: 1,
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
+test('POST /api/project/1/aoi', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test AOI',
+                checkpoint_id: 1,
+                bounds: {
+                    type: 'Polygon',
+                    coordinates: [[
+                        [-79.37724530696869, 38.83428180092151],
+                        [-79.37677592039108, 38.83428180092151],
+                        [-79.37677592039108, 38.83455550411051],
+                        [-79.37724530696869, 38.83455550411051],
+                        [-79.37724530696869, 38.83428180092151]
+                    ]]
+                }
             }
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+        }, t);
+
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -175,22 +180,23 @@ test('POST /api/project/1/aoi', (t) => {
                 ]]
             }
         });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET /api/project/1/share', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/share',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('GET /api/project/1/share', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/share',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
 
         t.deepEquals(res.body, {
             total: 0,
@@ -198,20 +204,24 @@ test('GET /api/project/1/share', (t) => {
             shares: []
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
-test('POST /api/project/1/aoi/1/share', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/share',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
+test('POST /api/project/1/aoi/1/share', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/1/share',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
         t.equals(res.statusCode, 404, 'status: 404');
 
         t.deepEquals(res.body, {
@@ -220,20 +230,24 @@ test('POST /api/project/1/aoi/1/share', (t) => {
             messages: []
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
-test('POST /api/project/1/aoi/2/share', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/2/share',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
+test('POST /api/project/1/aoi/2/share', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/2/share',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
         t.equals(res.statusCode, 404, 'status: 404');
 
         t.deepEquals(res.body, {
@@ -242,8 +256,11 @@ test('POST /api/project/1/aoi/2/share', (t) => {
             messages: []
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
 test('[meta] Set aoi.storage: true', async (t) => {
@@ -253,7 +270,7 @@ test('[meta] Set aoi.storage: true', async (t) => {
                 aois
             SET
                 storage = true
-        `, []);
+        `);
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -261,17 +278,16 @@ test('[meta] Set aoi.storage: true', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/aoi/1/share', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/share',
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('POST /api/project/1/aoi/1/share', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/1/share',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
@@ -296,23 +312,25 @@ test('POST /api/project/1/aoi/1/share', (t) => {
             }
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
 let uuid;
 
-test('GET /api/project/1/share', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/share',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('GET /api/project/1/share', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/share',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
 
         t.ok(res.body.shares[0].created, '.created: <date>');
         delete res.body.shares[0].created;
@@ -328,86 +346,81 @@ test('GET /api/project/1/share', (t) => {
                 storage: false
             }]
         });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET /api/share/uuid', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/share',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
+test('GET /api/share/uuid', async (t) => {
+    try {
+        let res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/share',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
         uuid = res.body.shares[0].uuid;
-        request({
+
+        res = await flight.request({
             json: true,
             url: `http://localhost:2000/api/share/${uuid}`,
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        }, (err, res) => {
-            t.error(err, 'no errors');
-            t.equals(res.statusCode, 200, 'status: 200');
-            t.ok(res.body.created, '.created: <date>');
-            delete res.body.created;
-            t.ok(res.body.uuid, '.uuid: <uuid>');
-            delete res.body.uuid;
+        }, t);
 
-            t.deepEqual(res.body, {
-                project_id: 1,
-                aoi_id: 1,
-                storage: false,
-                checkpoint_id: 1,
-                classes: [{ name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }],
-                bounds: {
-                    'type': 'Polygon',
-                    'coordinates': [
-                        [
-                            [
-                                -79.377245307,
-                                38.834281801
-                            ],
-                            [
-                                -79.37677592,
-                                38.834281801
-                            ],
-                            [
-                                -79.37677592,
-                                38.834555504
-                            ],
-                            [
-                                -79.377245307,
-                                38.834555504
-                            ],
-                            [
-                                -79.377245307,
-                                38.834281801
-                            ]
-                        ]
-                    ]
-                }
-            });
-            t.end();
+        t.equals(res.statusCode, 200, 'status: 200');
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+        t.ok(res.body.uuid, '.uuid: <uuid>');
+        delete res.body.uuid;
+
+        t.deepEqual(res.body, {
+            project_id: 1,
+            aoi_id: 1,
+            storage: false,
+            checkpoint_id: 1,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.377245307, 38.834281801 ],
+                    [ -79.37677592, 38.834281801 ],
+                    [ -79.37677592, 38.834555504 ],
+                    [ -79.377245307, 38.834555504 ],
+                    [ -79.377245307, 38.834281801 ]
+                ]]
+            }
         });
-    });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
-test('GET /api/project/1/aoi/1', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1',
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+test('GET /api/project/1/aoi/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
@@ -449,21 +462,24 @@ test('GET /api/project/1/aoi/1', (t) => {
                 storage: false
             }]
         });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', (t) => {
-    request({
-        json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
-        t.error(err, 'no errors');
+test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
         t.equals(res.statusCode, 404, 'status: 404');
 
         t.deepEquals(res.body, {
@@ -472,26 +488,33 @@ test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', (t) => {
             messages: []
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/<uuid> - exists', (t) => {
-    request({
-        json: true,
-        url: `http://localhost:2000/api/project/1/aoi/1/share/${uuid}`,
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${flight.token.ingalls}`
-        }
-    }, (err, res) => {
+test('DELETE /api/project/1/aoi/1/<uuid> - exists', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: `http://localhost:2000/api/project/1/aoi/1/share/${uuid}`,
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.deepEquals(res.body, {
+            status: 200,
+            message: 'AOI Share Deleted'
+        });
+    } catch (err) {
         t.error(err, 'no errors');
-        t.equals(res.statusCode, 200, 'status: 200');
+    }
 
-        t.deepEquals(res.body, true);
-
-        t.end();
-    });
+    t.end();
 });
 
 
