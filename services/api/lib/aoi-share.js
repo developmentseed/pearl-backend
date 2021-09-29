@@ -173,8 +173,9 @@ class AOIShare extends Generic {
                     s.uuid AS uuid,
                     s.aoi_id AS aoi_id,
                     s.project_id AS project_id,
-                    s.bounds AS bounds
+                    s.bounds AS bounds,
                     s.created AS created,
+                    s.patches AS patches,
                     s.storage AS storage,
                     a.checkpoint_id AS checkpoint_id,
                     c.classes AS classes

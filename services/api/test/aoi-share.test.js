@@ -295,22 +295,21 @@ test('POST /api/project/1/aoi/1/share', async (t) => {
         delete res.body.uuid;
 
         t.deepEquals(res.body, {
-            project_id: 1,
             aoi_id: 1,
-            storage: false,
-            patches: [],
+            project_id: 1,
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
                 ]]
-            }
+            },
+            storage: false,
+            patches: [],
         });
-
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -382,9 +381,20 @@ test('GET /api/share/uuid', async (t) => {
         delete res.body.uuid;
 
         t.deepEqual(res.body, {
-            project_id: 1,
             aoi_id: 1,
+            project_id: 1,
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [ -79.37724530696869, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83428180092151 ],
+                    [ -79.37677592039108, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83455550411051 ],
+                    [ -79.37724530696869, 38.83428180092151 ]
+                ]]
+            },
             storage: false,
+            patches: [],
             checkpoint_id: 1,
             classes: [
                 { name: 'Water', color: '#0000FF' },
@@ -392,16 +402,6 @@ test('GET /api/share/uuid', async (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[
-                    [-79.377245307, 38.834281801],
-                    [-79.37677592, 38.834281801],
-                    [-79.37677592, 38.834555504],
-                    [-79.377245307, 38.834555504],
-                    [-79.377245307, 38.834281801]
-                ]]
-            }
         });
     } catch (err) {
         t.error(err, 'no errors');
