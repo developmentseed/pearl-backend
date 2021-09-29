@@ -8,6 +8,10 @@ const Generic = require('./generic');
  * @class
  */
 class AOIPatch extends Generic {
+    static _table = 'aoi_patch';
+    static _patch = Object.keys(require('../schema/req.body.PatchPatch.json').properties);
+    static _res = require('../schema/res.Patch.json');
+
     constructor() {
         super();
     }
@@ -50,7 +54,7 @@ class AOIPatch extends Generic {
         }
 
         const list = AOIPatch.deserialize(pgres.rows, 'patches');
-        list.projectid = projectid;
+        list.project_id = projectid;
         list.aoi_id = aoiid;
         return list;
     }
@@ -179,7 +183,7 @@ class AOIPatch extends Generic {
      * @param {Number} patch.project_id Project ID
      * @param {Number} patch.aoi_id AOI ID
      */
-    async generate(pool, patch) {
+    static async generate(pool, patch) {
         let pgres;
         try {
             pgres = await pool.query(sql`
