@@ -1,9 +1,9 @@
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
+const Proxy = require('../lib/proxy');
 
 async function router(schema, config) {
-    const proxy = new (require('../lib/proxy').Proxy)(config);
 
     /**
      * @api {get} /api/mosaic List Mosaics
@@ -62,6 +62,7 @@ async function router(schema, config) {
         try {
             req.url = req.url + '/tilejson.json';
 
+            const proxy = new Proxy(config);
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -94,7 +95,9 @@ async function router(schema, config) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            await proxy.request(req, res);
+            const proxy = new Proxy(config);
+            await ear
+            roxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -5,20 +5,29 @@ const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
 const Checkpoint = require('../lib/checkpoint');
 const AOIPatch = require('../lib/aoi-patch');
+const AOIShare = require('../lib/aoi-share');
+const Proxy = require('../lib/proxy');
 
 async function router(schema, config) {
-    const proxy = new (require('../lib/proxy').Proxy)(config);
-    const aoishare = new (require('../lib/aoi-share').AOIShare)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     const getAoiTileJSON = async (aoi, req) => {
-        const tiffurl = aoi.uuid ? await aoishare.url(aoi.uuid) : await aoi.url(config);
+        let tiffurl;
+        if (aoi.uuid) {
+            const a = AOIShare.from(config.pool, aoi.uuid);
+            tiffurl = await a.url(config);
+        } else {
+            const a = AOI.from(config.pool, aoi.uuid);
+            tiffurl = await a.url(config);
+        }
 
         req.url = '/cog/tilejson.json';
         req.query.url = tiffurl.origin + tiffurl.pathname;
         req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
         req.query.maxzoom = 20;
 
+
+        const proxy = new Proxy(config);
 
         let tj, tiles;
         if (aoi.uuid) {
@@ -89,7 +98,7 @@ async function router(schema, config) {
 
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            const shares = await aoishare.list(req.params.projectid, {
+            const shares = await AOIShare.list(config.pool. req.params.projectid, {
                 aoi_id: a.id
             });
 
@@ -157,6 +166,7 @@ async function router(schema, config) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
+            const proxy = new Proxy(config);
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -213,6 +223,7 @@ async function router(schema, config) {
 
                     if (!(await a.exists(config))) throw new Err(500, null, 'AOI is not on Azure?!');
 
+                    const proxy = new Proxy(config);
                     const pres = await proxy.request({
                         url: '/cog/statistics',
                         query: {
@@ -316,6 +327,7 @@ async function router(schema, config) {
                 colormap: cmap
             };
 
+            const proxy = new Proxy(config);
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -346,7 +358,7 @@ async function router(schema, config) {
             const aois = await AOI.list(config.pool, req.params.projectid, req.query);
 
             for (const a of aois.aois) {
-                const shares = await aoishare.list(req.params.projectid, {
+                const shares = await AOIShare.list(config.pool, req.params.projectid, {
                     aoi: a.id
                 });
 
@@ -430,7 +442,7 @@ async function router(schema, config) {
                 patchurls.push(await patch.url(config));
             }
 
-            const share = await aoishare.create(a);
+            const share = await AOIShare.generate(config.pool, a);
 
             if (config.TileUrl) {
                 const tiffurl = await a.url(config);
@@ -443,8 +455,9 @@ async function router(schema, config) {
                     colormap: cmap
                 };
 
+                const proxy = new Proxy(config);
                 const pres = await proxy.request(req, true);
-                const up = await aoishare.upload(share.uuid, pres);
+                const up = await share.upload(config, pres);
                 return res.json(up);
             } else {
                 return res.json(share);
@@ -463,14 +476,24 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Delete a Shared AOI
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.delete('/project/:projectid/aoi/:aoiid/share/:shareuuid', {}, config.requiresAuth, async (req, res) => {
+    await schema.delete('/project/:projectid/aoi/:aoiid/share/:shareuuid', {
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            return res.json(await aoishare.delete(req.params.aoiid, req.params.shareuuid));
+            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            await share.delete(config);
+
+            return res.json({
+                status: 200,
+                message: 'AOI Share Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -508,7 +531,7 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            return res.json(await aoishare.list(req.params.projectid, req.query));
+            return res.json(await AOIShare.list(config.pool, req.params.projectid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -603,7 +626,9 @@ async function router(schema, config) {
      */
     await schema.get('/share/:shareuuid', {}, async (req, res) => {
         try {
-            return res.json(await aoishare.get(req.params.shareuuid));
+            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+
+            return res.json(share.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -626,7 +651,7 @@ async function router(schema, config) {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            const a = await aoishare.get(req.params.shareuuid);
+            const a = await AOIShare.from(config.pool, req.params.shareuuid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             res.json(await getAoiTileJSON(a, req));
@@ -651,14 +676,13 @@ async function router(schema, config) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            const a = await aoishare.get(req.params.shareuuid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
-
-            const tiffurl = await aoishare.url(req.params.shareuuid);
+            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            const tiffurl = await share.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
+            const proxy = new Proxy(config);
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -677,10 +701,10 @@ async function router(schema, config) {
      */
     await schema.get('/share/:shareuuid/download/raw', {}, async (req, res) => {
         try {
-            const a = await aoishare.get(req.params.shareuuid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            if (!share.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const aoi = await AOI.from(config.pool, a.aoi_id);
+            const aoi = await AOI.from(config.pool, share.aoi_id);
             await aoi.download(config, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -699,13 +723,13 @@ async function router(schema, config) {
      */
     await schema.get('/share/:shareuuid/download/color', {}, async (req, res) => {
         try {
-            const a = await aoishare.get(req.params.shareuuid);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            if (!share.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const aoi = await AOI.from(config.pool, a.aoi_id);
+            const aoi = await AOI.from(config.pool, share.aoi_id);
             const tiffurl = await aoi.url(config);
 
-            const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
+            const chkpt = await Checkpoint.from(config.pool, share.checkpoint_id);
             const cmap = {};
             for (let i = 0; i < chkpt.classes.length; i++) {
                 cmap[i] = chkpt.classes[i].color;
@@ -726,6 +750,7 @@ async function router(schema, config) {
                 colormap: cmap
             };
 
+            const proxy = new Proxy(config);
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);

@@ -58,6 +58,4 @@ class Proxy {
     }
 }
 
-module.exports = {
-    Proxy
-};
+module.exports = Proxy;
