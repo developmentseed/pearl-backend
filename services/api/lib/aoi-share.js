@@ -109,7 +109,7 @@ class AOIShare extends Generic {
     /**
      * Upload an AOI share geotiff and mark the AOI share storage property as true
      *
-     * @param {String} shareuuid AOI Share UUID to upload to
+     * @param {Config} config
      * @param {Object} file File Stream to upload
      */
     async upload(shareuuid, file) {
@@ -118,9 +118,8 @@ class AOIShare extends Generic {
         const storage = new Storage(this.config, 'aois');
         await storage.upload(file, `share-${shareuuid}.tiff`);
 
-        return await this.patch(shareuuid, {
-            storage: true
-        });
+        this.storage = true;
+        return await this.commit(config.pool);
     }
 
     /**

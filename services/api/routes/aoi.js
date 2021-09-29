@@ -412,17 +412,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Export an AOI & it's patches to share
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "aoi_id": 1432,
-     *       "project_id": 1,
-     *       "storage": false,
-     *       "created": "<date>",
-     *       "patches": []
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Share.json} apiSuccess
      */
-    await schema.post('/project/:projectid/aoi/:aoiid/share', {}, config.requiresAuth, async (req, res) => {
+    await schema.post('/project/:projectid/aoi/:aoiid/share', {
+        res: 'res.Share.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Param.int(req, 'aoiid');
@@ -458,9 +452,9 @@ async function router(schema, config) {
                 const proxy = new Proxy(config);
                 const pres = await proxy.request(req, true);
                 const up = await share.upload(config, pres);
-                return res.json(up);
+                return res.json(up.serialize());
             } else {
-                return res.json(share);
+                return res.json(share.serialize());
             }
         } catch (err) {
             return Err.respond(err, res);
