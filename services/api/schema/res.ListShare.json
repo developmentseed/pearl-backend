@@ -35,7 +35,7 @@
                         "$ref": "./util/created.json"
                     },
                     "storage": {
-                        "type": "integer"
+                        "type": "boolean"
                     }
                 }
             }

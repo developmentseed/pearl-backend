@@ -585,7 +585,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {get} /api/share/:shareuuid Get AOI
+     * @api {get} /api/share/:shareuuid Get Share
      * @apiVersion 1.0.0
      * @apiName GetShare
      * @apiGroup Share

@@ -7,8 +7,7 @@
         "bounds",
         "created",
         "storage",
-        "checkpoint_id",
-        "classes"
+        "patches"
     ],
     "additionalProperties": false,
     "properties": {
@@ -29,6 +28,12 @@
         },
         "storage": {
             "type": "boolean"
+        },
+        "patches": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
         },
         "checkpoint_id": {
             "type": "integer"

@@ -82,17 +82,17 @@
     "POST /project/:projectid/aoi/:aoiid/share": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /project/:projectid/aoi/:aoiid/share/:shareuuid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid/share": {
         "body": false,
         "query": true,
-        "res": false
+        "res": true
     },
     "DELETE /project/:projectid/aoi/:aoiid": {
         "body": false,
@@ -107,7 +107,7 @@
     "GET /share/:shareuuid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /share/:shareuuid/tiles": {
         "body": false,
@@ -267,7 +267,7 @@
     "GET /mosaic/:layer": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /mosaic/:layer/tiles/:z/:x/:y.:format": {
         "body": false,
@@ -277,12 +277,12 @@
     "GET /project": {
         "body": false,
         "query": true,
-        "res": false
+        "res": true
     },
     "GET /project/:projectid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "POST /project": {
         "body": true,
