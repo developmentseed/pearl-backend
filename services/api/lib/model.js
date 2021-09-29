@@ -168,7 +168,7 @@ class Model extends Generic {
     /**
      * Download a Model Asset
      *
-     * @param {Config} Config
+     * @param {Config} config
      * @param {Stream} res Stream to pipe model to (usually express response object)
      */
     async download(config, res) {

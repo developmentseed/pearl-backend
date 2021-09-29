@@ -53,6 +53,7 @@ function configure(args = {}, cb) {
  */
 
 /**
+ * @param {Object} args - Command Line Args
  * @param {Config} config
  * @param {function} cb
  */
