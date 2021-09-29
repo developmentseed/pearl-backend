@@ -261,10 +261,24 @@ async function server(args, config, cb) {
 
     schema.router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {
+            let errs = [];
+
+            if (err.validationErrors.body) {
+                errs = errs.concat(err.validationErrors.body.map((e) => {
+                    return { message: e.message };
+                }));
+            }
+
+            if (err.validationErrors.query) {
+                errs = errs.concat(err.validationErrors.query.map((e) => {
+                    return { message: e.message };
+                }));
+            }
+
             return Err.respond(
                 new Err(400, null, 'validation error'),
                 res,
-                err.validationErrors.body
+                errs
             );
         } else {
             next(err);
