@@ -4,11 +4,11 @@ const Busboy = require('busboy');
 const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
 const Checkpoint = require('../lib/checkpoint');
+const AOIPatch = require('../lib/aoi-patch');
 
 async function router(schema, config) {
     const proxy = new (require('../lib/proxy').Proxy)(config);
     const aoishare = new (require('../lib/aoi-share').AOIShare)(config);
-    const aoipatch = new (require('../lib/aoi-patch').AOIPatch)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     const getAoiTileJSON = async (aoi, req) => {
@@ -303,8 +303,8 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
-                patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
+                const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                patchurls.push(await patch.url(config));
             }
 
             req.method = 'POST';
@@ -426,8 +426,8 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                await aoipatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
-                patchurls.push(await aoipatch.url(req.params.aoiid, patchid));
+                const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                patchurls.push(await patch.url(config));
             }
 
             const share = await aoishare.create(a);
@@ -713,7 +713,8 @@ async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of aoi.patches) {
-                patchurls.push(await aoipatch.url(aoi.id, patchid));
+                const patch = await AOIPatch.from(config.pool, patchid);
+                patchurls.push(await patch.url(config));
             }
 
             req.method = 'POST';
