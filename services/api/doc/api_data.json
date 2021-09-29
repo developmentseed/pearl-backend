@@ -5383,7 +5383,7 @@
   {
     "type": "get",
     "url": "/api/share/:shareuuid",
-    "title": "Get AOI",
+    "title": "Get Share",
     "version": "1.0.0",
     "name": "GetShare",
     "group": "Share",
@@ -5442,15 +5442,22 @@
           },
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "Integer[]",
             "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
             "field": "checkpoint_id",
             "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object[]",
-            "optional": false,
+            "optional": true,
             "field": "classes",
             "description": "<p>undefined undefined</p>"
           }
@@ -5568,7 +5575,7 @@
           },
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "Boolean",
             "optional": false,
             "field": "shares.storage",
             "description": "<p>undefined</p>"
@@ -5641,15 +5648,22 @@
           },
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "Integer[]",
             "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
             "field": "checkpoint_id",
             "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Object[]",
-            "optional": false,
+            "optional": true,
             "field": "classes",
             "description": "<p>undefined undefined</p>"
           }
