@@ -2,9 +2,6 @@ const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const { sql } = require('slonik');
 
-/**
- * @class
- */
 class Auth {
     constructor(config) {
         this.pool = config.pool;
@@ -101,7 +98,7 @@ class Auth {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page * query.limit}
+                    ${query.page}
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal error');

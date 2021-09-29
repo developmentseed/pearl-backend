@@ -43,7 +43,7 @@
         "strict": "error",
         "node/no-unsupported-features": [ "error", { "version": 8 } ],
         "node/no-missing-require": "error",
-        "valid-jsdoc": ["error", {
+        "valid-jsdoc": ["warn", {
             "requireParamDescription": false,
             "requireReturnDescription": false,
             "requireReturnType": false,

@@ -2,7 +2,9 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "schemas": {
+        "name": {
+            "type": "string",
+            "description": "Name of the Project"
         }
     }
 }
