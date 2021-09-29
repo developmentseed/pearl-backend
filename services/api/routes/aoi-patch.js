@@ -3,9 +3,9 @@ const { Param } = require('../lib/util');
 const Busboy = require('busboy');
 const AOI = require('../lib/aoi');
 const AOIPatch = require('../lib/aoi-patch');
+const Proxy = require('../lib/proxy');
 
 async function router(schema, config) {
-    const proxy = new (require('../lib/proxy').Proxy)(config);
     const auth = new (require('../lib/auth').Auth)(config);
 
     /**
@@ -160,6 +160,7 @@ async function router(schema, config) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
+            const proxy = new Proxy(config);
             const response = await proxy.request(req);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
@@ -212,6 +213,7 @@ async function router(schema, config) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
+            const proxy = new Proxy(config);
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
