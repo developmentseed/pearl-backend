@@ -9,7 +9,7 @@ const { sql } = require('slonik');
 class Batch extends Generic {
     static _table = 'batch';
     static _patch = Object.keys(require('../schema/req.body.PatchBatch.json').properties);
-    static _res = require('../schema/res.Batch.json')
+    static _res = require('../schema/res.Batch.json');
 
     constructor() {
         super();

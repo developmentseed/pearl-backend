@@ -31,7 +31,7 @@ async function router(schema, config) {
 
             await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            return res.json(await AOIPatch.list(req.params.projectid, req.params.aoiid, req.query));
+            return res.json(await AOIPatch.list(config.pool, req.params.projectid, req.params.aoiid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }

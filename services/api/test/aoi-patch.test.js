@@ -365,7 +365,7 @@ test('DELETE /api/project/1/aoi/1/patch/1', async (t) => {
 
         t.deepEquals(res.body, {
             status: 200,
-            message: 'AOI Patch deleted'
+            message: 'AOI Patch Deleted'
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -490,7 +490,7 @@ test('GET /api/project/1/aoi/1/patch/1', async (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'AOI Patch not found',
+            message: 'aoi_patch not found',
             messages: []
         });
     } catch (err) {

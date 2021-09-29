@@ -1,0 +1,45 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "project_id",
+        "aoi_id",
+        "patches"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "aoi_id": {
+            "type": "integer"
+        },
+        "patches": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "created",
+                    "storage"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "$ref": "./util/id.json"
+                    },
+                    "created": {
+                        "$ref": "./util/created.json"
+                    },
+                    "storage": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        }
+    }
+}

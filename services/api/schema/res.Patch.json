@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "project_id",
+        "aoi_id",
+        "created",
+        "storage"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./util/id.json"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "aoi_id": {
+            "type": "integer"
+        },
+        "created": {
+            "$ref": "./util/created.json"
+        },
+        "storage": {
+            "type": "boolean"
+        }
+    }
+}
