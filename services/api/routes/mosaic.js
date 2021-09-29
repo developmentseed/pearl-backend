@@ -37,26 +37,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a TileJSON object for a given mosaic layer
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "tilejson": "2.2.0",
-     *       "name": "naip.latest",
-     *       "version": "1.0.0",
-     *       "scheme": "xyz",
-     *       "tiles": [ "http://localhost:8000/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?" ],
-     *       "minzoom": 12,
-     *       "maxzoom": 18,
-     *       "bounds": [
-     *           -124.81903735821528,
-     *           24.49673997373884,
-     *           -66.93084562551495,
-     *           49.44192498524237
-     *       ],
-     *       "center": [ -95.87494149186512, 36.9693324794906, 12 ]
-     *   }
+     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
      */
-    await schema.get('/mosaic/:layer', {}, async (req, res) => {
+    await schema.get('/mosaic/:layer', {
+        res: 'res.TileJSON.json'
+    }, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {

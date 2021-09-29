@@ -98,7 +98,7 @@ async function router(schema, config) {
 
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            const shares = await AOIShare.list(config.pool. req.params.projectid, {
+            const shares = await AOIShare.list(config.pool, req.params.projectid, {
                 aoi_id: a.id
             });
 
@@ -503,23 +503,12 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all shares for a given project
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.aoi.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "project_id": 123,
-     *       "shares": [{
-     *           "uuid": "<uuid>",
-     *           "aoi_id": 1432,
-     *           "storage": true,
-     *           "created": "<date>"
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.query.Share.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListShare.json} apiSuccess
      */
     await schema.get('/project/:projectid/share', {
-        query: 'req.query.aoi.json'
+        query: 'req.query.Share.json',
+        res: 'res.ListShare.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -605,20 +594,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given AOI Export using the UUID
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1432,
-     *       "name": "I'm an AOI",
-     *       "checkpoint_id": 1,
-     *       "storage": true,
-     *       "bookmarked": false
-     *       "created": "<date>",
-     *       "bounds": { "GeoJSON "},
-     *       "classes": []
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Share.json} apiSuccess
      */
-    await schema.get('/share/:shareuuid', {}, async (req, res) => {
+    await schema.get('/share/:shareuuid', {
+        res: 'res.Share.json'
+    }, async (req, res) => {
         try {
             const share = await AOIShare.from(config.pool, req.params.shareuuid);
 

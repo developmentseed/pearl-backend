@@ -16,31 +16,15 @@ async function router(schema, config) {
      * @apiGroup Projects
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.project-list.json} apiParam
-     *
      * @apiDescription
      *     Return a list of projects
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "projects": [{
-     *           "id": 1,
-     *           "name": 123,
-     *           "created": "<date>",
-     *           "aois": [{
-     *              "id": 1,
-     *              "name": "aoi name",
-     *              "created": "<date>",
-     *              "storage": false
-     *            }],
-     *            "checkpoints": []
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListProjects.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
      */
     await schema.get('/project', {
-        query: 'req.query.project-list.json'
+        query: 'req.query.ListProjects.json',
+        res: 'res.ListProjects.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             const results = await Project.list(config.pool, req.auth.uid, req.query);
@@ -77,17 +61,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given project
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "name": "Test Project",
-     *       "created": "<date>"
-     *       "model_id": 1,
-     *       "mosaic": "naip.latest"
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
-    await schema.get('/project/:projectid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid', {
+        res: 'res.Project.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
 

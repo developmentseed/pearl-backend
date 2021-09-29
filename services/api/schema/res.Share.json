@@ -1,0 +1,84 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "name",
+        "bounds",
+        "area",
+        "project_id",
+        "bookmarked",
+        "bookmarked_at",
+        "checkpoint_id",
+        "created",
+        "storage",
+        "patches",
+        "px_stats"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./util/id.json"
+        },
+        "name": {
+            "type": "string"
+        },
+        "bounds": {
+            "type": "object"
+        },
+        "area": {
+            "type": "integer"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "bookmarked": {
+            "type": ["boolean", "null"]
+        },
+        "bookmarked_at": {
+            "type": ["integer", "null"]
+        },
+        "checkpoint_id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "storage": {
+            "type": "boolean"
+        },
+        "patches": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        },
+        "px_stats": {
+            "type": "object"
+        },
+        "classes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "color"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "color": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "shares": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        }
+    }
+}
