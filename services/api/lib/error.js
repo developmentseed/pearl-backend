@@ -1,6 +1,5 @@
-/**
- * @class
- */
+
+
 class PublicError {
     constructor(status, err, safe, print = true) {
         // Wrap postgres errors to ensure stack trace (line nums) are returned

@@ -26,7 +26,7 @@
                 "additionalProperties": false,
                 "properties": {
                     "id": {
-                        "$ref": "./util/id.json"
+                        "type": "integer"
                     },
                     "error": {
                         "type": ["null", "string"]

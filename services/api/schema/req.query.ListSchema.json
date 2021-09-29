@@ -3,7 +3,7 @@
     "additionalProperties": false,
     "properties": {
         "method": {
-            "type": ["string"],
+            "type": "string",
             "description": "HTTP Verb",
             "enum": [
                 "GET",
@@ -18,7 +18,7 @@
             ]
         },
         "url": {
-            "type": ["string"],
+            "type": "string",
             "description": "URLEncoded URL that you want to fetch"
         }
     }

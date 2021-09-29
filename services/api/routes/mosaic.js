@@ -1,9 +1,9 @@
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
-const Proxy = require('../lib/proxy');
 
 async function router(schema, config) {
+    const proxy = new (require('../lib/proxy').Proxy)(config);
 
     /**
      * @api {get} /api/mosaic List Mosaics
@@ -37,17 +37,31 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a TileJSON object for a given mosaic layer
      *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
+     * @apiSuccessExample Success-Response:
+     *   HTTP/1.1 200 OK
+     *   {
+     *       "tilejson": "2.2.0",
+     *       "name": "naip.latest",
+     *       "version": "1.0.0",
+     *       "scheme": "xyz",
+     *       "tiles": [ "http://localhost:8000/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?" ],
+     *       "minzoom": 12,
+     *       "maxzoom": 18,
+     *       "bounds": [
+     *           -124.81903735821528,
+     *           24.49673997373884,
+     *           -66.93084562551495,
+     *           49.44192498524237
+     *       ],
+     *       "center": [ -95.87494149186512, 36.9693324794906, 12 ]
+     *   }
      */
-    await schema.get('/mosaic/:layer', {
-        res: 'res.TileJSON.json'
-    }, async (req, res) => {
+    await schema.get('/mosaic/:layer', {}, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
             req.url = req.url + '/tilejson.json';
 
-            const proxy = new Proxy(config);
             await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
@@ -80,8 +94,7 @@ async function router(schema, config) {
             await Param.int(req, 'x');
             await Param.int(req, 'y');
 
-            const proxy = new Proxy(config);
-            proxy.request(req, res);
+            await proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }
