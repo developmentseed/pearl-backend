@@ -101,7 +101,7 @@ class Auth {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal error');

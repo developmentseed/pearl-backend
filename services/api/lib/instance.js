@@ -105,7 +105,7 @@ class Instance extends Generic {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list instances');
