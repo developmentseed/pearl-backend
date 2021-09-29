@@ -18,8 +18,7 @@
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer",
-            "description": "Unique Batch ID"
+            "$ref": "./util/id.json"
         },
         "error": {
             "type": ["null", "string"],

@@ -143,11 +143,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Update an existing Project
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.project-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchProject.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.patch('/project/:projectid', {
-        body: 'req.body.project-patch.json',
+        body: 'req.body.PatchProject.json',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {

@@ -43,13 +43,13 @@ class AOIPatch extends Generic {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list AOI Patches');
         }
 
-        const list = AOIPatch.deserialize(pgres.rows);
+        const list = AOIPatch.deserialize(pgres.rows, 'patches');
         list.projectid = projectid;
         list.aoi_id = aoiid;
         return list;
@@ -170,37 +170,6 @@ class AOIPatch extends Generic {
 
         return this;
     }
-
-    /**
-     * Return a single aoi
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Number} patchid - Specific AOI id
-     */
-    static async from(pool, patchid) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-               SELECT
-                    id,
-                    aoi_id,
-                    project_id,
-                    created,
-                    storage
-                FROM
-                    aoi_patch
-                WHERE
-                    id = ${patchid}
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to get AOI Patch');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
-
-        return AOIPatch.deserialize(pgres.rows[0]);
-    }
-
 
     /**
      * Create a new AOI Patch
