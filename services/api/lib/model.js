@@ -5,6 +5,9 @@ const bbox = require('@turf/bbox').default;
 const { sql } = require('slonik');
 const Generic = require('./generic');
 
+/**
+ * @class
+ */
 class Model extends Generic {
     static _table = 'models';
     static _res = require('../schema/res.Model.json');
@@ -53,7 +56,7 @@ class Model extends Generic {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        const models = Model.deserialize(pgres.rows);
+        const models = this.deserialize(pgres.rows);
 
         models.models = models.models.map((m) => {
             m.bounds = bbox(m.bounds);
@@ -114,7 +117,7 @@ class Model extends Generic {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        return Model.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**
@@ -165,7 +168,7 @@ class Model extends Generic {
     /**
      * Download a Model Asset
      *
-     * @param {Config} Config
+     * @param {Config} config
      * @param {Stream} res Stream to pipe model to (usually express response object)
      */
     async download(config, res) {
@@ -210,7 +213,7 @@ class Model extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No model found');
 
-        return Model.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**

@@ -1,5 +1,3 @@
-
-
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 

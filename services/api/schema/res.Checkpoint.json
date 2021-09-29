@@ -16,7 +16,7 @@
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer"
+            "$ref": "./util/id.json"
         },
         "name": {
             "type": "string"

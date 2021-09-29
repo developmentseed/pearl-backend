@@ -3,48 +3,38 @@
     "required": [
         "total",
         "project_id",
-        "checkpoints"
+        "shares"
     ],
     "additionalProperties": false,
     "properties": {
         "total": {
-            "type": "integer",
-            "description": "Total number of items"
+            "type": "integer"
         },
         "project_id": {
             "type": "integer"
         },
-        "checkpoints": {
+        "shares": {
             "type": "array",
             "items": {
                 "type": "object",
                 "required": [
-                    "id",
-                    "name",
-                    "parent",
+                    "uuid",
+                    "aoi_id",
                     "created",
-                    "storage",
-                    "bookmarked"
+                    "storage"
                 ],
                 "additionalProperties": false,
                 "properties": {
-                    "id": {
-                        "$ref": "./util/id.json"
-                    },
-                    "name": {
+                    "uuid": {
                         "type": "string"
                     },
-                    "parent": {
-                        "type": ["integer", "null"],
-                        "description": "If the checkpoint was derived from a parent checkpoint will contain the ID of the parent"
+                    "aoi_id": {
+                        "type": "integer"
                     },
                     "created": {
                         "$ref": "./util/created.json"
                     },
                     "storage": {
-                        "type": "boolean"
-                    },
-                    "bookmarked": {
                         "type": "boolean"
                     }
                 }

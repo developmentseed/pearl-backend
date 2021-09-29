@@ -2,6 +2,7 @@ const CP = require('child_process');
 
 /**
  * @class
+ *
  * Spin up a CPU based GPU worker for tests
  * Assumes that the gpu has been build and tagged as `gpu` in docker
  */

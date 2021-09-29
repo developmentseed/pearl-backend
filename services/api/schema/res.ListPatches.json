@@ -2,7 +2,9 @@
     "type": "object",
     "required": [
         "total",
-        "batch"
+        "project_id",
+        "aoi_id",
+        "patches"
     ],
     "additionalProperties": false,
     "properties": {
@@ -10,40 +12,30 @@
             "type": "integer",
             "description": "Total number of items"
         },
-        "batch": {
+        "project_id": {
+            "type": "integer"
+        },
+        "aoi_id": {
+            "type": "integer"
+        },
+        "patches": {
             "type": "array",
             "items": {
                 "type": "object",
                 "required": [
                     "id",
                     "created",
-                    "updated",
-                    "aoi",
-                    "name",
-                    "completed",
-                    "error"
+                    "storage"
                 ],
                 "additionalProperties": false,
                 "properties": {
                     "id": {
                         "$ref": "./util/id.json"
                     },
-                    "error": {
-                        "type": ["null", "string"]
-                    },
                     "created": {
-                        "type": "integer"
+                        "$ref": "./util/created.json"
                     },
-                    "updated": {
-                        "type": "integer"
-                    },
-                    "aoi": {
-                        "type": "integer"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "completed": {
+                    "storage": {
                         "type": "boolean"
                     }
                 }
