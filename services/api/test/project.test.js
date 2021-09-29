@@ -374,7 +374,7 @@ test('GET /api/project?sort=asc', async (t) => {
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.true(new Date(res.body.projects[1].created) > new Date(res.body.projects[0].created));
     } catch (err) {
@@ -471,6 +471,7 @@ test('GET /api/project/1', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            uid: 1,
             name: 'Test Project',
             model_id: 1,
             model_name: 'NAIP Supervised',
@@ -533,6 +534,7 @@ test('GET /api/project/1', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
+            uid: 1,
             name: 'Renamed Test Project',
             model_id: 1,
             model_name: 'NAIP Supervised',
@@ -580,7 +582,10 @@ test('DELETE /api/project/1', async (t) => {
             }
         }, t);
 
-        t.deepEquals(res.body, {});
+        t.deepEquals(res.body, {
+            status: 200,
+            message: 'Project Deleted'
+        });
     } catch (err) {
         t.error(err, 'no errors');
     }

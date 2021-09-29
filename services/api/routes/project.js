@@ -45,6 +45,7 @@ async function router(schema, config) {
                     }
                 }
             }
+
             res.json(results);
         } catch (err) {
             return Err.respond(err, res);
@@ -70,8 +71,6 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
 
             const proj = (await Project.has_auth(config.pool, req.auth, req.params.projectid)).serialize();
-
-            delete proj.uid;
 
             const checkpoints = await Checkpoint.list(config.pool, req.params.projectid, { bookmarked: true });
             // remove reduntant project id
@@ -151,10 +150,10 @@ async function router(schema, config) {
      * @apiDescription
      *     Archive a project
      *
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:projectid', {
-        res: 'res.Project.json'
+        res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -183,7 +182,10 @@ async function router(schema, config) {
             });
 
             await proj.delete(config.pool);
-            return res.json({});
+            return res.json({
+                status: 200,
+                message: 'Project Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
