@@ -1,29 +1,50 @@
 {
-    "type": "object",
-    "additionalProperties": false,
-    "patternProperties": {
-        ".*": {
-            "type": "object",
-            "required": [
-                "body",
-                "query",
-                "res"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "body": {
-                    "type": "boolean",
-                    "description": "Does the request body have a schema"
-                },
-                "query": {
-                    "type": "boolean",
-                    "description": "Do the request query params have a schema"
-                },
-                "res": {
-                    "type": "boolean",
-                    "description": "Does the response have a schema"
+    "oneOf": [{
+        "type": "object",
+        "additionalProperties": false,
+        "patternProperties": {
+            ".*": {
+                "type": "object",
+                "required": [
+                    "body",
+                    "query",
+                    "res"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "body": {
+                        "type": "boolean",
+                        "description": "Does the request body have a schema"
+                    },
+                    "query": {
+                        "type": "boolean",
+                        "description": "Do the request query params have a schema"
+                    },
+                    "res": {
+                        "type": "boolean",
+                        "description": "Does the response have a schema"
+                    }
                 }
             }
         }
-    }
+    }, {
+        "type": "object",
+        "required": [
+            "body",
+            "res",
+            "query"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "body": {
+                "type": ["null", "object"]
+            },
+            "res": {
+                "type": ["null", "object"]
+            },
+            "query": {
+                "type": ["null", "object"]
+            }
+        }
+    }]
 }
