@@ -132,7 +132,7 @@ class Batch extends Generic {
                 ) RETURNING *
             `);
 
-            return Batch.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate Batch');
         }

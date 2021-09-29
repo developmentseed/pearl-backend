@@ -56,7 +56,7 @@ class Model extends Generic {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        const models = Model.deserialize(pgres.rows);
+        const models = this.deserialize(pgres.rows);
 
         models.models = models.models.map((m) => {
             m.bounds = bbox(m.bounds);
@@ -117,7 +117,7 @@ class Model extends Generic {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        return Model.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**
@@ -213,7 +213,7 @@ class Model extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No model found');
 
-        return Model.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**

@@ -57,7 +57,7 @@ class AOIShare extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOI Shares');
         }
 
-        const list = AOIShare.deserialize(pgres.rows, 'shares');
+        const list = this.deserialize(pgres.rows, 'shares');
         list.project_id = projectid;
         return list;
     }
@@ -75,48 +75,16 @@ class AOIShare extends Generic {
     }
 
     /**
-     * Return a Row as a JSON Object
-     *
-     * @param {Object} row Postgres Database Row
-     *
-     * @returns {Object}
-     */
-    static json(row) {
-        const def = {
-            project_id: parseInt(row.project_id),
-            aoi_id: parseInt(row.aoi_id),
-            created: row.created,
-            storage: row.storage,
-            uuid: row.uuid,
-            patches: row.patches,
-            checkpoint_id: row.checkpoint_id,
-            classes: row.classes
-        };
-
-        if (typeof row.bounds === 'object') {
-            def.bounds = row.bounds;
-        } else {
-            try {
-                def.bounds = JSON.parse(row.bounds);
-            } catch (err) {
-                // Ignore Errors
-            }
-        }
-
-        return def;
-    }
-
-    /**
      * Upload an AOI share geotiff and mark the AOI share storage property as true
      *
      * @param {Config} config
      * @param {Object} file File Stream to upload
      */
-    async upload(shareuuid, file) {
+    async upload(config, file) {
         if (this.storage) throw new Err(404, null, 'AOI Share has already been uploaded');
 
-        const storage = new Storage(this.config, 'aois');
-        await storage.upload(file, `share-${shareuuid}.tiff`);
+        const storage = new Storage(config, 'aois');
+        await storage.upload(file, `share-${this.uuid}.tiff`);
 
         this.storage = true;
         return await this.commit(config.pool);
@@ -125,15 +93,14 @@ class AOIShare extends Generic {
     /**
      * Download an AOI share geotiff
      *
-     * @param {Number} shareuuid AOI ID to download
+     * @param {Config} config
      * @param {Stream} res Stream to pipe geotiff to (usually express response object)
      */
-    async download(shareuuid, res) {
-        const aoi = await this.get(shareuuid);
-        if (!aoi.storage) throw new Err(404, null, 'AOI Share has not been uploaded');
+    async download(config, res) {
+        if (!this.storage) throw new Err(404, null, 'AOI Share has not been uploaded');
 
-        const storage = new Storage(this.config, 'aois');
-        await storage.download(`share-${shareuuid}.tiff`, res);
+        const storage = new Storage(config, 'aois');
+        await storage.download(`share-${this.uuid}.tiff`, res);
     }
 
     /**
@@ -206,7 +173,7 @@ class AOIShare extends Generic {
                     s.uuid AS uuid,
                     s.aoi_id AS aoi_id,
                     s.project_id AS project_id,
-                    ST_AsGeojson(s.bounds)::JSON AS bounds,
+                    s.bounds AS bounds
                     s.created AS created,
                     s.storage AS storage,
                     a.checkpoint_id AS checkpoint_id,
@@ -228,7 +195,7 @@ class AOIShare extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
-        return AOIShare.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
 
@@ -258,7 +225,7 @@ class AOIShare extends Generic {
             throw new Err(500, err, 'Failed to create AOI Share');
         }
 
-        return AOIShare.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 }
 
