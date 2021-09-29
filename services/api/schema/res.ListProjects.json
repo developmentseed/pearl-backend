@@ -16,8 +16,10 @@
                 "required": [
                     "id",
                     "name",
-                    "model_id",
-                    "created"
+                    "created",
+                    "aois",
+                    "checkpoints",
+                    "model"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -28,12 +30,23 @@
                         "type": "string",
                         "description": "Name of the Project"
                     },
-                    "model_id": {
-                        "type": "integer",
-                        "description": "Starter Model to use for project"
-                    },
                     "created": {
                         "type": "integer"
+                    },
+                    "aois": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "checkpoints": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "model": {
+                        "type": "object"
                     }
                 }
             }
