@@ -5400,16 +5400,23 @@ define({ "api": [
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "String",
             "optional": false,
-            "field": "id",
-            "description": "<p>Unique ID</p>"
+            "field": "uuid",
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
             "optional": false,
-            "field": "name",
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
             "description": "<p>undefined</p>"
           },
           {
@@ -5423,28 +5430,14 @@ define({ "api": [
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "area",
-            "description": "<p>undefined</p>"
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
           },
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "Boolean",
             "optional": false,
-            "field": "project_id",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean/Null",
-            "optional": false,
-            "field": "bookmarked",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer/Null",
-            "optional": false,
-            "field": "bookmarked_at",
+            "field": "storage",
             "description": "<p>undefined</p>"
           },
           {
@@ -5456,58 +5449,9 @@ define({ "api": [
           },
           {
             "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "created",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "storage",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "patches",
-            "description": "<p>undefined undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "px_stats",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "Object[]",
-            "optional": true,
+            "optional": false,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "classes.name",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "classes.color",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object[]",
-            "optional": true,
-            "field": "shares",
             "description": "<p>undefined undefined</p>"
           }
         ]
@@ -5655,16 +5599,23 @@ define({ "api": [
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "String",
             "optional": false,
-            "field": "id",
-            "description": "<p>Unique ID</p>"
+            "field": "uuid",
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
             "optional": false,
-            "field": "name",
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
             "description": "<p>undefined</p>"
           },
           {
@@ -5678,28 +5629,14 @@ define({ "api": [
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "area",
-            "description": "<p>undefined</p>"
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
           },
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "Boolean",
             "optional": false,
-            "field": "project_id",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean/Null",
-            "optional": false,
-            "field": "bookmarked",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer/Null",
-            "optional": false,
-            "field": "bookmarked_at",
+            "field": "storage",
             "description": "<p>undefined</p>"
           },
           {
@@ -5711,58 +5648,9 @@ define({ "api": [
           },
           {
             "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "created",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "storage",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "patches",
-            "description": "<p>undefined undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "px_stats",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "Object[]",
-            "optional": true,
+            "optional": false,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "classes.name",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "classes.color",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object[]",
-            "optional": true,
-            "field": "shares",
             "description": "<p>undefined undefined</p>"
           }
         ]

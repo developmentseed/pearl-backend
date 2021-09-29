@@ -53,7 +53,7 @@ class AOIPatch extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOI Patches');
         }
 
-        const list = AOIPatch.deserialize(pgres.rows, 'patches');
+        const list = this.deserialize(pgres.rows, 'patches');
         list.project_id = projectid;
         list.aoi_id = aoiid;
         return list;
@@ -199,7 +199,7 @@ class AOIPatch extends Generic {
             throw new Err(500, err, 'Failed to create AOI Patch');
         }
 
-        return AOIPatch.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 }
 

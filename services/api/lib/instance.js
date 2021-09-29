@@ -111,7 +111,7 @@ class Instance extends Generic {
             throw new Err(500, new Error(err), 'Failed to list instances');
         }
 
-        return Instance.deserialize(pgres.rows);
+        return this.deserialize(pgres.rows);
     }
 
     /**
@@ -213,7 +213,7 @@ class Instance extends Generic {
                 pod = await kube.createPod(podSpec);
             }
 
-            const inst = Instance.deserialize(pgres.rows[0]);
+            const inst = this.deserialize(pgres.rows[0]);
             inst.token = inst.gen_token(config, instance.uid);
             inst.pod = pod;
 
@@ -283,7 +283,7 @@ class Instance extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
-        const inst = Instance.deserialize(pgres.rows[0]);
+        const inst = this.deserialize(pgres.rows[0]);
         inst.token = inst.gen_token(config, auth);
         inst.status = podStatus && podStatus.status ? podStatus.status : {};
 

@@ -1,5 +1,4 @@
 const test = require('tape');
-const request = require('request');
 const Flight = require('./flight');
 const { sql } = require('slonik');
 
@@ -11,7 +10,7 @@ flight.user(test, 'ingalls', true);
 
 test('POST /api/model', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             method: 'POST',
             json: true,
             url: 'http://localhost:2000/api/model',
@@ -396,11 +395,11 @@ test('GET /api/share/uuid', async (t) => {
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
-                    [ -79.377245307, 38.834281801 ],
-                    [ -79.37677592, 38.834281801 ],
-                    [ -79.37677592, 38.834555504 ],
-                    [ -79.377245307, 38.834555504 ],
-                    [ -79.377245307, 38.834281801 ]
+                    [-79.377245307, 38.834281801],
+                    [-79.37677592, 38.834281801],
+                    [-79.37677592, 38.834555504],
+                    [-79.377245307, 38.834555504],
+                    [-79.377245307, 38.834281801]
                 ]]
             }
         });

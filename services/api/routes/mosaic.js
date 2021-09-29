@@ -81,8 +81,7 @@ async function router(schema, config) {
             await Param.int(req, 'y');
 
             const proxy = new Proxy(config);
-            await ear
-            roxy.request(req, res);
+            proxy.request(req, res);
         } catch (err) {
             return Err.respond(err, res);
         }

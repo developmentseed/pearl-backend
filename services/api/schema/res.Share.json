@@ -1,80 +1,39 @@
 {
     "type": "object",
     "required": [
-        "id",
-        "name",
-        "bounds",
-        "area",
+        "uuid",
+        "aoi_id",
         "project_id",
-        "bookmarked",
-        "bookmarked_at",
-        "checkpoint_id",
+        "bounds",
         "created",
         "storage",
-        "patches",
-        "px_stats"
+        "checkpoint_id",
+        "classes"
     ],
     "additionalProperties": false,
     "properties": {
-        "id": {
-            "$ref": "./util/id.json"
-        },
-        "name": {
+        "uuid": {
             "type": "string"
         },
-        "bounds": {
-            "type": "object"
-        },
-        "area": {
+        "aoi_id": {
             "type": "integer"
         },
         "project_id": {
             "type": "integer"
         },
-        "bookmarked": {
-            "type": ["boolean", "null"]
-        },
-        "bookmarked_at": {
-            "type": ["integer", "null"]
-        },
-        "checkpoint_id": {
-            "type": "integer"
+        "bounds": {
+            "type": "object"
         },
         "created": {
-            "type": "integer"
+            "$ref": "./util/created.json"
         },
         "storage": {
             "type": "boolean"
         },
-        "patches": {
-            "type": "array",
-            "items": {
-                "type": "integer"
-            }
-        },
-        "px_stats": {
-            "type": "object"
+        "checkpoint_id": {
+            "type": "integer"
         },
         "classes": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "color"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "color": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "shares": {
             "type": "array",
             "items": {
                 "type": "object"
