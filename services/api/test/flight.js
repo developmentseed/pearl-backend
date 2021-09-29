@@ -148,6 +148,7 @@ class Flight {
      *
      * @param {Object} test Tape runner
      * @param {String} username Username for user to create
+     * @param {Boolean} [admin=false] Should the user be an admin
      */
     user(test, username, admin = false) {
         test.test('Create Token', async (t) => {

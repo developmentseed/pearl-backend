@@ -4,6 +4,9 @@ const Generic = require('./generic');
 const Storage = require('./storage');
 const { sql } = require('slonik');
 
+/**
+ * @class
+ */
 class AOI extends Generic {
     static _table = 'aois';
     static _res = require('../schema/res.AOI.json');
@@ -79,7 +82,7 @@ class AOI extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOIs');
         }
 
-        const list = AOI.deserialize(pgres.rows);
+        const list = this.deserialize(pgres.rows);
         list.project_id = projectid;
 
         return list;
@@ -264,7 +267,7 @@ class AOI extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'aoi not found');
 
-        return AOI.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**
@@ -310,7 +313,7 @@ class AOI extends Generic {
             throw new Err(500, err, 'Failed to create AOI');
         }
 
-        return AOI.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 }
 

@@ -2,200 +2,38 @@ const Err = require('./error');
 const AOI = require('./aoi');
 const Storage = require('./storage');
 const { sql } = require('slonik');
+const Generic = require('./generic');
 
-class AOIPatch {
-    constructor(config) {
-        this.pool = config.pool;
-        this.config = config;
-    }
+/**
+ * @class
+ */
+class AOIPatch extends Generic {
+    static _table = 'aoi_patch';
+    static _patch = Object.keys(require('../schema/req.body.PatchPatch.json').properties);
+    static _res = require('../schema/res.Patch.json');
 
-    /**
-     * Ensure a user can only access their own project assets (or is an admin and can access anything)
-     *
-     * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} aoiid AOI the user is attemping to access
-     * @param {Number} patchid AOI the user is attemping to access
-     */
-    async has_auth(pool, auth, projectid, aoiid, patchid) {
-        const a = await AOI.has_auth(pool, auth, projectid, aoiid);
-        const patch = await this.get(patchid);
-
-        if (patch.aoi_id !== a.id) {
-            throw new Err(400, null, `AOI Patch #${patchid} is not associated with aoi #${aoiid}`);
-        }
-
-        return patch;
-    }
-
-    /**
-     * Return a sharing URL that can be used to titiler
-     *
-     * @param {Number} aoiid AOI ID to get a share URL for
-     * @param {Number} patchid AOI Patch ID to get a share URL for
-     */
-    async url(aoiid, patchid) {
-        if (!this.storage) throw new Err(404, null, 'AOI Patch has not been uploaded');
-
-        const storage = new Storage(this.config, 'aois');
-        return await storage.url(`aoi-${aoiid}-patch-${patchid}.tiff`);
-    }
-
-    /**
-     * Return a Row as a JSON Object
-     *
-     * @param {Object} row Postgres Database Row
-     *
-     * @returns {Object}
-     */
-    static json(row) {
-        const def = {
-            id: parseInt(row.id),
-            created: row.created,
-            storage: row.storage,
-            project_id: parseInt(row.project_id),
-            aoi_id: parseInt(row.aoi_id)
-        };
-
-        return def;
-    }
-
-    /**
-     * Upload an AOI patch geotiff and mark the AOI patch storage property as true
-     *
-     * @param {Number} aoiid AOI ID to upload to
-     * @param {Number} patchid AOI Patch ID to upload to
-     * @param {Object} file File Stream to upload
-     */
-    async upload(aoiid, patchid, file) {
-        const storage = new Storage(this.config, 'aois');
-        await storage.upload(file, `aoi-${aoiid}-patch-${patchid}.tiff`);
-
-        return await this.patch(patchid, {
-            storage: true
-        });
-    }
-
-    /**
-     * Download an AOI patch geotiff
-     *
-     * @param {Number} aoiid AOI ID to download
-     * @param {Number} patchid Patch ID to download
-     * @param {Stream} res Stream to pipe geotiff to (usually express response object)
-     */
-    async download(aoiid, patchid, res) {
-        const aoi = await this.get(aoiid);
-        if (!aoi.storage) throw new Err(404, null, 'AOI has not been uploaded');
-
-        const storage = new Storage(this.config, 'aois');
-        await storage.download(`aoi-${aoiid}-patch-${patchid}.tiff`, res);
-    }
-
-    /**
-     * Delete an AOI Patch
-     *
-     * @param {Number} aoiid - Specific AOI id
-     * @param {Number} patchid - Specific AOI Patch id
-     */
-    async delete(aoiid, patchid) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(sql`
-                DELETE
-                    FROM
-                        aoi_patch
-                    WHERE
-                        id = ${patchid}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to delete AOI Patch');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
-
-        if (pgres.rows[0].storage && this.config.AzureStorage) {
-            const storage = new Storage(this.config, 'aois');
-            await storage.delete(`aoi-${aoiid}-patch-${patchid}.tiff`);
-        }
-
-        return true;
-    }
-
-    /**
-     * Update AOI Patch properties
-     *
-     * @param {Number} patchid - Specific AOI Patch id
-     * @param {Object} patch AOI Object
-     * @param {Boolean} patch.storage Has the storage been uploaded
-     */
-    async patch(patchid, patch) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(sql`
-                UPDATE aoi_patch
-                    SET
-                        storage = COALESCE(${patch.storage}, storage)
-                    WHERE
-                        id = ${patchid}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update AOI Patch');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
-
-        return AOIPatch.json(pgres.rows[0]);
-    }
-
-    /**
-     * Return a single aoi
-     *
-     * @param {Number} patchid - Specific AOI id
-     */
-    async get(patchid) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(sql`
-               SELECT
-                    id,
-                    aoi_id,
-                    project_id,
-                    created,
-                    storage
-                FROM
-                    aoi_patch
-                WHERE
-                    id = ${patchid}
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to get AOI Patch');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
-
-        return AOIPatch.json(pgres.rows[0]);
+    constructor() {
+        super();
     }
 
     /**
      * Return a list of AOI Patches
      *
+     * @param {Pool} pool - Instantiated Postgres Pool
      * @param {Number} projectid - AOI Patches related to a specific project
      * @param {Number} aoiid - AOI Patches related to a specific AOI
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    async list(projectid, aoiid, query) {
+    static async list(pool, projectid, aoiid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -209,52 +47,160 @@ class AOIPatch {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list AOI Patches');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            project_id: projectid,
-            aoi_id: aoiid,
-            patches: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    created: row.created,
-                    storage: row.storage
-                };
-            })
-        };
+        const list = this.deserialize(pgres.rows, 'patches');
+        list.project_id = projectid;
+        list.aoi_id = aoiid;
+        return list;
+    }
+
+    /**
+     * Ensure a user can only access their own project assets (or is an admin and can access anything)
+     *
+     * @param {Pool} pool Instantiated Postgres Pool
+     * @param {Object} auth req.auth object
+     * @param {Number} projectid Project the user is attempting to access
+     * @param {Number} aoiid AOI the user is attemping to access
+     * @param {Number} patchid AOI the user is attemping to access
+     */
+    static async has_auth(pool, auth, projectid, aoiid, patchid) {
+        const a = await AOI.has_auth(pool, auth, projectid, aoiid);
+        const patch = await AOIPatch.from(pool, patchid);
+
+        if (patch.aoi_id !== a.id) {
+            throw new Err(400, null, `AOI Patch #${patchid} is not associated with aoi #${aoiid}`);
+        }
+
+        return patch;
+    }
+
+    /**
+     * Return a sharing URL that can be used to titiler
+     *
+     * @param {Config} config
+     */
+    async url(config) {
+        if (!this.storage) throw new Err(404, null, 'AOI Patch has not been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        return await storage.url(`aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+    }
+
+    /**
+     * Upload an AOI patch geotiff and mark the AOI patch storage property as true
+     *
+     * @param {Config} config
+     * @param {Object} file File Stream to upload
+     */
+    async upload(config, file) {
+        if (this.storage) throw new Err(404, null, 'AOI Patch has already been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        await storage.upload(file, `aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+
+        this.storage = true;
+        return await this.commit(config.pool);
+    }
+
+    /**
+     * Download an AOI patch geotiff
+     *
+     * @param {Config} config
+     * @param {Stream} res Stream to pipe geotiff to (usually express response object)
+     */
+    async download(config, res) {
+        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        await storage.download(`aoi-${this.aoi_id}-patch-${this.id}.tiff`, res);
+    }
+
+    /**
+     * Delete an AOI Patch
+     *
+     * @param {Config} config
+     */
+    async delete(config) {
+        let pgres;
+        try {
+            pgres = await config.pool.query(sql`
+                DELETE
+                    FROM
+                        aoi_patch
+                    WHERE
+                        id = ${this.id}
+                    RETURNING *
+            `);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to delete AOI Patch');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
+
+        if (pgres.rows[0].storage && config.AzureStorage) {
+            const storage = new Storage(config, 'aois');
+            await storage.delete(`aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+        }
+
+        return true;
+    }
+
+    /**
+     * Update AOI Patch properties
+     *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     */
+    async commit(pool) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+                UPDATE aoi_patch
+                    SET
+                        storage = ${this.storage}
+                    WHERE
+                        id = ${this.id}
+                    RETURNING *
+            `);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to update AOI Patch');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
+
+        return this;
     }
 
     /**
      * Create a new AOI Patch
      *
-     * @param {Number} projectid - AOIS related to a specific project
-     * @param {Number} aoiid - AOIS related to a specific aoi
+     * @param {Pool} pool - Instantiated Postgres Pool
+     * @param {Object} patch - AOIS related to a specific aoi
+     * @param {Number} patch.project_id Project ID
+     * @param {Number} patch.aoi_id AOI ID
      */
-    async create(projectid, aoiid) {
+    static async generate(pool, patch) {
         let pgres;
         try {
-            pgres = await this.pool.query(sql`
+            pgres = await pool.query(sql`
                 INSERT INTO aoi_patch (
                     project_id,
                     aoi_id
                 ) VALUES (
-                    ${projectid},
-                    ${aoiid}
+                    ${patch.project_id},
+                    ${patch.aoi_id}
                 ) RETURNING *
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create AOI Patch');
         }
 
-        return AOIPatch.json(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 }
 
-module.exports = {
-    AOIPatch
-};
+module.exports = AOIPatch;

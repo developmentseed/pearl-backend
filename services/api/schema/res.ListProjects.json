@@ -2,29 +2,24 @@
     "type": "object",
     "required": [
         "total",
-        "project_id",
-        "checkpoints"
+        "projects"
     ],
     "additionalProperties": false,
     "properties": {
         "total": {
-            "type": "integer",
-            "description": "Total number of items"
-        },
-        "project_id": {
             "type": "integer"
         },
-        "checkpoints": {
+        "projects": {
             "type": "array",
             "items": {
                 "type": "object",
                 "required": [
                     "id",
                     "name",
-                    "parent",
                     "created",
-                    "storage",
-                    "bookmarked"
+                    "aois",
+                    "checkpoints",
+                    "model"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -32,20 +27,26 @@
                         "$ref": "./util/id.json"
                     },
                     "name": {
-                        "type": "string"
-                    },
-                    "parent": {
-                        "type": ["integer", "null"],
-                        "description": "If the checkpoint was derived from a parent checkpoint will contain the ID of the parent"
+                        "type": "string",
+                        "description": "Name of the Project"
                     },
                     "created": {
-                        "$ref": "./util/created.json"
+                        "type": "integer"
                     },
-                    "storage": {
-                        "type": "boolean"
+                    "aois": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
                     },
-                    "bookmarked": {
-                        "type": "boolean"
+                    "checkpoints": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "model": {
+                        "type": "object"
                     }
                 }
             }

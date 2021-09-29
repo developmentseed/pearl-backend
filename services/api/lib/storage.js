@@ -25,6 +25,8 @@ class Storage {
 
     /**
      * Return an Azure Container Client
+     *
+     * @returns {Object}
      */
     #blob() {
         // don't access these services unless AzureStorage is truthy
