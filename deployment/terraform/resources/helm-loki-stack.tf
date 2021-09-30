@@ -11,17 +11,22 @@ resource "helm_release" "lulc-loki-stack" {
   }
 
   set {
-    name = "loki.persistence.enabled"
+    name  = "prometheus.enabled"
     value = "true"
   }
 
   set {
-    name = "loki.persistence.size"
+    name  = "loki.persistence.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "loki.persistence.size"
     value = "40Gi"
   }
 
   set {
-    name = "grafana.enabled"
+    name  = "grafana.enabled"
     value = "true"
   }
 
