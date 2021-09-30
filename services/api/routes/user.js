@@ -57,7 +57,7 @@ async function router(schema, config) {
         return res.json({
             username: req.auth.username,
             email: req.auth.email,
-            access: req.auth.access,
+            access: req.auth.access
         });
     });
 
