@@ -73,7 +73,7 @@ class Project extends Generic {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list projects');
@@ -108,7 +108,7 @@ class Project extends Generic {
                 ) RETURNING *
             `);
 
-            return Project.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate project');
         }
@@ -146,7 +146,7 @@ class Project extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No project found');
 
-        return Project.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**

@@ -1,5 +1,3 @@
-
-
 const k8s = require('@kubernetes/client-node');
 
 /**
@@ -23,6 +21,8 @@ class Kube {
 
     /**
      * Method to list GPU pods in the cluster
+     *
+     * @returns {Object[]}
      */
     async listPods() {
         const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, undefined, undefined, undefined, 'type=gpu');
@@ -44,6 +44,8 @@ class Kube {
      * @param {String} name
      * @param {String} type
      * @param {Object} env
+     *
+     * @returns {Object}
      */
     makePodSpec(name, type, env) {
         const nodeSelectorKey = this.config.nodeSelectorKey;
@@ -145,6 +147,8 @@ class Kube {
 
     /**
      * Create a pod based on podSpec
+     *
+     * @param {Object} podSpec
      */
     async createPod(podSpec) {
         const res = await this.k8sApi.createNamespacedPod(this.namespace, podSpec);
@@ -169,6 +173,8 @@ class Kube {
 
     /**
      * Get pod details
+     *
+     * @param {String} name
      */
     async getPod(name) {
         const res = await this.k8sApi.readNamespacedPod(name, this.namespace);
@@ -180,6 +186,8 @@ class Kube {
 
     /**
      * Get pod status.
+     *
+     * @param {String} name
      */
     async getPodStatus(name) {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);

@@ -9,7 +9,7 @@ const { sql } = require('slonik');
 class Batch extends Generic {
     static _table = 'batch';
     static _patch = Object.keys(require('../schema/req.body.PatchBatch.json').properties);
-    static _res = require('../schema/res.Batch.json')
+    static _res = require('../schema/res.Batch.json');
 
     constructor() {
         super();
@@ -132,7 +132,7 @@ class Batch extends Generic {
                 ) RETURNING *
             `);
 
-            return Batch.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate Batch');
         }

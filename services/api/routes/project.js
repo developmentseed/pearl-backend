@@ -16,31 +16,15 @@ async function router(schema, config) {
      * @apiGroup Projects
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.project-list.json} apiParam
-     *
      * @apiDescription
      *     Return a list of projects
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "projects": [{
-     *           "id": 1,
-     *           "name": 123,
-     *           "created": "<date>",
-     *           "aois": [{
-     *              "id": 1,
-     *              "name": "aoi name",
-     *              "created": "<date>",
-     *              "storage": false
-     *            }],
-     *            "checkpoints": []
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListProjects.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
      */
     await schema.get('/project', {
-        query: 'req.query.project-list.json'
+        query: 'req.query.ListProjects.json',
+        res: 'res.ListProjects.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             const results = await Project.list(config.pool, req.auth.uid, req.query);
@@ -61,6 +45,7 @@ async function router(schema, config) {
                     }
                 }
             }
+
             res.json(results);
         } catch (err) {
             return Err.respond(err, res);
@@ -77,23 +62,15 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given project
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "name": "Test Project",
-     *       "created": "<date>"
-     *       "model_id": 1,
-     *       "mosaic": "naip.latest"
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
-    await schema.get('/project/:projectid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid', {
+        res: 'res.Project.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
 
             const proj = (await Project.has_auth(config.pool, req.auth, req.params.projectid)).serialize();
-
-            delete proj.uid;
 
             const checkpoints = await Checkpoint.list(config.pool, req.params.projectid, { bookmarked: true });
             // remove reduntant project id
@@ -143,11 +120,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Update an existing Project
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.project-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchProject.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.patch('/project/:projectid', {
-        body: 'req.body.project-patch.json',
+        body: 'req.body.PatchProject.json',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -173,10 +150,10 @@ async function router(schema, config) {
      * @apiDescription
      *     Archive a project
      *
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:projectid', {
-        res: 'res.Project.json'
+        res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
@@ -205,7 +182,10 @@ async function router(schema, config) {
             });
 
             await proj.delete(config.pool);
-            return res.json({});
+            return res.json({
+                status: 200,
+                message: 'Project Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }

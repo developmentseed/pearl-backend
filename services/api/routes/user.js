@@ -1,5 +1,3 @@
-
-
 const Err = require('../lib/error');
 
 async function router(schema, config) {
@@ -26,7 +24,6 @@ async function router(schema, config) {
      *           "username": "example",
      *           "email": "example@example.com",
      *           "access": "user",
-     *           "flags": { "test_flag": true }
      *       }]
      *   }
      */
@@ -52,21 +49,15 @@ async function router(schema, config) {
      * @apiDescription
      *     Return basic user information about the currently authenticated user
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "username": "example"
-     *       "email": "example@example.com",
-     *       "access": "admin",
-     *       "flags": {}
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Me.json} apiSuccess
      */
-    await schema.get('/user/me', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/user/me', {
+        res: 'res.Me.json'
+    }, config.requiresAuth, async (req, res) => {
         return res.json({
             username: req.auth.username,
             email: req.auth.email,
             access: req.auth.access,
-            flags: req.auth.flags
         });
     });
 

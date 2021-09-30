@@ -1,8 +1,9 @@
-
-
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const wkx = require('wkx');
 
+/**
+ * @class
+ */
 class Config {
     static async env(args = {}) {
         if (args.prod && !process.env.SigningSecret) {

@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const test = require('tape');
-const request = require('request');
 const Flight = require('./flight');
 
 const flight = new Flight();
@@ -11,53 +10,59 @@ flight.takeoff(test);
 
 const UPDATE = process.env.UPDATE;
 
-test('GET: api/schema', (t) => {
-    request({
-        url: '/api/schema',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
-
-        t.equals(res.statusCode, 200, 'http: 200');
+test('GET: api/schema', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/schema',
+            method: 'GET',
+            json: true
+        }, t);
 
         const fixture = path.resolve(__dirname, './fixtures/get_schema.json');
-        if (UPDATE) {
-            fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
-        }
 
         t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
 
-        t.end();
-    });
+        if (UPDATE) {
+            fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
+        }
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('GET: api/schema?method=FAKE', (t) => {
-    request({
-        url: '/api/schema?method=fake',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?method=FAKE', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/schema?method=fake',
+            method: 'GET',
+            json: true
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
+
         t.deepEquals(res.body, {
             status: 400,
             message: 'validation error',
-            messages: []
+            messages: [{
+                message: 'should be equal to one of the allowed values'
+            }]
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET: api/schema?method=GET', (t) => {
-    request({
-        url: '/api/schema?method=GET',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?method=GET', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/schema?method=GET',
+            method: 'GET',
+            json: true
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {
@@ -66,17 +71,20 @@ test('GET: api/schema?method=GET', (t) => {
             messages: []
         });
 
-        t.end();
-    });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
 });
 
-test('GET: api/schema?url=123', (t) => {
-    request({
-        url: '/api/schema?url=123',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?url=123', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/schema?url=123',
+            method: 'GET',
+            json: true
+        }, false);
 
         t.equals(res.statusCode, 400, 'http: 400');
         t.deepEquals(res.body, {
@@ -84,36 +92,32 @@ test('GET: api/schema?url=123', (t) => {
             message: 'url & method params must be used together',
             messages: []
         });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
-        t.end();
-    });
+    t.end();
 });
 
-test('GET: api/schema?method=POST&url=/token', (t) => {
-    request({
-        url: '/api/schema?method=POST&url=/token',
-        method: 'GET',
-        json: true
-    }, (err, res) => {
-        t.error(err, 'no error');
+test('GET: api/schema?method=POST&url=/login', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/schema?method=GET&url=/schema',
+            method: 'GET',
+            json: true
+        }, t);
 
-        t.equals(res.statusCode, 200, 'http: 200');
         t.deepEquals(res.body, {
-            body: {
-                type: 'object',
-                required: ['name'],
-                additionalProperties: false,
-                properties: {
-                    name: { type: 'string', description: 'name of the created token' }
-                }
-            },
-            query: null,
-            res: null
+            query: require('../schema/req.query.ListSchema.json'),
+            res: require('../schema/res.ListSchema.json'),
+            body: null
         });
 
-        t.end();
-    });
-});
+    } catch (err) {
+        t.error(err, 'no error');
+    }
 
+    t.end();
+});
 
 flight.landing(test);
