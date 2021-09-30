@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+# v0.6.0
+
+## Fixes
+- Fix PX_Stats [`#517`](https://github.com/developmentseed/lulc-infra/pull/517)
+- Small fix to patch list [`#515`](https://github.com/developmentseed/lulc-infra/pull/515)
+- Use base url from flight.request and fix type in docstrings [`#510`](https://github.com/developmentseed/lulc-infra/pull/510)
+- set max body size on API ingress to 300mb, refs #511 [`#513`](https://github.com/developmentseed/lulc-infra/pull/513)
+- Use 403 error instead of 401 when the user doesn't fit the permission [`#507`](https://github.com/developmentseed/lulc-infra/pull/507)
+- Fix permissions in /share/:shareuuid/download/* endpoints [`#505`](https://github.com/developmentseed/lulc-infra/pull/505)
+- start count at 1 instead of 0 [`#482`](https://github.com/developmentseed/lulc-infra/pull/482)
+
+## Features
+- Additional Model Architecture Support [`#519`](https://github.com/developmentseed/lulc-infra/pull/519)
+- Terraform [`#447`](https://github.com/developmentseed/lulc-infra/pull/447)
+- Support UNET Architecture models  [`#487`](https://github.com/developmentseed/lulc-infra/pull/487)
+## Improvements
+
+- Objectify CheckPoint Class [`#518`](https://github.com/developmentseed/lulc-infra/pull/518)
+- Objectify Instance Class [`#516`](https://github.com/developmentseed/lulc-infra/pull/516)
+- Objectification of Model Class [`#509`](https://github.com/developmentseed/lulc-infra/pull/509)
+- Standard Azure Blob Storage [`#508`](https://github.com/developmentseed/lulc-infra/pull/508)
+- AOI  [`#502`](https://github.com/developmentseed/lulc-infra/pull/502)
+- Ingress nginx [`#503`](https://github.com/developmentseed/lulc-infra/pull/503)
+- Remove model#abort [`#501`](https://github.com/developmentseed/lulc-infra/pull/501)
+- Add bookmarked_at field to AOI [`#496`](https://github.com/developmentseed/lulc-infra/pull/496)
+- Add Share Downloads [`#500`](https://github.com/developmentseed/lulc-infra/pull/500)
+- Fix Res Error [`#499`](https://github.com/developmentseed/lulc-infra/pull/499)
+- Update API documentation [`#498`](https://github.com/developmentseed/lulc-infra/pull/498)
+- Return 0 when there isn't active gpus running [`#497`](https://github.com/developmentseed/lulc-infra/pull/497)
+- give 10 gpus for staging [`#494`](https://github.com/developmentseed/lulc-infra/pull/494)
+- Global Retrain Test [`#488`](https://github.com/developmentseed/lulc-infra/pull/488)
+- Global Tests [`#481`](https://github.com/developmentseed/lulc-infra/pull/481)
+- switch to pytorch 1.9 + cuda 11.1 [`#415`](https://github.com/developmentseed/lulc-infra/pull/415)
+- Lock ws to v7 [`#480`](https://github.com/developmentseed/lulc-infra/pull/480)
+- Batch Error [`#479`](https://github.com/developmentseed/lulc-infra/pull/479)
+- Reduce Progress Updates [`#478`](https://github.com/developmentseed/lulc-infra/pull/478)
+- Lint All The Things [`#477`](https://github.com/developmentseed/lulc-infra/pull/477)
+- Lint Python [`#476`](https://github.com/developmentseed/lulc-infra/pull/476)
+
 # v0.5.0
 
 ## Fixes
