@@ -117,4 +117,74 @@ test('POST /api/project/1/checkpoint', async (t) => {
     t.end();
 });
 
+test('GET /api/project/1/checkpoint/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/checkpoint/1',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, t);
+
+        t.ok(res.body.created);
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            name: 'TEST',
+            parent: null,
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            storage: true,
+            bookmarked: false,
+            project_id: 1,
+            analytics: null,
+            retrain_geoms: [
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] },
+                { type: 'MultiPoint', coordinates: [] }
+            ],
+            input_geoms: [
+                { type: 'GeometryCollection', geometries: [] },
+                { type: 'GeometryCollection', geometries: [] },
+                { type: 'GeometryCollection', geometries: [] },
+                { type: 'GeometryCollection', geometries: [] }
+            ]
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/project/1/checkpoint/1/download', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/checkpoint/1/download',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            note: 'This is just a file we use to test uploads'
+        });
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
