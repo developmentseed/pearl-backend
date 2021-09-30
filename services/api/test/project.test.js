@@ -11,7 +11,7 @@ flight.user(test, 'ingalls', true);
 test('GET /api/project (empty)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: '/api/project',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -32,7 +32,7 @@ test('GET /api/project (empty)', (t) => {
 test('GET /api/project/1 (empty)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: '/api/project/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -48,7 +48,7 @@ test('POST /api/model', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/model',
+        url: '/api/model',
         body: {
             name: 'NAIP Supervised',
             active: true,
@@ -76,7 +76,7 @@ test('POST /api/model', (t) => {
 test('POST /api/project (Invalid Mosaic)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: '/api/project',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -103,7 +103,7 @@ test('POST /api/project (Invalid Mosaic)', (t) => {
 test('POST /api/project', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: '/api/project',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -135,7 +135,7 @@ test('POST /api/project', (t) => {
 test('POST /api/project/1/checkpoint', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint',
+        url: '/api/project/1/checkpoint',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -190,7 +190,7 @@ test('POST /api/project/1/checkpoint', (t) => {
 test('POST /api/project/1/aoi', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
+        url: '/api/project/1/aoi',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -245,7 +245,7 @@ test('POST /api/project/1/aoi', (t) => {
 test('GET /api/project', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: '/api/project',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -316,7 +316,7 @@ test('GET /api/project', (t) => {
 test('POST /api/project (sort)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: '/api/project',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -348,7 +348,7 @@ test('POST /api/project (sort)', (t) => {
 test('GET /api/project?sort=asc', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project?sort=asc',
+        url: '/api/project?sort=asc',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -366,7 +366,7 @@ test('GET /api/project?sort=asc', (t) => {
 test('GET /api/project?name=lulc', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project?name=lulc',
+        url: '/api/project?name=lulc',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -434,7 +434,7 @@ test('GET /api/project?name=lulc', (t) => {
 test('GET /api/project/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: '/api/project/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -461,7 +461,7 @@ test('GET /api/project/1', (t) => {
 test('PATCH /api/project/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: '/api/project/1',
         method: 'PATCH',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -491,7 +491,7 @@ test('PATCH /api/project/1', (t) => {
 test('GET /api/project/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: '/api/project/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -518,7 +518,7 @@ test('GET /api/project/1', (t) => {
 test('DELETE /api/project/1/checkpoint/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint/1',
+        url: '/api/project/1/checkpoint/1',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -539,7 +539,7 @@ test('DELETE /api/project/1/checkpoint/1', (t) => {
 test('DELETE /api/project/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: '/api/project/1',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -556,7 +556,7 @@ test('DELETE /api/project/1', (t) => {
 test('GET /api/project/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1',
+        url: '/api/project/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -571,7 +571,7 @@ test('GET /api/project/1', (t) => {
 test('DELETE /api/project/3', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/3',
+        url: '/api/project/3',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`

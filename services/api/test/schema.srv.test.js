@@ -13,7 +13,7 @@ const UPDATE = process.env.UPDATE;
 
 test('GET: api/schema', (t) => {
     request({
-        url: 'http://localhost:2000/api/schema',
+        url: '/api/schema',
         method: 'GET',
         json: true
     }, (err, res) => {
@@ -34,7 +34,7 @@ test('GET: api/schema', (t) => {
 
 test('GET: api/schema?method=FAKE', (t) => {
     request({
-        url: 'http://localhost:2000/api/schema?method=fake',
+        url: '/api/schema?method=fake',
         method: 'GET',
         json: true
     }, (err, res) => {
@@ -53,7 +53,7 @@ test('GET: api/schema?method=FAKE', (t) => {
 
 test('GET: api/schema?method=GET', (t) => {
     request({
-        url: 'http://localhost:2000/api/schema?method=GET',
+        url: '/api/schema?method=GET',
         method: 'GET',
         json: true
     }, (err, res) => {
@@ -72,7 +72,7 @@ test('GET: api/schema?method=GET', (t) => {
 
 test('GET: api/schema?url=123', (t) => {
     request({
-        url: 'http://localhost:2000/api/schema?url=123',
+        url: '/api/schema?url=123',
         method: 'GET',
         json: true
     }, (err, res) => {
@@ -91,7 +91,7 @@ test('GET: api/schema?url=123', (t) => {
 
 test('GET: api/schema?method=POST&url=/token', (t) => {
     request({
-        url: 'http://localhost:2000/api/schema?method=POST&url=/token',
+        url: '/api/schema?method=POST&url=/token',
         method: 'GET',
         json: true
     }, (err, res) => {

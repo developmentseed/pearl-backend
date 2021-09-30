@@ -13,7 +13,7 @@ test('POST /api/model', (t) => {
     request({
         method: 'POST',
         json: true,
-        url: 'http://localhost:2000/api/model',
+        url: '/api/model',
         body: {
             name: 'NAIP Supervised',
             active: true,
@@ -41,7 +41,7 @@ test('POST /api/model', (t) => {
 test('POST /api/project', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project',
+        url: '/api/project',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -73,7 +73,7 @@ test('POST /api/project', (t) => {
 test('POST /api/project/1/checkpoint', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/checkpoint',
+        url: '/api/project/1/checkpoint',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -128,7 +128,7 @@ test('POST /api/project/1/checkpoint', (t) => {
 test('POST /api/project/1/aoi', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi',
+        url: '/api/project/1/aoi',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -183,7 +183,7 @@ test('POST /api/project/1/aoi', (t) => {
 test('GET /api/project/1/share', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/share',
+        url: '/api/project/1/share',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -205,7 +205,7 @@ test('GET /api/project/1/share', (t) => {
 test('POST /api/project/1/aoi/1/share', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/share',
+        url: '/api/project/1/aoi/1/share',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -227,7 +227,7 @@ test('POST /api/project/1/aoi/1/share', (t) => {
 test('POST /api/project/1/aoi/2/share', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/2/share',
+        url: '/api/project/1/aoi/2/share',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -264,7 +264,7 @@ test('[meta] Set aoi.storage: true', async (t) => {
 test('POST /api/project/1/aoi/1/share', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/share',
+        url: '/api/project/1/aoi/1/share',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -305,7 +305,7 @@ let uuid;
 test('GET /api/project/1/share', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/share',
+        url: '/api/project/1/share',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -336,7 +336,7 @@ test('GET /api/project/1/share', (t) => {
 test('GET /api/share/uuid', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/share',
+        url: '/api/project/1/share',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -345,7 +345,7 @@ test('GET /api/share/uuid', (t) => {
         uuid = res.body.shares[0].uuid;
         request({
             json: true,
-            url: `http://localhost:2000/api/share/${uuid}`,
+            url: `/api/share/${uuid}`,
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -400,7 +400,7 @@ test('GET /api/share/uuid', (t) => {
 test('GET /api/project/1/aoi/1', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1',
+        url: '/api/project/1/aoi/1',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -457,7 +457,7 @@ test('GET /api/project/1/aoi/1', (t) => {
 test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
+        url: '/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -479,7 +479,7 @@ test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', (t) => {
 test('DELETE /api/project/1/aoi/1/<uuid> - exists', (t) => {
     request({
         json: true,
-        url: `http://localhost:2000/api/project/1/aoi/1/share/${uuid}`,
+        url: `/api/project/1/aoi/1/share/${uuid}`,
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`

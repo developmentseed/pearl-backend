@@ -12,7 +12,7 @@ flight.user(test, 'ingalls');
 test('GET /api/user/me (valid token - 200 success)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/user/me',
+        url: '/api/user/me',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -30,7 +30,7 @@ test('GET /api/user/me (valid token - 200 success)', (t) => {
 test('GET /api/user/me (public)', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/user/me',
+        url: '/api/user/me',
         method: 'GET'
     }, (err, res) => {
         t.error(err, 'no errors');
@@ -45,7 +45,7 @@ test('GET /api/user/me (public)', (t) => {
 test('POST /api/login', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/login',
+        url: '/api/login',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -63,7 +63,7 @@ test('POST /api/login', (t) => {
 test('POST /api/token', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/token',
+        url: '/api/token',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`

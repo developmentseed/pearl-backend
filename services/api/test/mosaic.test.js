@@ -11,7 +11,7 @@ flight.user(test, 'ingalls', true);
 test('GET /api/mosaic', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/mosaic',
+        url: '/api/mosaic',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
@@ -33,7 +33,7 @@ test('GET /api/mosaic', (t) => {
 test('GET /api/mosaic/naip.latest', (t) => {
     request({
         json: true,
-        url: 'http://localhost:2000/api/mosaic/naip.latest',
+        url: '/api/mosaic/naip.latest',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${flight.token.ingalls}`
