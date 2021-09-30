@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const test = require('tape');
-const { sql } = require('slonik');
 
 const Flight = require('./flight');
 
@@ -33,7 +32,7 @@ test('POST /api/model', async (t) => {
             },
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, t);
     } catch (err) {
         t.error(err, 'no error');
@@ -96,7 +95,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
             }
         }, t);
 
-        const res_upload = await flight.request({
+        await flight.request({
             json: true,
             url: `/api/project/1/checkpoint/${res.body.id}/upload`,
             method: 'POST',
