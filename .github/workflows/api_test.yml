@@ -35,9 +35,9 @@ jobs:
         run: docker run api sh -c "npm install --include=dev && npm run lint"
 
       - name: Docker API Test
-        run: docker run --network lulc-infra_default \
-          -e "Postgres=postgres://docker:docker@postgis:5432/gis" \
-          -e "AZURE_STORAGE_CONNECTION_STRING=${LULCCI_ACSC}" \
+        run: docker run --network lulc-infra_default
+          -e "Postgres=postgres://docker:docker@postgis:5432/gis"
+          -e "AZURE_STORAGE_CONNECTION_STRING=${LULCCI_ACSC}"
           api npm test
 
       - name: Docker Cleanup
