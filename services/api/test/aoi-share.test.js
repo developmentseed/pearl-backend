@@ -13,7 +13,7 @@ test('POST /api/model', async (t) => {
         await flight.request({
             method: 'POST',
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             body: {
                 name: 'NAIP Supervised',
                 active: true,
@@ -43,7 +43,7 @@ test('POST /api/project', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project',
+            url: '/api/project',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -76,7 +76,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -133,7 +133,7 @@ test('POST /api/project/1/aoi', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi',
+            url: '/api/project/1/aoi',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -190,7 +190,7 @@ test('GET /api/project/1/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/share',
+            url: '/api/project/1/share',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -214,7 +214,7 @@ test('POST /api/project/1/aoi/1/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/share',
+            url: '/api/project/1/aoi/1/share',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -240,7 +240,7 @@ test('POST /api/project/1/aoi/2/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/2/share',
+            url: '/api/project/1/aoi/2/share',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -281,7 +281,7 @@ test('POST /api/project/1/aoi/1/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/share',
+            url: '/api/project/1/aoi/1/share',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -323,7 +323,7 @@ test('GET /api/project/1/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/share',
+            url: '/api/project/1/share',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -355,7 +355,7 @@ test('GET /api/share/uuid', async (t) => {
     try {
         let res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/share',
+            url: '/api/project/1/share',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -366,7 +366,7 @@ test('GET /api/share/uuid', async (t) => {
 
         res = await flight.request({
             json: true,
-            url: `http://localhost:2000/api/share/${uuid}`,
+            url: `/api/share/${uuid}`,
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -414,7 +414,7 @@ test('GET /api/project/1/aoi/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -472,7 +472,7 @@ test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
+            url: '/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -498,7 +498,7 @@ test('DELETE /api/project/1/aoi/1/<uuid> - exists', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: `http://localhost:2000/api/project/1/aoi/1/share/${uuid}`,
+            url: `/api/project/1/aoi/1/share/${uuid}`,
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

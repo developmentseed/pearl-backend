@@ -11,7 +11,7 @@ test('GET /api/mosaic', async(t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/mosaic',
+            url: '/api/mosaic',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -34,7 +34,7 @@ test('GET /api/mosaic/naip.latest', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/mosaic/naip.latest',
+            url: '/api/mosaic/naip.latest',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

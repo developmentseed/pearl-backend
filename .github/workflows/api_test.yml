@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.event.pull_request.draft == false
     timeout-minutes: 30
+    env:
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.LULCCI_ASCS }}
     steps:
       - uses: actions/checkout@v2
 
@@ -33,7 +35,10 @@ jobs:
         run: docker run api sh -c "npm install --include=dev && npm run lint"
 
       - name: Docker API Test
-        run: docker run --network lulc-infra_default -e "Postgres=postgres://docker:docker@postgis:5432/gis" api npm test
+        run: docker run --network lulc-infra_default
+          -e "Postgres=postgres://docker:docker@postgis:5432/gis"
+          -e "AZURE_STORAGE_CONNECTION_STRING=${LULCCI_ACSC}"
+          api npm test
 
       - name: Docker Cleanup
         run: docker-compose kill

@@ -13,7 +13,7 @@ test('POST /api/model', async (t) => {
         await flight.request({
             method: 'POST',
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             body: {
                 name: 'NAIP Supervised',
                 active: true,
@@ -43,7 +43,7 @@ test('POST /api/project', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project',
+            url: '/api/project',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -76,7 +76,7 @@ test('GET /api/project/1/checkpoint (empty)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -99,7 +99,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -180,7 +180,7 @@ test('PATCH /api/project/1/checkpoint/1 (no class length change)', async (t) => 
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint/1',
+            url: '/api/project/1/checkpoint/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -212,7 +212,7 @@ test('PATCH /api/project/1/checkpoint/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint/1',
+            url: '/api/project/1/checkpoint/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -277,7 +277,7 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint/1',
+            url: '/api/project/1/checkpoint/1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -344,7 +344,7 @@ test('GET /api/project/1/checkpoint', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -376,7 +376,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -457,7 +457,7 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles',
+            url: '/api/project/1/checkpoint/1/tiles',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -484,7 +484,7 @@ test('GET /api/project/1/checkpoint/1/tiles/1/0/0 - geometries', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint/1/tiles/1/0/0.mvt',
+            url: '/api/project/1/checkpoint/1/tiles/1/0/0.mvt',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

@@ -4776,50 +4776,15 @@
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "id",
-            "description": "<p>Unique ID</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "uid",
-            "description": "<p>undefined</p>"
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "name",
-            "description": "<p>Name of the Project</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "model_id",
-            "description": "<p>Starter Model to use for project</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": true,
-            "field": "model_name",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "mosaic",
-            "description": "<p>Imagery to use with model</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "created",
-            "description": "<p>undefined</p>"
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -4920,6 +4885,13 @@
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "checkpoints",
+            "description": "<p>undefined undefined</p>"
           }
         ]
       }
@@ -4993,6 +4965,13 @@
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "checkpoints",
+            "description": "<p>undefined undefined</p>"
           }
         ]
       }
@@ -5088,14 +5067,28 @@
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "projects.model_id",
-            "description": "<p>Starter Model to use for project</p>"
+            "field": "projects.created",
+            "description": "<p>undefined</p>"
           },
           {
             "group": "Success 200",
-            "type": "Integer",
+            "type": "Object[]",
             "optional": false,
-            "field": "projects.created",
+            "field": "projects.aois",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "projects.checkpoints",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "projects.model",
             "description": "<p>undefined</p>"
           }
         ]
@@ -5183,6 +5176,13 @@
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "checkpoints",
+            "description": "<p>undefined undefined</p>"
           }
         ]
       }
@@ -5232,19 +5232,6 @@
             "optional": true,
             "field": "url",
             "description": "<p>URLEncoded URL that you want to fetch</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": true,
-            "field": "schemas",
-            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -5915,7 +5902,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"users\": [{\n        \"id\": 1,\n        \"username\": \"example\",\n        \"email\": \"example@example.com\",\n        \"access\": \"user\",\n        \"flags\": { \"test_flag\": true }\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"users\": [{\n        \"id\": 1,\n        \"username\": \"example\",\n        \"email\": \"example@example.com\",\n        \"access\": \"user\",\n    }]\n}",
           "type": "json"
         }
       ]
@@ -5939,13 +5926,31 @@
     ],
     "description": "<p>Return basic user information about the currently authenticated user</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "access",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/user.js",
     "groupTitle": "User"

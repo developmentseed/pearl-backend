@@ -332,6 +332,6 @@
     "GET /user/me": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     }
 }
