@@ -11,7 +11,7 @@
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer"
+            "$ref": "./util/id.json"
         },
         "uid": {
             "type": "integer"
@@ -33,6 +33,12 @@
         },
         "created": {
             "type": "integer"
+        },
+        "checkpoints": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         }
     }
 }

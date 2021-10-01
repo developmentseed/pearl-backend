@@ -106,13 +106,13 @@ class CheckPoint extends Generic {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list checkpoints');
         }
 
-        const list = CheckPoint.deserialize(pgres.rows);
+        const list = this.deserialize(pgres.rows);
         list.project_id = projectid;
         return list;
     }
@@ -208,7 +208,7 @@ class CheckPoint extends Generic {
     /**
      * Return a single checkpoint
      *
-     * @param {Pool} - Instantiated Postgres Pool
+     * @param {Pool} pool - Instantiated Postgres Pool
      * @param {Number} checkpointid - Checkpoint ID to get
      */
     static async from(pool, checkpointid) {
@@ -255,7 +255,7 @@ class CheckPoint extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
 
-        return CheckPoint.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**
@@ -292,7 +292,7 @@ class CheckPoint extends Generic {
                 ) RETURNING *
             `);
 
-            return CheckPoint.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23503') throw new Err(400, err, 'Parent does not exist');
             throw new Err(500, err, 'Failed to create checkpoint');
