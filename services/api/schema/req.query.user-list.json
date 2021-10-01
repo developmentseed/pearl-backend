@@ -3,14 +3,10 @@
     "additionalProperties": false,
     "properties": {
         "limit": {
-            "type": "integer",
-            "default": 100,
-            "description": "Limit number of returned runs"
+            "$ref": "./util/limit.json"
         },
         "page": {
-            "type": "integer",
-            "default": 0,
-            "description": "The offset based on limit to return"
+            "$ref": "./util/page.json"
         },
         "filter": {
             "type": "string",

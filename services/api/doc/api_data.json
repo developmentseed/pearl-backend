@@ -361,18 +361,20 @@
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned aois</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -2512,18 +2514,20 @@
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned checkpoints</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -3304,18 +3308,20 @@
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned runs</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -5000,18 +5006,20 @@
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned runs</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -5475,18 +5483,20 @@
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned aois</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -5873,18 +5883,20 @@
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned runs</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
