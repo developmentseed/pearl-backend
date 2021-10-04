@@ -34,7 +34,7 @@ test('gpu connection', (t) => {
 
     ws.on('message', (msg) => {
         msg = JSON.parse(String(msg));
-o
+
         if (msg.message.split('#')[0] !== 'info') {
             try {
                 output.compare(msg);
@@ -91,6 +91,14 @@ test('AOI Share', async (t) => {
         });
 
         t.equals(sres.statusCode, 200);
+
+        const tres = await request({
+            url: API + `/api/share/${cres.body.uuid}/tiles`,
+            json: true,
+            method: 'GET'
+        });
+
+        t.equals(tres.statusCode, 200);
 
     } catch (err) {
         t.error(err, 'no errors');

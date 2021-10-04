@@ -14,10 +14,10 @@ async function router(schema, config) {
     const getAoiTileJSON = async (aoi, req) => {
         let tiffurl;
         if (aoi.uuid) {
-            const a = AOIShare.from(config.pool, aoi.uuid);
+            const a = await AOIShare.from(config.pool, aoi.uuid);
             tiffurl = await a.url(config);
         } else {
-            const a = AOI.from(config.pool, aoi.uuid);
+            const a = await AOI.from(config.pool, aoi.id);
             tiffurl = await a.url(config);
         }
 
