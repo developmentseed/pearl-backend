@@ -10,11 +10,11 @@ api:
     tag: 'chartpress_replace'
   resources:
     requests:
-      cpu: 1200m
-      memory: 4Gi
+      cpu: 1000m
+      memory: 2Gi
     limits:
-      cpu: 4
-      memory: 8Gi
+      cpu: 3
+      memory: 6Gi
 socket:
   enabled: true
   containerPort: 1999
