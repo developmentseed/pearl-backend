@@ -3,18 +3,18 @@ domain: lulc.ds.io
 adminEmail: sanjay@developmentseed.org
 api:
   enabled: true
-  replicaCount: 1
+  replicaCount: 2
   containerPort: 2000
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
   resources:
     requests:
-      cpu: 1200m
-      memory: 4Gi
+      cpu: 2
+      memory: 6Gi
     limits:
       cpu: 4
-      memory: 8Gi
+      memory: 12Gi
 socket:
   enabled: true
   containerPort: 1999
