@@ -138,6 +138,8 @@ class Kube {
     /**
      *
      * Delete a pod based on the name
+     *
+     * @param {String} name
      */
     async deletePod(name) {
         const res = await this.k8sApi.deleteNamespacedPod(name, this.namespace);
