@@ -22,6 +22,10 @@ resource "helm_release" "lulc" {
   }
   
   set {
+    name  = "api.replicaCount"
+    value = 2 
+  }
+  set {
     name  = "api.env.SigningSecret"
     value = var.signing_secret 
   }
