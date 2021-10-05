@@ -270,12 +270,14 @@ class Instance extends Generic {
 
         const podName = `${config.Deployment}-gpu-${instanceid}`;
         let podStatus;
+        let pod = false;
 
         if (config.Environment !== 'local') {
 
             try {
                 const kube = new Kube(config, 'default');
                 podStatus = await kube.getPodStatus(podName);
+                pod = await kube.getPod(podName);
             } catch (error) {
                 console.error('Couldnt fetch podstatus', error.statusMessage);
             }
@@ -285,7 +287,9 @@ class Instance extends Generic {
 
         const inst = this.deserialize(pgres.rows[0]);
         inst.token = inst.gen_token(config, auth);
+
         inst.status = podStatus && podStatus.status ? podStatus.status : {};
+        inst.pod = pod ? pod : {};
 
         return inst;
     }
