@@ -13,7 +13,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
 
   default_node_pool {
     name           = "nodepool1"
-    vm_size        = "Standard_DS2_v2"
+    vm_size        = "Standard_DS3_v2"
     vnet_subnet_id = azurerm_subnet.aks.id
     enable_auto_scaling   = true
     min_count             = 1
