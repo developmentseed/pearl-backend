@@ -185,6 +185,7 @@ test('GET /api/project/1/instance/1', async (t) => {
             checkpoint_id: null,
             active: false,
             type: 'gpu',
+            pod: {},
             status: {}
         });
 

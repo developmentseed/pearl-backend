@@ -66,54 +66,33 @@ class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    'cpu': '4',
-                    'memory': '8Gi'
+                    cpu: '4',
+                    memory: '8Gi'
                 },
                 limits: {
-                    'cpu': '8',
-                    'memory': '16Gi'
+                    cpu: '8',
+                    memory: '16Gi'
                 }
             };
         }
-        // if (deploymentName === 'lulc-production-lulc-helm') {
-        //     resources = {
-        //         requests: {
-        //             'cpu': '2',
-        //             'memory': '2Gi'
-        //         },
-        //         limits: {
-        //             'cpu': '4',
-        //             'memory': '8Gi'
-        //         }
-        //     }
-        // } else {
-        //     resources = {
-        //             limits: {
-        //                 'nvidia.com/gpu': 1
-        //             }
-        //         }
-        // }
+
         const nodeSelector = {};
         nodeSelector[nodeSelectorKey] = nodeSelectorValue;
 
         let volumes = [];
         let volumeMounts = [];
         if (type === 'gpu') {
-            volumes = [
-                {
-                    name: 'dshm',
-                    emptyDir: {
-                        medium: 'Memory'
-                    }
+            volumes = [{
+                name: 'dshm',
+                emptyDir: {
+                    medium: 'Memory'
                 }
-            ];
+            }];
 
-            volumeMounts = [
-                {
-                    mountPath: '/dev/shm',
-                    name: 'dshm'
-                }
-            ];
+            volumeMounts = [{
+                mountPath: '/dev/shm',
+                name: 'dshm'
+            }];
         }
 
         return {
@@ -129,15 +108,13 @@ class Kube {
                 }
             },
             spec: {
-                containers: [
-                    {
-                        name: `gpu-${name}`,
-                        image: `${gpuImageName}:${gpuImageTag}`,
-                        resources: resources,
-                        env: env,
-                        volumeMounts: volumeMounts
-                    }
-                ],
+                containers: [{
+                    name: `gpu-${name}`,
+                    image: `${gpuImageName}:${gpuImageTag}`,
+                    resources: resources,
+                    env: env,
+                    volumeMounts: volumeMounts
+                }],
                 volumes: volumes,
                 nodeSelector: nodeSelector,
                 restartPolicy: 'Never'
@@ -161,8 +138,9 @@ class Kube {
     /**
      *
      * Delete a pod based on the name
+     *
+     * @param {String} name
      */
-
     async deletePod(name) {
         const res = await this.k8sApi.deleteNamespacedPod(name, this.namespace);
         if (res.statusCode >= 400) {

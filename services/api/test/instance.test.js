@@ -175,6 +175,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             aoi_id: null,
             checkpoint_id: null,
             status: {},
+            pod: {},
             active: true,
             type: 'gpu'
         });
@@ -210,6 +211,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
         t.deepEquals(res.body, {
             id: 1,
             status: {},
+            pod: {},
             project_id: 1,
             batch: null,
             aoi_id: null,
@@ -330,7 +332,8 @@ test('GET /api/project/1/instance/1', async (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: true,
-            status: {}
+            status: {},
+            pod: {}
         });
 
     } catch (err) {
@@ -366,7 +369,8 @@ test('GET /api/instance/1', async (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: true,
-            status: {}
+            status: {},
+            pod: {}
         });
 
     } catch (err) {
@@ -427,6 +431,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             id: 1,
             project_id: 1,
             status: {},
+            pod: {},
             batch: null,
             aoi_id: null,
             checkpoint_id: 1,
