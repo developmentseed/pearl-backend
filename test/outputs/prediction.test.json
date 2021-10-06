@@ -36,6 +36,12 @@
             }
         }
     },{
+        "type": "schema",
+        "items": 20,
+        "data": {
+            "$ref": "./refs/model#retrain.json"
+        }
+    },{
         "type": "static",
         "data": {
             "message": "model#checkpoint",
