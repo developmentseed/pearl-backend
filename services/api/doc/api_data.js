@@ -59,13 +59,122 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON\" }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/Null",
+            "optional": false,
+            "field": "bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "bookmarked_at",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "checkpoint_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "px_stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "classes.color",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "shares",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
@@ -85,6 +194,26 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete an existing AOI</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
@@ -140,13 +269,73 @@ define({ "api": [
     ],
     "description": "<p>Return all information about a given AOI</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "batch",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "batch.error",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch.aoi",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "batch.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "batch.completed",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
@@ -172,18 +361,20 @@ define({ "api": [
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned aois</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -213,13 +404,129 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aois\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"bookmarked\": false,\n        \"created\": \"<date>\",\n        \"bounds\": { \"GeoJSON \"}\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>Id of the associated project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "aois",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aois.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "aois.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "aois.checkpoint_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "aois.bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aois.area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/Null",
+            "optional": false,
+            "field": "aois.bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "aois.bookmarked_at",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aois.checkpoint_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aois.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "aois.storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "aois.patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "aois.px_stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "aois.classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "aois.shares",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
@@ -258,6 +565,13 @@ define({ "api": [
           },
           {
             "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "px_stats",
+            "description": "<p>Coverage % stats by class element id</p>"
+          },
+          {
+            "group": "Body",
             "type": "Integer[]",
             "optional": true,
             "field": "patches",
@@ -267,13 +581,122 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"project_id\": 1,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"bookmarked\": false,\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/Null",
+            "optional": false,
+            "field": "bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "bookmarked_at",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "checkpoint_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "px_stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "classes.color",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "shares",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
@@ -294,13 +717,45 @@ define({ "api": [
     ],
     "description": "<p>Create a new Patch</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"storage\": true,\n    \"created\": \"<date>\"\n    \"project_id\": 1,\n    \"aoi_id\": 1\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
@@ -321,13 +776,24 @@ define({ "api": [
     ],
     "description": "<p>Delete a given patch</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\ntrue",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
@@ -366,13 +832,45 @@ define({ "api": [
     ],
     "description": "<p>Get a specific patch</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
@@ -382,7 +880,7 @@ define({ "api": [
     "url": "/api/project/:project/aoi/:aoiid/patch",
     "title": "List Patches",
     "version": "1.0.0",
-    "name": "ListPatch",
+    "name": "ListPatches",
     "group": "AOIPatch",
     "permission": [
       {
@@ -392,14 +890,84 @@ define({ "api": [
       }
     ],
     "description": "<p>Return all patches for a given API</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          }
+        ]
+      }
+    },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"aoi_id\": 123\n    \"patches\": [{\n        \"id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "patches.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "patches.created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "patches.storage",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
@@ -419,6 +987,70 @@ define({ "api": [
       }
     ],
     "description": "<p>Get the TileJSON for a given AOI Patch</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"2.2.0\""
+            ],
+            "optional": false,
+            "field": "tilejson",
+            "description": "<p>TileJSON Spec Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Unique name of layer</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"1.0.0\""
+            ],
+            "optional": false,
+            "field": "version",
+            "description": "<p>Style Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"xyz\""
+            ],
+            "optional": false,
+            "field": "schema",
+            "description": "<p>Tile format</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "tiles",
+            "description": "<p>Array of tile URLs Tile URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
   },
@@ -456,13 +1088,45 @@ define({ "api": [
     ],
     "description": "<p>Upload a new AOI Patch asset to the API</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": " HTTP/1.1 200 OK\n {\n     \"id\": 1432,\n     \"storage\": true,\n     \"created\": \"<date>\"\n     \"project_id\": 1,\n     \"aoi\": 1\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi-patch.js",
     "groupTitle": "AOIPatch"
@@ -500,6 +1164,70 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given AOI</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"2.2.0\""
+            ],
+            "optional": false,
+            "field": "tilejson",
+            "description": "<p>TileJSON Spec Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Unique name of layer</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"1.0.0\""
+            ],
+            "optional": false,
+            "field": "version",
+            "description": "<p>Style Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"xyz\""
+            ],
+            "optional": false,
+            "field": "schema",
+            "description": "<p>Tile format</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "tiles",
+            "description": "<p>Array of tile URLs Tile URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
   },
@@ -519,13 +1247,122 @@ define({ "api": [
     ],
     "description": "<p>Upload a new GeoTiff to the API</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"storage\": true,\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"}\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "area",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean/Null",
+            "optional": false,
+            "field": "bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "bookmarked_at",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "checkpoint_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "px_stats",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "classes.color",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "shares",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "AOI"
@@ -553,7 +1390,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -561,13 +1398,6 @@ define({ "api": [
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -582,6 +1412,13 @@ define({ "api": [
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -724,7 +1561,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>Unique Batch ID</p>"
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Will contain an error message if the instance has suffered a fatal error</p>"
           },
           {
             "group": "Success 200",
@@ -850,7 +1694,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>Unique Batch ID</p>"
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Will contain an error message if the instance has suffered a fatal error</p>"
           },
           {
             "group": "Success 200",
@@ -1049,6 +1900,13 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "batch.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "batch.error",
             "description": "<p>undefined</p>"
           },
           {
@@ -1119,6 +1977,13 @@ define({ "api": [
           },
           {
             "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "error",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
             "type": "Integer",
             "optional": true,
             "field": "progress",
@@ -1149,7 +2014,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>Unique Batch ID</p>"
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Null/String",
+            "optional": false,
+            "field": "error",
+            "description": "<p>Will contain an error message if the instance has suffered a fatal error</p>"
           },
           {
             "group": "Success 200",
@@ -1351,13 +2223,101 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"parent\": 123,\n    \"instance_id\": 124,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "parent",
+            "description": "<p>If the checkpoint was derived from a parent checkpoint will contain the ID of the parent</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "analytics",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "retrain_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "input_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
@@ -1377,6 +2337,26 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete an existing Checkpoint NOTE: This will also delete AOIs that depend on the given checkpoint</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
@@ -1414,13 +2394,101 @@ define({ "api": [
     ],
     "description": "<p>Return a given checkpoint for a given instance</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"parent\": 123,\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "parent",
+            "description": "<p>If the checkpoint was derived from a parent checkpoint will contain the ID of the parent</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "analytics",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "retrain_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "input_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
@@ -1446,18 +2514,20 @@ define({ "api": [
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned checkpoints</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -1479,13 +2549,73 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"instance_id\": 123,\n    \"checkpoints\": [{\n        \"id\": 1432,\n        \"parent\": 123,\n        \"name\": \"Checkpoint Name\",\n        \"storage\": true,\n        \"created\": \"<date>\",\n        \"bookmarked\": false\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "checkpoints",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "checkpoints.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "checkpoints.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "checkpoints.parent",
+            "description": "<p>If the checkpoint was derived from a parent checkpoint will contain the ID of the parent</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "checkpoints.created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "checkpoints.storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "checkpoints.bookmarked",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
@@ -1504,39 +2634,40 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Update a checkpoint</p>",
     "parameter": {
       "fields": {
-        "Body": [
+        "Query": [
           {
-            "group": "Body",
+            "group": "Query",
             "type": "String",
             "optional": true,
             "field": "name",
             "description": "<p>Human readable name of the Checkpoint</p>"
           },
           {
-            "group": "Body",
+            "group": "Query",
             "type": "Boolean",
             "optional": true,
             "field": "bookmarked",
             "description": "<p>Has the checkpoint been bookmarked in the frontend</p>"
           },
           {
-            "group": "Body",
+            "group": "Query",
             "type": "Object[]",
             "optional": true,
             "field": "classes",
             "description": "<p>Named output classes &amp; their associated colours. NOTE: Patching cannot change the number of classes undefined</p>"
           },
           {
-            "group": "Body",
+            "group": "Query",
             "type": "String",
             "optional": false,
             "field": "classes.name",
             "description": "<p>undefined</p>"
           },
           {
-            "group": "Body",
+            "group": "Query",
             "type": "String",
             "optional": false,
             "field": "classes.color",
@@ -1545,15 +2676,102 @@ define({ "api": [
         ]
       }
     },
-    "description": "<p>Update a checkpoint</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"instance_id\": 124,\n    \"parent\": 123,\n    \"storage\": true,\n    \"classes\": [ ... ],\n    \"name\": \"Named Checkpoint\",\n    \"bookmarked\": false,\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "parent",
+            "description": "<p>If the checkpoint was derived from a parent checkpoint will contain the ID of the parent</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "analytics",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "retrain_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "input_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
@@ -1591,6 +2809,70 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given Checkpoint</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"2.2.0\""
+            ],
+            "optional": false,
+            "field": "tilejson",
+            "description": "<p>TileJSON Spec Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Unique name of layer</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"1.0.0\""
+            ],
+            "optional": false,
+            "field": "version",
+            "description": "<p>Style Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"xyz\""
+            ],
+            "optional": false,
+            "field": "schema",
+            "description": "<p>Tile format</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "tiles",
+            "description": "<p>Array of tile URLs Tile URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
   },
@@ -1610,13 +2892,101 @@ define({ "api": [
     ],
     "description": "<p>Upload a new checkpoint asset to the API</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Checkpoint Name\",\n    \"classes\": [ ... ],\n    \"storage\": true,\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "parent",
+            "description": "<p>If the checkpoint was derived from a parent checkpoint will contain the ID of the parent</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "bookmarked",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "analytics",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "retrain_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Unknown",
+            "optional": false,
+            "field": "input_geoms",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": true,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/checkpoint.js",
     "groupTitle": "Checkpoints"
@@ -1664,7 +3034,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -1775,6 +3145,26 @@ define({ "api": [
       }
     ],
     "description": "<p>Set all instances to active: false - used by the socket server upon initial api connection</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/instance.js",
     "groupTitle": "Instance"
   },
@@ -1801,7 +3191,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -1918,18 +3308,20 @@ define({ "api": [
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned runs</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -1976,7 +3368,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "instances.id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -2065,7 +3457,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -2177,13 +3569,105 @@ define({ "api": [
     ],
     "description": "<p>A newly instantiated GPU Instance does not know what it's project id is. This API allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"uid\": 123,\n    \"active\": true,\n    \"created\": \"<date>\"\n    \"pod\": { ... }\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"cpu\"",
+              "\"gpu\""
+            ],
+            "optional": false,
+            "field": "type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "status",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "batch",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "checkpoint_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "last_update",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "token",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "pod",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/instance.js",
     "groupTitle": "Instance"
@@ -2291,7 +3775,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -2299,13 +3783,6 @@ define({ "api": [
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -2320,6 +3797,13 @@ define({ "api": [
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -2475,7 +3959,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -2483,13 +3967,6 @@ define({ "api": [
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -2504,6 +3981,13 @@ define({ "api": [
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -2595,13 +4079,94 @@ define({ "api": [
     ],
     "description": "<p>List information about a set of models</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"models\": [{\n        \"id\": 1,\n        \"created\": \"<date>\",\n        \"active\": true,\n        \"name\": \"NA Model\"\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "models",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "models.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "models.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "models.active",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "models.uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "models.name",
+            "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]/Null",
+            "optional": false,
+            "field": "models.bounds",
+            "description": "<p>Recommended geographic area on which this model can be used</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "models.meta",
+            "description": "<p>Generic key/value store for additional model metadata</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "models.classes",
+            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "models.classes.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "models.classes.color",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/model.js",
     "groupTitle": "Model"
@@ -2648,7 +4213,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -2656,13 +4221,6 @@ define({ "api": [
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "active",
-            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -2677,6 +4235,13 @@ define({ "api": [
             "optional": false,
             "field": "name",
             "description": "<p>Human-readable name of the Model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "active",
+            "description": "<p>Can the model be used for gpu instances</p>"
           },
           {
             "group": "Success 200",
@@ -2769,13 +4334,68 @@ define({ "api": [
     ],
     "description": "<p>Return a TileJSON object for a given mosaic layer</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"tilejson\": \"2.2.0\",\n    \"name\": \"naip.latest\",\n    \"version\": \"1.0.0\",\n    \"scheme\": \"xyz\",\n    \"tiles\": [ \"http://localhost:8000/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?\" ],\n    \"minzoom\": 12,\n    \"maxzoom\": 18,\n    \"bounds\": [\n        -124.81903735821528,\n        24.49673997373884,\n        -66.93084562551495,\n        49.44192498524237\n    ],\n    \"center\": [ -95.87494149186512, 36.9693324794906, 12 ]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"2.2.0\""
+            ],
+            "optional": false,
+            "field": "tilejson",
+            "description": "<p>TileJSON Spec Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Unique name of layer</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"1.0.0\""
+            ],
+            "optional": false,
+            "field": "version",
+            "description": "<p>Style Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"xyz\""
+            ],
+            "optional": false,
+            "field": "schema",
+            "description": "<p>Tile format</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "tiles",
+            "description": "<p>Array of tile URLs Tile URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/mosaic.js",
     "groupTitle": "Mosaic"
@@ -3154,7 +4774,27 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Delete a project</p>",
+    "description": "<p>Archive a project</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/project.js",
     "groupTitle": "Project"
   },
@@ -3208,7 +4848,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID</p>"
           },
           {
             "group": "Success 200",
@@ -3251,16 +4891,16 @@ define({ "api": [
             "optional": false,
             "field": "created",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "checkpoints",
+            "description": "<p>undefined undefined</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      }
     },
     "filename": "./routes/project.js",
     "groupTitle": "Projects"
@@ -3281,13 +4921,66 @@ define({ "api": [
     ],
     "description": "<p>Return all information about a given project</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n    \"model_id\": 1,\n    \"mosaic\": \"naip.latest\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the Project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_id",
+            "description": "<p>Starter Model to use for project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "model_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "mosaic",
+            "description": "<p>Imagery to use with model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "checkpoints",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/project.js",
     "groupTitle": "Projects"
@@ -3306,24 +4999,27 @@ define({ "api": [
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return a list of projects</p>",
     "parameter": {
       "fields": {
         "Query": [
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned runs</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -3344,15 +5040,67 @@ define({ "api": [
         ]
       }
     },
-    "description": "<p>Return a list of projects</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"projects\": [{\n        \"id\": 1,\n        \"name\": 123,\n        \"created\": \"<date>\",\n        \"aois\": [{\n           \"id\": 1,\n           \"name\": \"aoi name\",\n           \"created\": \"<date>\",\n           \"storage\": false\n         }],\n         \"checkpoints\": []\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "projects",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "projects.name",
+            "description": "<p>Name of the Project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "projects.aois",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "projects.checkpoints",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "projects.model",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/project.js",
     "groupTitle": "Projects"
@@ -3386,13 +5134,66 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"Test Project\",\n    \"created\": \"<date>\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the Project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "model_id",
+            "description": "<p>Starter Model to use for project</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "model_name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "mosaic",
+            "description": "<p>Imagery to use with model</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "checkpoints",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/project.js",
     "groupTitle": "Projects"
@@ -3439,19 +5240,6 @@ define({ "api": [
             "optional": true,
             "field": "url",
             "description": "<p>URLEncoded URL that you want to fetch</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Unknown",
-            "optional": true,
-            "field": "schemas",
-            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -3505,7 +5293,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 100000000 (m^2)\n        \"max_inference\": 100000000 (m^2)\n        \"instance_window\": 600 (m secs)\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"version\": \"1.0.0\"\n    \"limits\": {\n        \"live_inference\": 100000000 (m^2)\n        \"max_inference\": 200000000 (m^2)\n        \"instance_window\": 600 (m secs)\n    }\n}",
           "type": "json"
         }
       ]
@@ -3528,13 +5316,69 @@ define({ "api": [
       }
     ],
     "description": "<p>Delete a Shared AOI</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/aoi.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/share/:shareuuid/download/color",
+    "title": "Download Color AOI",
+    "version": "1.0.0",
+    "name": "DownloadColorAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return the colourized aoi fabric geotiff</p>",
+    "filename": "./routes/aoi.js",
+    "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/share/:shareuuid/download/raw",
+    "title": "Download Raw AOI",
+    "version": "1.0.0",
+    "name": "DownloadRawAOI",
+    "group": "Share",
+    "permission": [
+      {
+        "name": "public",
+        "title": "Public",
+        "description": "<p>This API endpoint does not require authentication</p>"
+      }
+    ],
+    "description": "<p>Return the aoi fabric geotiff</p>",
     "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
   {
     "type": "get",
     "url": "/api/share/:shareuuid",
-    "title": "Get AOI",
+    "title": "Get Share",
     "version": "1.0.0",
     "name": "GetShare",
     "group": "Share",
@@ -3547,13 +5391,73 @@ define({ "api": [
     ],
     "description": "<p>Return all information about a given AOI Export using the UUID</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"id\": 1432,\n    \"name\": \"I'm an AOI\",\n    \"checkpoint_id\": 1,\n    \"storage\": true,\n    \"bookmarked\": false\n    \"created\": \"<date>\",\n    \"bounds\": { \"GeoJSON \"},\n    \"classes\": []\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "uuid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpoint_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "Share"
@@ -3579,18 +5483,20 @@ define({ "api": [
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned aois</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -3620,13 +5526,59 @@ define({ "api": [
       }
     },
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"project_id\": 123,\n    \"shares\": [{\n        \"uuid\": \"<uuid>\",\n        \"aoi_id\": 1432,\n        \"storage\": true,\n        \"created\": \"<date>\"\n    }]\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "shares",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "shares.uuid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "shares.aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "shares.created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "shares.storage",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "Share"
@@ -3647,13 +5599,73 @@ define({ "api": [
     ],
     "description": "<p>Export an AOI &amp; it's patches to share</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"aoi_id\": 1432,\n    \"project_id\": 1,\n    \"storage\": false,\n    \"created\": \"<date>\",\n    \"patches\": []\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "uuid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "aoi_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "storage",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "patches",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": true,
+            "field": "checkpoint_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "classes",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "Share"
@@ -3691,6 +5703,70 @@ define({ "api": [
       }
     ],
     "description": "<p>Return tilejson for a given AOI using uuid</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"2.2.0\""
+            ],
+            "optional": false,
+            "field": "tilejson",
+            "description": "<p>TileJSON Spec Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Unique name of layer</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"1.0.0\""
+            ],
+            "optional": false,
+            "field": "version",
+            "description": "<p>Style Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"xyz\""
+            ],
+            "optional": false,
+            "field": "schema",
+            "description": "<p>Tile format</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "tiles",
+            "description": "<p>Array of tile URLs Tile URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "center",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/aoi.js",
     "groupTitle": "Share"
   },
@@ -3807,18 +5883,20 @@ define({ "api": [
           {
             "group": "Query",
             "type": "Integer",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned runs</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
             "defaultValue": "0",
-            "description": "<p>The offset based on limit to return</p>"
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -3836,7 +5914,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"users\": [{\n        \"id\": 1,\n        \"username\": \"example\",\n        \"email\": \"example@example.com\",\n        \"access\": \"user\",\n        \"flags\": { \"test_flag\": true }\n    }]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"total\": 1,\n    \"users\": [{\n        \"id\": 1,\n        \"username\": \"example\",\n        \"email\": \"example@example.com\",\n        \"access\": \"user\",\n    }]\n}",
           "type": "json"
         }
       ]
@@ -3860,13 +5938,31 @@ define({ "api": [
     ],
     "description": "<p>Return basic user information about the currently authenticated user</p>",
     "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    \"username\": \"example\"\n    \"email\": \"example@example.com\",\n    \"access\": \"admin\",\n    \"flags\": {}\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "access",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
     },
     "filename": "./routes/user.js",
     "groupTitle": "User"

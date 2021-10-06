@@ -10,6 +10,9 @@ import time
 import jwt
 from lib.api import API
 from lib.ModelSessionPyTorchExample import TorchFineTuning
+from lib.ModelSessionUnet import LoadUnet
+from lib.ModelSessionDeepLabv3 import LoadDeepLabv3Plus
+from lib.ModelSessionUnet2 import LoadUnet2
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
 from lib.utils import setup_logging
@@ -66,6 +69,7 @@ def main():
     os.environ["INSTANCE_ID"] = arg(
         [os.environ.get("INSTANCE_ID"), args.instance_id, "1"]
     )
+
     os.environ["API"] = arg([os.environ.get("API"), args.api], "http://localhost:2000")
 
     os.environ["SOCKET"] = arg(
@@ -81,7 +85,7 @@ def main():
     connection(
         "{}?token={}".format(os.environ["SOCKET"], api.token.replace("api.", "")),
         model,
-        api
+        api,
     )
 
 
@@ -104,7 +108,6 @@ def connection(uri, model, api):
         router.on_act("model#aoi", model.load_aoi)
 
     router.on_act("model#status", model.status)
-    router.on_act("model#abort", model.abort)
 
     router.on_msg("info#connected", placeholder)
     router.on_msg("info#disconnected", placeholder)
@@ -116,9 +119,15 @@ def connection(uri, model, api):
 
 def load(gpu_id, api):
     model_type = api.model["model_type"]
-
+    print(model_type)
     if model_type == "pytorch_example":
         model = TorchFineTuning(gpu_id, api.model_dir, api.model["classes"])
+    elif model_type == "unet":
+        model = LoadUnet(gpu_id, api.model_dir, api.model["classes"])
+    elif model_type == "unet2":
+        model = LoadUnet2(gpu_id, api.model_dir, api.model["classes"])
+    elif model_type == "deeplabv3plus":
+        model = LoadDeepLabv3Plus(gpu_id, api.model_dir, api.model["classes"])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 

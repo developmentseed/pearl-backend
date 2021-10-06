@@ -4,7 +4,6 @@ require('dotenv').config();
 
 const fs = require('fs');
 const path = require('path');
-const Err = require('./lib/error');
 const express = require('express');
 const { fetchJSON } = require('./lib/util');
 const jwt = require('express-jwt');
@@ -16,6 +15,8 @@ const bodyparser = require('body-parser');
 const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 
+const Err = require('./lib/error');
+const Kube = require('./lib/kube');
 const Schema = require('./lib/schema');
 
 const argv = require('minimist')(process.argv, {
@@ -52,6 +53,7 @@ function configure(args = {}, cb) {
  */
 
 /**
+ * @param {Object} args - Command Line Args
  * @param {Config} config
  * @param {function} cb
  */
@@ -61,7 +63,6 @@ async function server(args, config, cb) {
 
     const auth = new (require('./lib/auth').Auth)(config);
     const authtoken = new (require('./lib/auth').AuthToken)(config);
-    const instance = new (require('./lib/instance').Instance)(config);
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -101,14 +102,8 @@ async function server(args, config, cb) {
     app.get('/api', async (req, res) => {
         let podList = [];
         if (config.Environment !== 'local') {
-            podList = await instance.kube.listPods();
-        }
-
-        let activePods;
-        if (podList.length) {
-            activePods = podList.filter((p) => {
-                return p.status.phase === 'Running';
-            });
+            const kube = new Kube(config, 'default');
+            podList = await kube.listPods();
         }
 
         return res.json({
@@ -118,7 +113,7 @@ async function server(args, config, cb) {
                 max_inference: 200000000,
                 instance_window: 600,
                 total_gpus: config.GpuCount,
-                active_gpus: activePods ? activePods.length : null
+                active_gpus: podList.filter((p) => p.status.phase === 'Running').length
             }
         });
     });
@@ -266,10 +261,24 @@ async function server(args, config, cb) {
 
     schema.router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {
+            let errs = [];
+
+            if (err.validationErrors.body) {
+                errs = errs.concat(err.validationErrors.body.map((e) => {
+                    return { message: e.message };
+                }));
+            }
+
+            if (err.validationErrors.query) {
+                errs = errs.concat(err.validationErrors.query.map((e) => {
+                    return { message: e.message };
+                }));
+            }
+
             return Err.respond(
                 new Err(400, null, 'validation error'),
                 res,
-                err.validationErrors.body
+                errs
             );
         } else {
             next(err);

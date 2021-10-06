@@ -1,10 +1,10 @@
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Project = require('../lib/project');
+const Instance = require('../lib/instance');
 
 async function router(schema, config) {
     const auth = new (require('../lib/auth').Auth)(config);
-    const instance = new (require('../lib/instance').Instance)(config);
 
     /**
      * @api {get} /api/project/:projectid/instance Create Instance
@@ -17,11 +17,11 @@ async function router(schema, config) {
      *     Instruct the GPU pool to start a new model instance and return a time limited session
      *     token for accessing the websockets GPU API
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.instance.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateInstance.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.post('/project/:projectid/instance', {
-        body: 'req.body.instance.json',
+        body: 'req.body.CreateInstance.json',
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -29,9 +29,10 @@ async function router(schema, config) {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
-            const inst = await instance.create(req.auth, req.body);
+            req.body.uid = req.auth.uid;
+            const inst = await Instance.generate(config, req.body);
 
-            res.json(inst);
+            res.json(inst.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -44,11 +45,11 @@ async function router(schema, config) {
      * @apiGroup Instance
      * @apiPermission admin
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.instance-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchInstance.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.patch('/project/:projectid/instance/:instanceid', {
-        body: 'req.body.instance-patch.json',
+        body: 'req.body.PatchInstance.json',
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -56,7 +57,11 @@ async function router(schema, config) {
             await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
-            return res.json(await instance.patch(req.params.instanceid, req.body));
+            const instance = await Instance.from(config, req.auth, req.params.instanceid);
+            instance.patch(req.body);
+            await instance.commit(config.pool);
+
+            return res.json(instance.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -73,18 +78,18 @@ async function router(schema, config) {
      *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
      *     field will be pinned to their own uid. Admins can filter by any uid or none.
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.instance-list.json} apiParam
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListInstances.json} apiParam
      * @apiSchema {jsonschema=../schema/res.ListInstances.json} apiSuccess
      */
     await schema.get('/project/:projectid/instance', {
-        query: 'req.query.instance-list.json',
+        query: 'req.query.ListInstances.json',
         res: 'res.ListInstances.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            res.json(await instance.list(req.params.projectid, req.query));
+            res.json(await Instance.list(config.pool, req.params.projectid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -109,7 +114,9 @@ async function router(schema, config) {
             await Param.int(req, 'projectid');
             await Param.int(req, 'instanceid');
 
-            res.json(await instance.has_auth(config.pool, req.auth, req.params.projectid, req.params.instanceid));
+            const instance = await Instance.has_auth(config, req.auth, req.params.projectid, req.params.instanceid);
+
+            return res.json(instance.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -126,22 +133,18 @@ async function router(schema, config) {
      *     A newly instantiated GPU Instance does not know what it's project id is. This API
      *     allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "uid": 123,
-     *       "active": true,
-     *       "created": "<date>"
-     *       "pod": { ... }
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
-    await schema.get('/instance/:instanceid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/instance/:instanceid', {
+        res: 'res.Instance.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
-            return res.json(await instance.get(req.auth, req.params.instanceid));
+            const instance = await Instance.from(config, req.auth, req.params.instanceid);
+
+            return res.json(instance.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -156,12 +159,19 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Set all instances to active: false - used by the socket server upon initial api connection
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/instance', config.requiresAuth, async (req, res) => {
         try {
             await auth.is_admin(req);
 
-            return res.json(await instance.reset());
+            await Instance.reset(config.pool);
+
+            return res.json({
+                status: 200,
+                messages: 'Instances Reset'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }

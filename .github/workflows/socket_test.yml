@@ -1,0 +1,32 @@
+name: Socket Test
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker Pull
+        run: docker-compose pull
+
+      - name: Docker Layer Caching
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+
+      - name: Docker Socket Build
+        run: docker build -t socket services/socket
+
+      - name: Docker Socket Lint
+        run: docker run socket sh -c "npm install --include=dev && npm run lint"
+
+

@@ -1,0 +1,63 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "models"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "models": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "created",
+                    "active",
+                    "uid",
+                    "name",
+                    "meta",
+                    "classes",
+                    "bounds"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "$ref": "./util/id.json"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "uid": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Human-readable name of the Model"
+                    },
+                    "bounds": {
+                        "type": ["array", "null"],
+                        "description": "Recommended geographic area on which this model can be used",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "description": "Generic key/value store for additional model metadata"
+                    },
+                    "classes": {
+                        "$ref": "./util/model-classes.json"
+                    }
+                }
+            }
+        }
+    }
+}

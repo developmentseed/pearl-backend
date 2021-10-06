@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-'use strict';
+
 
 const express = require('express');
 const WebSocket = require('ws');
@@ -53,12 +53,6 @@ async function server(argv, config, cb) {
     srv.keepAliveTimeout = 0;
     srv.on('request', app);
 
-    srv.on('upgrade', (request, socket, head) => {
-        wss.handleUpgrade(request, socket, head, (ws) => {
-            wss.emit('connection', ws, request);
-        });
-    });
-
     const wss = new WebSocket.Server({
         noServer: true,
         verifyClient: ({ req }, cb) => {
@@ -76,6 +70,12 @@ async function server(argv, config, cb) {
         }
     });
 
+    srv.on('upgrade', (request, socket, head) => {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            wss.emit('connection', ws, request);
+        });
+    });
+
     const timeout = new Timeout(config, pool);
 
     wss.on('connection', (ws, req) => {
@@ -87,6 +87,8 @@ async function server(argv, config, cb) {
         });
 
         ws.on('message', (payload) => {
+            payload = String(payload);
+
             if (payload.split('#')[0] === 'ping') return ws.send(`pong#${payload.split('#')[1]}`);
 
             pool.route(ws, payload);

@@ -12,7 +12,7 @@ test('POST /api/model', async (t) => {
         await flight.request({
             method: 'POST',
             json: true,
-            url: 'http://localhost:2000/api/model',
+            url: '/api/model',
             body: {
                 name: 'NAIP Supervised',
                 active: true,
@@ -42,7 +42,7 @@ test('POST /api/project', async (t) => {
     try {
         await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project',
+            url: '/api/project',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -64,12 +64,12 @@ test('GET /api/project/1/instance (empty)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.deepEquals(res.body, {
             total: 0,
@@ -86,7 +86,7 @@ test('POST /api/project/1/instance', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -121,12 +121,12 @@ test('GET /api/project/1/instance', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -151,7 +151,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -163,8 +163,10 @@ test('PATCH /api/project/1/instance/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <string>');
         delete res.body.created;
         delete res.body.last_update;
+        delete res.body.token;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -172,6 +174,8 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             batch: null,
             aoi_id: null,
             checkpoint_id: null,
+            status: {},
+            pod: {},
             active: true,
             type: 'gpu'
         });
@@ -187,7 +191,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -199,11 +203,15 @@ test('PATCH /api/project/1/instance/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <string>');
         delete res.body.created;
         delete res.body.last_update;
+        delete res.body.token;
 
         t.deepEquals(res.body, {
             id: 1,
+            status: {},
+            pod: {},
             project_id: 1,
             batch: null,
             aoi_id: null,
@@ -223,7 +231,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -242,12 +250,12 @@ test('GET /api/project/1/instance?status=active', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance?status=active',
+            url: '/api/project/1/instance?status=active',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -272,12 +280,12 @@ test('GET /api/project/1/instance', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance',
+            url: '/api/project/1/instance',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
-        });
+        }, t);
 
         t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
         delete res.body.instances[0].created;
@@ -302,7 +310,7 @@ test('GET /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -324,7 +332,45 @@ test('GET /api/project/1/instance/1', async (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: true,
-            status: {}
+            status: {},
+            pod: {}
+        });
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET /api/instance/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/instance/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.ok(res.body.created, '.created: <date>');
+        t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <str>');
+        delete res.body.created;
+        delete res.body.last_update;
+        delete res.body.token;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            type: 'gpu',
+            project_id: 1,
+            batch: null,
+            aoi_id: null,
+            checkpoint_id: null,
+            active: true,
+            status: {},
+            pod: {}
         });
 
     } catch (err) {
@@ -338,7 +384,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
     try {
         await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
+            url: '/api/project/1/checkpoint',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -352,7 +398,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
                     { name: 'Built', color: '#806060' }
                 ]
             }
-        });
+        }, t);
     } catch (err) {
         t.error(err, 'no error');
     }
@@ -364,7 +410,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/instance/1',
+            url: '/api/project/1/instance/1',
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -372,16 +418,20 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             body: {
                 checkpoint_id: 1
             }
-        });
+        }, t);
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.last_update, '.last_update: <date>');
+        t.ok(res.body.token, '.token: <string>');
         delete res.body.created;
         delete res.body.last_update;
+        delete res.body.token;
 
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
+            status: {},
+            pod: {},
             batch: null,
             aoi_id: null,
             checkpoint_id: 1,

@@ -1,0 +1,55 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "projects"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer"
+        },
+        "projects": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "created",
+                    "aois",
+                    "checkpoints",
+                    "model"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "$ref": "./util/id.json"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the Project"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "aois": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "checkpoints": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "model": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    }
+}

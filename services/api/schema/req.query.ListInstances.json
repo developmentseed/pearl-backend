@@ -1,0 +1,26 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "status": {
+            "type": "string",
+            "default": "active",
+            "description": "Filter instances by active status",
+            "enum": [
+                "active",
+                "inactive",
+                "all"
+            ]
+        },
+        "batch": {
+            "type": ["boolean", "integer"],
+            "description": "Filter batch instances, if a boolean - show hide batch instances, if an integer, only show specific instance with a given batch id"
+        }
+    }
+}

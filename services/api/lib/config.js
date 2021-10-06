@@ -1,17 +1,25 @@
-
-
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const wkx = require('wkx');
 
+/**
+ * @class
+ */
 class Config {
     static async env(args = {}) {
         if (args.prod && !process.env.SigningSecret) {
             throw new Error('SigningSecret env var must be set in production environment');
         }
 
-        this.silent = !!args.silent;
+        this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
+        this.silent = !!args.silent;
         this.test = !!args.test;
+
+        if (this.test) {
+            this.AzurePrefix = Math.random().toString(36).substring(2, 15) + '-';
+        } else {
+            this.AzurePrefix = '';
+        }
 
         this.AzureStorage = process.env.AZURE_STORAGE_CONNECTION_STRING || false;
         if (this.AzureStorage) console.log('ok - AzureStorage: Enabled');
@@ -22,8 +30,6 @@ class Config {
         this.Postgres = process.env.Postgres || 'postgres://postgres@localhost:5432/lulc';
 
         this.TileUrl = process.env.TileUrl || args.tileurl || false;
-
-        this.SigningSecret = process.env.SigningSecret || 'dev-secret';
 
         this.Port = args.port || 2000;
 

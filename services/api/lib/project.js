@@ -7,14 +7,11 @@ const Generic = require('./generic');
  */
 class Project extends Generic {
     static _table = 'projects';
+    static _patch = Object.keys(require('../schema/req.body.PatchProject.json').properties);
+    static _res = require('../schema/res.Project.json');
 
     constructor() {
         super();
-
-        this._table = Project._table;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchProject.json').properties);
     }
 
     /**
@@ -28,28 +25,10 @@ class Project extends Generic {
         const proj = await Project.from(pool, projectid);
 
         if (auth.access !== 'admin' && auth.uid !== proj.uid) {
-            throw new Err(401, null, 'Cannot access a project you are not the owner of');
+            throw new Err(403, null, 'Cannot access a project you are not the owner of');
         }
 
         return proj;
-    }
-
-    /**
-     * Return a Row as a JSON Object
-     * @param {Object} row Postgres Database Row
-     *
-     * @returns {Object}
-     */
-    serialize() {
-        return {
-            id: this.id,
-            uid: this.uid,
-            name: this.name,
-            model_id: this.model_id,
-            model_name: this.model_name,
-            mosaic: this.mosaic,
-            created: this.created
-        };
     }
 
     /**
@@ -94,7 +73,7 @@ class Project extends Generic {
                 LIMIT
                     ${query.limit}
                 OFFSET
-                    ${query.page}
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list projects');
@@ -106,6 +85,7 @@ class Project extends Generic {
     /**
      * Create a new project
      *
+     * @param {Pool} pool - Instantiated Postgres Pool
      * @param {Number} uid - User ID that is creating project
      * @param {Object} project - Project Object
      * @param {Object} project.name - Project Name
@@ -128,7 +108,7 @@ class Project extends Generic {
                 ) RETURNING *
             `);
 
-            return Project.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate project');
         }
@@ -166,7 +146,7 @@ class Project extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No project found');
 
-        return Project.deserialize(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**

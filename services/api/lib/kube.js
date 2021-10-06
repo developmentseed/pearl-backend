@@ -1,5 +1,3 @@
-
-
 const k8s = require('@kubernetes/client-node');
 
 /**
@@ -23,6 +21,8 @@ class Kube {
 
     /**
      * Method to list GPU pods in the cluster
+     *
+     * @returns {Object[]}
      */
     async listPods() {
         const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, undefined, undefined, undefined, 'type=gpu');
@@ -44,6 +44,8 @@ class Kube {
      * @param {String} name
      * @param {String} type
      * @param {Object} env
+     *
+     * @returns {Object}
      */
     makePodSpec(name, type, env) {
         const nodeSelectorKey = this.config.nodeSelectorKey;
@@ -64,54 +66,33 @@ class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    'cpu': '4',
-                    'memory': '8Gi'
+                    cpu: '4',
+                    memory: '8Gi'
                 },
                 limits: {
-                    'cpu': '8',
-                    'memory': '16Gi'
+                    cpu: '8',
+                    memory: '16Gi'
                 }
             };
         }
-        // if (deploymentName === 'lulc-production-lulc-helm') {
-        //     resources = {
-        //         requests: {
-        //             'cpu': '2',
-        //             'memory': '2Gi'
-        //         },
-        //         limits: {
-        //             'cpu': '4',
-        //             'memory': '8Gi'
-        //         }
-        //     }
-        // } else {
-        //     resources = {
-        //             limits: {
-        //                 'nvidia.com/gpu': 1
-        //             }
-        //         }
-        // }
+
         const nodeSelector = {};
         nodeSelector[nodeSelectorKey] = nodeSelectorValue;
 
         let volumes = [];
         let volumeMounts = [];
         if (type === 'gpu') {
-            volumes = [
-                {
-                    name: 'dshm',
-                    emptyDir: {
-                        medium: 'Memory'
-                    }
+            volumes = [{
+                name: 'dshm',
+                emptyDir: {
+                    medium: 'Memory'
                 }
-            ];
+            }];
 
-            volumeMounts = [
-                {
-                    mountPath: '/dev/shm',
-                    name: 'dshm'
-                }
-            ];
+            volumeMounts = [{
+                mountPath: '/dev/shm',
+                name: 'dshm'
+            }];
         }
 
         return {
@@ -127,15 +108,13 @@ class Kube {
                 }
             },
             spec: {
-                containers: [
-                    {
-                        name: `gpu-${name}`,
-                        image: `${gpuImageName}:${gpuImageTag}`,
-                        resources: resources,
-                        env: env,
-                        volumeMounts: volumeMounts
-                    }
-                ],
+                containers: [{
+                    name: `gpu-${name}`,
+                    image: `${gpuImageName}:${gpuImageTag}`,
+                    resources: resources,
+                    env: env,
+                    volumeMounts: volumeMounts
+                }],
                 volumes: volumes,
                 nodeSelector: nodeSelector,
                 restartPolicy: 'Never'
@@ -145,6 +124,8 @@ class Kube {
 
     /**
      * Create a pod based on podSpec
+     *
+     * @param {Object} podSpec
      */
     async createPod(podSpec) {
         const res = await this.k8sApi.createNamespacedPod(this.namespace, podSpec);
@@ -157,8 +138,9 @@ class Kube {
     /**
      *
      * Delete a pod based on the name
+     *
+     * @param {String} name
      */
-
     async deletePod(name) {
         const res = await this.k8sApi.deleteNamespacedPod(name, this.namespace);
         if (res.statusCode >= 400) {
@@ -169,6 +151,8 @@ class Kube {
 
     /**
      * Get pod details
+     *
+     * @param {String} name
      */
     async getPod(name) {
         const res = await this.k8sApi.readNamespacedPod(name, this.namespace);
@@ -180,6 +164,8 @@ class Kube {
 
     /**
      * Get pod status.
+     *
+     * @param {String} name
      */
     async getPodStatus(name) {
         const res = await this.k8sApi.readNamespacedPodStatus(name, this.namespace);
@@ -195,6 +181,4 @@ class Kube {
     }
 }
 
-module.exports = {
-    Kube
-};
+module.exports = Kube;

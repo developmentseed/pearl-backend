@@ -2,12 +2,12 @@ const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
 const Project = require('../lib/project');
+const AOI = require('../lib/aoi');
+const Model = require('../lib/model');
+const Instance = require('../lib/instance');
+const Checkpoint = require('../lib/checkpoint');
 
 async function router(schema, config) {
-    const aoi = new (require('../lib/aoi').AOI)(config);
-    const checkpoint = new (require('../lib/checkpoint').CheckPoint)(config);
-    const model = new (require('../lib/model').Model)(config);
-    const instance = new (require('../lib/instance').Instance)(config);
 
     /**
      * @api {post} /api/project List Projects
@@ -16,39 +16,23 @@ async function router(schema, config) {
      * @apiGroup Projects
      * @apiPermission user
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.project-list.json} apiParam
-     *
      * @apiDescription
      *     Return a list of projects
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "projects": [{
-     *           "id": 1,
-     *           "name": 123,
-     *           "created": "<date>",
-     *           "aois": [{
-     *              "id": 1,
-     *              "name": "aoi name",
-     *              "created": "<date>",
-     *              "storage": false
-     *            }],
-     *            "checkpoints": []
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListProjects.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
      */
     await schema.get('/project', {
-        query: 'req.query.project-list.json'
+        query: 'req.query.ListProjects.json',
+        res: 'res.ListProjects.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             const results = await Project.list(config.pool, req.auth.uid, req.query);
             if (results.projects && results.projects.length) {
                 for (let index = 0; index < results.projects.length; index++) {
                     const p = results.projects[index];
-                    const aois = await aoi.list(p.id, { bookmarked: 'true' });
-                    const checkpoints = await checkpoint.list(p.id, { bookmarked: 'true' });
+                    const aois = await AOI.list(config.pool, p.id, { bookmarked: true });
+                    const checkpoints = await Checkpoint.list(config.pool, p.id, { bookmarked: true });
                     // remove reduntant project id
                     delete aois.project_id;
                     delete checkpoints.project_id;
@@ -56,11 +40,12 @@ async function router(schema, config) {
                     p['checkpoints'] = checkpoints.checkpoints;
                     p['model'] = {};
                     if (p.model_id) {
-                        p['model'] = await model.get(p.model_id);
+                        p['model'] = (await Model.from(config.pool, p.model_id)).serialize();
                         delete p.model_id;
                     }
                 }
             }
+
             res.json(results);
         } catch (err) {
             return Err.respond(err, res);
@@ -77,25 +62,17 @@ async function router(schema, config) {
      * @apiDescription
      *     Return all information about a given project
      *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "id": 1,
-     *       "name": "Test Project",
-     *       "created": "<date>"
-     *       "model_id": 1,
-     *       "mosaic": "naip.latest"
-     *   }
+     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
-    await schema.get('/project/:projectid', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid', {
+        res: 'res.Project.json'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
 
             const proj = (await Project.has_auth(config.pool, req.auth, req.params.projectid)).serialize();
 
-            delete proj.uid;
-
-            const checkpoints = await checkpoint.list(req.params.projectid, { bookmarked: 'true' });
+            const checkpoints = await Checkpoint.list(config.pool, req.params.projectid, { bookmarked: true });
             // remove reduntant project id
             delete checkpoints.project_id;
             proj['checkpoints'] = checkpoints.checkpoints;
@@ -143,11 +120,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Update an existing Project
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.project-patch.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchProject.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.patch('/project/:projectid', {
-        body: 'req.body.project-patch.json',
+        body: 'req.body.PatchProject.json',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -173,30 +150,42 @@ async function router(schema, config) {
      * @apiDescription
      *     Archive a project
      *
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:projectid', {
-        res: 'res.Project.json'
+        res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Param.int(req, 'projectid');
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            const insts = await instance.list(req.params.projectid);
+            const insts = await Instance.list(config.pool, req.params.projectid);
             for (const inst of insts.instances) {
                 if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
-                await instance.delete(inst.id);
+
+                const instance = new Instance();
+                instance.id = inst.id;
+                await instance.delete(config.pool);
             }
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
-            const aois = await aoi.list(req.params.projectid);
-            aois.aois.forEach(async (a) => { await aoi.delete(a.id); });
+            const aois = await AOI.list(config.pool, req.params.projectid);
+            aois.aois.forEach(async (a) => {
+                const aoi = await AOI.from(config.pool, a.id);
+                await aoi.delete(config.pool);
+            });
 
-            const chkpts = await checkpoint.list(req.params.projectid);
-            chkpts.checkpoints.forEach(async (c) => { await checkpoint.delete(c.id); });
+            const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
+            chkpts.checkpoints.forEach(async (c) => {
+                const ch = await Checkpoint.from(config.pool, c.id);
+                await ch.delete(config.pool);
+            });
 
             await proj.delete(config.pool);
-            return res.json({});
+            return res.json({
+                status: 200,
+                message: 'Project Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }

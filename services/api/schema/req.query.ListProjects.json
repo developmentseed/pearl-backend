@@ -1,0 +1,22 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "desc",
+            "description": "Sorting order for listing projects based on created timestamp. Allowed 'desc' and 'asc'. Default desc."
+        },
+        "name": {
+            "type": "string",
+            "default": "",
+            "description": "Filter projects that matches the name."
+        }
+    }
+}

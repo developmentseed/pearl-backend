@@ -1,5 +1,6 @@
 {
     "extends": "eslint:recommended",
+    "root": true,
     "parser": "@babel/eslint-parser",
     "parserOptions": {
         "ecmaVersion": 2018,
@@ -42,7 +43,7 @@
         "strict": "error",
         "node/no-unsupported-features": [ "error", { "version": 8 } ],
         "node/no-missing-require": "error",
-        "valid-jsdoc": ["warn", {
+        "valid-jsdoc": ["error", {
             "requireParamDescription": false,
             "requireReturnDescription": false,
             "requireReturnType": false,

@@ -18,7 +18,6 @@ LOGGER = logging.getLogger("server")
 class ModelSrv:
     def __init__(self, model, api):
 
-        self.is_aborting = False
         self.aoi = None
         self.chk = None
         self.processing = False
@@ -32,24 +31,16 @@ class ModelSrv:
             self.aoi = AOI.load(self.api, self.api.instance.get("aoi_id"))
 
         if api.batch is not False:
-            self.prediction({
-                "name": api.batch.get('name', 'Default Batch'),
-                "polygon": api.batch.get('bounds')
-            })
-
-    def abort(self, body, websocket):
-        if self.processing is False:
-            websocket.error(
-                "Nothing to abort",
-                "The GPU is not currently processing and has nothing to abort",
+            self.prediction(
+                {
+                    "name": api.batch.get("name", "Default Batch"),
+                    "polygon": api.batch.get("bounds"),
+                }
             )
-        else:
-            self.is_aborting = True
 
     def status(self, body, websocket):
         try:
             payload = {
-                "is_aborting": self.is_aborting,
                 "processing": self.processing,
                 "aoi": False,
                 "checkpoint": False,
@@ -108,7 +99,7 @@ class ModelSrv:
 
                 color_list = [item["color"] for item in self.model.classes]
 
-                while len(patch.tiles) > 0 and self.is_aborting is False:
+                while len(patch.tiles) > 0:
                     zxy = patch.tiles.pop()
                     output = MemRaster(
                         np.ones([256, 256], dtype=np.uint8) * body["class"],
@@ -205,11 +196,8 @@ class ModelSrv:
                     pin_memory=True,
                 )
 
-                current = 0
+                current = 1
                 for i, (data, xyz) in enumerate(dataloader):
-                    if self.is_aborting:
-                        break
-
                     xyz = xyz.numpy()
                     outputs = self.model.run(data, True)
 
@@ -355,7 +343,7 @@ class ModelSrv:
             websocket.error("Checkpoint Load Error", e)
             raise e
 
-    def prediction(self, body, websocket = False):
+    def prediction(self, body, websocket=False):
         try:
             if self.processing is True:
                 return is_processing(websocket)
@@ -418,11 +406,10 @@ class ModelSrv:
                 pin_memory=True,
             )
 
-            current = 0
-            for i, (data, xyz) in enumerate(dataloader):
-                if self.is_aborting:
-                    break
+            current = 1
+            progress = 0
 
+            for i, (data, xyz) in enumerate(dataloader):
                 xyz = xyz.numpy()
                 outputs = self.model.run(data, True)
 
@@ -472,13 +459,12 @@ class ModelSrv:
                             )
                         )
                     else:
-                        res = self.api.batch_patch({
-                            "progress": int(float(current) / float(self.aoi.total) * 100)
-                        })
+                        new_prog = int(float(current) / float(self.aoi.total) * 100)
 
-                        if res.get('abort') is True:
-                            self.is_aborting = True
+                        if progress != new_prog:
+                            res = self.api.batch_patch({"progress": new_prog})
 
+                            progress = new_prog
 
                     current = current + 1
 
@@ -491,42 +477,34 @@ class ModelSrv:
                     )
                     self.aoi.add_to_fabric(output)
 
-            if self.is_aborting is True:
-                if websocket is not False:
-                    websocket.send(
-                        json.dumps(
-                            {
-                                "message": "model#aborted",
-                            }
-                        )
+            self.aoi.upload_fabric()
+
+            LOGGER.info("ok - done prediction")
+
+            if websocket is not False:
+                websocket.send(
+                    json.dumps(
+                        {
+                            "message": "model#prediction#complete",
+                            "data": {
+                                "aoi": self.aoi.id,
+                            },
+                        }
                     )
+                )
             else:
-                self.aoi.upload_fabric()
+                self.api.batch_patch(
+                    {"progress": 100, "completed": True, "aoi": self.aoi.id}
+                )
 
-                LOGGER.info("ok - done prediction")
+                sys.exit()
 
-                if websocket is not False:
-                    websocket.send(
-                        json.dumps(
-                            {
-                                "message": "model#prediction#complete",
-                                "data": {
-                                    "aoi": self.aoi.id,
-                                },
-                            }
-                        )
-                    )
-                else:
-                    self.api.batch_patch({
-                        "progress": 100,
-                        "completed": True,
-                        "aoi": self.aoi.id
-                    })
-
-                    sys.exit()
-
-                done_processing(self)
+            done_processing(self)
         except Exception as e:
+            self.api.batch_patch(
+                {"completed": False, "error": str("Processing Error: " + str(e))}
+            )
+
             done_processing(self)
             websocket.error("Processing Error", e)
             raise e
@@ -557,8 +535,6 @@ class ModelSrv:
 
             LOGGER.info("ok - done retrain")
 
-            websocket.send(json.dumps({"message": "model#retrain#complete"}))
-
             if self.chk is None:
                 parent = None
             else:
@@ -584,24 +560,15 @@ class ModelSrv:
                 websocket,
             )
 
-            if self.is_aborting is True:
-                websocket.send(
-                    json.dumps(
-                        {
-                            "message": "model#aborted",
-                        }
-                    )
+            websocket.send(json.dumps({"message": "model#retrain#complete"}))
+
+            done_processing(self)
+
+            if self.aoi is not None:
+                self.prediction(
+                    {"name": body["name"], "polygon": mapping(self.aoi.poly)},
+                    websocket,
                 )
-
-                done_processing(self)
-            else:
-                done_processing(self)
-
-                if self.aoi is not None:
-                    self.prediction(
-                        {"name": body["name"], "polygon": mapping(self.aoi.poly)},
-                        websocket,
-                    )
 
         except Exception as e:
             done_processing(self)
@@ -653,7 +620,6 @@ class ModelSrv:
 
 def done_processing(modelsrv):
     modelsrv.processing = False
-    modelsrv.is_aborting = False
 
 
 def is_processing(websocket):

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "lulc-helm.fullname" . }}-ingress-socket
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod-issuer
+    appgw.ingress.kubernetes.io/request-timeout: "300"
+spec:
+  tls:
+    - hosts:
+      - socket.{{ .Values.domain }}
+      secretName: {{ template "lulc-helm.fullname" . }}-secret-socket
+
+  rules:
+  - host: socket.{{ .Values.domain }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ template "lulc-helm.fullname" . }}-socket
+            port:
+              number: 80
