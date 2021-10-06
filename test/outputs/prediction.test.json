@@ -37,7 +37,7 @@
         }
     },{
         "type": "schema",
-        "items": 2,
+        "items": 49,
         "data": {
             "$ref": "./refs/model#retrain.json"
         }

@@ -72,15 +72,6 @@ def geom2px(geom, modelsrv, websocket=False):
 
     pxs = []
 
-    if websocket is not False:
-        websocket.send(json.dumps({
-            "message": "model#retrain#progress",
-            "data": {
-                "total": len(coords),
-                "processed": 0
-                }
-            }))
-
     for i, coord in enumerate(coords):
         xy = ll2xy(coord[0], coord[1])
         xyz = mercantile.tile(coord[0], coord[1], zoom)
@@ -103,7 +94,7 @@ def geom2px(geom, modelsrv, websocket=False):
                 "message": "model#retrain#progress",
                 "data": {
                     "total": len(coords),
-                    "processed": i
+                    "processed": i + 1
                     }
                 }))
 
