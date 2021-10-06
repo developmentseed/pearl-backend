@@ -31,6 +31,9 @@ module "resources" {
   placeholder_is_gpu   = true
   placeholder_num_gpus = 2
 
+  nginx_enabled = true
+  frontend_domain = "landcover.io"
+
   domain = "lulc-production.ds.io"
 }
 
