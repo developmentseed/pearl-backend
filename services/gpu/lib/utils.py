@@ -56,7 +56,7 @@ def pxs2geojson(classes):
     return geoms
 
 
-def geom2px(geom, modelsrv):
+def geom2px(geom, modelsrv, websocket=False):
     zoom = modelsrv.api.model["model_zoom"]
 
     coords = []
@@ -70,7 +70,17 @@ def geom2px(geom, modelsrv):
         return False
 
     pxs = []
-    for coord in coords:
+
+    if websocket is not False:
+        websocket.send(json.dumps({
+            "message": "model#retrain#progress",
+            "data": {
+                "total": len(coords),
+                "processed": 0
+                }
+            }))
+
+    for i, coord in enumerate(coords):
         xy = ll2xy(coord[0], coord[1])
         xyz = mercantile.tile(coord[0], coord[1], zoom)
 
@@ -86,6 +96,15 @@ def geom2px(geom, modelsrv):
         value = retrain[pixels[0], pixels[1]]
 
         pxs.append(PX(coord, xy, xyz, pixels, value))
+
+        if websocket is not False:
+            websocket.send(json.dumps({
+                "message": "model#retrain#progress",
+                "data": {
+                    "total": len(coords),
+                    "processed": i
+                    }
+                }))
 
     return pxs
 
@@ -209,7 +228,7 @@ def rowcol(transform, xs, ys, op=math.floor, precision=None):
     return rows, cols
 
 
-def generate_random_points(count, feature, modelsrv):
+def generate_random_points(count, feature):
     polygon = shape(feature)
     points = {"type": "MultiPoint", "coordinates": []}
     minx, miny, maxx, maxy = polygon.bounds
@@ -217,7 +236,8 @@ def generate_random_points(count, feature, modelsrv):
         point = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
         if polygon.contains(point):
             points["coordinates"].append(mapping(point)["coordinates"])
-    return geom2px(points, modelsrv)
+
+    return points
 
 
 def setup_logging(log_path, log_name, level=logging.DEBUG):

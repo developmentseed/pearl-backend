@@ -521,14 +521,16 @@ class ModelSrv:
                 cls["retrain_geometry"] = []
                 for feature in cls["geometry"]["features"]:
                     if feature["geometry"]["type"] == "Polygon":
-                        points = generate_random_points(50, feature["geometry"], self)
-                        cls["retrain_geometry"] = cls["retrain_geometry"] + points
+                        points = generate_random_points(50, feature["geometry"])
+                        cls["retrain_geometry"] = cls["retrain_geometry"] + geom2px(
+                            points, self, websocket
+                        )
                     elif (
                         feature["geometry"]["type"] == "MultiPoint"
                         and len(feature["geometry"]["coordinates"]) > 0
                     ):
                         cls["retrain_geometry"] = cls["retrain_geometry"] + geom2px(
-                            feature["geometry"], self
+                            feature["geometry"], self, websocket
                         )
 
             self.model.retrain(body["classes"])
