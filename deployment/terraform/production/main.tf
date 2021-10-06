@@ -34,7 +34,7 @@ module "resources" {
   nginx_enabled = true
   frontend_domain = "landcover.io"
 
-  domain = "lulc-production.ds.io"
+  domain = "lulc.ds.io"
 }
 
 terraform {
