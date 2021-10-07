@@ -9,10 +9,10 @@ import time
 
 import jwt
 from lib.api import API
-from lib.ModelSessionPyTorchExample import TorchFineTuning
-from lib.ModelSessionUnet import LoadUnet
-from lib.ModelSessionDeepLabv3 import LoadDeepLabv3Plus
-from lib.ModelSessionUnet2 import LoadUnet2
+from lib.models.ModelSessionPyTorchExample import TorchFineTuning
+from lib.models.ModelSessionUnet import LoadUnet
+from lib.models.ModelSessionDeepLabv3 import LoadDeepLabv3Plus
+from lib.models.ModelSessionUnet2 import LoadUnet2
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
 from lib.utils import setup_logging

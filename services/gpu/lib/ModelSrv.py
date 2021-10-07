@@ -10,7 +10,7 @@ from shapely.geometry import mapping
 from .AOI import AOI
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
-from .utils import generate_random_points, geom2px, pred2png, pxs2geojson, serialize
+from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson, serialize
 
 LOGGER = logging.getLogger("server")
 
@@ -517,19 +517,29 @@ class ModelSrv:
 
             LOGGER.info("ok - starting retrain")
 
+            total = 0;
             for cls in body["classes"]:
                 cls["retrain_geometry"] = []
                 for feature in cls["geometry"]["features"]:
                     if feature["geometry"]["type"] == "Polygon":
-                        points = generate_random_points(50, feature["geometry"], self)
-                        cls["retrain_geometry"] = cls["retrain_geometry"] + points
+                        points = generate_random_points(50, feature["geometry"])
+                        cls["retrain_geometry"] = geom2coords(points)
+
                     elif (
                         feature["geometry"]["type"] == "MultiPoint"
                         and len(feature["geometry"]["coordinates"]) > 0
                     ):
-                        cls["retrain_geometry"] = cls["retrain_geometry"] + geom2px(
-                            feature["geometry"], self
-                        )
+                        cls["retrain_geometry"] = geom2coords(feature["geometry"])
+
+                    total += len(cls["retrain_geometry"]) - 1
+
+            curr = 1
+            for cls in body["classes"]:
+                cnt = len(cls["retrain_geometry"])
+                cls["retrain_geometry"] = geom2px(
+                    cls["retrain_geometry"], self, websocket, total, curr
+                )
+                curr += cnt
 
             self.model.retrain(body["classes"])
 
