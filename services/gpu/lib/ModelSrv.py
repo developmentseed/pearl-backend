@@ -531,7 +531,7 @@ class ModelSrv:
                     ):
                         cls["retrain_geometry"] = geom2coords(feature["geometry"])
 
-                    total += len(cls["retrain_geometry"])
+                    total += len(cls["retrain_geometry"]) - 1
 
             curr = 1
             for cls in body["classes"]:
