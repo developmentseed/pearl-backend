@@ -533,10 +533,13 @@ class ModelSrv:
 
                     total += len(cls["retrain_geometry"])
 
+            curr = 1
             for cls in body["classes"]:
+                cnt = len(cls["retrain_geometry"])
                 cls["retrain_geometry"] = geom2px(
-                    cls["retrain_geometry"], self, websocket, total
+                    cls["retrain_geometry"], self, websocket, total, curr
                 )
+                curr += cnt
 
             self.model.retrain(body["classes"])
 

@@ -71,7 +71,7 @@ def geom2coords(geom):
 
 
 
-def geom2px(coords, modelsrv, websocket=False, total = 0):
+def geom2px(coords, modelsrv, websocket=False, total=0, curr=1):
     zoom = modelsrv.api.model["model_zoom"]
 
     pxs = []
@@ -98,7 +98,7 @@ def geom2px(coords, modelsrv, websocket=False, total = 0):
                 "message": "model#retrain#progress",
                 "data": {
                     "total": total,
-                    "processed": i + 1
+                    "processed": curr + i
                 }
             }))
 
