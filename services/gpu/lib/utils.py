@@ -71,7 +71,7 @@ def geom2coords(geom):
 
 
 
-def geom2px(coords, modelsrv, websocket=False, total):
+def geom2px(coords, modelsrv, websocket=False, total = 0):
     zoom = modelsrv.api.model["model_zoom"]
 
     pxs = []
