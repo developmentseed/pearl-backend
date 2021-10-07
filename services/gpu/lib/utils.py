@@ -56,10 +56,7 @@ def pxs2geojson(classes):
 
     return geoms
 
-
-def geom2px(geom, modelsrv, websocket=False):
-    zoom = modelsrv.api.model["model_zoom"]
-
+def geom2coords(geom):
     coords = []
 
     if geom["type"] == "Point":
@@ -69,6 +66,13 @@ def geom2px(geom, modelsrv, websocket=False):
             coords.append(coord)
     else:
         return False
+
+    return coords
+
+
+
+def geom2px(coords, modelsrv, websocket=False, total):
+    zoom = modelsrv.api.model["model_zoom"]
 
     pxs = []
 
@@ -93,10 +97,10 @@ def geom2px(geom, modelsrv, websocket=False):
             websocket.send(json.dumps({
                 "message": "model#retrain#progress",
                 "data": {
-                    "total": len(coords),
+                    "total": total,
                     "processed": i + 1
-                    }
-                }))
+                }
+            }))
 
     return pxs
 
