@@ -99,7 +99,8 @@ class Model extends Generic {
                     storage,
                     classes,
                     meta,
-                    bounds
+                    bounds,
+                    osmtag_id
                 ) VALUES (
                     ${model.uid},
                     ${model.name},
@@ -110,7 +111,8 @@ class Model extends Generic {
                     False,
                     ${JSON.stringify(model.classes)}::JSONB,
                     ${JSON.stringify(model.meta)}::JSONB,
-                    ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON)
+                    ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON),
+                    ${model.osmtag_id || null}
                 ) RETURNING *
             `);
         } catch (err) {
@@ -152,6 +154,7 @@ class Model extends Generic {
                     SET
                         storage = ${this.storage},
                         bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)})
+                        osmtag_id = ${this.osmtag_id}
                     WHERE
                         id = ${this.id}
                     RETURNING *

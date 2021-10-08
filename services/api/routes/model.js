@@ -3,6 +3,7 @@ const Busboy = require('busboy');
 const Err = require('../lib/error');
 const { Param } = require('../lib/util');
 const Model = require('../lib/model');
+const OSMTag = require('../lib/osmtag');
 
 async function router(schema, config) {
     const auth = new (require('../lib/auth').Auth)(config);
@@ -28,6 +29,17 @@ async function router(schema, config) {
             await auth.is_admin(req);
 
             req.body.uid = req.auth.uid;
+
+            if (req.body.tagmap) {
+                const tagmap = await OSMTag.generate(config.pool, {
+                    project_id: null,
+                    tagmap: req.body.tagmap
+                });
+
+                delete req.body.tagmap;
+                req.body.osmtag_id = tagmap.id;
+            }
+
             const model = await Model.generate(config.pool, req.body);
 
             return res.json(model.serialize());
@@ -60,8 +72,24 @@ async function router(schema, config) {
             await auth.is_admin(req);
 
             const model = await Model.from(config.pool, req.params.modelid);
+
+            if (req.body.tagmap && model.osmtag_id) {
+                const tagmap = await OSMTag.from(config.pool, model.osmtag_id);
+                tagmap.tagmap = req.body.tagmap;
+                await tagmap.commit(config.pool);
+                delete req.body.tagmap;
+            } else if (req.body.tagmap) {
+                const tagmap = await OSMTag.generate(config.pool, {
+                    project_id: null,
+                    tagmap: req.body.tagmap
+                });
+
+                delete req.body.tagmap;
+                req.body.osmtag_id = tagmap.id;
+            }
+
             model.patch(req.body);
-            model.commit(config.pool);
+            await model.commit(config.pool);
 
             res.json(model.serialize());
         } catch (err) {

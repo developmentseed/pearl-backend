@@ -4,6 +4,7 @@ const Busboy = require('busboy');
 const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
 const Checkpoint = require('../lib/checkpoint');
+const OSMTag = require('../lib/osmtag');
 
 async function router(schema, config) {
     const auth = new (require('../lib/auth').Auth)(config);
@@ -256,6 +257,19 @@ async function router(schema, config) {
             }
 
             req.body.project_id = req.params.projectid;
+
+            if (req.body.tagmap) {
+                const tagmap = await OSMTag.generate(config.pool, {
+                    project_id: req.params.projectid,
+                    tagmap: req.body.tagmap
+                });
+
+                delete req.body.tagmap;
+                req.body.osmtag_id = tagmap.id;
+            } else {
+                req.body.osmtag_id = null;
+            }
+
             const checkpoint = await Checkpoint.generate(config.pool, req.body);
 
             return res.json(checkpoint.serialize());
