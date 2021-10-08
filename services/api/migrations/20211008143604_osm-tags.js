@@ -3,6 +3,8 @@ exports.up = function(knex) {
         CREATE TABLE osmtag (
             id          BIGSERIAL PRIMARY KEY,
             tagmap      JSONB,
+            created     TIMESTAMP NOT NULL DEFAULT Now(),
+            updated     TIMESTAMP NOT NULL DEFAULT Now(),
             project_id  BIGINT REFERENCES projects(id)
         );
 

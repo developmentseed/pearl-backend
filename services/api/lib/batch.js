@@ -29,7 +29,7 @@ class Batch extends Generic {
         const batch = await this.from(pool, batchid);
 
         if (batch.project_id !== proj.id) {
-            throw new Err(400, null, `Batch #${batch} is not associated with project #${projectid}`);
+            throw new Err(400, null, `Batch #${batchid} is not associated with project #${projectid}`);
         }
 
         return batch;
@@ -119,7 +119,8 @@ class Batch extends Generic {
 
     static async generate(pool, batch) {
         try {
-            const pgres = await pool.query(sql` INSERT INTO batch (
+            const pgres = await pool.query(sql`
+                INSERT INTO batch (
                     uid,
                     project_id,
                     name,
