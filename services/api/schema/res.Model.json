@@ -12,7 +12,8 @@
         "storage",
         "classes",
         "meta",
-        "bounds"
+        "bounds",
+        "osmtag_id"
     ],
     "additionalProperties": false,
     "properties": {
@@ -70,6 +71,10 @@
         "meta": {
             "type": "object",
             "description": "Generic key/value store for additional model metadata"
+        },
+        "osmtag_id": {
+            "type": ["integer", "null"],
+            "description": "Optional default list of OSM Tags => Model Classes"
         }
     }
 }
