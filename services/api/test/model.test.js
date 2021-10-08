@@ -106,7 +106,7 @@ test('POST /api/model', async (t) => {
             }
         }, t);
 
-        t.deepEquals(Object.keys(res.body).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'model_zoom', 'name', 'storage', 'uid'], 'body');
+        t.deepEquals(Object.keys(res.body).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'model_zoom', 'name', 'storage', 'uid', 'osmtag_id'].sort(), 'body');
         t.ok(res.body.id, 1, '.id: 1');
     } catch (err) {
         t.error(err, 'no errors');
@@ -194,54 +194,12 @@ test('GET /api/model/1', async (t) => {
             }
         }, t);
 
-        t.deepEquals(Object.keys(res.body).sort(), [
-            'active', 'bounds', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'model_zoom', 'name', 'storage', 'uid'
-        ], 'body');
-
         delete res.body.created;
 
         t.deepEquals(res.body, {
             id: 1,
             active: true,
-            uid: 1,
-            bounds: [-180, -90, 180, 90],
-            name: 'NAIP Supervised',
-            model_type: 'pytorch_example',
-            model_inputshape: [240, 240, 4],
-            model_zoom: 17,
-            storage: true,
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-            meta: {}
-        }, 'body');
-    } catch (err) {
-        t.error(err, 'no errors');
-    }
-
-    t.end();
-});
-
-test('GET /api/model/1', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/model/1',
-            method: 'GET',
-            auth: {
-                bearer: flight.token.ingalls
-            }
-        }, t);
-
-        t.ok(res.body.created);
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            active: true,
+            osmtag_id: null,
             uid: 1,
             bounds: [-180, -90, 180, 90],
             name: 'NAIP Supervised',
@@ -285,6 +243,7 @@ test('PATCH /api/model/1', async (t) => {
             id: 1,
             active: true,
             uid: 1,
+            osmtag_id: null,
             bounds: [-1, -1, 1, 1],
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',

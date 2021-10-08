@@ -153,7 +153,7 @@ class Model extends Generic {
                 UPDATE models
                     SET
                         storage = ${this.storage},
-                        bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)})
+                        bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)}),
                         osmtag_id = ${this.osmtag_id}
                     WHERE
                         id = ${this.id}
