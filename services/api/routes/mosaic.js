@@ -1,5 +1,4 @@
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
 const Proxy = require('../lib/proxy');
 
@@ -40,6 +39,7 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
      */
     await schema.get('/mosaic/:layer', {
+        ':layer': 'string',
         res: 'res.TileJSON.json'
     }, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
@@ -72,14 +72,16 @@ async function router(schema, config) {
      *     Return an aerial imagery tile for a given set of mercator coordinates
      *
      */
-    await schema.get('/mosaic/:layer/tiles/:z/:x/:y.:format', {}, async (req, res) => {
+    await schema.get('/mosaic/:layer/tiles/:z/:x/:y.:format', {
+        ':layer': 'string',
+        ':format': 'string',
+        ':z': 'integer',
+        ':x': 'integer',
+        ':y': 'integer'
+    }, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
-
             const proxy = new Proxy(config);
             proxy.request(req, res);
         } catch (err) {

@@ -2,16 +2,6 @@ const fetch = require('node-fetch');
 const Err = require('./error');
 
 /**
- * @class
- */
-class Param {
-    static async int(req, name) {
-        req.params[name] = Number(req.params[name]);
-        if (isNaN(req.params[name])) throw new Err(400, null, `${name} param must be an integer`);
-    }
-}
-
-/**
  * Performs a request to the given url returning the response in json format
  * or throwing an error.
  *
@@ -41,7 +31,6 @@ async function fetchJSON(url, options) {
 
 
 module.exports = {
-    Param,
     fetchJSON
 };
 

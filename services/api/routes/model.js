@@ -1,7 +1,6 @@
 const Busboy = require('busboy');
 
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Model = require('../lib/model');
 const OSMTag = require('../lib/osmtag');
 
@@ -63,12 +62,11 @@ async function router(schema, config) {
      *     Update a model
      */
     await schema.patch('/model/:modelid', {
+        ':modelid': 'integer',
         body: 'req.body.PatchModel.json',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
-
             await auth.is_admin(req);
 
             const model = await Model.from(config.pool, req.params.modelid);
@@ -110,10 +108,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
     await schema.post('/model/:modelid/upload', {
+        ':modelid': 'integer',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
             await auth.is_admin(req);
 
             const busboy = new Busboy({
@@ -182,10 +180,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/model/:modelid', {
+        ':modelid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
             await auth.is_admin(req);
 
             const model = await Model.from(config.pool, req.params.modelid);
@@ -213,11 +211,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
     await schema.get('/model/:modelid', {
+        ':modelid': 'integer',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
-
             const model = await Model.from(config.pool, req.params.modelid);
 
             return res.json(model.serialize());
@@ -237,10 +234,10 @@ async function router(schema, config) {
      * @apiDescription
      *     Return the model itself
      */
-    await schema.get('/model/:modelid/download', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/model/:modelid/download', {
+        ':modelid': 'integer',
+    }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
-
             const model = await Model.from(config.pool, req.params.modelid);
             await model.download(config, res);
         } catch (err) {

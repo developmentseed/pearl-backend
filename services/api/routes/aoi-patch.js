@@ -1,5 +1,4 @@
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Busboy = require('busboy');
 const AOI = require('../lib/aoi');
 const AOIPatch = require('../lib/aoi-patch');
@@ -22,13 +21,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListPatches.json} apiSuccess
      */
     await schema.get('/project/:projectid/aoi/:aoiid/patch', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
         query: 'req.query.ListPatches.json',
         res: 'res.ListPatches.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-
             await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             return res.json(await AOIPatch.list(config.pool, req.params.projectid, req.params.aoiid, req.query));
@@ -51,13 +49,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
      */
     await schema.post('/project/:projectid/aoi/:aoiid/patch', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
         body: 'req.body.CreatePatch.json',
         res: 'res.Patch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-
             await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             const patch = await AOIPatch.generate(config.pool, {
@@ -84,13 +81,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:projectid/aoi/:aoiid/patch/:patchid', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':patchid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await Param.int(req, 'patchid');
-
             const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
             await patch.delete(config);
 
@@ -116,13 +112,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
      */
     await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':patchid': 'integer',
         res: 'res.Patch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await Param.int(req, 'patchid');
-
             const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             return res.json(patch.serialize());
@@ -144,15 +139,14 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
      */
     await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':patchid': 'integer',
         res: 'res.TileJSON.json'
     }, config.requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await Param.int(req, 'patchid');
-
             const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
             const tiffurl = await a.url(config);
 
@@ -197,15 +191,15 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a Tile for a given AOI Patch
      */
-    await schema.get('/project/:projectid/aoi/patch/:aoiid/tiles/:z/:x/:y', {}, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/patch/:aoiid/tiles/:z/:x/:y', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':patchid': 'integer',
+        ':z': 'integer',
+        ':x': 'integer',
+        ':y': 'integer'
+    }, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await Param.int(req, 'patchid');
-            await Param.int(req, 'z');
-            await Param.int(req, 'x');
-            await Param.int(req, 'y');
-
             const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             const tiffurl = await a.url(config);
@@ -230,12 +224,12 @@ async function router(schema, config) {
      * @apiDescription
      *     Download a Tiff Patch
      */
-    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/download', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/download', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':patchid': 'integer'
+    }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await Param.int(req, 'patchid');
-
             const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             await a.download(config, res);
@@ -257,12 +251,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
      */
     await schema.post('/project/:projectid/aoi/:aoiid/patch/:patchid/upload', {
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':patchid': 'integer',
         res: 'res.Patch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'aoiid');
-            await Param.int(req, 'patchid');
             await auth.is_admin(req);
 
             const busboy = new Busboy({

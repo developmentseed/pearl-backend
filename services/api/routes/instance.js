@@ -1,5 +1,4 @@
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
 
@@ -21,11 +20,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.post('/project/:projectid/instance', {
+        ':projectid': 'integer',
         body: 'req.body.CreateInstance.json',
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
@@ -49,12 +48,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.patch('/project/:projectid/instance/:instanceid', {
+        ':projectid': 'integer',
+        ':instanceid': 'integer',
         body: 'req.body.PatchInstance.json',
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
@@ -82,11 +81,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListInstances.json} apiSuccess
      */
     await schema.get('/project/:projectid/instance', {
+        ':projectid': 'integer',
         query: 'req.query.ListInstances.json',
         res: 'res.ListInstances.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             res.json(await Instance.list(config.pool, req.params.projectid, req.query));
@@ -108,12 +107,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.get('/project/:projectid/instance/:instanceid', {
+        ':projectid': 'integer',
+        ':instanceid': 'integer',
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'instanceid');
-
             const instance = await Instance.has_auth(config, req.auth, req.params.projectid, req.params.instanceid);
 
             return res.json(instance.serialize());
@@ -136,10 +134,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
      */
     await schema.get('/instance/:instanceid', {
+        ':instanceid': 'integer',
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'instanceid');
             await auth.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
