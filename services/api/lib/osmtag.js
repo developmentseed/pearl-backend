@@ -36,6 +36,22 @@ class OSMTag extends Generic {
         return osmtag;
     }
 
+    async commit(pool) {
+        try {
+            await pool.query(sql`
+                UPDATE osmtag
+                    SET
+                        tagmap = ${JSON.stringify(this.tagmap)}
+                    WHERE
+                        id = ${this.id}
+            `);
+
+            return this;
+        } catch (err) {
+            throw new Err(500, err, 'Failed to update OSMTag');
+        }
+    }
+
     static async generate(pool, osmtag) {
         try {
             if (!osmtag.project_id) osmtag.project_id = null;
