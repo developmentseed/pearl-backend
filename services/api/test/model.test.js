@@ -45,7 +45,7 @@ test('GET /api/model/1 (not found)', async (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'No model found',
+            message: 'models not found',
             messages: []
         }, 'body');
 
@@ -71,7 +71,7 @@ test('GET /api/model/1/download (not found)', async (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'No model found',
+            message: 'models not found',
             messages: []
         }, 'body');
     } catch (err) {

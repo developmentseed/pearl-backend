@@ -9,7 +9,7 @@ module.exports = {
     },
     migrations: {
         tableName: 'knex_migrations',
-        stub: 'migration.stub',
+        stub: path.resolve(__dirname, 'migrations/migration.stub'),
         directory: path.resolve(__dirname, './migrations')
     }
 };

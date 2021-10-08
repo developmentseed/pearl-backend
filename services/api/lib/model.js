@@ -180,43 +180,6 @@ class Model extends Generic {
     }
 
     /**
-      * Retrieve information about a model
-      *
-      * @param {Pool} pool - Instantiated Postgres Pool
-      * @param {String} modelid Model id
-      */
-    static async from(pool, modelid) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    id,
-                    created,
-                    active,
-                    uid,
-                    name,
-                    model_type,
-                    model_inputshape,
-                    model_zoom,
-                    storage,
-                    classes,
-                    meta,
-                    bounds
-                FROM
-                    models
-                WHERE
-                    id = ${modelid}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Internal Model Error');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'No model found');
-
-        return this.deserialize(pgres.rows[0]);
-    }
-
-    /**
      * Set a model as inactive and unusable
      *
      * @param {Pool} pool Instantiated Postgres Pool

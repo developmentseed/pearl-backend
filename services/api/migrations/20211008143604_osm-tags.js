@@ -2,7 +2,8 @@ exports.up = function(knex) {
     return knex.schema.raw(`
         CREATE TABLE osmtag (
             id          BIGSERIAL PRIMARY KEY,
-            tagmap      JSONB
+            tagmap      JSONB,
+            project_id  BIGINT REFERENCES projects(id)
         );
 
         ALTER TABLE models
