@@ -330,31 +330,7 @@ test('GET /api/instance/1', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/checkpoint', async (t) => {
-    try {
-        await flight.request({
-            json: true,
-            url: '/api/project/1/checkpoint',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Test Checkpoint',
-                classes: [
-                    { name: 'Water', color: '#0000FF' },
-                    { name: 'Tree Canopy', color: '#008000' },
-                    { name: 'Field', color: '#80FF80' },
-                    { name: 'Built', color: '#806060' }
-                ]
-            }
-        }, t);
-    } catch (err) {
-        t.error(err, 'no error');
-    }
-
-    t.end();
-});
+flight.fixture(test, 'checkpoint.json', 'ingalls');
 
 test('PATCH /api/project/1/instance/1', async (t) => {
     try {

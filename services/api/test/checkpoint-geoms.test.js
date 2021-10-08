@@ -82,6 +82,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
             parent: null,
             storage: false,
             bookmarked: false,
+            osmtag_id: null,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -175,6 +176,7 @@ test('PATCH /api/project/1/checkpoint/1', async (t) => {
             id: 1,
             name: 'NEW NAME',
             project_id: 1,
+            osmtag_id: null,
             storage: false,
             bookmarked: true,
             parent: null,
@@ -232,6 +234,7 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
             name: 'NEW NAME',
             bookmarked: true,
             parent: null,
+            osmtag_id: null,
             classes: [
                 { name: 'Water', color: '#FF00FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -360,6 +363,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
             parent: 1,
             storage: false,
             bookmarked: false,
+            osmtag_id: null,
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },

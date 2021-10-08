@@ -11,63 +11,7 @@ flight.user(test, 'ingalls', true);
 
 flight.fixture(test, 'model.json', 'ingalls');
 flight.fixture(test, 'project.json', 'ingalls');
-
-test('POST /api/project/1/checkpoint', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/project/1/checkpoint',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Test Checkpoint',
-                classes: [
-                    { name: 'Water', color: '#0000FF' },
-                    { name: 'Tree Canopy', color: '#008000' },
-                    { name: 'Field', color: '#80FF80' },
-                    { name: 'Built', color: '#806060' }
-                ]
-            }
-        }, t);
-
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            storage: false,
-            project_id: 1,
-            parent: null,
-            name: 'Test Checkpoint',
-            analytics: null,
-            bookmarked: false,
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-            retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
-            ],
-            input_geoms: [
-                { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] }
-            ]
-        });
-    } catch (err) {
-        t.error(err, 'no errors');
-    }
-
-    t.end();
-});
+flight.fixture(test, 'checkpoint.json', 'ingalls');
 
 test('GET /api/project/1/aoi (empty)', async (t) => {
     try {
