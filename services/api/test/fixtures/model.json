@@ -1,0 +1,19 @@
+{
+    "method": "POST",
+    "json": true,
+    "url": "/api/model",
+    "body": {
+        "name": "NAIP Supervised",
+        "active": true,
+        "model_type": "pytorch_example",
+        "model_inputshape": [240,240,4],
+        "model_zoom": 17,
+        "classes": [
+            { "name": "Water", "color": "#0000FF" },
+            { "name": "Tree Canopy", "color": "#008000" },
+            { "name": "Field", "color": "#80FF80" },
+            { "name": "Built", "color": "#806060" }
+        ],
+        "meta": {}
+    }
+}

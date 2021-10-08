@@ -222,6 +222,7 @@ class CheckPoint extends Generic {
                     checkpoints.classes,
                     checkpoints.created,
                     checkpoints.storage,
+                    checkpoints.osmtag_id,
                     checkpoints.bookmarked,
                     checkpoints.project_id,
                     checkpoints.analytics,

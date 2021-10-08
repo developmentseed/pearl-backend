@@ -55,6 +55,30 @@ class Flight {
     }
 
     /**
+     * Make a request using a JSON fixture
+     *
+     * @param {Tape} test Tape Instance
+     * @param {String} name Name of fixture present in the ./fixtures folder (Should be JSON)
+     * @param {String} auth Name of the token that will be used to make the request
+     */
+    fixture(test, name, auth) {
+        test(`Fixture: ${name}`, async (t) => {
+            const req = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/', name)));
+            if (auth) req.auth = {
+                bearer: this.token[auth]
+            }
+
+            try {
+                await this.request(req, t);
+            } catch (err) {
+                t.error(err, 'no errors');
+            }
+
+            t.end();
+        });
+    }
+
+    /**
      * Request data from the API & Ensure the output schema matches the response
      *
      * @param {Object} req Request Object

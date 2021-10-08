@@ -10,6 +10,9 @@ flight.init(test);
 flight.takeoff(test);
 flight.user(test, 'ingalls', true);
 
+flight.fixture(test, 'model.json', 'ingalls');
+flight.fixture(test, 'project.json', 'ingalls');
+
 test('POST /api/model', async (t) => {
     try {
         await flight.request({
@@ -74,6 +77,7 @@ test('POST /api/project', async (t) => {
 
     t.end();
 });
+flight.fixture(test, 'project.json', 'ingalls');
 
 test('POST /api/project/1/checkpoint', async (t) => {
     try {
