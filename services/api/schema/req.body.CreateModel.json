@@ -70,6 +70,9 @@
         "meta": {
             "type": "object",
             "description": "Generic key/value store for additional model metadata"
+        },
+        "tagmap": {
+            "$ref": "./util/osm-tagmap.json"
         }
     }
 }
