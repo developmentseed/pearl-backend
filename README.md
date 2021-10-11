@@ -35,3 +35,7 @@ http://localhost:2000/docs
 ### Deploy and CI
 
 Notes on deploy process and CI integration can be found [here](docs/deploy.md).
+
+### Debugging and Logs
+
+Instructions for accessing the Grafana UI to inspect application logs can be found [here](docs/logs.md)
