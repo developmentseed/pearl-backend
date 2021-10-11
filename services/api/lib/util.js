@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-const Err = require('./error');
 
 /**
  * Performs a request to the given url returning the response in json format

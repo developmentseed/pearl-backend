@@ -66,7 +66,7 @@ class Flight {
             const req = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/', name)));
             if (auth) req.auth = {
                 bearer: this.token[auth]
-            }
+            };
 
             try {
                 await this.request(req, t);

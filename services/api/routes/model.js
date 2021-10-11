@@ -265,7 +265,7 @@ async function router(schema, config) {
      *     Return the model itself
      */
     await schema.get('/model/:modelid/download', {
-        ':modelid': 'integer',
+        ':modelid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
             const model = await Model.from(config.pool, req.params.modelid);

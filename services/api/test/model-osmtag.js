@@ -118,7 +118,7 @@ test('POST /api/model', async (t) => {
                     0: { 'natural': 'water' },
                     1: { 'natural': 'forest' },
                     2: { 'natural': 'field' },
-                    3: { 'building': 'yes' },
+                    3: { 'building': 'yes' }
                 },
                 meta: {}
             }
@@ -134,7 +134,7 @@ test('POST /api/model', async (t) => {
             active: true,
             model_type: 'pytorch_example',
             model_zoom: 17,
-            model_inputshape: [ 240, 240, 4 ],
+            model_inputshape: [240, 240, 4],
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -142,7 +142,7 @@ test('POST /api/model', async (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
-            bounds: [ -180, -90, 180, 90 ],
+            bounds: [-180, -90, 180, 90],
             meta: {},
             osmtag_id: 1
         });
@@ -216,7 +216,7 @@ test('PATCH /api/model', async (t) => {
                     0: { 'natural': 'water', 'coastline': 'yes' },
                     1: { },
                     2: { 'natural': 'field' },
-                    3: { 'building': 'yes' },
+                    3: { 'building': 'yes' }
                 }
             }
         }, t);
@@ -231,7 +231,7 @@ test('PATCH /api/model', async (t) => {
             active: true,
             model_type: 'pytorch_example',
             model_zoom: 17,
-            model_inputshape: [ 240, 240, 4 ],
+            model_inputshape: [240, 240, 4],
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -239,7 +239,7 @@ test('PATCH /api/model', async (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: true,
-            bounds: [ -180, -90, 180, 90 ],
+            bounds: [-180, -90, 180, 90],
             meta: {},
             osmtag_id: 1
         });

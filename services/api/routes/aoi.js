@@ -645,7 +645,7 @@ async function router(schema, config) {
         ':shareuuid': 'string',
         ':z': 'integer',
         ':x': 'integer',
-        ':y': 'integer',
+        ':y': 'integer'
     }, async (req, res) => {
         try {
             const share = await AOIShare.from(config.pool, req.params.shareuuid);
@@ -672,7 +672,7 @@ async function router(schema, config) {
      *     Return the aoi fabric geotiff
      */
     await schema.get('/share/:shareuuid/download/raw', {
-        ':shareuuid': 'string',
+        ':shareuuid': 'string'
     }, async (req, res) => {
         try {
             const share = await AOIShare.from(config.pool, req.params.shareuuid);
@@ -696,7 +696,7 @@ async function router(schema, config) {
      *     Return the colourized aoi fabric geotiff
      */
     await schema.get('/share/:shareuuid/download/color', {
-        ':shareuuid': 'string',
+        ':shareuuid': 'string'
     }, async (req, res) => {
         try {
             const share = await AOIShare.from(config.pool, req.params.shareuuid);

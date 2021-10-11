@@ -117,7 +117,7 @@ async function router(schema, config) {
         ':checkpointid': 'integer',
         ':z': 'integer',
         ':x': 'integer',
-        ':y': 'integer',
+        ':y': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
             const c = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
@@ -194,7 +194,7 @@ async function router(schema, config) {
      */
     await schema.get('/project/:projectid/checkpoint/:checkpointid/download', {
         ':projectid': 'integer',
-        ':checkpointid': 'integer',
+        ':checkpointid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);

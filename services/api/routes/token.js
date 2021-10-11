@@ -75,7 +75,7 @@ async function router(schema, config) {
      *   }
      */
     await schema.delete('/token/:tokenid', {
-        ':tokenid': 'integer',
+        ':tokenid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
             return res.json(await authtoken.delete(req.auth, req.params.tokenid));
