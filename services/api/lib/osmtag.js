@@ -36,6 +36,16 @@ class OSMTag extends Generic {
         return osmtag;
     }
 
+    static validate(osmtag, classes) {
+        if (Object.keys(osmtag).length !== classes.length) throw new Err(400, null, 'OSMTag must have key entry for every class in array');
+
+        for (let i = 0; i < classes.length; i++) {
+            if (!osmtag[i]) throw new Err(400, null, `OSMTag missing entry for ${classes[i].name} class (Element ${i})`);
+        }
+
+        return true;
+    }
+
     async commit(pool) {
         try {
             await pool.query(sql`
@@ -62,7 +72,7 @@ class OSMTag extends Generic {
                     tagmap
                 ) VALUES (
                     ${osmtag.project_id},
-                    ${JSON.stringify(osmtag.tagmap)},
+                    ${JSON.stringify(osmtag.tagmap)}
                 ) RETURNING *
             `);
 

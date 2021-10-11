@@ -137,6 +137,29 @@ test('GET /api/model (storage: false)', async (t) => {
     t.end();
 });
 
+test('GET /api/model/1/osmtag - No OSMTags', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/model/1/osmtag',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'Model does not have OSMTags',
+            messages: []
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('Set Storage: true', async (t) => {
     try {
         await flight.config.pool.query(sql`

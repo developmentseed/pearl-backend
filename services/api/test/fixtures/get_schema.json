@@ -254,6 +254,11 @@
         "query": false,
         "res": true
     },
+    "GET /model/:modelid/osmtag": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /model/:modelid/download": {
         "body": false,
         "query": false,

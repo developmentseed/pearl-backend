@@ -30,6 +30,8 @@ async function router(schema, config) {
             req.body.uid = req.auth.uid;
 
             if (req.body.tagmap) {
+                OSMTag.validate(req.body.tagmap, req.body.classes);
+
                 const tagmap = await OSMTag.generate(config.pool, {
                     project_id: null,
                     tagmap: req.body.tagmap
@@ -223,6 +225,34 @@ async function router(schema, config) {
         }
     });
 
+    /**
+     * @api {get} /api/model/:modelid/osmtag Get OSMTags
+     * @apiVersion 1.0.0
+     * @apiName GetOSMTags
+     * @apiGroup Model
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return OSMTags for a Model if they exist
+     *
+     * @apiSchema {jsonschema=../schema/res.OSMTag.json} apiSuccess
+     */
+    await schema.get('/model/:modelid/osmtag', {
+        ':modelid': 'integer',
+        res: 'res.OSMTag.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const model = await Model.from(config.pool, req.params.modelid);
+
+            if (!model.osmtag_id) throw new Err(404, null, 'Model does not have OSMTags');
+
+            const tags = await OSMTag.from(config.pool, model.osmtag_id);
+
+            return res.json(tags.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/model/:modelid/download Download Model
