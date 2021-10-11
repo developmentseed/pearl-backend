@@ -71,7 +71,7 @@
                 "type": ["null", "object"]
             }
         },
-        "osmtag": {
+        "tagmap": {
             "$ref": "./util/osm-tagmap.json"
         }
     }

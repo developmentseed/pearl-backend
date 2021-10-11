@@ -287,6 +287,8 @@ async function router(schema, config) {
             req.body.project_id = req.params.projectid;
 
             if (req.body.tagmap) {
+                OSMTag.validate(req.body.tagmap, req.body.classes);
+
                 const tagmap = await OSMTag.generate(config.pool, {
                     project_id: req.params.projectid,
                     tagmap: req.body.tagmap

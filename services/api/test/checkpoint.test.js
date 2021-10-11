@@ -93,6 +93,29 @@ test('POST /api/project/1/checkpoint', async (t) => {
     t.end();
 });
 
+test('GET /api/project/1/checkpoint/1/osmtag', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/checkpoint/1/osmtag',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'Checkpoint does not have OSMTags',
+            messages: []
+        }, t);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('PATCH /api/project/1/checkpoint/1 (no class length change)', async (t) => {
     try {
         const res = await flight.request({
