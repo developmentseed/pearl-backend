@@ -26,5 +26,6 @@ Visit the corresponding link from below to see logs of API, GPU, Socket and Tile
 Visit http://localhost:3000/d/-cAOM_Dnk/lulc-dev-logs?orgId=1
 
 ### Staging
+Visit http://localhost:3000/d/mHHOh_vnz/lulc-staging-logs?orgId=1
 
 ### Production
