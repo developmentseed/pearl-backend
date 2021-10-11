@@ -1,6 +1,5 @@
 const test = require('tape');
 const Flight = require('./flight');
-const { sql } = require('slonik');
 
 const flight = new Flight();
 
@@ -32,7 +31,7 @@ test('POST /api/project/1/checkpoint - Error: Entry for every class', async (t) 
                     1: {
                         'natural': 'water'
                     }
-                },
+                }
             }
         }, false);
 
@@ -70,7 +69,7 @@ test('POST /api/project/1/checkpoint - Error: OSMTag missing entry', async (t) =
                     2: { 'natural': 'water' },
                     3: { 'natural': 'water' },
                     4: { 'natural': 'water' }
-                },
+                }
             }
         }, false);
 
