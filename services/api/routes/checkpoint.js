@@ -35,6 +35,36 @@ async function router(schema, config) {
     });
 
     /**
+     * @api {get} /api/project/:projectid/checkpoint/:checkpointid/osmtag Get OSMTags
+     * @apiVersion 1.0.0
+     * @apiName GetOSMTags
+     * @apiGroup Checkpoints
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return OSMTags for a Checkpoint if they exist
+     *
+     * @apiSchema {jsonschema=../schema/res.OSMTag.json} apiSuccess
+     */
+    await schema.get('/project/:projectid/checkpoint/:checkpointid/osmtag', {
+        ':projectid': 'integer',
+        ':checkpointid': 'integer',
+        res: 'res.OSMTag.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+
+            if (!checkpoint.osmtag_id) throw new Err(404, null, 'Checkpoint does not have OSMTags');
+
+            const tags = await OSMTag.from(config.pool, checkpoint.osmtag_id);
+
+            return res.json(tags.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles TileJSON Checkpoint
      * @apiVersion 1.0.0
      * @apiName TileJSONCheckpoint

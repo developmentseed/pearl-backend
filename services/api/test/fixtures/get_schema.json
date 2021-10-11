@@ -154,6 +154,11 @@
         "query": false,
         "res": true
     },
+    "GET /project/:projectid/checkpoint/:checkpointid/osmtag": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /project/:projectid/checkpoint/:checkpointid/tiles": {
         "body": false,
         "query": false,
