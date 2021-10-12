@@ -20,6 +20,8 @@ exports.up = function(knex) {
 
 exports.down = function(knex) {
     return knex.schema.raw(`
+        ALTER TABLE models DROP column osmtag_id;
+        ALTER TABLE checkpoints DROP column osmtag_id;
         DROP TABLE osmtags;
     `);
 }
