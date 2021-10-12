@@ -1,6 +1,5 @@
 const test = require('tape');
 const Flight = require('./flight');
-const { sql } = require('slonik');
 const fs = require('fs');
 const path = require('path');
 
@@ -205,7 +204,7 @@ test('POST: /api/project/1/aoi/1/patch/1/upload', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: `/api/project/1/aoi/1/patch/1/upload`,
+            url: '/api/project/1/aoi/1/patch/1/upload',
             method: 'POST',
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -413,7 +412,7 @@ test('GET /api/project/1/aoi/1/patch/1', async (t) => {
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, false);
 
         t.equals(res.statusCode, 404, 'status: 404');
