@@ -103,6 +103,7 @@ def connection(uri, model, api):
     if api.batch is False:
         router.on_act("model#prediction", model.prediction)
         router.on_act("model#patch", model.patch)
+        router.on_act("model#osm", model.osm)
         router.on_act("model#retrain", model.retrain)
         router.on_act("model#checkpoint", model.load_checkpoint)
         router.on_act("model#aoi", model.load_aoi)

@@ -222,6 +222,7 @@ class CheckPoint extends Generic {
                     checkpoints.classes,
                     checkpoints.created,
                     checkpoints.storage,
+                    checkpoints.osmtag_id,
                     checkpoints.bookmarked,
                     checkpoints.project_id,
                     checkpoints.analytics,
@@ -269,6 +270,7 @@ class CheckPoint extends Generic {
      * @param {Object[]} checkpoint.classes - Checkpoint Class names
      * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
      * @param {Object} checkpoint.analytics - Checkpoint Analytics
+     * @param {Number} checkpoint.osmtag_id - optional ID of OSMTAgs used
      */
     static async generate(pool, checkpoint) {
         try {
@@ -280,7 +282,8 @@ class CheckPoint extends Generic {
                     classes,
                     retrain_geoms,
                     input_geoms,
-                    analytics
+                    analytics,
+                    osmtag_id
                 ) VALUES (
                     ${checkpoint.project_id},
                     ${checkpoint.parent ? checkpoint.parent : null},
@@ -288,7 +291,8 @@ class CheckPoint extends Generic {
                     ${JSON.stringify(checkpoint.classes)}::JSONB,
                     ${sql.array(checkpoint.retrain_geoms.map((e) => JSON.stringify(e)), 'json')}::JSONB[],
                     ${sql.array(checkpoint.input_geoms.map((e) => JSON.stringify(e)), 'json')}::JSONB[],
-                    ${checkpoint.analytics ? JSON.stringify(checkpoint.analytics) : null}::JSONB
+                    ${checkpoint.analytics ? JSON.stringify(checkpoint.analytics) : null}::JSONB,
+                    ${checkpoint.osmtag_id || null}
                 ) RETURNING *
             `);
 

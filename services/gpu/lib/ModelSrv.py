@@ -509,6 +509,27 @@ class ModelSrv:
             websocket.error("Processing Error", e)
             raise e
 
+    def osm(self, body, websocket):
+        try:
+            if self.processing is True:
+                return is_processing(websocket)
+            self.processing = True
+
+            osm = OSM(self.api.server.get('qa_tiles'))
+
+            done_processing(self)
+
+            self.retrain({
+                "name": "",
+                "classes": []
+            }, websocket)
+
+        except Exception as e:
+            done_processing(self)
+            websocket.error("OSM Error", e)
+            raise e
+
+
     def retrain(self, body, websocket):
         try:
             if self.processing is True:

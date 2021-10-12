@@ -1,0 +1,14 @@
+{
+    "json": true,
+    "url": "http://localhost:2000/api/project/1/checkpoint",
+    "method": "POST",
+    "body": {
+        "name": "Test Checkpoint",
+        "classes": [
+            { "name": "Water", "color": "#0000FF" },
+            { "name": "Tree Canopy", "color": "#008000" },
+            { "name": "Field", "color": "#80FF80" },
+            { "name": "Built", "color": "#806060" }
+        ]
+    }
+}

@@ -24,7 +24,7 @@
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/patch/:aoiid/tiles/:z/:x/:y": {
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
@@ -154,6 +154,11 @@
         "query": false,
         "res": true
     },
+    "GET /project/:projectid/checkpoint/:checkpointid/osmtag": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /project/:projectid/checkpoint/:checkpointid/tiles": {
         "body": false,
         "query": false,
@@ -250,6 +255,11 @@
         "res": true
     },
     "GET /model/:modelid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /model/:modelid/osmtag": {
         "body": false,
         "query": false,
         "res": true

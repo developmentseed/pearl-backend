@@ -149,10 +149,6 @@ function connect(test, API) {
 
             t.equals(res.statusCode, 200, '200 status code');
 
-            t.deepEquals(Object.keys(res.body).sort(), [
-                'id', 'bounds', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
-            ].sort(), 'expected props');
-
             t.ok(parseInt(res.body.id), 'id: <integer>');
 
             delete res.body.created;
@@ -167,6 +163,7 @@ function connect(test, API) {
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
                 storage: false,
+                osmtag_id: null,
                 classes: [
                     { name: 'Water', color: '#0000FF' },
                     { name: 'Emergent Wetlands', color: '#008000' },
@@ -204,10 +201,6 @@ function connect(test, API) {
 
             t.equals(res.statusCode, 200, '200 status code');
 
-            t.deepEquals(Object.keys(res.body).sort(), [
-                'id', 'bounds', 'created', 'active', 'uid', 'name', 'model_type', 'model_inputshape', 'model_zoom', 'storage', 'classes', 'meta'
-            ].sort(), 'expected props');
-
             t.ok(parseInt(res.body.id), 'id: <integer>');
 
             delete res.body.created;
@@ -222,6 +215,7 @@ function connect(test, API) {
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
                 storage: true,
+                osmtag_id: null,
                 classes: [
                     { name: 'Water', color: '#0000FF' },
                     { name: 'Emergent Wetlands', color: '#008000' },
@@ -399,6 +393,7 @@ function running(test, API) {
 
             t.deepEquals(res.body, {
                 version: '1.0.0',
+                qa_tiles: 'https://qa-tiles-server-dev.ds.io/services/z17',
                 limits: {
                     live_inference: 100000000,
                     max_inference: 200000000,

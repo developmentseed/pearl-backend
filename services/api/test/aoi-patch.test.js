@@ -8,36 +8,8 @@ flight.init(test);
 flight.takeoff(test);
 flight.user(test, 'ingalls', true);
 
-test('POST /api/model', async (t) => {
-    try {
-        await flight.request({
-            method: 'POST',
-            json: true,
-            url: 'http://localhost:2000/api/model',
-            body: {
-                name: 'NAIP Supervised',
-                active: true,
-                model_type: 'pytorch_example',
-                model_inputshape: [240,240,4],
-                model_zoom: 17,
-                classes: [
-                    { name: 'Water', color: '#0000FF' },
-                    { name: 'Tree Canopy', color: '#008000' },
-                    { name: 'Field', color: '#80FF80' },
-                    { name: 'Built', color: '#806060' }
-                ],
-                meta: {}
-            },
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            }
-        }, t);
-    } catch (err) {
-        t.error(err, 'no error');
-    }
+flight.fixture(test, 'model.json', 'ingalls');
 
-    t.end();
-});
 
 test('POST /api/project/1/aoi/1/patch - no project', async (t) => {
     try {
@@ -64,95 +36,8 @@ test('POST /api/project/1/aoi/1/patch - no project', async (t) => {
     t.end();
 });
 
-test('POST /api/project', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: 'http://localhost:2000/api/project',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Test Project',
-                model_id: 1,
-                mosaic: 'naip.latest'
-            }
-        }, t);
-
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            uid: 1,
-            name: 'Test Project',
-            model_id: 1,
-            mosaic: 'naip.latest'
-        });
-    } catch (err) {
-        t.error(err, 'no errors');
-    }
-
-    t.end();
-});
-
-test('POST /api/project/1/checkpoint', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: 'http://localhost:2000/api/project/1/checkpoint',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Test Checkpoint',
-                classes: [
-                    { name: 'Water', color: '#0000FF' },
-                    { name: 'Tree Canopy', color: '#008000' },
-                    { name: 'Field', color: '#80FF80' },
-                    { name: 'Built', color: '#806060' }
-                ]
-            }
-        }, t);
-
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            storage: false,
-            project_id: 1,
-            parent: null,
-            name: 'Test Checkpoint',
-            analytics: null,
-            bookmarked: false,
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-            retrain_geoms: [
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] },
-                { type: 'MultiPoint', coordinates: [] }
-            ],
-            input_geoms: [
-                { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] },
-                { type: 'GeometryCollection', 'geometries': [] }
-            ]
-        });
-    } catch (err) {
-        t.error(err, 'no errors');
-    }
-
-    t.end();
-});
+flight.fixture(test, 'project.json', 'ingalls');
+flight.fixture(test, 'checkpoint.json', 'ingalls');
 
 test('POST /api/project/1/aoi/1/patch - no aoi', async (t) => {
     try {

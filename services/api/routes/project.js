@@ -1,5 +1,4 @@
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Mosaic = require('../lib/mosaic');
 const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
@@ -65,11 +64,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.get('/project/:projectid', {
+        ':projectid': 'integer',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-
             const proj = (await Project.has_auth(config.pool, req.auth, req.params.projectid)).serialize();
 
             const checkpoints = await Checkpoint.list(config.pool, req.params.projectid, { bookmarked: true });
@@ -124,12 +122,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.patch('/project/:projectid', {
+        ':projectid': 'integer',
         body: 'req.body.PatchProject.json',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
             proj.patch(req.body);
             await proj.commit(config.pool);
@@ -153,10 +150,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:projectid', {
+        ':projectid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             const insts = await Instance.list(config.pool, req.params.projectid);
