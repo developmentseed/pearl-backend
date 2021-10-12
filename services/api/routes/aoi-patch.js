@@ -267,7 +267,7 @@ async function router(schema, config) {
             });
 
             const files = [];
-            const patch = AOIPatch.from(config.pool, req.params.patchid);
+            const patch = await AOIPatch.from(config.pool, req.params.patchid);
 
             busboy.on('file', (fieldname, file) => {
                 files.push(patch.upload(config, file));
