@@ -24,7 +24,7 @@
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/patch/:aoiid/tiles/:z/:x/:y": {
+    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
