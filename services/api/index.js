@@ -108,11 +108,11 @@ async function server(args, config, cb) {
 
         return res.json({
             version: pkg.version,
+            qa_tiles: config.QA_Tiles,
             limits: {
                 live_inference: 100000000,
                 max_inference: 200000000,
                 instance_window: 600,
-                qa_tiles: config.QA_Tiles,
                 total_gpus: config.GpuCount,
                 active_gpus: podList.filter((p) => p.status.phase === 'Running').length
             }

@@ -20,7 +20,7 @@ class Output {
 
         this.fixtures = [];
 
-        this.log = fs.createWriteStream(`/tmp/output.log`);
+        this.log = fs.createWriteStream('/tmp/output.log');
 
         for (const d of this.schema.data) {
             if (!d.items) d.items = 1;
