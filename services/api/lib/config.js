@@ -27,6 +27,8 @@ class Config {
         this.Environment = args.prod ? 'deploy' : 'local';
         console.log(`ok - Environment: ${this.Environment}`);
 
+        this.QA_Tiles = process.env.QA_TILES || 'https://qa-tiles-server-dev.ds.io/services/z17';
+
         this.Postgres = process.env.Postgres || 'postgres://postgres@localhost:5432/lulc';
 
         this.TileUrl = process.env.TileUrl || args.tileurl || false;

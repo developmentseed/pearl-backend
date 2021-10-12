@@ -515,7 +515,7 @@ class ModelSrv:
                 return is_processing(websocket)
             self.processing = True
 
-            osm = OSM()
+            osm = OSM(self.api.server.get('qa_tiles'))
 
             done_processing(self)
 

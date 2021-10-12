@@ -9,8 +9,8 @@ tiler = tileschemes.WebMercator()
 LOGGER = logging.getLogger("server")
 
 class OSM:
-    def __init__(self):
-        self.url = 'https://qa-tiles-server-dev.ds.io/services/z17'
+    def __init__(self, url):
+        self.url = url;
 
         self.requests = requests.Session()
         adapter = HTTPAdapter(
