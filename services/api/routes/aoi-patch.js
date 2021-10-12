@@ -147,7 +147,7 @@ async function router(schema, config) {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const a = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
             const tiffurl = await a.url(config);
 
             req.url = '/cog/tilejson.json';
@@ -200,7 +200,7 @@ async function router(schema, config) {
         ':y': 'integer'
     }, async (req, res) => {
         try {
-            const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const a = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             const tiffurl = await a.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
@@ -230,7 +230,7 @@ async function router(schema, config) {
         ':patchid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOIPatch.has_auth(config.pool, auth, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
+            const a = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, req.params.patchid);
 
             await a.download(config, res);
         } catch (err) {
@@ -274,6 +274,8 @@ async function router(schema, config) {
             });
 
             busboy.on('finish', async () => {
+                await Promise.all(files);
+
                 try {
                     return res.json(patch.serialize());
                 } catch (err) {
