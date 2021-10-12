@@ -191,7 +191,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a Tile for a given AOI Patch
      */
-    await schema.get('/project/:projectid/aoi/patch/:aoiid/tiles/:z/:x/:y', {
+    await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y', {
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':patchid': 'integer',
