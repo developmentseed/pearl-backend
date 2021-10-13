@@ -27,6 +27,12 @@ class OSM:
 
         self.tilejson = self.meta()
 
+    def extract(self, bounds, include=[], exclude=[]):
+        tiles = mercantile.tiles(*bounds, 17)
+        for tile in tiles:
+            self.tile(tile.x, tile.y, tilx.z)
+
+
     def meta(self):
         LOGGER.info("ok - GET " + self.url)
         r = self.requests.get(self.url)
@@ -37,8 +43,8 @@ class OSM:
 
         return r.json();
 
-    def tile(self, x, y):
-        url = self.tilejson.get('tiles')[0].replace('{z}', str(17)).replace('{x}', str(x)).replace('{y}', str(y))
+    def tile(self, x, y, z):
+        url = self.tilejson.get('tiles')[0].replace('{z}', str(z)).replace('{x}', str(x)).replace('{y}', str(y))
 
 
         LOGGER.info("ok - GET " + url)
