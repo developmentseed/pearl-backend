@@ -1,6 +1,35 @@
 const { Validator } = require('express-json-validator-middleware');
 const $RefParser = require('json-schema-ref-parser');
 const path = require('path');
+const Err = require('./error');
+
+/**
+ *
+ */
+class Param {
+    static integer(req, name) {
+        req.params[name] = parseInt(req.params[name]);
+        if (isNaN(req.params[name])) {
+            throw new Err(400, null, `${name} param must be an integer`);
+        }
+    }
+
+    static number(req, name) {
+        req.params[name] = Number(req.params[name]);
+        if (isNaN(req.params[name])) {
+            throw new Err(400, null, `${name} param must be numeric`);
+        }
+    }
+
+    static boolean(req, name) {
+        if (!['true', 'false'].includes(req.params[name])) throw new Error(`${name} param must be a boolean`);
+        req.params[name] = req.params[name] === true ? true : false;
+    }
+
+    static string(req, name) {
+        req.params[name] = String(req.params[name]);
+    }
+}
 
 /**
  * @class
@@ -23,11 +52,18 @@ class Schemas {
         this.validate = this.validator.validate;
     }
 
-    check (url, schemas, fns) {
+    check(url, schemas, fns) {
         if (typeof url !== 'string') throw new Error('URL should be string');
 
         if (schemas === null) schemas = {};
         if (typeof schemas !== 'object') throw new Error('Schemas should be object');
+
+        // Make sure express params are validated/coerced into proper type
+        const matches = url.match(/(:.+?)(?=\/|\.|$)/g);
+        if (matches) for (const match of matches) {
+            if (!schemas[match]) throw new Error(`${match} type is not defined in schema`);
+            if (!Param[schemas[match]]) throw new Error(`${schemas[match]} is not a supported type for ${match}`);
+        }
 
         if (!fns.length) throw new Error('At least 1 route function should be defined');
     }
@@ -82,9 +118,39 @@ class Schemas {
 
         if (schemas.query) flow[1].push(Schemas.query(schemas.query));
 
+        // Make sure express params are validated/coerced into proper type
+        const matches = url.match(/(:.+?)(?=\/|\.|$)/g);
+        if (matches) for (const match of matches) {
+            if (!schemas[match]) throw new Error(`${match} type is not defined in schema`);
+
+            flow[1].push(Schemas.param(match, schemas[match]));
+        }
+
         flow[1].push(this.validate(opts));
 
         return flow;
+    }
+
+    /**
+     * Express middleware to identify express params that should be integers/number/booleans
+     * according to the schema and attempt to cast them as such to ensure they pass the schema
+     *
+     * @param {String} match Express Param
+     * @param {String} type Type to coerce it to
+     *
+     * @returns {Function}
+     */
+    static param(match, type) {
+        return function (req, res, next) {
+
+            try {
+                Param[type](req, match.replace(':', ''));
+            } catch (err) {
+                return Err.respond(err, res);
+            }
+
+            return next();
+        };
     }
 
     /**

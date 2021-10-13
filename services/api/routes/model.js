@@ -1,8 +1,8 @@
 const Busboy = require('busboy');
 
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 const Model = require('../lib/model');
+const OSMTag = require('../lib/osmtag');
 
 async function router(schema, config) {
     const auth = new (require('../lib/auth').Auth)(config);
@@ -28,6 +28,19 @@ async function router(schema, config) {
             await auth.is_admin(req);
 
             req.body.uid = req.auth.uid;
+
+            if (req.body.tagmap) {
+                OSMTag.validate(req.body.tagmap, req.body.classes);
+
+                const tagmap = await OSMTag.generate(config.pool, {
+                    project_id: null,
+                    tagmap: req.body.tagmap
+                });
+
+                delete req.body.tagmap;
+                req.body.osmtag_id = tagmap.id;
+            }
+
             const model = await Model.generate(config.pool, req.body);
 
             return res.json(model.serialize());
@@ -51,17 +64,32 @@ async function router(schema, config) {
      *     Update a model
      */
     await schema.patch('/model/:modelid', {
+        ':modelid': 'integer',
         body: 'req.body.PatchModel.json',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
-
             await auth.is_admin(req);
 
             const model = await Model.from(config.pool, req.params.modelid);
+
+            if (req.body.tagmap && model.osmtag_id) {
+                const tagmap = await OSMTag.from(config.pool, model.osmtag_id);
+                tagmap.tagmap = req.body.tagmap;
+                await tagmap.commit(config.pool);
+                delete req.body.tagmap;
+            } else if (req.body.tagmap) {
+                const tagmap = await OSMTag.generate(config.pool, {
+                    project_id: null,
+                    tagmap: req.body.tagmap
+                });
+
+                delete req.body.tagmap;
+                req.body.osmtag_id = tagmap.id;
+            }
+
             model.patch(req.body);
-            model.commit(config.pool);
+            await model.commit(config.pool);
 
             res.json(model.serialize());
         } catch (err) {
@@ -82,10 +110,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
     await schema.post('/model/:modelid/upload', {
+        ':modelid': 'integer',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
             await auth.is_admin(req);
 
             const busboy = new Busboy({
@@ -154,10 +182,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/model/:modelid', {
+        ':modelid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
             await auth.is_admin(req);
 
             const model = await Model.from(config.pool, req.params.modelid);
@@ -185,11 +213,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
      */
     await schema.get('/model/:modelid', {
+        ':modelid': 'integer',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
-
             const model = await Model.from(config.pool, req.params.modelid);
 
             return res.json(model.serialize());
@@ -198,6 +225,34 @@ async function router(schema, config) {
         }
     });
 
+    /**
+     * @api {get} /api/model/:modelid/osmtag Get OSMTags
+     * @apiVersion 1.0.0
+     * @apiName GetOSMTags
+     * @apiGroup Model
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return OSMTags for a Model if they exist
+     *
+     * @apiSchema {jsonschema=../schema/res.OSMTag.json} apiSuccess
+     */
+    await schema.get('/model/:modelid/osmtag', {
+        ':modelid': 'integer',
+        res: 'res.OSMTag.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const model = await Model.from(config.pool, req.params.modelid);
+
+            if (!model.osmtag_id) throw new Err(404, null, 'Model does not have OSMTags');
+
+            const tags = await OSMTag.from(config.pool, model.osmtag_id);
+
+            return res.json(tags.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 
     /**
      * @api {get} /api/model/:modelid/download Download Model
@@ -209,10 +264,10 @@ async function router(schema, config) {
      * @apiDescription
      *     Return the model itself
      */
-    await schema.get('/model/:modelid/download', {}, config.requiresAuth, async (req, res) => {
+    await schema.get('/model/:modelid/download', {
+        ':modelid': 'integer'
+    }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'modelid');
-
             const model = await Model.from(config.pool, req.params.modelid);
             await model.download(config, res);
         } catch (err) {

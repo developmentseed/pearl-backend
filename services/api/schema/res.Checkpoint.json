@@ -11,7 +11,8 @@
         "project_id",
         "analytics",
         "retrain_geoms",
-        "input_geoms"
+        "input_geoms",
+        "osmtag_id"
     ],
     "additionalProperties": false,
     "properties": {
@@ -63,6 +64,9 @@
             "items": {
                 "type": "number"
             }
+        },
+        "osmtag_id": {
+            "type": ["integer", "null"]
         }
     }
 }

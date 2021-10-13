@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "patternProperties": {
+        "^[0-9]+$": {
+            "type": "object",
+            "description": "Each key in should be the class element id, each value an object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "string",
+                    "description": "An object containing OSM Key/Value pairs"
+                }
+            }
+        }
+    }
+}

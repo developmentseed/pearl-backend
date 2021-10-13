@@ -1,6 +1,5 @@
 const Err = require('../lib/error');
 const Batch = require('../lib/batch');
-const { Param } = require('../lib/util');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
 const Checkpoint = require('../lib/checkpoint');
@@ -21,12 +20,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListBatches.json} apiSuccess
      */
     await schema.get('/project/:projectid/batch', {
+        ':projectid': 'integer',
         query: 'req.query.ListBatches.json',
         res: 'res.ListBatches.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.query.uid = req.auth.uid;
@@ -51,12 +49,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Batch.json} apiSuccess
      */
     await schema.post('/project/:projectid/batch', {
+        ':projectid': 'integer',
         body: 'req.body.CreateBatch.json',
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             const existing_batch = await Instance.list(config.pool, req.params.projectid, {
@@ -105,12 +102,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Batch.json} apiSuccess
      */
     await schema.get('/project/:projectid/batch/:batchid', {
+        ':projectid': 'integer',
+        ':batchid': 'integer',
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'batchid');
-
             const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
 
             return res.json(batch.serialize());
@@ -133,13 +129,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Batch.json} apiSuccess
      */
     await schema.patch('/project/:projectid/batch/:batchid', {
+        ':projectid': 'integer',
+        ':batchid': 'integer',
         body: 'req.body.PatchBatch.json',
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'projectid');
-            await Param.int(req, 'batchid');
-
             const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
             batch.patch(req.body);
             await batch.commit(config.pool);

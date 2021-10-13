@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+# v0.6.1
+
+## Fixes
+- AOI Patch BugFix [`#548`](https://github.com/developmentseed/lulc-infra/pull/548)
+- Change default Auth0 tenant endpoint [`#546`](https://github.com/developmentseed/lulc-infra/pull/546)
+- remove old azure docs. update deployment docs with new terraform setup [`#544`](https://github.com/developmentseed/lulc-infra/pull/544)
+
+## Improvements
+
+- add helm resource for grafana + loki stack for logging [`#521`](https://github.com/developmentseed/lulc-infra/pull/521)
+- Model Retraining Improvements [`#541`](https://github.com/developmentseed/lulc-infra/pull/541)
+
 # v0.6.0
 
 ## Fixes

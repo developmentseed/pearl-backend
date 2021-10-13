@@ -108,6 +108,7 @@ async function server(args, config, cb) {
 
         return res.json({
             version: pkg.version,
+            qa_tiles: config.QA_Tiles,
             limits: {
                 live_inference: 100000000,
                 max_inference: 200000000,

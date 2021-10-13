@@ -1,5 +1,4 @@
 const Err = require('../lib/error');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const authtoken = new (require('../lib/auth').AuthToken)(config);
@@ -75,10 +74,10 @@ async function router(schema, config) {
      *       "message": "Token Deleted"
      *   }
      */
-    await schema.delete('/token/:tokenid', {}, config.requiresAuth, async (req, res) => {
+    await schema.delete('/token/:tokenid', {
+        ':tokenid': 'integer'
+    }, config.requiresAuth, async (req, res) => {
         try {
-            await Param.int(req, 'tokenid');
-
             return res.json(await authtoken.delete(req.auth, req.params.tokenid));
         } catch (err) {
             return Err.respond(err, res);

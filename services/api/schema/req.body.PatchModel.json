@@ -11,6 +11,9 @@
             "items": {
                 "type": "number"
             }
+        },
+        "tagmap": {
+            "$ref": "./util/osm-tagmap.json"
         }
     }
 }

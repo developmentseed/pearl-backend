@@ -20,6 +20,8 @@ class Output {
 
         this.fixtures = [];
 
+        this.log = fs.createWriteStream('/tmp/output.log');
+
         for (const d of this.schema.data) {
             if (!d.items) d.items = 1;
 
@@ -37,6 +39,8 @@ class Output {
         if (!this.fixtures.length) throw new Error('No more fixtures to pop()');
 
         const expected = this.fixtures.pop();
+
+        this.log.write(JSON.stringify(returned) + '\n');
 
         if (expected.type === 'static') {
             this.t.deepEquals(returned, expected.data);
@@ -61,6 +65,10 @@ class Output {
      */
     done() {
         return !this.fixtures.length;
+    }
+
+    close() {
+        this.log.close();
     }
 }
 

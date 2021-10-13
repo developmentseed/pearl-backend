@@ -51,6 +51,7 @@ test('gpu connection', (t) => {
         }
 
         if (output.done()) {
+            output.close();
             t.ok('Ending Connection');
             ws.close();
         }

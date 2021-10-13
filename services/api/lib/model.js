@@ -99,7 +99,8 @@ class Model extends Generic {
                     storage,
                     classes,
                     meta,
-                    bounds
+                    bounds,
+                    osmtag_id
                 ) VALUES (
                     ${model.uid},
                     ${model.name},
@@ -110,7 +111,8 @@ class Model extends Generic {
                     False,
                     ${JSON.stringify(model.classes)}::JSONB,
                     ${JSON.stringify(model.meta)}::JSONB,
-                    ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON)
+                    ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON),
+                    ${model.osmtag_id || null}
                 ) RETURNING *
             `);
         } catch (err) {
@@ -151,7 +153,8 @@ class Model extends Generic {
                 UPDATE models
                     SET
                         storage = ${this.storage},
-                        bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)})
+                        bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)}),
+                        osmtag_id = ${this.osmtag_id}
                     WHERE
                         id = ${this.id}
                     RETURNING *
@@ -177,43 +180,6 @@ class Model extends Generic {
 
         const storage = new Storage(config, 'models');
         await storage.download(`model-${this.id}.zip`, res);
-    }
-
-    /**
-      * Retrieve information about a model
-      *
-      * @param {Pool} pool - Instantiated Postgres Pool
-      * @param {String} modelid Model id
-      */
-    static async from(pool, modelid) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    id,
-                    created,
-                    active,
-                    uid,
-                    name,
-                    model_type,
-                    model_inputshape,
-                    model_zoom,
-                    storage,
-                    classes,
-                    meta,
-                    bounds
-                FROM
-                    models
-                WHERE
-                    id = ${modelid}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Internal Model Error');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'No model found');
-
-        return this.deserialize(pgres.rows[0]);
     }
 
     /**

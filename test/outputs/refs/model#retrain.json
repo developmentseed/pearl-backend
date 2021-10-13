@@ -1,0 +1,30 @@
+{
+    "type": "object",
+    "required": [
+        "message",
+        "data"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "message": {
+            "type": "string",
+            "enum": [ "model#retrain#progress" ]
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "total",
+                "processed"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "total": {
+                    "type": "integer"
+                },
+                "processed": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

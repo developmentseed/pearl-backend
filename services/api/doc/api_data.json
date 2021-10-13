@@ -1487,6 +1487,13 @@
             "optional": false,
             "field": "meta",
             "description": "<p>Generic key/value store for additional model metadata</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": "<p>Optional default list of OSM Tags =&gt; Model Classes</p>"
           }
         ]
       }
@@ -3763,6 +3770,13 @@
             "optional": false,
             "field": "meta",
             "description": "<p>Generic key/value store for additional model metadata</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "tagmap",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -3872,6 +3886,13 @@
             "optional": false,
             "field": "meta",
             "description": "<p>Generic key/value store for additional model metadata</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": "<p>Optional default list of OSM Tags =&gt; Model Classes</p>"
           }
         ]
       }
@@ -4056,6 +4077,13 @@
             "optional": false,
             "field": "meta",
             "description": "<p>Generic key/value store for additional model metadata</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": "<p>Optional default list of OSM Tags =&gt; Model Classes</p>"
           }
         ]
       }
@@ -4201,6 +4229,13 @@
             "optional": true,
             "field": "bounds",
             "description": "<p>Recommended geographic area on which this model can be used</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "tagmap",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -4310,6 +4345,13 @@
             "optional": false,
             "field": "meta",
             "description": "<p>Generic key/value store for additional model metadata</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": "<p>Optional default list of OSM Tags =&gt; Model Classes</p>"
           }
         ]
       }
