@@ -1,6 +1,7 @@
 const test = require('tape');
 const Flight = require('./flight');
-const { sql } = require('slonik');
+const fs = require('fs');
+const path = require('path');
 
 const flight = new Flight();
 
@@ -17,8 +18,8 @@ test('POST /api/project/1/aoi/1/patch - no project', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch',
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, false);
 
@@ -45,8 +46,8 @@ test('POST /api/project/1/aoi/1/patch - no aoi', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch',
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, false);
 
@@ -67,8 +68,8 @@ test('POST /api/project/1/aoi', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi',
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             },
             body: {
                 name: 'Test AOI',
@@ -124,8 +125,8 @@ test('GET /api/project/1/aoi/1/patch', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch',
             method: 'GET',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, t);
 
@@ -148,8 +149,8 @@ test('POST /api/project/1/aoi/1/patch', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch',
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, t);
 
@@ -175,8 +176,8 @@ test('GET /api/project/1/aoi/1/patch', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch',
             method: 'GET',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, t);
 
@@ -199,14 +200,32 @@ test('GET /api/project/1/aoi/1/patch', async (t) => {
     t.end();
 });
 
-test('[meta] Set aoi-patch.storage: true', async (t) => {
+test('POST: /api/project/1/aoi/1/patch/1/upload', async (t) => {
     try {
-        await flight.config.pool.query(sql`
-            UPDATE
-                aoi_patch
-            SET
-                storage = true
-        `);
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1/patch/1/upload',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            auth: {
+                bearer: flight.token.ingalls
+            },
+            formData : {
+                file : fs.createReadStream(path.resolve(__dirname, './fixtures/asset'))
+            }
+        }, t);
+
+        t.ok(res.body.created);
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            project_id: 1,
+            aoi_id: 1,
+            storage: true
+        });
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -220,16 +239,41 @@ test('GET /api/project/1/aoi/1/patch/1', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
             method: 'GET',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, t);
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
         t.deepEquals(res.body, {
-            id: 1, storage: true, project_id: 1, aoi_id: 1
+            id: 1,
+            storage: true,
+            project_id: 1,
+            aoi_id: 1
         });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/project/1/aoi/1/patch/1/download', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1/patch/1/download',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            note: 'This is just a file we use to test uploads'
+        });
+
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -243,8 +287,8 @@ test('DELETE /api/project/1/aoi/1/patch/1', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
             method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, t);
 
@@ -265,8 +309,8 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1',
             method: 'PATCH',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             },
             body: {
                 patches: [1],
@@ -319,8 +363,8 @@ test('PATCH /api/project/1/aoi/1 - update the name and check if the bookmarked v
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1',
             method: 'PATCH',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             },
             body: {
                 name: 'New test AOI'
@@ -343,8 +387,8 @@ test('PATCH /api/project/1/aoi/1 - unbookmarking', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1',
             method: 'PATCH',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             },
             body: {
                 bookmarked: false
@@ -366,8 +410,8 @@ test('GET /api/project/1/aoi/1/patch/1', async (t) => {
             json: true,
             url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
             method: 'GET',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
+            auth: {
+                bearer: flight.token.ingalls
             }
         }, false);
 
