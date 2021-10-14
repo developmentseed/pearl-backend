@@ -1,6 +1,8 @@
 import json
+import logging
 import tempfile
 import requests
+import mercantile
 from vt2geojson.tools import vt_bytes_to_geojson
 import urllib3
 from requests.adapters import HTTPAdapter
@@ -32,24 +34,24 @@ class OSM:
         self.cache = False
 
     def download(self, bounds):
-        cache = tempfile.NamedTemporaryFile(delete=False)
+        cache = tempfile.NamedTemporaryFile(delete=False, mode='w')
 
         tiles = mercantile.tiles(*bounds, 17)
         for tile in tiles:
-            geojson = self.tile2geojson(self.tile(tile.x, tile.y, tilx.z), tile.x, tile.y, tile.z)
+            geojson = self.tile2geojson(self.tile(tile.x, tile.y, tile.z), tile.x, tile.y, tile.z)
 
-            for (feat in geojson):
+            for feat in geojson.get('features', []):
                 cache.write(json.dumps(feat) + '\n')
 
         cache.close()
 
         self.cache = cache.name
 
-    def class(self):
+    def extract(self):
         if self.cache is False:
             raise Exception("OSM#download() must be called to generate cache")
 
-        extract = tempfile.NamedTemporaryFile(delete=False)
+        extract = tempfile.NamedTemporaryFile(delete=False, mode='w')
 
         with open(self.cache) as f:
             for line in f.readlines():
@@ -67,7 +69,7 @@ class OSM:
 
         r.raise_for_status()
 
-        LOGGER.info("ok - Received " + url)
+        LOGGER.info("ok - Received " + self.url)
 
         return r.json();
 

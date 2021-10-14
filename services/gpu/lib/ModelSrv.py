@@ -10,6 +10,7 @@ from shapely.geometry import mapping
 from .AOI import AOI
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
+from .osm import OSM
 from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson, serialize
 
 LOGGER = logging.getLogger("server")
@@ -518,6 +519,9 @@ class ModelSrv:
             osm = OSM(self.api.server.get('qa_tiles'))
 
             osm.download(body.get('bounds'))
+
+            for cls in body.get('classes'):
+                cls['file'] = osm.extract();
 
             #include=body.get('include', []),
             #exclude=body.get('exclude', [])
