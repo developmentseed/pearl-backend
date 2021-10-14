@@ -1,0 +1,62 @@
+{
+    "action": "model#osm",
+    "data": {
+        "name": "Seneca Rocks, WV Corrected (OSM)",
+        "bounds": [
+            -79.38355922698973,
+            38.830046580030306,
+            -79.37222957611084,
+            38.83666569946354
+        ],
+        "classes": [
+            {
+                "name": "Structure",
+                "color": "#f76f73"
+            },
+            {
+                "name": "Water",
+                "color": "#0000FF"
+            },
+            {
+                "name": "No Data",
+                "color": "#62a092"
+            },
+            {
+                "name": "Impervious Road",
+                "color": "#0218a2"
+            },
+            {
+                "name": "Emergent Wetlands",
+                "color": "#008000"
+            },
+            {
+                "name": "Impervious Surface",
+                "color": "#ffb703"
+            },
+            {
+                "name": "Tree Canopy",
+                "color": "#80FF80"
+            },
+            {
+                "name": "Shrubland",
+                "color": "#806060"
+            },
+            {
+                "name": "Barren",
+                "color": "#027fdc"
+            },
+            {
+                "name": "Low Vegetation",
+                "color": "#07c4c5"
+            },
+            {
+                "name": "Tundra",
+                "color": "#ffffff"
+            },
+            {
+                "name": "Mountain",
+                "color": "#a4afbf"
+            }
+        ]
+    }
+}
