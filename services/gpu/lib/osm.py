@@ -32,7 +32,7 @@ class OSM:
         self.cache = False
 
     def download(self, bounds):
-        self.cache = tempfile.NamedTemporaryFile(delete=False)
+        cache = tempfile.NamedTemporaryFile(delete=False)
 
         tiles = mercantile.tiles(*bounds, 17)
         for tile in tiles:
@@ -43,15 +43,23 @@ class OSM:
 
         cache.close()
 
+        self.cache = cache.name
+
     def class(self):
         if self.cache is False:
             raise Exception("OSM#download() must be called to generate cache")
 
+        extract = tempfile.NamedTemporaryFile(delete=False)
 
+        with open(self.cache) as f:
+            for line in f.readlines():
+                # Filter Here
+                extract.write(line + '\n')
+
+        return extract.name
 
     def tile2geojson(self, vt, x, y, z):
         return vt_bytes_to_geojson(vt, x, y, z)
-
 
     def meta(self):
         LOGGER.info("ok - GET " + self.url)
@@ -65,7 +73,6 @@ class OSM:
 
     def tile(self, x, y, z):
         url = self.tilejson.get('tiles')[0].replace('{z}', str(z)).replace('{x}', str(x)).replace('{y}', str(y))
-
 
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url)
