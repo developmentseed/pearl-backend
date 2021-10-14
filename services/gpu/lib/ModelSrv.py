@@ -521,16 +521,13 @@ class ModelSrv:
             osm.download(body.get('bounds'))
 
             for cls in body.get('classes'):
-                cls['file'] = osm.extract();
-
-            #include=body.get('include', []),
-            #exclude=body.get('exclude', [])
+                cls['file'] = osm.extract(cls);
 
             done_processing(self)
 
             self.retrain({
-                "name": "",
-                "classes": []
+                "name": body.get('name'),
+                "classes": body.get('classes')
             }, websocket)
 
         except Exception as e:

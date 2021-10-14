@@ -47,16 +47,23 @@ class OSM:
 
         self.cache = cache.name
 
-    def extract(self):
+        LOGGER.info("ok - Cached OSM " + self.cache)
+
+    def extract(self, cls):
         if self.cache is False:
             raise Exception("OSM#download() must be called to generate cache")
 
         extract = tempfile.NamedTemporaryFile(delete=False, mode='w')
 
+        includes = cls.get('include')
+        excludes = cls.get('exclude');
+
         with open(self.cache) as f:
             for line in f.readlines():
                 # Filter Here
                 extract.write(line + '\n')
+
+        LOGGER.info('ok - Cached {}: {}'.format(cls.get('name'), extract.name))
 
         return extract.name
 
