@@ -517,11 +517,10 @@ class ModelSrv:
 
             osm = OSM(self.api.server.get('qa_tiles'))
 
-            osm.extract(
-                body,
-                include=body.get('include', []),
-                exclude=body.get('exclude', [])
-            );
+            osm.download(body.get('bounds'))
+
+            #include=body.get('include', []),
+            #exclude=body.get('exclude', [])
 
             done_processing(self)
 

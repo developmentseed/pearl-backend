@@ -1,3 +1,5 @@
+import json
+import tempfile
 import requests
 from vt2geojson.tools import vt_bytes_to_geojson
 import urllib3
@@ -27,10 +29,22 @@ class OSM:
 
         self.tilejson = self.meta()
 
-    def extract(self, bounds, include=[], exclude=[]):
+    def download(self, bounds):
+        f = tempfile.NamedTemporaryFile(delete=False)
+
         tiles = mercantile.tiles(*bounds, 17)
         for tile in tiles:
-            self.tile(tile.x, tile.y, tilx.z)
+            geojson = self.tile2geojson(self.tile(tile.x, tile.y, tilx.z), tile.x, tile.y, tile.z)
+
+            for (feat in geojson):
+                f.write(json.dumps(feat) + '\n')
+
+        f.close()
+
+        return f.name
+
+    def tile2geojson(self, vt, x, y, z):
+        return vt_bytes_to_geojson(vt, x, y, z)
 
 
     def meta(self):
@@ -54,5 +68,5 @@ class OSM:
 
         LOGGER.info("ok - Received " + url)
 
-        return vt_bytes_to_geojson(r.content, x, y, z)
+        return r.content
 
