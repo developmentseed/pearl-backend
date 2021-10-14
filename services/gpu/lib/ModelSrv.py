@@ -546,6 +546,12 @@ class ModelSrv:
 
             total = 0;
             for cls in body["classes"]:
+                if cls.get('geometry') is None:
+                    cls['geometry'] = {
+                        'type': 'FeatureCollection',
+                        'features': []
+                    }
+
                 cls["retrain_geometry"] = []
                 for feature in cls["geometry"]["features"]:
                     if feature["geometry"]["type"] == "Polygon":

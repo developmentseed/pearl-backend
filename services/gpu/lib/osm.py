@@ -62,7 +62,7 @@ class OSM:
             for line in f.readlines():
                 line = json.loads(line)
                 # Filter Here
-                extract.write(line + '\n')
+                extract.write(json.dumps(line) + '\n')
 
         LOGGER.info('ok - Cached {}: {}'.format(cls.get('name'), extract.name))
 
