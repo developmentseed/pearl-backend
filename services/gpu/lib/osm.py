@@ -60,6 +60,7 @@ class OSM:
 
         with open(self.cache) as f:
             for line in f.readlines():
+                line = json.loads(line)
                 # Filter Here
                 extract.write(line + '\n')
 
