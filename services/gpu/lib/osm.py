@@ -60,7 +60,7 @@ class OSM:
 
         with open(self.cache) as f:
             for feat in f.readlines():
-                feat = json.loads(line)
+                feat = json.loads(feat)
                 # Filter Here
 
                 if feat['geometry']['type'] != 'Polygon' and feat['geometry']['type'] != 'MultiPolygon':
