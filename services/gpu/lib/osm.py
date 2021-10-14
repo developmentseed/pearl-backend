@@ -59,10 +59,14 @@ class OSM:
         excludes = cls.get('exclude');
 
         with open(self.cache) as f:
-            for line in f.readlines():
-                line = json.loads(line)
+            for feat in f.readlines():
+                feat = json.loads(line)
                 # Filter Here
-                extract.write(json.dumps(line) + '\n')
+
+                if feat['geometry']['type'] != 'Polygon' and feat['geometry']['type'] != 'MultiPolygon':
+                    continue
+
+                extract.write(json.dumps(feat) + '\n')
 
         LOGGER.info('ok - Cached {}: {}'.format(cls.get('name'), extract.name))
 
