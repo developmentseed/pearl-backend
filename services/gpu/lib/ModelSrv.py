@@ -556,15 +556,25 @@ class ModelSrv:
                 for feature in cls["geometry"]["features"]:
                     if feature["geometry"]["type"] == "Polygon" or feature["geometry"]["type"] == "MultiPolygon":
                         points = generate_random_points(50, feature["geometry"])
-                        cls["retrain_geometry"] = geom2coords(points)
+                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
 
                     elif (
                         feature["geometry"]["type"] == "MultiPoint"
                         and len(feature["geometry"]["coordinates"]) > 0
                     ):
-                        cls["retrain_geometry"] = geom2coords(feature["geometry"])
+                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(feature["geometry"]])
 
                     total += len(cls["retrain_geometry"]) - 1
+
+                if type(cls['file']) is str:
+                    with open(cls['file']) as f:
+                        for feat in f.readlines():
+                            feat = json.loads(feat)
+
+                            points = generate_random_points(50, feature["geometry"])
+                            cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
+                            total += len(cls['retrain_geometry'])
+
 
             curr = 1
             for cls in body["classes"]:
