@@ -517,7 +517,6 @@ class ModelSrv:
             self.processing = True
 
             osm = OSM(self.api.server.get('qa_tiles'))
-
             osm.download(body.get('bounds'))
 
             for cls in body.get('classes'):

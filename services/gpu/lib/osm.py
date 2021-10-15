@@ -1,4 +1,5 @@
 import json
+import re
 import logging
 import tempfile
 import requests
@@ -58,6 +59,11 @@ class OSM:
         includes = cls.get('include', [])
         excludes = cls.get('exclude', []);
 
+        tags = {}
+        for key, value in cls['tagmap'].items():
+            tags[key] = re.compile(value)
+
+
         with open(self.cache) as f:
             for feat in f.readlines():
                 feat = json.loads(feat)
@@ -65,6 +71,14 @@ class OSM:
 
                 if feat['geometry']['type'] != 'Polygon' and feat['geometry']['type'] != 'MultiPolygon':
                     continue
+
+                for key, value in tags.items():
+                    pvalue = feat['properties'].get(key)
+                    if pvalue is None:
+                        continue
+
+                    if not value.match(pvalue):
+                        continue
 
                 extract.write(json.dumps(feat) + '\n')
 
