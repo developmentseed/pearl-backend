@@ -521,6 +521,9 @@ class ModelSrv:
             osm.download(body.get('bounds'))
 
             for cls in body.get('classes'):
+                if cls.get('tagmap') is None:
+                    cls['tagmap'] = {}
+
                 cls['file'] = osm.extract(cls);
 
             done_processing(self)
