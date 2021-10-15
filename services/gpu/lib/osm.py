@@ -63,7 +63,6 @@ class OSM:
         for key, value in cls['tagmap'].items():
             tags[key] = re.compile(value)
 
-
         with open(self.cache) as f:
             for feat in f.readlines():
                 feat = json.loads(feat)
@@ -72,6 +71,7 @@ class OSM:
                 if feat['geometry']['type'] != 'Polygon' and feat['geometry']['type'] != 'MultiPolygon':
                     continue
 
+                match = False
                 for key, value in tags.items():
                     pvalue = feat['properties'].get(key)
                     if pvalue is None:
@@ -80,7 +80,10 @@ class OSM:
                     if not value.match(pvalue):
                         continue
 
-                extract.write(json.dumps(feat) + '\n')
+                    match = True
+
+                if match is True:
+                    extract.write(json.dumps(feat) + '\n')
 
         LOGGER.info('ok - Cached {}: {}'.format(cls.get('name'), extract.name))
 
