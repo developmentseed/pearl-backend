@@ -55,8 +55,8 @@ class OSM:
 
         extract = tempfile.NamedTemporaryFile(delete=False, mode='w')
 
-        includes = cls.get('include')
-        excludes = cls.get('exclude');
+        includes = cls.get('include', [])
+        excludes = cls.get('exclude', []);
 
         with open(self.cache) as f:
             for feat in f.readlines():

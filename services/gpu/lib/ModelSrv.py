@@ -562,14 +562,14 @@ class ModelSrv:
                         feature["geometry"]["type"] == "MultiPoint"
                         and len(feature["geometry"]["coordinates"]) > 0
                     ):
-                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(feature["geometry"]])
+                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(feature["geometry"])]
 
                     total += len(cls["retrain_geometry"]) - 1
 
                 if type(cls['file']) is str:
                     with open(cls['file']) as f:
-                        for feat in f.readlines():
-                            feat = json.loads(feat)
+                        for feature in f.readlines():
+                            feature = json.loads(feature)
 
                             points = generate_random_points(50, feature["geometry"])
                             cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
