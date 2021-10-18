@@ -67,9 +67,12 @@ class OSM:
         elif len(excludes) > 0:
             mode = 'exclude'
 
-        tags = {}
-        for key, value in cls['tagmap'].items():
-            tags[key] = re.compile(value)
+        tags = []
+        for ele in cls['tagmap']:
+            tags.append({
+                key: ele['key'],
+                value: re.compile(ele['value'])
+            })
 
         with open(self.cache) as f:
             for feat in f.readlines():
@@ -80,12 +83,12 @@ class OSM:
                     continue
 
                 match = False
-                for key, value in tags.items():
-                    pvalue = feat['properties'].get(key)
+                for tag in tags:
+                    pvalue = feat['properties'].get(tag['key'])
                     if pvalue is None:
                         continue
 
-                    if not value.match(pvalue):
+                    if not tag['value'].match(pvalue):
                         continue
 
                     match = True
