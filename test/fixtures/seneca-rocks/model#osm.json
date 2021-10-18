@@ -1,0 +1,167 @@
+{
+    "action": "model#osm",
+    "data": {
+        "name": "Seneca Rocks, WV Corrected (OSM)",
+        "bounds": [
+            -79.38355922698973,
+            38.830046580030306,
+            -79.37222957611084,
+            38.83666569946354
+        ],
+        "classes": [
+            {
+                "name": "Structure",
+                "color": "#f76f73",
+                "tagmap": [{
+                    "key": "building",
+                    "value":  ".*"
+                },{
+                    "key": "amenity",
+                    "value": "hospital"
+                },{
+                    "key": "amenity",
+                    "value": "pub"
+                } ]
+            },
+            {
+                "name": "Water",
+                "color": "#0000FF",
+                "tagmap": [{
+                    "key": "landuse",
+                    "value": "reservoir"
+                },{
+                    "key": "landuse",
+                    "value": "pond"
+                },{
+                    "key": "leisure",
+                    "value": "swimming_area"
+                },{
+                    "key": "natural",
+                    "value": "bay"
+                },{
+                    "key": "natural",
+                    "value": "water"
+                }]
+            },
+            {
+                "name": "No Data",
+                "color": "#62a092",
+                "tagmap": []
+            },
+            {
+                "name": "Impervious Road",
+                "color": "#0218a2",
+                "tagmap": [{
+                    "key": "highway",
+                    "value": ".*"
+                },{
+                    "key": "amenity",
+                    "value": "parking"
+                },{
+                    "key": "parking",
+                    "value": "surface"
+                }]
+            },
+            {
+                "name": "Emergent Wetlands",
+                "color": "#008000",
+                "tagmap": [{
+                    "key": "natural",
+                    "value": "mud"
+                },{
+                    "key": "natural",
+                    "value": "wetland"
+                }]
+            },
+            {
+                "name": "Impervious Surface",
+                "color": "#ffb703",
+                "tagmap": [{
+                    "key": "building",
+                    "value":  ".*"
+                },{
+                    "key": "amenity",
+                    "value": "hospital"
+                },{
+                    "key": "amenity",
+                    "value": "pub"
+                }]
+            },
+            {
+                "name": "Tree Canopy",
+                "color": "#80FF80",
+                "tagmap": [{
+                    "key": "natural",
+                    "value": "tree"
+                },{
+                    "key": "natural",
+                    "value": "tree_row"
+                },{
+                    "key": "natural",
+                    "value": "wood"
+                },{
+                    "key": "landuse",
+                    "value": "forest"
+                }]
+            },
+            {
+                "name": "Shrubland",
+                "color": "#806060",
+                "tagmap": [{
+                    "key": "landuse",
+                    "value": "scrub"
+                },{
+                    "key": "natural",
+                    "value": "fell"
+                },{
+                    "key": "natural",
+                    "value": "grassland"
+                },{
+                    "key": "natural",
+                    "value": "heath"
+                },{
+                    "key": "natural",
+                    "value": "scrub"
+                }]
+            },
+            {
+                "name": "Barren",
+                "color": "#027fdc",
+                "tagmap": [{
+                    "key": "natural",
+                    "value": "beach"
+                },{
+                    "key": "natural",
+                    "value": "sand"
+                },{
+                    "key": "natural",
+                    "value": "shingle"
+                },{
+                    "key": "natural",
+                    "value": "bare_rock"
+                },{
+                    "key": "natural",
+                    "value": "scree"
+                },{
+                    "key": "natural",
+                    "value": "glacier"
+                }]
+            },
+            {
+                "name": "Low Vegetation",
+                "color": "#07c4c5",
+                "tagmap": []
+            },
+            {
+                "name": "Tundra",
+                "color": "#ffffff",
+                "tagmap": []
+            },
+            {
+                "name": "Mountain",
+                "color": "#a4afbf",
+                "tagmap": []
+            }
+        ]
+    }
+}

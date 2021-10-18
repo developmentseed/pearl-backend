@@ -10,6 +10,7 @@ from shapely.geometry import mapping
 from .AOI import AOI
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
+from .osm import OSM
 from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson, serialize
 
 LOGGER = logging.getLogger("server")
@@ -516,12 +517,19 @@ class ModelSrv:
             self.processing = True
 
             osm = OSM(self.api.server.get('qa_tiles'))
+            osm.download(body.get('bounds'))
+
+            for cls in body.get('classes'):
+                if cls.get('tagmap') is None:
+                    cls['tagmap'] = {}
+
+                cls['file'] = osm.extract(cls);
 
             done_processing(self)
 
             self.retrain({
-                "name": "",
-                "classes": []
+                "name": body.get('name'),
+                "classes": body.get('classes')
             }, websocket)
 
         except Exception as e:
@@ -540,27 +548,42 @@ class ModelSrv:
 
             total = 0;
             for cls in body["classes"]:
+                if cls.get('geometry') is None:
+                    cls['geometry'] = {
+                        'type': 'FeatureCollection',
+                        'features': []
+                    }
+
                 cls["retrain_geometry"] = []
                 for feature in cls["geometry"]["features"]:
-                    if feature["geometry"]["type"] == "Polygon":
+                    if feature["geometry"]["type"] == "Polygon" or feature["geometry"]["type"] == "MultiPolygon":
                         points = generate_random_points(50, feature["geometry"])
-                        cls["retrain_geometry"] = geom2coords(points)
+                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
 
                     elif (
                         feature["geometry"]["type"] == "MultiPoint"
                         and len(feature["geometry"]["coordinates"]) > 0
                     ):
-                        cls["retrain_geometry"] = geom2coords(feature["geometry"])
+                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(feature["geometry"])]
 
-                    total += len(cls["retrain_geometry"]) - 1
+                if cls.get('file') is not None:
+                    with open(cls['file']) as f:
+                        for feature in f.readlines():
+                            feature = json.loads(feature)
 
-            curr = 1
+                            points = generate_random_points(50, feature["geometry"])
+                            cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
+
+                total += len(cls['retrain_geometry'])
+
+
+            curr = 0
             for cls in body["classes"]:
-                cnt = len(cls["retrain_geometry"])
                 cls["retrain_geometry"] = geom2px(
                     cls["retrain_geometry"], self, websocket, total, curr
                 )
-                curr += cnt
+
+                curr += len(cls['retrain_geometry'])
 
             self.model.retrain(body["classes"])
 
@@ -591,7 +614,9 @@ class ModelSrv:
                 websocket,
             )
 
-            websocket.send(json.dumps({"message": "model#retrain#complete"}))
+            websocket.send(json.dumps({
+                "message": "model#retrain#complete"
+            }))
 
             done_processing(self)
 

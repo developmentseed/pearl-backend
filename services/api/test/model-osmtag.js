@@ -30,9 +30,10 @@ test('POST /api/model - Error: Entry for every class', async (t) => {
                     { name: 'Built', color: '#806060' }
                 ],
                 tagmap: {
-                    1: {
-                        'natural': 'water'
-                    }
+                    1: [{
+                        key: 'natural',
+                        value: 'water'
+                    }]
                 },
                 meta: {}
             }
@@ -72,10 +73,10 @@ test('POST /api/model - Error: OSMTag missing entry', async (t) => {
                     { name: 'Built', color: '#806060' }
                 ],
                 tagmap: {
-                    1: { 'natural': 'water' },
-                    2: { 'natural': 'water' },
-                    3: { 'natural': 'water' },
-                    4: { 'natural': 'water' }
+                    1: [{ key: 'natural', value: 'water' }],
+                    2: [{ key: 'natural', value: 'water' }],
+                    3: [{ key: 'natural', value: 'water' }],
+                    4: [{ key: 'natural', value: 'water' }]
                 },
                 meta: {}
             }
@@ -115,10 +116,10 @@ test('POST /api/model', async (t) => {
                     { name: 'Built', color: '#806060' }
                 ],
                 tagmap: {
-                    0: { 'natural': 'water' },
-                    1: { 'natural': 'forest' },
-                    2: { 'natural': 'field' },
-                    3: { 'building': 'yes' }
+                    0: [{ key: 'natural', value: 'water' }],
+                    1: [{ key: 'natural', value: 'forest' }],
+                    2: [{ key: 'natural', value: 'field' }],
+                    3: [{ key: 'building', value: 'yes' }]
                 },
                 meta: {}
             }
@@ -189,10 +190,10 @@ test('GET /api/model/1/osmtag', async (t) => {
             id: 1,
             project_id: null,
             tagmap: {
-                0: { natural: 'water' },
-                1: { natural: 'forest' },
-                2: { natural: 'field' },
-                3: { building: 'yes' }
+                0: [{ key: 'natural', value: 'water' }],
+                1: [{ key: 'natural', value: 'forest' }],
+                2: [{ key: 'natural', value: 'field' }],
+                3: [{ key: 'building', value: 'yes' }]
             }
         });
     } catch (err) {
@@ -213,10 +214,22 @@ test('PATCH /api/model', async (t) => {
             },
             body: {
                 tagmap: {
-                    0: { 'natural': 'water', 'coastline': 'yes' },
-                    1: { },
-                    2: { 'natural': 'field' },
-                    3: { 'building': 'yes' }
+                    0: [{
+                        key: 'natural',
+                        value: 'water'
+                    },{
+                        key: 'coastline',
+                        value: 'yes'
+                    }],
+                    1: [],
+                    2: [{
+                        key: 'natural',
+                        value: 'field'
+                    }],
+                    3: [{
+                        key: 'building',
+                        value: 'yes'
+                    }]
                 }
             }
         }, t);
@@ -271,10 +284,22 @@ test('GET /api/model/1/osmtag', async (t) => {
             id: 1,
             project_id: null,
             tagmap: {
-                0: { natural: 'water', coastline: 'yes' },
-                1: { },
-                2: { natural: 'field' },
-                3: { building: 'yes' }
+                0: [{
+                    key: 'natural',
+                    value: 'water'
+                },{
+                    key: 'coastline',
+                    value: 'yes'
+                }],
+                1: [],
+                2: [{
+                    key: 'natural',
+                    value: 'field'
+                }],
+                3: [{
+                    key: 'building',
+                    value: 'yes'
+                }]
             }
         });
     } catch (err) {
