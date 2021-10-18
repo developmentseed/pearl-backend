@@ -566,8 +566,6 @@ class ModelSrv:
                     ):
                         cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(feature["geometry"])]
 
-                    total += len(cls["retrain_geometry"]) - 1
-
                 if cls.get('file') is not None:
                     with open(cls['file']) as f:
                         for feature in f.readlines():
@@ -575,16 +573,17 @@ class ModelSrv:
 
                             points = generate_random_points(50, feature["geometry"])
                             cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
-                            total += len(cls['retrain_geometry'])
+
+                total += len(cls['retrain_geometry'])
 
 
-            curr = 1
+            curr = 0
             for cls in body["classes"]:
-                cnt = len(cls["retrain_geometry"])
                 cls["retrain_geometry"] = geom2px(
                     cls["retrain_geometry"], self, websocket, total, curr
                 )
-                curr += cnt
+
+                curr += len(cls['retrain_geometry'])
 
             self.model.retrain(body["classes"])
 
@@ -615,7 +614,9 @@ class ModelSrv:
                 websocket,
             )
 
-            websocket.send(json.dumps({"message": "model#retrain#complete"}))
+            websocket.send(json.dumps({
+                "message": "model#retrain#complete"
+            }))
 
             done_processing(self)
 

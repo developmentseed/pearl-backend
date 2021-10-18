@@ -98,7 +98,7 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1):
                 "message": "model#retrain#progress",
                 "data": {
                     "total": total,
-                    "processed": curr + i
+                    "processed": curr + i + 1
                 }
             }))
 
