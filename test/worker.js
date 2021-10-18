@@ -25,6 +25,7 @@ class Worker {
         this.test = test;
         this.opts = opts;
         this.worker = false;
+        this.exited = false;
     }
 
     /**
@@ -41,9 +42,7 @@ class Worker {
                 '--env', `SOCKET=${this.opts.socket}`,
                 '--env', `TileUrl=${this.opts.tiler}`,
                 'gpu'
-            ], {
-                detached: true
-            });
+            ]);
 
             this.worker.stdout.pipe(process.stdout);
             this.worker.stderr.pipe(process.stderr);
@@ -52,14 +51,23 @@ class Worker {
                 console.error(err);
             });
 
+            this.worker.on('exit', () => {
+                this.exited = true;
+            });
+
             t.end();
         });
     }
 
     stop() {
         this.test('Stopping Worker', (t) => {
-            if (!this.worker.kill()) throw new Error('Failed to kill worker');
-            t.ok('Killed Worker');
+            if (!this.exited) {
+                if (!this.worker.kill()) throw new Error('Failed to kill worker');
+                t.ok('Killed Worker');
+            } else {
+                this.exited = true;
+            }
+
             t.end();
         });
     }
