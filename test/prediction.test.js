@@ -29,6 +29,7 @@ test('gpu connection', (t) => {
     const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
     const output = new Output(t, './outputs/prediction.test.json');
     let sent = false;
+    let sent_retrain = false;
 
     ws.on('message', (msg) => {
         msg = JSON.parse(String(msg));
@@ -45,9 +46,10 @@ test('gpu connection', (t) => {
             t.ok('Sending: model#prediction (1)');
             ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
             sent = true;
-        } else if (msg.message === 'model#prediction#complete') {
+        } else if (msg.message === 'model#prediction#complete' && !sent_retrain) {
             t.ok('Sending: model#retrain (1)');
             ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#retrain.json')));
+            sent_retrain = true;
         }
 
         if (output.done()) {
