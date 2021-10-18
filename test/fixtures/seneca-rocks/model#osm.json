@@ -12,175 +12,155 @@
             {
                 "name": "Structure",
                 "color": "#f76f73",
-                "tagmap": {
-                    "building": ".*",
-                    "amenity": "bar",
-                    "amenity": "hospital",
-                    "amenity": "pub",
-                    "amenity": "restaurant",
-                    "amenity": "school",
-                    "amenity": "university",
-                    "amenity": "animal_shelter",
-                    "amenity": "arts_centre",
-                    "amenity": "bank",
-                    "amenity": "bar",
-                    "amenity": "brothel",
-                    "amenity": "cafe",
-                    "amenity": "car_rental",
-                    "amenity": "car_wash",
-                    "amenity": "casino",
-                    "amenity": "cinema",
-                    "amenity": "clinic",
-                    "amenity": "college",
-                    "amenity": "community_centre",
-                    "amenity": "courthouse",
-                    "amenity": "crematorium",
-                    "amenity": "crypt",
-                    "amenity": "dentist",
-                    "amenity": "dive_centre",
-                    "amenity": "driving_school",
-                    "amenity": "embassy",
-                    "amenity": "fast_food",
-                    "amenity": "ferry_terminal",
-                    "amenity": "fire_station",
-                    "amenity": "food_court",
-                    "amenity": "fuel",
-                    "amenity": "grave_yard",
-                    "amenity": "gym",
-                    "amenity": "hospital",
-                    "amenity": "internet_cafe"
-                }
+                "tagmap": [{
+                    "key": "building",
+                    "value":  ".*"
+                },{
+                    "key": "amenity",
+                    "value": "hospital"
+                },{
+                    "key": "amenity",
+                    "value": "pub"
+                } ]
             },
             {
                 "name": "Water",
                 "color": "#0000FF",
-                "tagmap": {
-                    "landuse": "reservoir",
-                    "landuse": "pond",
-                    "leisure": "swimming_area",
-                    "leisure": "swimming_pool",
-                    "natural": "bay",
-                    "natural": "water",
-                    "natural": "riverbank",
-                    "natural": "coastline",
-                    "amenity": "fountain",
-                    "waterway": "river",
-                    "waterway": "riverbank",
-                    "waterway": "stream"
-                }
+                "tagmap": [{
+                    "key": "landuse",
+                    "value": "reservoir"
+                },{
+                    "key": "landuse",
+                    "value": "pond"
+                },{
+                    "key": "leisure",
+                    "value": "swimming_area"
+                },{
+                    "key": "natural",
+                    "value": "bay"
+                },{
+                    "key": "natural",
+                    "value": "water"
+                }]
             },
             {
                 "name": "No Data",
                 "color": "#62a092",
-                "tagmap": {}
+                "tagmap": []
             },
             {
                 "name": "Impervious Road",
                 "color": "#0218a2",
-                "tagmap": {
-                    "highway": ".*",
-                    "amenity": "parking",
-                    "parking": "surface"
-                }
+                "tagmap": [{
+                    "key": "highway",
+                    "value": ".*"
+                },{
+                    "key": "amenity",
+                    "value": "parking"
+                },{
+                    "key": "parking",
+                    "value": "surface"
+                }]
             },
             {
                 "name": "Emergent Wetlands",
                 "color": "#008000",
-                "tagmap": {
-                    "natural": "mud",
-                    "natural": "wetland"
-                }
+                "tagmap": [{
+                    "key": "natural",
+                    "value": "mud"
+                },{
+                    "key": "natural",
+                    "value": "wetland"
+                }]
             },
             {
                 "name": "Impervious Surface",
                 "color": "#ffb703",
-                "tagmap": {
-                    "building": ".*",
-                    "highway": ".*",
-                    "amenity": "bar",
-                    "amenity": "hospital",
-                    "amenity": "pub",
-                    "amenity": "restaurant",
-                    "amenity": "school",
-                    "amenity": "university",
-                    "amenity": "animal_shelter",
-                    "amenity": "arts_centre",
-                    "amenity": "bank",
-                    "amenity": "bar",
-                    "amenity": "brothel",
-                    "amenity": "cafe",
-                    "amenity": "car_rental",
-                    "amenity": "car_wash",
-                    "amenity": "casino",
-                    "amenity": "cinema",
-                    "amenity": "clinic",
-                    "amenity": "college",
-                    "amenity": "community_centre",
-                    "amenity": "courthouse",
-                    "amenity": "crematorium",
-                    "amenity": "crypt",
-                    "amenity": "dentist",
-                    "amenity": "dive_centre",
-                    "amenity": "driving_school",
-                    "amenity": "embassy",
-                    "amenity": "fast_food",
-                    "amenity": "ferry_terminal",
-                    "amenity": "fire_station",
-                    "amenity": "food_court",
-                    "amenity": "fuel",
-                    "amenity": "grave_yard",
-                    "amenity": "gym",
-                    "amenity": "hospital",
-                    "amenity": "internet_cafe"
-                }
+                "tagmap": [{
+                    "key": "building",
+                    "value":  ".*"
+                },{
+                    "key": "amenity",
+                    "value": "hospital"
+                },{
+                    "key": "amenity",
+                    "value": "pub"
+                }]
             },
             {
                 "name": "Tree Canopy",
                 "color": "#80FF80",
-                "tagmap": {
-                    "natural": "tree",
-                    "natural": "tree_row",
-                    "natural": "wood",
-                    "landuse": "forest"
-                }
+                "tagmap": [{
+                    "key": "natural",
+                    "value": "tree"
+                },{
+                    "key": "natural",
+                    "value": "tree_row"
+                },{
+                    "key": "natural",
+                    "value": "wood"
+                },{
+                    "key": "landuse",
+                    "value": "forest"
+                }]
             },
             {
                 "name": "Shrubland",
                 "color": "#806060",
-                "tagmap": {
-                    "landuse": "scrub",
-                    "natural": "fell",
-                    "natural": "grassland",
-                    "natural": "heath",
-                    "natural": "scrub"
-                }
+                "tagmap": [{
+                    "key": "landuse",
+                    "value": "scrub"
+                },{
+                    "key": "natural",
+                    "value": "fell"
+                },{
+                    "key": "natural",
+                    "value": "grassland"
+                },{
+                    "key": "natural",
+                    "value": "heath"
+                },{
+                    "key": "natural",
+                    "value": "scrub"
+                }]
             },
             {
                 "name": "Barren",
                 "color": "#027fdc",
-                "tagmap": {
-                    "natural": "beach",
-                    "natural": "sand",
-                    "natural": "shingle",
-                    "natural": "bare_rock",
-                    "natural": "scree",
-                    "natural": "glacier"
-                }
+                "tagmap": [{
+                    "key": "natural",
+                    "value": "beach"
+                },{
+                    "key": "natural",
+                    "value": "sand"
+                },{
+                    "key": "natural",
+                    "value": "shingle"
+                },{
+                    "key": "natural",
+                    "value": "bare_rock"
+                },{
+                    "key": "natural",
+                    "value": "scree"
+                },{
+                    "key": "natural",
+                    "value": "glacier"
+                }]
             },
             {
                 "name": "Low Vegetation",
                 "color": "#07c4c5",
-                "tagmap": {}
+                "tagmap": []
             },
             {
                 "name": "Tundra",
                 "color": "#ffffff",
-                "tagmap": {}
+                "tagmap": []
             },
             {
                 "name": "Mountain",
                 "color": "#a4afbf",
-                "tagmap": {}
+                "tagmap": []
             }
         ]
     }
