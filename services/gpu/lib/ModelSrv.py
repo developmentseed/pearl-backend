@@ -568,7 +568,7 @@ class ModelSrv:
 
                     total += len(cls["retrain_geometry"]) - 1
 
-                if type(cls['file']) is str:
+                if cls.get('file') is not None:
                     with open(cls['file']) as f:
                         for feature in f.readlines():
                             feature = json.loads(feature)
