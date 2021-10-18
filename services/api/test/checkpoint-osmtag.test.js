@@ -32,7 +32,7 @@ test('POST /api/project/1/checkpoint - Error: Entry for every class', async (t) 
                         key: 'natural',
                         value: 'water'
                     }]
-                },
+                }
             }
         }, false);
 
@@ -69,8 +69,8 @@ test('POST /api/project/1/checkpoint - Error: OSMTag missing entry', async (t) =
                     1: [{ key: 'natural', value: 'water' }],
                     2: [{ key: 'natural', value: 'water' }],
                     3: [{ key: 'natural', value: 'water' }],
-                    4: [{ key: 'natural', value: 'water' }],
-                },
+                    4: [{ key: 'natural', value: 'water' }]
+                }
             }
         }, false);
 
@@ -108,7 +108,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
                     1: [{ key: 'natural', value: 'forest' }],
                     2: [{ key: 'natural', value: 'field' }],
                     3: [{ key: 'building', value: 'yes' }]
-                },
+                }
             }
         }, t);
 
@@ -174,7 +174,7 @@ test('GET /api/project/1/checkpoint/1/osmtag', async (t) => {
                 1: [{ key: 'natural', value: 'forest' }],
                 2: [{ key: 'natural', value: 'field' }],
                 3: [{ key: 'building', value: 'yes' }]
-            },
+            }
         });
     } catch (err) {
         t.error(err, 'no errors');

@@ -76,7 +76,7 @@ test('POST /api/model - Error: OSMTag missing entry', async (t) => {
                     1: [{ key: 'natural', value: 'water' }],
                     2: [{ key: 'natural', value: 'water' }],
                     3: [{ key: 'natural', value: 'water' }],
-                    4: [{ key: 'natural', value: 'water' }],
+                    4: [{ key: 'natural', value: 'water' }]
                 },
                 meta: {}
             }
