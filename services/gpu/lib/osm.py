@@ -59,6 +59,14 @@ class OSM:
         includes = cls.get('include', [])
         excludes = cls.get('exclude', []);
 
+        mode = 'undetermined'
+        if len(includes) > 0 and len(excludes) > 0:
+            raise Exception('includes and excludes options are mutually exclusive')
+        elif len(includes) > 0:
+            mode = 'include'
+        elif len(excludes) > 0:
+            mode = 'exclude'
+
         tags = {}
         for key, value in cls['tagmap'].items():
             tags[key] = re.compile(value)
@@ -81,6 +89,15 @@ class OSM:
                         continue
 
                     match = True
+
+                if mode == 'include':
+                    for i_id in includes:
+                        if feat['properties']['@id'] != i_id:
+                            match = False
+                elif mode == 'exclude':
+                    for e_id in excludes:
+                        if feat['properties']['@id'] == i_id:
+                            match = False
 
                 if match is True:
                     extract.write(json.dumps(feat) + '\n')
