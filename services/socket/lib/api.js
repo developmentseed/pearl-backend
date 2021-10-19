@@ -1,5 +1,3 @@
-
-
 const { promisify } = require('util');
 const request = promisify(require('request'));
 const jwt = require('jsonwebtoken');
