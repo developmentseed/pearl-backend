@@ -1,6 +1,7 @@
 import json
 import logging
 import sys
+import traceback
 
 import numpy as np
 import torch
@@ -403,8 +404,7 @@ class ModelSrv:
                 batch_size = 8
             else:
                 batch_size = 2
-            print("batch size")
-            print(batch_size)
+
             dataloader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=batch_size,
@@ -507,12 +507,17 @@ class ModelSrv:
 
             done_processing(self)
         except Exception as e:
-            self.api.batch_patch(
-                {"completed": False, "error": str("Processing Error: " + str(e))}
-            )
-
             done_processing(self)
-            websocket.error("Processing Error", e)
+
+            traceback.print_exc()
+
+            if websocket is False:
+                self.api.batch_patch(
+                    {"completed": False, "error": str("Processing Error: " + str(e))}
+                )
+            else:
+                websocket.error("Processing Error", e)
+
             raise e
 
     def osm(self, body, websocket):

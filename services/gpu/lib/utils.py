@@ -7,6 +7,13 @@ import os
 import random
 import sys
 import threading
+import rasterio
+import rasterio.crs
+import rasterio.io
+import rasterio.mask
+import rasterio.merge
+import rasterio.transform
+
 from collections.abc import Iterable
 from logging.handlers import TimedRotatingFileHandler
 
