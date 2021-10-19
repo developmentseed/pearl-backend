@@ -70,7 +70,7 @@ class API:
         self.instance_id = instance_id
         self.project_id = self.instance["project_id"]
 
-        if self.instance.get("batch") is not None
+        if self.instance.get("batch") is not None:
             self.batch = self.batch_meta()
         else:
             self.batch = False
