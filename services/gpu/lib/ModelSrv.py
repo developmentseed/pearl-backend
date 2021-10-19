@@ -11,7 +11,14 @@ from .AOI import AOI
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
 from .osm import OSM
-from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson, serialize
+from .utils import (
+    generate_random_points,
+    geom2px,
+    geom2coords,
+    pred2png,
+    pxs2geojson,
+    serialize,
+)
 
 LOGGER = logging.getLogger("server")
 
@@ -516,27 +523,25 @@ class ModelSrv:
                 return is_processing(websocket)
             self.processing = True
 
-            osm = OSM(self.api.server.get('qa_tiles'))
-            osm.download(body.get('bounds'))
+            osm = OSM(self.api.server.get("qa_tiles"))
+            osm.download(body.get("bounds"))
 
-            for cls in body.get('classes'):
-                if cls.get('tagmap') is None:
-                    cls['tagmap'] = {}
+            for cls in body.get("classes"):
+                if cls.get("tagmap") is None:
+                    cls["tagmap"] = {}
 
-                cls['file'] = osm.extract(cls);
+                cls["file"] = osm.extract(cls)
 
             done_processing(self)
 
-            self.retrain({
-                "name": body.get('name'),
-                "classes": body.get('classes')
-            }, websocket)
+            self.retrain(
+                {"name": body.get("name"), "classes": body.get("classes")}, websocket
+            )
 
         except Exception as e:
             done_processing(self)
             websocket.error("OSM Error", e)
             raise e
-
 
     def retrain(self, body, websocket):
         try:
@@ -546,36 +551,44 @@ class ModelSrv:
 
             LOGGER.info("ok - starting retrain")
 
-            total = 0;
+            total = 0
             for cls in body["classes"]:
-                if cls.get('geometry') is None:
-                    cls['geometry'] = {
-                        'type': 'FeatureCollection',
-                        'features': []
-                    }
+                if cls.get("geometry") is None:
+                    cls["geometry"] = {"type": "FeatureCollection", "features": []}
 
                 cls["retrain_geometry"] = []
                 for feature in cls["geometry"]["features"]:
-                    if feature["geometry"]["type"] == "Polygon" or feature["geometry"]["type"] == "MultiPolygon":
+                    if (
+                        feature["geometry"]["type"] == "Polygon"
+                        or feature["geometry"]["type"] == "MultiPolygon"
+                    ):
                         points = generate_random_points(50, feature["geometry"])
-                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
+                        cls["retrain_geometry"] = [
+                            *cls["retrain_geometry"],
+                            *geom2coords(points),
+                        ]
 
                     elif (
                         feature["geometry"]["type"] == "MultiPoint"
                         and len(feature["geometry"]["coordinates"]) > 0
                     ):
-                        cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(feature["geometry"])]
+                        cls["retrain_geometry"] = [
+                            *cls["retrain_geometry"],
+                            *geom2coords(feature["geometry"]),
+                        ]
 
-                if cls.get('file') is not None:
-                    with open(cls['file']) as f:
+                if cls.get("file") is not None:
+                    with open(cls["file"]) as f:
                         for feature in f.readlines():
                             feature = json.loads(feature)
 
                             points = generate_random_points(50, feature["geometry"])
-                            cls["retrain_geometry"] = [*cls['retrain_geometry'], *geom2coords(points)]
+                            cls["retrain_geometry"] = [
+                                *cls["retrain_geometry"],
+                                *geom2coords(points),
+                            ]
 
-                total += len(cls['retrain_geometry'])
-
+                total += len(cls["retrain_geometry"])
 
             curr = 0
             for cls in body["classes"]:
@@ -583,7 +596,7 @@ class ModelSrv:
                     cls["retrain_geometry"], self, websocket, total, curr
                 )
 
-                curr += len(cls['retrain_geometry'])
+                curr += len(cls["retrain_geometry"])
 
             self.model.retrain(body["classes"])
 
@@ -614,9 +627,7 @@ class ModelSrv:
                 websocket,
             )
 
-            websocket.send(json.dumps({
-                "message": "model#retrain#complete"
-            }))
+            websocket.send(json.dumps({"message": "model#retrain#complete"}))
 
             done_processing(self)
 

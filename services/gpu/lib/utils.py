@@ -56,6 +56,7 @@ def pxs2geojson(classes):
 
     return geoms
 
+
 def geom2coords(geom):
     coords = []
 
@@ -68,7 +69,6 @@ def geom2coords(geom):
         return False
 
     return coords
-
 
 
 def geom2px(coords, modelsrv, websocket=False, total=0, curr=1):
@@ -94,13 +94,14 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1):
         pxs.append(PX(coord, xy, xyz, pixels, value))
 
         if websocket is not False:
-            websocket.send(json.dumps({
-                "message": "model#retrain#progress",
-                "data": {
-                    "total": total,
-                    "processed": curr + i + 1
-                }
-            }))
+            websocket.send(
+                json.dumps(
+                    {
+                        "message": "model#retrain#progress",
+                        "data": {"total": total, "processed": curr + i + 1},
+                    }
+                )
+            )
 
     return pxs
 
