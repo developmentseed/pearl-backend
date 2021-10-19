@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import sys
 
 import numpy as np
@@ -16,8 +15,7 @@ from .utils import (
     geom2px,
     geom2coords,
     pred2png,
-    pxs2geojson,
-    serialize,
+    pxs2geojson
 )
 
 LOGGER = logging.getLogger("server")

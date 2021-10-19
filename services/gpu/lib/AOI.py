@@ -9,7 +9,6 @@ from pyproj import Geod
 from rasterio.io import MemoryFile
 from rasterio.windows import Window
 from shapely.geometry import box, shape
-from shapely.ops import transform
 
 LOGGER = logging.getLogger("server")
 

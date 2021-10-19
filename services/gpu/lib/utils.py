@@ -12,12 +12,6 @@ from logging.handlers import TimedRotatingFileHandler
 
 import mercantile
 import numpy as np
-import rasterio
-import rasterio.crs
-import rasterio.io
-import rasterio.mask
-import rasterio.merge
-import rasterio.transform
 from PIL import Image
 from rasterio.transform import from_bounds
 from shapely.geometry import Point, mapping, shape
