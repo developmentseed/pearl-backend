@@ -6,19 +6,16 @@ const arequest = promisify(request);
  * @class Proxy
  */
 class Proxy {
-    constructor(config) {
-        this.config = config;
-    }
-
     /**
      * Proxy a request to the TiTiler
      *
      * @param {Object} req Express Request Object
      * @param {Object|boolean} res Express Response Object or false if the response
      *                             should be returned instead of piped
+     * @param {String} base Base URL to be requested
      */
-    async request(req, res) {
-        const url = new URL(this.config.TileUrl + req.url);
+    static async request(req, res, base) {
+        const url = new URL(req.url, base);
 
         for (const p of Object.keys(req.query)) {
             url.searchParams.append(p, req.query[p]);
@@ -43,14 +40,14 @@ class Proxy {
                         }
                     }).pipe(res);
                 }
+            } else {
+                return await arequest({
+                    url: url,
+                    json: typeof req.body === 'object',
+                    method: req.method,
+                    body: req.body
+                });
             }
-
-            return await arequest({
-                url: url,
-                json: typeof req.body === 'object',
-                method: req.method,
-                body: req.body
-            });
         } catch (err) {
             throw new Error(err);
         }

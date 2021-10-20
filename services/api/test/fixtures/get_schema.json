@@ -319,6 +319,21 @@
         "query": false,
         "res": false
     },
+    "GET /tiles": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /tiles/:layer": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /tiles/:layer/:z/:x/:y.mvt": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /token": {
         "body": false,
         "query": false,
