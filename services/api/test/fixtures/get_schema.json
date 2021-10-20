@@ -309,6 +309,16 @@
         "query": false,
         "res": true
     },
+    "GET /schema": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /user": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /tiles": {
         "body": false,
         "query": false,
@@ -319,12 +329,7 @@
         "query": false,
         "res": true
     },
-    "GET /schema": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /user": {
+    "GET /tiles/:layer/:z/:x/:y.mvt": {
         "body": false,
         "query": false,
         "res": false

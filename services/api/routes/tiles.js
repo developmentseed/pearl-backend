@@ -58,6 +58,39 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {get} /api/tiles/:layer/:z/:x/:y.mvt Get MVT
+     * @apiVersion 1.0.0
+     * @apiName TileJSONTiles
+     * @apiGroup Tiles
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a TileJSON for the given layer
+     */
+    await schema.get('/tiles/:layer/:z/:x/:y.mvt', {
+        ':layer': 'string',
+        ':z': 'integer',
+        ':x': 'integer',
+        ':y': 'integer',
+    }, async (req, res) => {
+        try {
+            if (!Tiles.list().tiles.includes(req.params.layer)) throw new Err(400, null, 'Unsupported Layer');
+
+            let tilejson;
+            if (req.params.layer === 'qa-latest') {
+                req.url = `/${req.params.z}/${req.params.x}/${req.params.y}.pbf`;
+                tilejson = (await Proxy.request(req, false, config.QA_Tiles)).body;
+            } else {
+                throw new Err(400, null, 'Unconfigured Layer');
+            }
+
+            return res.json(tilejson);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;
