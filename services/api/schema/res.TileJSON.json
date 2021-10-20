@@ -4,7 +4,7 @@
         "tilejson",
         "name",
         "version",
-        "schema",
+        "scheme",
         "tiles",
         "bounds",
         "center"
@@ -12,7 +12,10 @@
     "properties": {
         "tilejson": {
             "type": "string",
-            "enum": [ "2.2.0" ],
+            "enum": [
+                "2.2.0",
+                "2.1.0"
+            ],
             "description": "TileJSON Spec Version"
         },
         "name": {
@@ -21,10 +24,9 @@
         },
         "version": {
             "type": "string",
-            "description": "Style Version",
-            "enum": [ "1.0.0" ]
+            "description": "Style Version"
         },
-        "schema": {
+        "scheme": {
             "type": "string",
             "enum": [ "xyz" ],
             "description": "Tile format"

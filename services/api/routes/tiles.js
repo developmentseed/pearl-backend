@@ -42,12 +42,18 @@ async function router(schema, config) {
         res: 'res.TileJSON.json'
     }, async (req, res) => {
         try {
-            if (!Tiles.list().tiles.includes(req.params.layer)) throw Err(400, null, 'Unsupported Layer');
+            if (!Tiles.list().tiles.includes(req.params.layer)) throw new Err(400, null, 'Unsupported Layer');
 
-            if (req.params.layer === 'qa_latest') req.url = config.QA_Tiles;
+            let tilejson;
+            if (req.params.layer === 'qa-latest') {
+                req.url = '';
+                tilejson = (await Proxy.request(req, false, config.QA_Tiles)).body;
+            } else {
+                throw new Err(400, null, 'Unconfigured Layer');
+            }
 
-            const proxy = new Proxy(config);
-            await proxy.request(req, res);
+
+            return res.json(tilejson);
         } catch (err) {
             return Err.respond(err, res);
         }

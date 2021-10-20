@@ -6,10 +6,6 @@ const arequest = promisify(request);
  * @class Proxy
  */
 class Proxy {
-    constructor(config) {
-        this.config = config;
-    }
-
     /**
      * Proxy a request to the TiTiler
      *
@@ -17,8 +13,8 @@ class Proxy {
      * @param {Object|boolean} res Express Response Object or false if the response
      *                             should be returned instead of piped
      */
-    async request(req, res) {
-        const url = new URL(this.config.TileUrl + req.url);
+    static async request(req, res, base) {
+        const url = new URL(req.url, base);
 
         for (const p of Object.keys(req.query)) {
             url.searchParams.append(p, req.query[p]);
