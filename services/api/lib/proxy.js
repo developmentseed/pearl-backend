@@ -12,6 +12,7 @@ class Proxy {
      * @param {Object} req Express Request Object
      * @param {Object|boolean} res Express Response Object or false if the response
      *                             should be returned instead of piped
+     * @param {String} base Base URL to be requested
      */
     static async request(req, res, base) {
         const url = new URL(req.url, base);

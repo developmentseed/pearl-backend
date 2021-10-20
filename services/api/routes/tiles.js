@@ -73,7 +73,7 @@ async function router(schema, config) {
         ':layer': 'string',
         ':z': 'integer',
         ':x': 'integer',
-        ':y': 'integer',
+        ':y': 'integer'
     }, async (req, res) => {
         try {
             if (!Tiles.list().tiles.includes(req.params.layer)) throw new Err(400, null, 'Unsupported Layer');

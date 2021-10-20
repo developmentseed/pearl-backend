@@ -1,7 +1,5 @@
 const test = require('tape');
 const Flight = require('./flight');
-const fs = require('fs');
-const { sql } = require('slonik');
 
 const flight = new Flight();
 
@@ -23,7 +21,7 @@ test('GET /api/tiles', async (t) => {
         t.deepEquals(res.body, {
             tiles: [
                 'qa-latest'
-           ]
+            ]
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -34,7 +32,7 @@ test('GET /api/tiles', async (t) => {
 
 test('GET /api/tiles/qa-latest', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             json: true,
             url: '/api/tiles/qa-latest',
             method: 'GET',
