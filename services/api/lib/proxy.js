@@ -40,14 +40,14 @@ class Proxy {
                         }
                     }).pipe(res);
                 }
+            } else {
+                return await arequest({
+                    url: url,
+                    json: typeof req.body === 'object',
+                    method: req.method,
+                    body: req.body
+                });
             }
-
-            return await arequest({
-                url: url,
-                json: typeof req.body === 'object',
-                method: req.method,
-                body: req.body
-            });
         } catch (err) {
             throw new Error(err);
         }
