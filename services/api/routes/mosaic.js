@@ -47,7 +47,7 @@ async function router(schema, config) {
         try {
             req.url = req.url + '/tilejson.json';
 
-            await Proxy.request(req, res, this.config.TileUrl);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -81,7 +81,7 @@ async function router(schema, config) {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            Proxy.request(req, res, this.config.TileUrl);
+            Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }

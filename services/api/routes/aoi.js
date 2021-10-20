@@ -28,7 +28,7 @@ async function router(schema, config) {
 
         let tj, tiles;
         if (aoi.uuid) {
-            const response = await Proxy.request(req, false, this.config.TileUrl);
+            const response = await Proxy.request(req, false, config.TileUrl);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
@@ -47,7 +47,7 @@ async function router(schema, config) {
 
             req.query.colormap = JSON.stringify(cmap);
 
-            const response = await Proxy.request(req, false, this.config.TileUrl);
+            const response = await Proxy.request(req, false, config.TileUrl);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
@@ -161,7 +161,7 @@ async function router(schema, config) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-            await Proxy.request(req, res, this.config.TileUrl);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -226,7 +226,7 @@ async function router(schema, config) {
                         },
                         body: {},
                         method: 'GET'
-                    }, false, this.config.TileUrl);
+                    }, false, config.TileUrl);
 
                     const px_stats = {};
 
@@ -320,7 +320,7 @@ async function router(schema, config) {
                 colormap: cmap
             };
 
-            await Proxy.request(req, res, this.config.TileUrl);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -440,7 +440,7 @@ async function router(schema, config) {
                     colormap: cmap
                 };
 
-                const pres = await Proxy.request(req, true, this.config.TileUrl);
+                const pres = await Proxy.request(req, true, config.TileUrl);
                 const up = await share.upload(config, pres);
                 return res.json(up.serialize());
             } else {
@@ -648,7 +648,7 @@ async function router(schema, config) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-            await Proxy.request(req, res, this.config.TileUrl);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -719,7 +719,7 @@ async function router(schema, config) {
                 colormap: cmap
             };
 
-            await Proxy.request(req, res, this.config.TileUrl);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
