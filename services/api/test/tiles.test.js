@@ -42,8 +42,6 @@ test('GET /api/tiles/qa-latest', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
-
-        t.deepEquals(res.body, { });
     } catch (err) {
         t.error(err, 'no errors');
     }
