@@ -9,7 +9,6 @@
         "bounds",
         "center"
     ],
-    "additionalProperties": false,
     "properties": {
         "tilejson": {
             "type": "string",

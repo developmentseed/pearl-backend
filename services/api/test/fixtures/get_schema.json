@@ -309,6 +309,16 @@
         "query": false,
         "res": true
     },
+    "GET /tiles": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /tiles/:layer": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /schema": {
         "body": false,
         "query": true,
