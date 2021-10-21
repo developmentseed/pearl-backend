@@ -1,6 +1,16 @@
 const Err = require('../lib/error');
 const Proxy = require('../lib/proxy');
 const Tiles = require('../lib/tiles');
+const VectorTile = require('@mapbox/vector-tile').VectorTile;
+const Protobuf = require('pbf');
+const zlib = require('zlib');
+const { promisify } = require('util');
+const request = require('request');
+const gunzip = promisify(zlib.gunzip);
+const gzip = promisify(zlib.gzip);
+const arequest = promisify(request);
+const geojsonvt = require('geojson-vt');
+const vtpbf = require('vt-pbf');
 
 async function router(schema, config) {
     /**
@@ -67,7 +77,9 @@ async function router(schema, config) {
      * @apiPermission user
      *
      * @apiDescription
-     *     Return a TileJSON for the given layer
+     *     Return an MVT for the given layer
+     *     This endpoint will request the upstream vector tile and parse it in place
+     *     Adding a `feature.properties.@ftype = '<GeoJSON Geometry Type>'` property
      */
     await schema.get('/tiles/:layer/:z/:x/:y.mvt', {
         ':layer': 'string',
@@ -78,15 +90,46 @@ async function router(schema, config) {
         try {
             if (!Tiles.list().tiles.includes(req.params.layer)) throw new Err(400, null, 'Unsupported Layer');
 
-            let tilejson;
+            const preq = {
+                method: 'GET',
+                encoding: null
+            };
+
             if (req.params.layer === 'qa-latest') {
-                req.url = `/${req.params.z}/${req.params.x}/${req.params.y}.pbf`;
-                tilejson = (await Proxy.request(req, false, config.QA_Tiles)).body;
+                preq.url = new URL(`/services/z17/tiles/${req.params.z}/${req.params.x}/${req.params.y}.pbf`, new URL(config.QA_Tiles).origin);
             } else {
                 throw new Err(400, null, 'Unconfigured Layer');
             }
 
-            return res.json(tilejson);
+            let mvt = await arequest(preq);
+            mvt = await gunzip(mvt.body);
+            mvt = new VectorTile(new Protobuf(mvt));
+
+            const feats = [];
+            for (let i = 0; i < mvt.layers.osm.length; i++) {
+                const feat = mvt.layers.osm.feature(i).toGeoJSON(req.params.x, req.params.y, req.params.z);
+                feat.properties['@ftype'] = feat.geometry.type;
+                feats.push(feat);
+            }
+
+            const t = geojsonvt({
+                type: 'FeatureCollection',
+                features: feats
+            }, {
+                maxZoom: 17
+            }).getTile(
+                req.params.z,
+                req.params.x,
+                req.params.y
+            );
+
+            const resbody = vtpbf.fromGeojsonVt({
+                osm: t
+            });
+
+            res.header('Content-Type', 'application/vnd.mapbox-vector-tile');
+            res.header('Content-Encoding', 'gzip');
+            res.send(await gzip(Buffer.from(resbody.buffer)));
         } catch (err) {
             return Err.respond(err, res);
         }
