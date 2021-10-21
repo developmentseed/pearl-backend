@@ -128,6 +128,7 @@ async function router(schema, config) {
             });
 
             res.header('Content-Type', 'application/vnd.mapbox-vector-tile');
+            res.header('Content-Encoding', 'gzip');
             res.send(await gzip(Buffer.from(resbody.buffer)));
         } catch (err) {
             return Err.respond(err, res);
