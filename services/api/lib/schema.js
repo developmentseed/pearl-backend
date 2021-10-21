@@ -106,10 +106,6 @@ class Schemas {
 
         this.schemas.set(parsed.join(' '), schemas);
 
-        if (!schemas.body && !schemas.query) {
-            return [parsed[1]];
-        }
-
         const opts = {};
         if (schemas.query) opts.query = schemas.query;
         if (schemas.body) opts.body = schemas.body;

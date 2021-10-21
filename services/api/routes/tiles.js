@@ -7,8 +7,10 @@ const zlib = require('zlib');
 const { promisify } = require('util');
 const request = require('request');
 const gunzip = promisify(zlib.gunzip);
+const gzip = promisify(zlib.gzip);
 const arequest = promisify(request);
 const geojsonvt = require('geojson-vt');
+const vtpbf = require('vt-pbf');
 
 async function router(schema, config) {
     /**
@@ -115,18 +117,18 @@ async function router(schema, config) {
                 features: feats
             }, {
                 maxZoom: 17
+            }).getTile(
+                req.params.z,
+                req.params.x,
+                req.params.y
+            );
+
+            const resbody = vtpbf.fromGeojsonVt({
+                osm: t
             });
 
-            /*
-            const t = geojsonvt({
-                type: 'FeatureCollection',
-                features: feats
-            }).getTile(req.params.z, req.params.x, req.params.y);
-            */
-
-            console.error(t);
-
-            return res.json(true);
+            res.header('Content-Type', 'application/vnd.mapbox-vector-tile');
+            res.send(await gzip(Buffer.from(resbody.buffer)));
         } catch (err) {
             return Err.respond(err, res);
         }

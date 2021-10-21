@@ -50,15 +50,18 @@ test('GET /api/tiles/qa-latest', async (t) => {
 test('GET /api/tiles/qa-latest/17/100/100.mvt', async (t) => {
     try {
         const res = await flight.request({
-            json: true,
             url: '/api/tiles/qa-latest/17/36634/50171.mvt',
             method: 'GET',
+            encoding: null,
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, false);
 
         t.equals(res.statusCode, 200);
+        t.ok(res.body);
+
+        console.error(res.body);
     } catch (err) {
         t.error(err, 'no errors');
     }
