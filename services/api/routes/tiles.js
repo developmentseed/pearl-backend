@@ -8,6 +8,7 @@ const { promisify } = require('util');
 const request = require('request');
 const gunzip = promisify(zlib.gunzip);
 const arequest = promisify(request);
+const geojsonvt = require('geojson-vt');
 
 async function router(schema, config) {
     /**
@@ -74,7 +75,9 @@ async function router(schema, config) {
      * @apiPermission user
      *
      * @apiDescription
-     *     Return a TileJSON for the given layer
+     *     Return an MVT for the given layer
+     *     This endpoint will request the upstream vector tile and parse it in place
+     *     Adding a `feature.properties.@ftype = '<GeoJSON Geometry Type>'` property
      */
     await schema.get('/tiles/:layer/:z/:x/:y.mvt', {
         ':layer': 'string',
@@ -103,9 +106,25 @@ async function router(schema, config) {
             const feats = [];
             for (let i = 0; i < mvt.layers.osm.length; i++) {
                 const feat = mvt.layers.osm.feature(i).toGeoJSON(req.params.x, req.params.y, req.params.z);
-                feat.properties['@ftype'] = feat.geometry.typetw
+                feat.properties['@ftype'] = feat.geometry.type;
                 feats.push(feat);
             }
+
+            const t = geojsonvt({
+                type: 'FeatureCollection',
+                features: feats
+            }, {
+                maxZoom: 17
+            });
+
+            /*
+            const t = geojsonvt({
+                type: 'FeatureCollection',
+                features: feats
+            }).getTile(req.params.z, req.params.x, req.params.y);
+            */
+
+            console.error(t);
 
             return res.json(true);
         } catch (err) {

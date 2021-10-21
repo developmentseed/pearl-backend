@@ -28,6 +28,7 @@
         "express-jwt": "^6.0.0",
         "express-minify": "^1.0.0",
         "express-session": "^1.17.1",
+        "geojson-vt": "^3.2.1",
         "jsonwebtoken": "^8.5.1",
         "jwks-rsa": "^2.0.5",
         "knex": "^0.95.1",
