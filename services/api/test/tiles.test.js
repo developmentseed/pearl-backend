@@ -51,7 +51,7 @@ test('GET /api/tiles/qa-latest/17/100/100.mvt', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/tiles/qa-latest/17/100/100.mvt',
+            url: '/api/tiles/qa-latest/17/36634/50171.mvt',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

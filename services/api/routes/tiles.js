@@ -1,6 +1,11 @@
 const Err = require('../lib/error');
 const Proxy = require('../lib/proxy');
 const Tiles = require('../lib/tiles');
+const VectorTile = require('@mapbox/vector-tile').VectorTile;
+const Protobuf = require('pbf');
+const zlib = require('zlib');
+const { promisify } = require('util');
+const gunzip = promisify(zlib.gunzip);
 
 async function router(schema, config) {
     /**
@@ -78,15 +83,19 @@ async function router(schema, config) {
         try {
             if (!Tiles.list().tiles.includes(req.params.layer)) throw new Err(400, null, 'Unsupported Layer');
 
-            let tilejson;
+            let mvt;
             if (req.params.layer === 'qa-latest') {
-                req.url = `/${req.params.z}/${req.params.x}/${req.params.y}.pbf`;
-                tilejson = (await Proxy.request(req, false, config.QA_Tiles)).body;
+                req.url = `/services/z17/tiles/${req.params.z}/${req.params.x}/${req.params.y}.pbf`;
+                mvt = (await Proxy.request(req, false, new URL(config.QA_Tiles).origin)).body;
             } else {
                 throw new Err(400, null, 'Unconfigured Layer');
             }
 
-            return res.json(tilejson);
+            const tile = new VectorTile(new Protobuf(mvt));
+
+            console.error(tile.layers);
+
+            return res.json(mvt);
         } catch (err) {
             return Err.respond(err, res);
         }
