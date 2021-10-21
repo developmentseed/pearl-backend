@@ -5,7 +5,9 @@ const VectorTile = require('@mapbox/vector-tile').VectorTile;
 const Protobuf = require('pbf');
 const zlib = require('zlib');
 const { promisify } = require('util');
+const request = require('request');
 const gunzip = promisify(zlib.gunzip);
+const arequest = promisify(request);
 
 async function router(schema, config) {
     /**
@@ -83,19 +85,29 @@ async function router(schema, config) {
         try {
             if (!Tiles.list().tiles.includes(req.params.layer)) throw new Err(400, null, 'Unsupported Layer');
 
-            let mvt;
+            const preq = {
+                method: 'GET',
+                encoding: null
+            };
+
             if (req.params.layer === 'qa-latest') {
-                req.url = `/services/z17/tiles/${req.params.z}/${req.params.x}/${req.params.y}.pbf`;
-                mvt = (await Proxy.request(req, false, new URL(config.QA_Tiles).origin)).body;
+                preq.url = new URL(`/services/z17/tiles/${req.params.z}/${req.params.x}/${req.params.y}.pbf`, new URL(config.QA_Tiles).origin);
             } else {
                 throw new Err(400, null, 'Unconfigured Layer');
             }
 
-            const tile = new VectorTile(new Protobuf(mvt));
+            let mvt = await arequest(preq);
+            mvt = await gunzip(mvt.body);
+            mvt = new VectorTile(new Protobuf(mvt));
 
-            console.error(tile.layers);
+            const feats = [];
+            for (let i = 0; i < mvt.layers.osm.length; i++) {
+                const feat = mvt.layers.osm.feature(i).toGeoJSON(req.params.x, req.params.y, req.params.z);
+                feat.properties['@ftype'] = feat.geometry.typetw
+                feats.push(feat);
+            }
 
-            return res.json(mvt);
+            return res.json(true);
         } catch (err) {
             return Err.respond(err, res);
         }
