@@ -5970,6 +5970,27 @@
       }
     ],
     "description": "<p>Return an MVT for the given layer This endpoint will request the upstream vector tile and parse it in place Adding a <code>feature.properties.@ftype = '&lt;GeoJSON Geometry Type&gt;'</code> property</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String[]",
+            "allowedValues": [
+              "\"Point\"",
+              "\"MultiPoint\"",
+              "\"LineString\"",
+              "\"MultiLineString\"",
+              "\"Polygon\"",
+              "\"MultiPolygon\""
+            ],
+            "optional": true,
+            "field": "types",
+            "description": ""
+          }
+        ]
+      }
+    },
     "filename": "./routes/tiles.js",
     "groupTitle": "Tiles"
   },

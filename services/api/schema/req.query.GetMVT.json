@@ -4,6 +4,7 @@
     "properties": {
         "types": {
             "type": "array",
+            "default": [ "Point", "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon" ],
             "items": {
                 "type": "string",
                 "enum": [
