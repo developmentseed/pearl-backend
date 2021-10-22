@@ -72,7 +72,7 @@ async function router(schema, config) {
     /**
      * @api {get} /api/tiles/:layer/:z/:x/:y.mvt Get MVT
      * @apiVersion 1.0.0
-     * @apiName TileJSONTiles
+     * @apiName GetMVT
      * @apiGroup Tiles
      * @apiPermission user
      *
@@ -80,8 +80,11 @@ async function router(schema, config) {
      *     Return an MVT for the given layer
      *     This endpoint will request the upstream vector tile and parse it in place
      *     Adding a `feature.properties.@ftype = '<GeoJSON Geometry Type>'` property
+     *
+     * @apiSchema (Query) {jsonschema=../schema/req.query.GetMVT.json} apiParam
      */
     await schema.get('/tiles/:layer/:z/:x/:y.mvt', {
+        query: 'req.query.GetMVT.json',
         ':layer': 'string',
         ':z': 'integer',
         ':x': 'integer',
@@ -109,6 +112,9 @@ async function router(schema, config) {
             for (let i = 0; i < mvt.layers.osm.length; i++) {
                 const feat = mvt.layers.osm.feature(i).toGeoJSON(req.params.x, req.params.y, req.params.z);
                 feat.properties['@ftype'] = feat.geometry.type;
+
+                if (!req.query.types.includes(feat.geometry.type)) continue;
+
                 feats.push(feat);
             }
 

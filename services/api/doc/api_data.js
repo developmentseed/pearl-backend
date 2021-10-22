@@ -46,14 +46,14 @@ define({ "api": [
             ],
             "optional": false,
             "field": "bounds.type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Unknown",
             "optional": false,
             "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -73,105 +73,105 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "area",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean/Null",
             "optional": false,
             "field": "bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "bookmarked_at",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "patches",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "px_stats",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "shares",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -283,7 +283,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "batch",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -297,42 +297,42 @@ define({ "api": [
             "type": "Null/String",
             "optional": false,
             "field": "batch.error",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "batch.created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "batch.updated",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "batch.aoi",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "batch.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "batch.completed",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -425,7 +425,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "aois",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -439,91 +439,91 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "aois.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "aois.checkpoint_name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "aois.bounds",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aois.area",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean/Null",
             "optional": false,
             "field": "aois.bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aois.bookmarked_at",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aois.checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aois.created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "aois.storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "aois.patches",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "aois.px_stats",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "aois.classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "aois.shares",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -575,7 +575,7 @@ define({ "api": [
             "type": "Integer[]",
             "optional": true,
             "field": "patches",
-            "description": "<p>List of patch ids to apply on export undefined</p>"
+            "description": "<p>List of patch ids to apply on export</p>"
           }
         ]
       }
@@ -595,105 +595,105 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "area",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean/Null",
             "optional": false,
             "field": "bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "bookmarked_at",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "patches",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "px_stats",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "shares",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -731,14 +731,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -752,7 +752,7 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -846,14 +846,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -867,7 +867,7 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -929,21 +929,21 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "patches",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -964,7 +964,7 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "patches.storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -994,7 +994,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"2.2.0\""
+              "\"2.2.0\"",
+              "\"2.1.0\""
             ],
             "optional": false,
             "field": "tilejson",
@@ -1010,9 +1011,6 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "String",
-            "allowedValues": [
-              "\"1.0.0\""
-            ],
             "optional": false,
             "field": "version",
             "description": "<p>Style Version</p>"
@@ -1024,7 +1022,7 @@ define({ "api": [
               "\"xyz\""
             ],
             "optional": false,
-            "field": "schema",
+            "field": "scheme",
             "description": "<p>Tile format</p>"
           },
           {
@@ -1039,14 +1037,14 @@ define({ "api": [
             "type": "Number[]",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": false,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1102,14 +1100,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -1123,7 +1121,7 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1171,7 +1169,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"2.2.0\""
+              "\"2.2.0\"",
+              "\"2.1.0\""
             ],
             "optional": false,
             "field": "tilejson",
@@ -1187,9 +1186,6 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "String",
-            "allowedValues": [
-              "\"1.0.0\""
-            ],
             "optional": false,
             "field": "version",
             "description": "<p>Style Version</p>"
@@ -1201,7 +1197,7 @@ define({ "api": [
               "\"xyz\""
             ],
             "optional": false,
-            "field": "schema",
+            "field": "scheme",
             "description": "<p>Tile format</p>"
           },
           {
@@ -1216,14 +1212,14 @@ define({ "api": [
             "type": "Number[]",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": false,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1261,105 +1257,105 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "area",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean/Null",
             "optional": false,
             "field": "bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "bookmarked_at",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "patches",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "px_stats",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "shares",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1397,14 +1393,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -1444,35 +1440,35 @@ define({ "api": [
             "type": "Integer[]",
             "optional": false,
             "field": "model_inputshape",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -1524,7 +1520,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
@@ -1548,14 +1544,14 @@ define({ "api": [
             ],
             "optional": false,
             "field": "bounds.type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Unknown",
             "optional": false,
             "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1663,14 +1659,14 @@ define({ "api": [
             ],
             "optional": false,
             "field": "bounds.type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1796,14 +1792,14 @@ define({ "api": [
             ],
             "optional": false,
             "field": "bounds.type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1900,7 +1896,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "batch",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -1914,42 +1910,42 @@ define({ "api": [
             "type": "Null/String",
             "optional": false,
             "field": "batch.error",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "batch.created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "batch.updated",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "batch.aoi",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "batch.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "batch.completed",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -1980,35 +1976,35 @@ define({ "api": [
             "type": "Integer",
             "optional": true,
             "field": "aoi",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "String",
             "optional": true,
             "field": "error",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Integer",
             "optional": true,
             "field": "progress",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Boolean",
             "optional": true,
             "field": "abort",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Boolean",
             "optional": true,
             "field": "completed",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -2116,14 +2112,14 @@ define({ "api": [
             ],
             "optional": false,
             "field": "bounds.type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "bounds.coordinates",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -2168,63 +2164,70 @@ define({ "api": [
             "type": "Object[]",
             "optional": true,
             "field": "analytics",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Number",
             "optional": false,
             "field": "analytics.counts",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Number",
             "optional": false,
             "field": "analytics.percent",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Number",
             "optional": false,
             "field": "analytics.f1score",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours</p>"
           },
           {
             "group": "Body",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Null/Object[]",
             "optional": true,
             "field": "retrain_geoms",
-            "description": "<p>Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes undefined</p>"
+            "description": "<p>Array of GeoJSON Multipoint geometries that were used for retraining. Length of geomms array must equals classes</p>"
           },
           {
             "group": "Body",
             "type": "Null/Object[]",
             "optional": true,
             "field": "input_geoms",
-            "description": "<p>Array of GeoJSON FeatureCollection that were input by the user. Length of this array must equals classes undefined</p>"
+            "description": "<p>Array of GeoJSON FeatureCollection that were input by the user. Length of this array must equals classes</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object",
+            "optional": true,
+            "field": "tagmap",
+            "description": ""
           }
         ]
       }
@@ -2244,7 +2247,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2258,7 +2261,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2272,56 +2275,63 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "analytics",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "retrain_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "input_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": ""
           }
         ]
       }
@@ -2415,7 +2425,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2429,7 +2439,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2443,56 +2453,122 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "analytics",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "retrain_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "input_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/checkpoint.js",
+    "groupTitle": "Checkpoints"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:projectid/checkpoint/:checkpointid/osmtag",
+    "title": "Get OSMTags",
+    "version": "1.0.0",
+    "name": "GetOSMTags",
+    "group": "Checkpoints",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return OSMTags for a Checkpoint if they exist</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>The project_id the OSMTag belongs to - public if null</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "tagmap",
+            "description": ""
           }
         ]
       }
@@ -2570,14 +2646,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "checkpoints",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2591,7 +2667,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "checkpoints.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2612,14 +2688,14 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "checkpoints.storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "checkpoints.bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -2664,21 +2740,21 @@ define({ "api": [
             "type": "Object[]",
             "optional": true,
             "field": "classes",
-            "description": "<p>Named output classes &amp; their associated colours. NOTE: Patching cannot change the number of classes undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours. NOTE: Patching cannot change the number of classes</p>"
           },
           {
             "group": "Query",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Query",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -2698,7 +2774,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2712,7 +2788,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2726,56 +2802,63 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "analytics",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "retrain_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "input_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": ""
           }
         ]
       }
@@ -2823,7 +2906,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"2.2.0\""
+              "\"2.2.0\"",
+              "\"2.1.0\""
             ],
             "optional": false,
             "field": "tilejson",
@@ -2839,9 +2923,6 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "String",
-            "allowedValues": [
-              "\"1.0.0\""
-            ],
             "optional": false,
             "field": "version",
             "description": "<p>Style Version</p>"
@@ -2853,7 +2934,7 @@ define({ "api": [
               "\"xyz\""
             ],
             "optional": false,
-            "field": "schema",
+            "field": "scheme",
             "description": "<p>Tile format</p>"
           },
           {
@@ -2868,14 +2949,14 @@ define({ "api": [
             "type": "Number[]",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": false,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -2913,7 +2994,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2927,7 +3008,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -2941,56 +3022,63 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "bookmarked",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "analytics",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "retrain_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Unknown",
             "optional": false,
             "field": "input_geoms",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": true,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "osmtag_id",
+            "description": ""
           }
         ]
       }
@@ -3052,84 +3140,84 @@ define({ "api": [
             ],
             "optional": false,
             "field": "type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "batch",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "active",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "last_update",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "url",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "token",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "pod",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -3209,84 +3297,84 @@ define({ "api": [
             ],
             "optional": false,
             "field": "type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "batch",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "active",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "last_update",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "url",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "token",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "pod",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -3368,7 +3456,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "instances",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -3386,28 +3474,28 @@ define({ "api": [
             ],
             "optional": false,
             "field": "instances.type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "instances.batch",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "instances.active",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "instances.created",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -3475,84 +3563,84 @@ define({ "api": [
             ],
             "optional": false,
             "field": "type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "batch",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "active",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "last_update",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "url",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "token",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "pod",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -3594,84 +3682,84 @@ define({ "api": [
             ],
             "optional": false,
             "field": "type",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "status",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "batch",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "active",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer/Null",
             "optional": false,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "last_update",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "url",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": true,
             "field": "token",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": true,
             "field": "pod",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -3734,28 +3822,28 @@ define({ "api": [
             "type": "Integer[]",
             "optional": false,
             "field": "model_inputshape",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours</p>"
           },
           {
             "group": "Body",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
@@ -3776,7 +3864,7 @@ define({ "api": [
             "type": "Object",
             "optional": true,
             "field": "tagmap",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -3796,14 +3884,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -3843,35 +3931,35 @@ define({ "api": [
             "type": "Integer[]",
             "optional": false,
             "field": "model_inputshape",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -3987,14 +4075,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4034,35 +4122,35 @@ define({ "api": [
             "type": "Integer[]",
             "optional": false,
             "field": "model_inputshape",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4084,6 +4172,65 @@ define({ "api": [
             "optional": false,
             "field": "osmtag_id",
             "description": "<p>Optional default list of OSM Tags =&gt; Model Classes</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/model.js",
+    "groupTitle": "Model"
+  },
+  {
+    "type": "get",
+    "url": "/api/model/:modelid/osmtag",
+    "title": "Get OSMTags",
+    "version": "1.0.0",
+    "name": "GetOSMTags",
+    "group": "Model",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return OSMTags for a Model if they exist</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer/Null",
+            "optional": false,
+            "field": "project_id",
+            "description": "<p>The project_id the OSMTag belongs to - public if null</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>The unix timestamp at which the resource was created</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>The unix timestamp at which the resource was last updated</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "tagmap",
+            "description": ""
           }
         ]
       }
@@ -4121,7 +4268,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "models",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4135,21 +4282,21 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "models.created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "models.active",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "models.uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4177,21 +4324,21 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "models.classes",
-            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "models.classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "models.classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -4221,7 +4368,7 @@ define({ "api": [
             "type": "Boolean",
             "optional": true,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Body",
@@ -4235,7 +4382,7 @@ define({ "api": [
             "type": "Object",
             "optional": true,
             "field": "tagmap",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -4255,14 +4402,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4302,35 +4449,35 @@ define({ "api": [
             "type": "Integer[]",
             "optional": false,
             "field": "model_inputshape",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "classes",
-            "description": "<p>Named output classes &amp; their associated colours undefined</p>"
+            "description": "<p>Named output classes &amp; their associated colours</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "classes.color",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4382,7 +4529,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"2.2.0\""
+              "\"2.2.0\"",
+              "\"2.1.0\""
             ],
             "optional": false,
             "field": "tilejson",
@@ -4398,9 +4546,6 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "String",
-            "allowedValues": [
-              "\"1.0.0\""
-            ],
             "optional": false,
             "field": "version",
             "description": "<p>Style Version</p>"
@@ -4412,7 +4557,7 @@ define({ "api": [
               "\"xyz\""
             ],
             "optional": false,
-            "field": "schema",
+            "field": "scheme",
             "description": "<p>Tile format</p>"
           },
           {
@@ -4427,14 +4572,14 @@ define({ "api": [
             "type": "Number[]",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": false,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -4897,7 +5042,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4918,7 +5063,7 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "model_name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4932,14 +5077,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "checkpoints",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -4977,7 +5122,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -4998,7 +5143,7 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "model_name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -5012,14 +5157,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "checkpoints",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -5090,14 +5235,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "total",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "projects",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -5118,28 +5263,28 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "projects.created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "projects.aois",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "projects.checkpoints",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "projects.model",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -5190,7 +5335,7 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "uid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -5211,7 +5356,7 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "model_name",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -5225,14 +5370,14 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "created",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "checkpoints",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -5440,28 +5585,28 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "uuid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -5475,28 +5620,28 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "patches",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": true,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -5575,35 +5720,35 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "total",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "shares",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "shares.uuid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "shares.aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -5617,7 +5762,7 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "shares.storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -5648,28 +5793,28 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "uuid",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "aoi_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "project_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
@@ -5683,28 +5828,28 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "storage",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "patches",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": true,
             "field": "checkpoint_id",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": true,
             "field": "classes",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
@@ -5752,7 +5897,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"2.2.0\""
+              "\"2.2.0\"",
+              "\"2.1.0\""
             ],
             "optional": false,
             "field": "tilejson",
@@ -5768,9 +5914,6 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "String",
-            "allowedValues": [
-              "\"1.0.0\""
-            ],
             "optional": false,
             "field": "version",
             "description": "<p>Style Version</p>"
@@ -5782,7 +5925,7 @@ define({ "api": [
               "\"xyz\""
             ],
             "optional": false,
-            "field": "schema",
+            "field": "scheme",
             "description": "<p>Tile format</p>"
           },
           {
@@ -5797,20 +5940,170 @@ define({ "api": [
             "type": "Number[]",
             "optional": false,
             "field": "bounds",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": false,
             "field": "center",
-            "description": "<p>undefined undefined</p>"
+            "description": ""
           }
         ]
       }
     },
     "filename": "./routes/aoi.js",
     "groupTitle": "Share"
+  },
+  {
+    "type": "get",
+    "url": "/api/tiles/:layer/:z/:x/:y.mvt",
+    "title": "Get MVT",
+    "version": "1.0.0",
+    "name": "GetMVT",
+    "group": "Tiles",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return an MVT for the given layer This endpoint will request the upstream vector tile and parse it in place Adding a <code>feature.properties.@ftype = '&lt;GeoJSON Geometry Type&gt;'</code> property</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String[]",
+            "allowedValues": [
+              "\"Point\"",
+              "\"MultiPoint\"",
+              "\"LineString\"",
+              "\"MultiLineString\"",
+              "\"Polygon\"",
+              "\"MultiPolygon\""
+            ],
+            "optional": true,
+            "field": "types",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/tiles.js",
+    "groupTitle": "Tiles"
+  },
+  {
+    "type": "get",
+    "url": "/api/tiles",
+    "title": "",
+    "version": "1.0.0",
+    "name": "ListTiles",
+    "group": "Tiles",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of all supported Vector Tile Layers</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "tiles",
+            "description": "<p>List of supported tile layers Name of layer</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/tiles.js",
+    "groupTitle": "Tiles"
+  },
+  {
+    "type": "get",
+    "url": "/api/tiles/:layer",
+    "title": "TileJSON",
+    "version": "1.0.0",
+    "name": "TileJSONTiles",
+    "group": "Tiles",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a TileJSON for the given layer</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"2.2.0\"",
+              "\"2.1.0\""
+            ],
+            "optional": false,
+            "field": "tilejson",
+            "description": "<p>TileJSON Spec Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Unique name of layer</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>Style Version</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"xyz\""
+            ],
+            "optional": false,
+            "field": "scheme",
+            "description": "<p>Tile format</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "tiles",
+            "description": "<p>Array of tile URLs Tile URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "bounds",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number[]",
+            "optional": false,
+            "field": "center",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "./routes/tiles.js",
+    "groupTitle": "Tiles"
   },
   {
     "type": "post",
@@ -5919,6 +6212,7 @@ define({ "api": [
         "description": "<p>The user must be an admin to use this endpoint</p>"
       }
     ],
+    "description": "<p>Return a list of users that have registered with the service</p>",
     "parameter": {
       "fields": {
         "Query": [
@@ -5951,7 +6245,6 @@ define({ "api": [
         ]
       }
     },
-    "description": "<p>Return a list of users that have registered with the service</p>",
     "success": {
       "examples": [
         {
@@ -5987,21 +6280,21 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "username",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "email",
-            "description": "<p>undefined</p>"
+            "description": ""
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "access",
-            "description": "<p>undefined</p>"
+            "description": ""
           }
         ]
       }

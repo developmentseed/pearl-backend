@@ -69,4 +69,44 @@ test('GET /api/tiles/qa-latest/17/100/100.mvt', async (t) => {
     t.end();
 });
 
+test('GET /api/tiles/qa-latest/17/100/100.mvt?types=Point', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/tiles/qa-latest/17/36634/50171.mvt?types=Point',
+            method: 'GET',
+            encoding: null,
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
+        t.equals(res.statusCode, 200);
+        t.ok(res.body);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/tiles/qa-latest/17/100/100.mvt?types=Point,Polygon', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/tiles/qa-latest/17/36634/50171.mvt?types=Point,Polygon',
+            method: 'GET',
+            encoding: null,
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
+        t.equals(res.statusCode, 200);
+        t.ok(res.body);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
