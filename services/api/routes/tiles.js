@@ -112,6 +112,9 @@ async function router(schema, config) {
             for (let i = 0; i < mvt.layers.osm.length; i++) {
                 const feat = mvt.layers.osm.feature(i).toGeoJSON(req.params.x, req.params.y, req.params.z);
                 feat.properties['@ftype'] = feat.geometry.type;
+
+                if (!req.query.types.includes(feat.geometry.type)) continue;
+
                 feats.push(feat);
             }
 
