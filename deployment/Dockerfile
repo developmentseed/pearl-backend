@@ -17,6 +17,9 @@ RUN wget -O terraform.zip https://releases.hashicorp.com/terraform/1.0.2/terrafo
 RUN unzip terraform.zip
 RUN mv terraform /usr/local/bin
 
+# Upgrade pip
+RUN pip3 install -U pip
+
 # Install azure client
 RUN pip3 install azure-cli
 
