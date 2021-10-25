@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const jwt = require('jsonwebtoken');
 const { sql } = require('slonik');
 

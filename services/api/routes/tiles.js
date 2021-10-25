@@ -1,4 +1,4 @@
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Proxy = require('../lib/proxy');
 const Tiles = require('../lib/tiles');
 const VectorTile = require('@mapbox/vector-tile').VectorTile;

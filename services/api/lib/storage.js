@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const moment = require('moment');
 const {
     BlobSASPermissions,

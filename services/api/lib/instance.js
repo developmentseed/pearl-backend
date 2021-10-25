@@ -1,5 +1,5 @@
+const { Err } = require('@openaddresses/batch-schema');
 const Project = require('./project');
-const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const Kube = require('./kube');
 const { sql } = require('slonik');

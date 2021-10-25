@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const Storage = require('./storage');
 const poly = require('@turf/bbox-polygon').default;
 const bbox = require('@turf/bbox').default;
