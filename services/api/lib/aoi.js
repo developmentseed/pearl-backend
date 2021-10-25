@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const Project = require('./project');
 const Generic = require('./generic');
 const Storage = require('./storage');

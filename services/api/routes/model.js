@@ -1,6 +1,6 @@
 const Busboy = require('busboy');
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Model = require('../lib/model');
 const OSMTag = require('../lib/osmtag');
 
