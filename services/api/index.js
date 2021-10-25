@@ -60,7 +60,7 @@ async function server(args, config, cb) {
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schema: path.resolve(__dirname, 'schema')
+        schemas: path.resolve(__dirname, 'schema')
     });
     await schema.api();
 
