@@ -378,7 +378,7 @@ test('PATCH /api/model/2 - no initial tagmap', async (t) => {
                     1: [{ key: 'natural', value: 'forest' }],
                     2: [{ key: 'natural', value: 'field' }],
                     3: [{ key: 'building', value: 'yes' }]
-                },
+                }
             }
         }, t);
 
