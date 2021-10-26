@@ -116,7 +116,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {patch} /api/project/:pid Patch Batch
+     * @api {patch} /api/project/:projectid/batch/:batchid Patch Batch
      * @apiVersion 1.0.0
      * @apiName PatchBatch
      * @apiGroup Batch
