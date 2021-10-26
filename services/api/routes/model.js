@@ -85,7 +85,7 @@ async function router(schema, config) {
                 });
 
                 delete req.body.tagmap;
-                req.body.osmtag_id = tagmap.id;
+                model.osmtag_id = tagmap.id;
             }
 
             model.patch(req.body);

@@ -309,4 +309,106 @@ test('GET /api/model/1/osmtag', async (t) => {
     t.end();
 });
 
+test('POST /api/model - no initial tagmap', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/model',
+            method: 'POST',
+            auth: {
+                bearer: flight.token.ingalls
+            },
+            body: {
+                name: 'NAIP Supervised',
+                active: true,
+                model_type: 'pytorch_example',
+                model_inputshape: [240,240,4],
+                model_zoom: 17,
+                classes: [
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Tree Canopy', color: '#008000' },
+                    { name: 'Field', color: '#80FF80' },
+                    { name: 'Built', color: '#806060' }
+                ],
+                meta: {}
+            }
+        }, t);
+
+        t.ok(res.body.created);
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 2,
+            uid: 1,
+            name: 'NAIP Supervised',
+            active: true,
+            model_type: 'pytorch_example',
+            model_zoom: 17,
+            model_inputshape: [240, 240, 4],
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            storage: false,
+            bounds: [-180, -90, 180, 90],
+            meta: {},
+            osmtag_id: null
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/model/2 - no initial tagmap', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/model/2',
+            method: 'PATCH',
+            auth: {
+                bearer: flight.token.ingalls
+            },
+            body: {
+                tagmap: {
+                    0: [{ key: 'natural', value: 'water' }],
+                    1: [{ key: 'natural', value: 'forest' }],
+                    2: [{ key: 'natural', value: 'field' }],
+                    3: [{ key: 'building', value: 'yes' }]
+                }
+            }
+        }, t);
+
+        t.ok(res.body.created);
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 2,
+            uid: 1,
+            name: 'NAIP Supervised',
+            active: true,
+            model_type: 'pytorch_example',
+            model_zoom: 17,
+            model_inputshape: [240, 240, 4],
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
+            storage: false,
+            bounds: [-180, -90, 180, 90],
+            meta: {},
+            osmtag_id: 2
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
