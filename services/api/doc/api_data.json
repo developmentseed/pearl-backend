@@ -397,7 +397,7 @@
   },
   {
     "type": "patch",
-    "url": "/api/project/:pid/batch/:batchid",
+    "url": "/api/project/:projectid/batch/:batchid",
     "title": "Patch Batch",
     "version": "1.0.0",
     "name": "PatchBatch",
