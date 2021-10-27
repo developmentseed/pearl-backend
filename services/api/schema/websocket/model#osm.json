@@ -2,11 +2,11 @@
     "type": "object",
     "additionalProperties": false,
     "required": [
-        "message",
+        "action",
         "data"
     ],
     "properties": {
-        "message": {
+        "action": {
             "type": "string",
             "enum": ["model#osm"]
         },
@@ -46,6 +46,10 @@
                                 "type": "string",
                                 "description": "Class Name"
                             },
+                            "geometry": {
+                                "type": "object",
+                                "description": "Optional Feature Collection of retrain geometries"
+                            },
                             "color": {
                                 "type": "string",
                                 "description": "Hex Colour Code"
@@ -79,3 +83,4 @@
         }
     }
 }
+
