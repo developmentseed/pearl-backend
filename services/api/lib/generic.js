@@ -12,7 +12,9 @@ class Generic {
     }
 
     patch(patch) {
-        for (const attr of this._patch) {
+        if (!this._patch) throw new Err(500, null, 'Internal: Patch not defined');
+
+        for (const attr of Object.keys(this._patch.properties)) {
             if (patch[attr] !== undefined) {
                 this[attr] = patch[attr];
             }
@@ -106,6 +108,7 @@ class Generic {
 
             return true;
         } catch (err) {
+            if (err.originalError.code === '23503') throw new Err(400, err, `${this._table} is still in use`);
             throw new Err(500, err, `Failed to delete from ${this._table}`);
         }
     }

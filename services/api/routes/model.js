@@ -219,6 +219,8 @@ async function router(schema, config) {
         try {
             const model = await Model.from(config.pool, req.params.modelid);
 
+            if (model.osmtag_id) model.osmtag = (await OSMTag.from(config.pool, req.params.modelid)).serialize().tagmap;
+
             return res.json(model.serialize());
         } catch (err) {
             return Err.respond(err, res);

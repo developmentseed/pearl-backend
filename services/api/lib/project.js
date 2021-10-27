@@ -7,7 +7,7 @@ const Generic = require('./generic');
  */
 class Project extends Generic {
     static _table = 'projects';
-    static _patch = Object.keys(require('../schema/req.body.PatchProject.json').properties);
+    static _patch = require('../schema/req.body.PatchProject.json');
     static _res = require('../schema/res.Project.json');
 
     constructor() {
