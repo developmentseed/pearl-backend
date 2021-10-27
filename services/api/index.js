@@ -254,7 +254,7 @@ async function server(args, config, cb) {
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
         const routepkg = require('./routes/' + r);
-        if (typeof route === 'function') await routepkg(schema, config);
+        if (typeof routepkg === 'function') await routepkg(schema, config);
     }
 
     schema.router.all('*', (req, res) => {
