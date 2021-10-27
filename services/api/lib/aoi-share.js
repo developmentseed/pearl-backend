@@ -8,7 +8,7 @@ const Generic = require('./generic');
  */
 class AOIShare extends Generic {
     static _table = 'aois_share';
-    static _patch = Object.keys(require('../schema/req.body.PatchShare.json').properties);
+    static _patch = require('../schema/req.body.PatchShare.json');
     static _res = require('../schema/res.Share.json');
 
     constructor() {

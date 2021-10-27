@@ -9,7 +9,7 @@ const Generic = require('./generic');
  */
 class AOIPatch extends Generic {
     static _table = 'aoi_patch';
-    static _patch = Object.keys(require('../schema/req.body.PatchPatch.json').properties);
+    static _patch = require('../schema/req.body.PatchPatch.json');
     static _res = require('../schema/res.Patch.json');
 
     constructor() {
