@@ -72,6 +72,9 @@
             "type": "object",
             "description": "Generic key/value store for additional model metadata"
         },
+        "osmtag": {
+            "$ref": "./util/osm-tagmap.json"
+        },
         "osmtag_id": {
             "type": ["integer", "null"],
             "description": "Optional default list of OSM Tags => Model Classes"
