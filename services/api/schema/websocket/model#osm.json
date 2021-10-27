@@ -1,0 +1,81 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "message",
+        "data"
+    ],
+    "properties": {
+        "message": {
+            "type": "string",
+            "enum": ["model#osm"]
+        },
+        "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "bounds",
+                "classes"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "bounds": {
+                    "type": "array",
+                    "items": {
+                        "type": "number",
+                        "minItems": 4,
+                        "maxItems": 4
+                    }
+                },
+                "classes": {
+                    "type": "array",
+                    "description": "Array of classes - none should be omitted, even if they don't need retraining",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "color",
+                            "tagmap"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Class Name"
+                            },
+                            "color": {
+                                "type": "string",
+                                "description": "Hex Colour Code"
+                            },
+                            "tagmap": {
+                                "type": "array",
+                                "description": "List of OSM tags that should be used to generate training data",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "key",
+                                        "value"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string",
+                                            "description": "OSM Key"
+                                        },
+                                        "value": {
+                                            "type": "string",
+                                            "description": "Regexp of OSM Value"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
