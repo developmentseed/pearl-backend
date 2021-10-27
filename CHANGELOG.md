@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+
+# v0.7.0
+
+## Fixes
+- TagMap In ModelGet [`#569`](https://github.com/developmentseed/lulc-infra/pull/569)
+- Terminate instance when abort is True [`#565`](https://github.com/developmentseed/lulc-infra/pull/565)
+- gpu pod ttl 2h and run janitor every 1 hour [`#567`](https://github.com/developmentseed/lulc-infra/pull/567)
+- apidoc@0.50 [`#564`](https://github.com/developmentseed/lulc-infra/pull/564)
+- Fix patch batch url in docs [`#563`](https://github.com/developmentseed/lulc-infra/pull/563)
+- Bug in Model TagMap [`#562`](https://github.com/developmentseed/lulc-infra/pull/562)
+- LibSchema [`#559`](https://github.com/developmentseed/lulc-infra/pull/559)
+- Make staging auth0 tenant default [`#554`](https://github.com/developmentseed/lulc-infra/pull/554)
+- upgrade pip in deploy Dockerfile [`#556`](https://github.com/developmentseed/lulc-infra/pull/556)
+
+## Features
+- OSM Data Processing [`#543`](https://github.com/developmentseed/lulc-infra/pull/543)
+- GPU OSM [`#550`](https://github.com/developmentseed/lulc-infra/pull/550)
+- QA Tiles Proxy [`#553`](https://github.com/developmentseed/lulc-infra/pull/553)
+- Tile Geometry Type Filtering [`#558`](https://github.com/developmentseed/lulc-infra/pull/558)
+- Tile Parser [`#555`](https://github.com/developmentseed/lulc-infra/pull/555)
+
+## Improvements
+- Housekeeping [`#551`](https://github.com/developmentseed/lulc-infra/pull/551)
+
 # v0.6.1
 
 ## Fixes
