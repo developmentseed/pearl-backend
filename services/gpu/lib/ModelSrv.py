@@ -473,9 +473,7 @@ class ModelSrv:
                             progress = new_prog
 
                             if res.get("abort") is True:
-                                res = self.api.batch_patch(
-                                    {"progress": 0, "completed": False, "abort": False}
-                                    )
+                                res = self.api.batch_patch({"progress": 0, "completed": False})
                                 done_processing(self)
                                 LOGGER.info("ok - prediction aborted")
                                 sys.exit()
