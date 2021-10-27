@@ -211,7 +211,7 @@ test('GET /api/model/1', async (t) => {
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
-            },
+            }
         }, t);
 
         t.ok(res.body.created);
