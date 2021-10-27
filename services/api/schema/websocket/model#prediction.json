@@ -1,0 +1,59 @@
+{
+    "type": "object",
+    "required": [
+        "message",
+        "data"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "message": {
+            "type": "string",
+            "enum": [ "model#prediction" ]
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "aoi",
+                "bounds",
+                "x",
+                "y",
+                "z",
+                "image",
+                "total",
+                "processed"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "aoi": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "bounds": {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
+                },
+                "z": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "processed": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

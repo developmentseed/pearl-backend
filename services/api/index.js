@@ -253,7 +253,8 @@ async function server(args, config, cb) {
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
+        const routepkg = require('./routes/' + r);
+        if (typeof routepkg === 'function') await routepkg(schema, config);
     }
 
     schema.router.all('*', (req, res) => {

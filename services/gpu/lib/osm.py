@@ -72,8 +72,11 @@ class OSM:
             mode = "exclude"
 
         tags = []
-        for ele in cls["tagmap"]:
-            tags.append({key: ele["key"], value: re.compile(ele["value"])})
+        for ele in cls.get("tagmap", []):
+            tags.append({
+                key: ele.get("key", ""),
+                value: re.compile(ele.get("value", ""))
+            })
 
         with open(self.cache) as f:
             for feat in f.readlines():
