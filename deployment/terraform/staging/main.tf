@@ -29,7 +29,7 @@ module "resources" {
 
   postgres_password    = var.postgres_password
   signing_secret       = var.signing_secret
-  auth0BaseUrl         = "https://pearl-landcover-staging.us.auth0.com"
+  auth0BaseUrl         = var.auth0BaseUrl
   admin_email          = "sanjay@developmentseed.org"
   gpu_count            = 10
   placeholder_is_gpu   = true
