@@ -14,6 +14,10 @@ variable "signing_secret" {
   type = string
 }
 
+variable "auth0BaseUrl" {
+  type = string
+}
+
 module "resources" {
   source = "../resources"
 
@@ -24,6 +28,8 @@ module "resources" {
   admin_email          = "sanjay@developmentseed.org"
   postgres_password    = var.postgres_password
   signing_secret       = var.signing_secret
+  auth0BaseUrl         = var.auth0BaseUrl
+
   placeholder_is_gpu   = false
   placeholder_num_gpus = 2
   domain               = "lulc-test.ds.io"

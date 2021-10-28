@@ -15,6 +15,10 @@ variable "signing_secret" {
   type = string
 }
 
+variable "auth0BaseUrl" {
+  type = string
+}
+
 module "resources" {
   source = "../resources"
 
@@ -25,6 +29,7 @@ module "resources" {
 
   postgres_password    = var.postgres_password
   signing_secret       = var.signing_secret
+  auth0BaseUrl         = var.auth0BaseUrl
   admin_email          = "sanjay@developmentseed.org"
   gpu_count            = 10
   placeholder_is_gpu   = true
