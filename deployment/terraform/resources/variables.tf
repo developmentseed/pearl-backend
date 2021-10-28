@@ -19,9 +19,6 @@ variable "signing_secret" {
   type = string
 }
 
-variable "auth0BaseUrl" {
-  type = string
-}
 variable "api_node_selector_key" {
   type = string
   default = "agentpool"
