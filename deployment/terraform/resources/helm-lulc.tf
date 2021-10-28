@@ -52,6 +52,10 @@ resource "helm_release" "lulc" {
   }
 
   set {
+    name = "api.env.auth0BaseUrl"
+    value = var.auth0BaseUrl
+  }
+  set {
     name  = "tiles.env.Debug"
     value = var.tiles_debug
   }

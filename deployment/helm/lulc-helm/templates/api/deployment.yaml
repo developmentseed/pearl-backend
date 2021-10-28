@@ -77,4 +77,6 @@ spec:
               value: {{ .Values.api.env.nodeSelectorKey }}
             - name: nodeSelectorValue
               value: {{ .Values.api.env.nodeSelectorValue }}
+            - name: AUTH0_ISSUER_BASE_URL
+              value: {{ .Values.api.env.auth0BaseUrl }}
 {{- end }}

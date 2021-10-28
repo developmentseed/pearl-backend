@@ -11,6 +11,7 @@ services:
         - TF_VAR_subscriptionId=${subscriptionId}
         - TF_VAR_postgres_password=${postgresPassword}
         - TF_VAR_signing_secret=${signingSecret}
+        - TF_VAR_auth0BaseUrl=${auth0BaseUrl}
         - ARM_SUBSCRIPTION_ID=${subscriptionId}
         - ARM_TENANT_ID=${tenantId}
         - ARM_CLIENT_ID=${servicePrincipalId}
