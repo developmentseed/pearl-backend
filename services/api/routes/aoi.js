@@ -1,4 +1,4 @@
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Busboy = require('busboy');
 const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
@@ -26,11 +26,9 @@ async function router(schema, config) {
         req.query.maxzoom = 20;
 
 
-        const proxy = new Proxy(config);
-
         let tj, tiles;
         if (aoi.uuid) {
-            const response = await proxy.request(req);
+            const response = await Proxy.request(req, false, config.TileUrl);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
@@ -49,7 +47,7 @@ async function router(schema, config) {
 
             req.query.colormap = JSON.stringify(cmap);
 
-            const response = await proxy.request(req);
+            const response = await Proxy.request(req, false, config.TileUrl);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
 
@@ -163,8 +161,7 @@ async function router(schema, config) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-            const proxy = new Proxy(config);
-            await proxy.request(req, res);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -220,8 +217,7 @@ async function router(schema, config) {
 
                     if (!(await a.exists(config))) throw new Err(500, null, 'AOI is not on Azure?!');
 
-                    const proxy = new Proxy(config);
-                    const pres = await proxy.request({
+                    const pres = await Proxy.request({
                         url: '/cog/statistics',
                         query: {
                             url: tiffurl.origin + tiffurl.pathname,
@@ -230,7 +226,7 @@ async function router(schema, config) {
                         },
                         body: {},
                         method: 'GET'
-                    }, false);
+                    }, false, config.TileUrl);
 
                     const px_stats = {};
 
@@ -324,8 +320,7 @@ async function router(schema, config) {
                 colormap: cmap
             };
 
-            const proxy = new Proxy(config);
-            await proxy.request(req, res);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -445,8 +440,7 @@ async function router(schema, config) {
                     colormap: cmap
                 };
 
-                const proxy = new Proxy(config);
-                const pres = await proxy.request(req, true);
+                const pres = await Proxy.request(req, true, config.TileUrl);
                 const up = await share.upload(config, pres);
                 return res.json(up.serialize());
             } else {
@@ -654,8 +648,7 @@ async function router(schema, config) {
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
 
-            const proxy = new Proxy(config);
-            await proxy.request(req, res);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -726,8 +719,7 @@ async function router(schema, config) {
                 colormap: cmap
             };
 
-            const proxy = new Proxy(config);
-            await proxy.request(req, res);
+            await Proxy.request(req, res, config.TileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }

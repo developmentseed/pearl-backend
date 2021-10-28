@@ -1,7 +1,5 @@
 #! /usr/bin/env node
 
-
-
 const express = require('express');
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');

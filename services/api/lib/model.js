@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const Storage = require('./storage');
 const poly = require('@turf/bbox-polygon').default;
 const bbox = require('@turf/bbox').default;
@@ -11,7 +11,7 @@ const Generic = require('./generic');
 class Model extends Generic {
     static _table = 'models';
     static _res = require('../schema/res.Model.json');
-    static _patch = Object.keys(require('../schema/req.body.PatchModel.json').properties);
+    static _patch = require('../schema/req.body.PatchModel.json');
 
     constructor() {
         super();

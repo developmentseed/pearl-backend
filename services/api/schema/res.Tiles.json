@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "required": [
+        "tiles"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "tiles": {
+            "type": "array",
+            "description": "List of supported tile layers",
+            "items": {
+                "type": "string",
+                "description": "Name of layer"
+            }
+        }
+    }
+}

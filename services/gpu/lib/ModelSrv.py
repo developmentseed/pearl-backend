@@ -1,7 +1,7 @@
 import json
 import logging
-import os
 import sys
+import traceback
 
 import numpy as np
 import torch
@@ -10,7 +10,14 @@ from shapely.geometry import mapping
 from .AOI import AOI
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
-from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson, serialize
+from .osm import OSM
+from .utils import (
+    generate_random_points,
+    geom2px,
+    geom2coords,
+    pred2png,
+    pxs2geojson
+)
 
 LOGGER = logging.getLogger("server")
 
@@ -397,8 +404,7 @@ class ModelSrv:
                 batch_size = 8
             else:
                 batch_size = 2
-            print("batch size")
-            print(batch_size)
+
             dataloader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=batch_size,
@@ -466,6 +472,12 @@ class ModelSrv:
 
                             progress = new_prog
 
+                            if res.get("abort") is True:
+                                res = self.api.batch_patch({"progress": 0, "completed": False})
+                                done_processing(self)
+                                LOGGER.info("ok - prediction aborted")
+                                sys.exit()
+
                     current = current + 1
 
                     # Push tile into geotiff fabric
@@ -501,12 +513,17 @@ class ModelSrv:
 
             done_processing(self)
         except Exception as e:
-            self.api.batch_patch(
-                {"completed": False, "error": str("Processing Error: " + str(e))}
-            )
-
             done_processing(self)
-            websocket.error("Processing Error", e)
+
+            traceback.print_exc()
+
+            if websocket is False:
+                self.api.batch_patch(
+                    {"completed": False, "error": str("Processing Error: " + str(e))}
+                )
+            else:
+                websocket.error("Processing Error", e)
+
             raise e
 
     def osm(self, body, websocket):
@@ -515,20 +532,22 @@ class ModelSrv:
                 return is_processing(websocket)
             self.processing = True
 
-            osm = OSM(self.api.server.get('qa_tiles'))
+            osm = OSM(self.api.server.get("qa_tiles"))
+            osm.download(body.get("bounds"))
+
+            for cls in body.get("classes"):
+                cls["file"] = osm.extract(cls)
 
             done_processing(self)
 
-            self.retrain({
-                "name": "",
-                "classes": []
-            }, websocket)
+            self.retrain(
+                {"name": body.get("name"), "classes": body.get("classes")}, websocket
+            )
 
         except Exception as e:
             done_processing(self)
             websocket.error("OSM Error", e)
             raise e
-
 
     def retrain(self, body, websocket):
         try:
@@ -538,29 +557,52 @@ class ModelSrv:
 
             LOGGER.info("ok - starting retrain")
 
-            total = 0;
+            total = 0
             for cls in body["classes"]:
+                if cls.get("geometry") is None:
+                    cls["geometry"] = {"type": "FeatureCollection", "features": []}
+
                 cls["retrain_geometry"] = []
                 for feature in cls["geometry"]["features"]:
-                    if feature["geometry"]["type"] == "Polygon":
+                    if (
+                        feature["geometry"]["type"] == "Polygon"
+                        or feature["geometry"]["type"] == "MultiPolygon"
+                    ):
                         points = generate_random_points(50, feature["geometry"])
-                        cls["retrain_geometry"] = geom2coords(points)
+                        cls["retrain_geometry"] = [
+                            *cls["retrain_geometry"],
+                            *geom2coords(points),
+                        ]
 
                     elif (
                         feature["geometry"]["type"] == "MultiPoint"
                         and len(feature["geometry"]["coordinates"]) > 0
                     ):
-                        cls["retrain_geometry"] = geom2coords(feature["geometry"])
+                        cls["retrain_geometry"] = [
+                            *cls["retrain_geometry"],
+                            *geom2coords(feature["geometry"]),
+                        ]
 
-                    total += len(cls["retrain_geometry"]) - 1
+                if cls.get("file") is not None:
+                    with open(cls["file"]) as f:
+                        for feature in f.readlines():
+                            feature = json.loads(feature)
 
-            curr = 1
+                            points = generate_random_points(50, feature["geometry"])
+                            cls["retrain_geometry"] = [
+                                *cls["retrain_geometry"],
+                                *geom2coords(points),
+                            ]
+
+                total += len(cls["retrain_geometry"])
+
+            curr = 0
             for cls in body["classes"]:
-                cnt = len(cls["retrain_geometry"])
                 cls["retrain_geometry"] = geom2px(
                     cls["retrain_geometry"], self, websocket, total, curr
                 )
-                curr += cnt
+
+                curr += len(cls["retrain_geometry"])
 
             self.model.retrain(body["classes"])
 

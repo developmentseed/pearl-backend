@@ -1,6 +1,6 @@
 const Busboy = require('busboy');
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Model = require('../lib/model');
 const OSMTag = require('../lib/osmtag');
 
@@ -85,7 +85,7 @@ async function router(schema, config) {
                 });
 
                 delete req.body.tagmap;
-                req.body.osmtag_id = tagmap.id;
+                model.osmtag_id = tagmap.id;
             }
 
             model.patch(req.body);
@@ -218,6 +218,8 @@ async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const model = await Model.from(config.pool, req.params.modelid);
+
+            if (model.osmtag_id) model.osmtag = (await OSMTag.from(config.pool, req.params.modelid)).serialize().tagmap;
 
             return res.json(model.serialize());
         } catch (err) {

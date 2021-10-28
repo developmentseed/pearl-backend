@@ -14,10 +14,9 @@ const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
-
-const Err = require('./lib/error');
 const Kube = require('./lib/kube');
-const Schema = require('./lib/schema');
+
+const { Schema, Err } = require('@openaddresses/batch-schema');
 
 const argv = require('minimist')(process.argv, {
     boolean: ['prod', 'silent', 'test'],
@@ -59,7 +58,11 @@ function configure(args = {}, cb) {
  */
 async function server(args, config, cb) {
     const app = express();
-    const schema = new Schema(express.Router());
+
+    const schema = new Schema(express.Router(), {
+        schemas: path.resolve(__dirname, 'schema')
+    });
+    await schema.api();
 
     const auth = new (require('./lib/auth').Auth)(config);
     const authtoken = new (require('./lib/auth').AuthToken)(config);
@@ -250,7 +253,8 @@ async function server(args, config, cb) {
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
+        const routepkg = require('./routes/' + r);
+        if (typeof routepkg === 'function') await routepkg(schema, config);
     }
 
     schema.router.all('*', (req, res) => {
@@ -260,31 +264,7 @@ async function server(args, config, cb) {
         });
     });
 
-    schema.router.use((err, req, res, next) => {
-        if (err instanceof ValidationError) {
-            let errs = [];
-
-            if (err.validationErrors.body) {
-                errs = errs.concat(err.validationErrors.body.map((e) => {
-                    return { message: e.message };
-                }));
-            }
-
-            if (err.validationErrors.query) {
-                errs = errs.concat(err.validationErrors.query.map((e) => {
-                    return { message: e.message };
-                }));
-            }
-
-            return Err.respond(
-                new Err(400, null, 'validation error'),
-                res,
-                errs
-            );
-        } else {
-            next(err);
-        }
-    });
+    schema.error();
 
     const srv = app.listen(config.Port, (err) => {
         if (err) return err;

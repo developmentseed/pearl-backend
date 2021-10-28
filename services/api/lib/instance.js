@@ -1,5 +1,5 @@
+const { Err } = require('@openaddresses/batch-schema');
 const Project = require('./project');
-const Err = require('./error');
 const jwt = require('jsonwebtoken');
 const Kube = require('./kube');
 const { sql } = require('slonik');
@@ -10,7 +10,7 @@ const Generic = require('./generic');
  */
 class Instance extends Generic {
     static _table = 'instances';
-    static _patch = Object.keys(require('../schema/req.body.PatchInstance.json').properties);
+    static _patch = require('../schema/req.body.PatchInstance.json');
     static _res = require('../schema/res.Instance.json');
 
     constructor() {

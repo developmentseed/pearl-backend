@@ -57,12 +57,12 @@ class API:
                 total=10,
                 backoff_factor=0.1,
                 allowed_methods=False,
-                status_forcelist=[429, 500, 502, 503, 504]
+                status_forcelist=[429, 500, 502, 503, 504],
             )
         )
 
-        self.requests.mount('https://', adapter)
-        self.requests.mount('http://', adapter)
+        self.requests.mount("https://", adapter)
+        self.requests.mount("http://", adapter)
 
         self.server = self.server_meta()
         self.instance = self.instance_meta(instance_id)
@@ -70,7 +70,7 @@ class API:
         self.instance_id = instance_id
         self.project_id = self.instance["project_id"]
 
-        if type(self.instance.get('batch')) == int:
+        if self.instance.get("batch") is not None:
             self.batch = self.batch_meta()
         else:
             self.batch = False
@@ -467,7 +467,13 @@ class API:
         return r.json()
 
     def batch_meta(self):
-        url = self.url + "/api/project/" + str(self.project_id) + "/batch/" + str(self.instance.get('batch'))
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/batch/"
+            + str(self.instance.get("batch"))
+        )
 
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
@@ -478,7 +484,13 @@ class API:
         return r.json()
 
     def batch_patch(self, body):
-        url = self.url + "/api/project/" + str(self.project_id) + "/batch/" + str(self.instance.get('batch'))
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/batch/"
+            + str(self.instance.get("batch"))
+        )
 
         LOGGER.info("ok - PATCH " + url)
         r = self.requests.patch(

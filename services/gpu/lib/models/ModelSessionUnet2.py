@@ -8,7 +8,6 @@ import sklearn.base
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import segmentation_models_pytorch as smp
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
@@ -17,8 +16,6 @@ from .ModelSessionAbstract import ModelSession
 
 sys.path.append("..")
 LOGGER = logging.getLogger("server")
-
-from typing import Optional, Union, List
 
 
 class Unet2(nn.Module):

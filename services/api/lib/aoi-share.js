@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const Storage = require('./storage');
 const { sql } = require('slonik');
 const Generic = require('./generic');
@@ -8,7 +8,7 @@ const Generic = require('./generic');
  */
 class AOIShare extends Generic {
     static _table = 'aois_share';
-    static _patch = Object.keys(require('../schema/req.body.PatchShare.json').properties);
+    static _patch = require('../schema/req.body.PatchShare.json');
     static _res = require('../schema/res.Share.json');
 
     constructor() {

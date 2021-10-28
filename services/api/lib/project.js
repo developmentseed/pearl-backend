@@ -1,4 +1,4 @@
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('./generic');
 
@@ -7,7 +7,7 @@ const Generic = require('./generic');
  */
 class Project extends Generic {
     static _table = 'projects';
-    static _patch = Object.keys(require('../schema/req.body.PatchProject.json').properties);
+    static _patch = require('../schema/req.body.PatchProject.json');
     static _res = require('../schema/res.Project.json');
 
     constructor() {

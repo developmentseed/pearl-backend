@@ -1,4 +1,4 @@
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Batch = require('../lib/batch');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
@@ -116,7 +116,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {patch} /api/project/:pid Patch Batch
+     * @api {patch} /api/project/:projectid/batch/:batchid Patch Batch
      * @apiVersion 1.0.0
      * @apiName PatchBatch
      * @apiGroup Batch

@@ -1,5 +1,5 @@
+const { Err } = require('@openaddresses/batch-schema');
 const Project = require('./project');
-const Err = require('./error');
 const Storage = require('./storage');
 const { sql } = require('slonik');
 const Generic = require('./generic');
@@ -10,7 +10,7 @@ const Generic = require('./generic');
 class CheckPoint extends Generic {
     static _table = 'checkpoints';
     static _res = require('../schema/res.Checkpoint.json');
-    static _patch = Object.keys(require('../schema/req.body.PatchCheckpoint.json').properties);
+    static _patch = require('../schema/req.body.PatchCheckpoint.json');
 
     constructor() {
         super();

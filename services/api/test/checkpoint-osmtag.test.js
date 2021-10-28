@@ -28,9 +28,10 @@ test('POST /api/project/1/checkpoint - Error: Entry for every class', async (t) 
                     { name: 'Built', color: '#806060' }
                 ],
                 tagmap: {
-                    1: {
-                        'natural': 'water'
-                    }
+                    1: [{
+                        key: 'natural',
+                        value: 'water'
+                    }]
                 }
             }
         }, false);
@@ -65,10 +66,10 @@ test('POST /api/project/1/checkpoint - Error: OSMTag missing entry', async (t) =
                     { name: 'Built', color: '#806060' }
                 ],
                 tagmap: {
-                    1: { 'natural': 'water' },
-                    2: { 'natural': 'water' },
-                    3: { 'natural': 'water' },
-                    4: { 'natural': 'water' }
+                    1: [{ key: 'natural', value: 'water' }],
+                    2: [{ key: 'natural', value: 'water' }],
+                    3: [{ key: 'natural', value: 'water' }],
+                    4: [{ key: 'natural', value: 'water' }]
                 }
             }
         }, false);
@@ -103,10 +104,10 @@ test('POST /api/project/1/checkpoint', async (t) => {
                     { name: 'Built', color: '#806060' }
                 ],
                 tagmap: {
-                    0: { 'natural': 'water' },
-                    1: { 'natural': 'forest' },
-                    2: { 'natural': 'field' },
-                    3: { 'building': 'yes' }
+                    0: [{ key: 'natural', value: 'water' }],
+                    1: [{ key: 'natural', value: 'forest' }],
+                    2: [{ key: 'natural', value: 'field' }],
+                    3: [{ key: 'building', value: 'yes' }]
                 }
             }
         }, t);
@@ -169,10 +170,10 @@ test('GET /api/project/1/checkpoint/1/osmtag', async (t) => {
             id: 1,
             project_id: 1,
             tagmap: {
-                0: { natural: 'water' },
-                1: { natural: 'forest' },
-                2: { natural: 'field' },
-                3: { building: 'yes' }
+                0: [{ key: 'natural', value: 'water' }],
+                1: [{ key: 'natural', value: 'forest' }],
+                2: [{ key: 'natural', value: 'field' }],
+                3: [{ key: 'building', value: 'yes' }]
             }
         });
     } catch (err) {

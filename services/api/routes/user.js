@@ -1,4 +1,4 @@
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 
 async function router(schema, config) {
     const auth = new (require('../lib/auth').Auth)(config);
@@ -10,10 +10,10 @@ async function router(schema, config) {
      * @apiGroup User
      * @apiPermission admin
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.user-list.json} apiParam
-     *
      * @apiDescription
      *     Return a list of users that have registered with the service
+     *
+     * @apiSchema (Query) {jsonschema=../schema/req.query.user-list.json} apiParam
      *
      * @apiSuccessExample Success-Response:
      *   HTTP/1.1 200 OK

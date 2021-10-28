@@ -3,12 +3,23 @@
     "additionalProperties": false,
     "patternProperties": {
         "^[0-9]+$": {
-            "type": "object",
-            "description": "Each key in should be the class element id, each value an object",
-            "patternProperties": {
-                "^.*$": {
-                    "type": "string",
-                    "description": "An object containing OSM Key/Value pairs"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "OSM Key"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "Regexp Pattern for matching OSM Value"
+                    }
                 }
             }
         }

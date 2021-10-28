@@ -7,17 +7,18 @@ import os
 import random
 import sys
 import threading
-from collections.abc import Iterable
-from logging.handlers import TimedRotatingFileHandler
-
-import mercantile
-import numpy as np
 import rasterio
 import rasterio.crs
 import rasterio.io
 import rasterio.mask
 import rasterio.merge
 import rasterio.transform
+
+from collections.abc import Iterable
+from logging.handlers import TimedRotatingFileHandler
+
+import mercantile
+import numpy as np
 from PIL import Image
 from rasterio.transform import from_bounds
 from shapely.geometry import Point, mapping, shape
@@ -56,6 +57,7 @@ def pxs2geojson(classes):
 
     return geoms
 
+
 def geom2coords(geom):
     coords = []
 
@@ -68,7 +70,6 @@ def geom2coords(geom):
         return False
 
     return coords
-
 
 
 def geom2px(coords, modelsrv, websocket=False, total=0, curr=1):
@@ -94,13 +95,14 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1):
         pxs.append(PX(coord, xy, xyz, pixels, value))
 
         if websocket is not False:
-            websocket.send(json.dumps({
-                "message": "model#retrain#progress",
-                "data": {
-                    "total": total,
-                    "processed": curr + i
-                }
-            }))
+            websocket.send(
+                json.dumps(
+                    {
+                        "message": "model#retrain#progress",
+                        "data": {"total": total, "processed": curr + i + 1},
+                    }
+                )
+            )
 
     return pxs
 
