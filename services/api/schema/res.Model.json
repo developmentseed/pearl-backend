@@ -38,6 +38,7 @@
             "type": "string",
             "description": "Underlying model type",
             "enum": [
+                "deeplabv3plus",
                 "random_forest",
                 "pytorch_example",
                 "pytorch_solar"
