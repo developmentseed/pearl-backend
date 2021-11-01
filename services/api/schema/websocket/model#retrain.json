@@ -1,30 +1,55 @@
 {
     "type": "object",
+    "additionalProperties": false,
     "required": [
-        "message",
+        "action",
         "data"
     ],
-    "additionalProperties": false,
     "properties": {
-        "message": {
+        "action": {
             "type": "string",
-            "enum": [ "model#retrain#progress" ]
+            "enum": ["model#osm"]
         },
         "data": {
             "type": "object",
-            "required": [
-                "total",
-                "processed"
-            ],
             "additionalProperties": false,
+            "required": [
+                "name",
+                "classes"
+            ],
             "properties": {
-                "total": {
-                    "type": "integer"
+                "name": {
+                    "type": "string"
                 },
-                "processed": {
-                    "type": "integer"
+                "classes": {
+                    "type": "array",
+                    "description": "Array of classes - none should be omitted, even if they don't need retraining",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "color",
+                            "tagmap"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Class Name"
+                            },
+                            "geometry": {
+                                "type": "object",
+                                "description": "Optional Feature Collection of retrain geometries"
+                            },
+                            "color": {
+                                "type": "string",
+                                "description": "Hex Colour Code"
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
+
