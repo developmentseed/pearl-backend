@@ -74,8 +74,8 @@ class OSM:
         tags = []
         for ele in cls.get("tagmap", []):
             tags.append({
-                key: ele.get("key", ""),
-                value: re.compile(ele.get("value", ""))
+                "key": ele.get("key", ""),
+                "value": re.compile(ele.get("value", ""))
             })
 
         with open(self.cache) as f:
