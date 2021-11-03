@@ -74,43 +74,46 @@ class OSM:
         tags = []
         for ele in cls.get("tagmap", []):
             tags.append({
-                key: ele.get("key", ""),
-                value: re.compile(ele.get("value", ""))
+                "key": ele.get("key", ""),
+                "value": re.compile(ele.get("value", ""))
             })
 
         with open(self.cache) as f:
-            for feat in f.readlines():
-                feat = json.loads(feat)
-                # Filter Here
+            if len(tags) == 0:
+                LOGGER.info("ok - Empty Layer (no tags): {}: {}".format(cls.get("name"), extract.name))
+            else:
+                for feat in f.readlines():
+                    feat = json.loads(feat)
+                    # Filter Here
 
-                if (
-                    feat["geometry"]["type"] != "Polygon"
-                    and feat["geometry"]["type"] != "MultiPolygon"
-                ):
-                    continue
-
-                match = False
-                for tag in tags:
-                    pvalue = feat["properties"].get(tag["key"])
-                    if pvalue is None:
+                    if (
+                        feat["geometry"]["type"] != "Polygon"
+                        and feat["geometry"]["type"] != "MultiPolygon"
+                    ):
                         continue
 
-                    if not tag["value"].match(pvalue):
-                        continue
+                    match = False
+                    for tag in tags:
+                        pvalue = feat["properties"].get(tag["key"])
+                        if pvalue is None:
+                            continue
 
-                    match = True
+                        if not tag["value"].match(pvalue):
+                            continue
 
-                if mode == "include":
-                    for i_id in includes:
-                        if feat["properties"]["@id"] != i_id:
-                            match = False
-                elif mode == "exclude":
-                    for e_id in excludes:
-                        if feat["properties"]["@id"] == i_id:
-                            match = False
+                        match = True
 
-                if match is True:
-                    extract.write(json.dumps(feat) + "\n")
+                    if mode == "include":
+                        for i_id in includes:
+                            if feat["properties"]["@id"] != i_id:
+                                match = False
+                    elif mode == "exclude":
+                        for e_id in excludes:
+                            if feat["properties"]["@id"] == i_id:
+                                match = False
+
+                    if match is True:
+                        extract.write(json.dumps(feat) + "\n")
 
         LOGGER.info("ok - Cached {}: {}".format(cls.get("name"), extract.name))
 
