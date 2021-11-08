@@ -105,4 +105,4 @@ async function router(schema, config) {
  * @apiSchema (Body) {jsonschema=../schema/websocket/model#aoi.json} apiParam
  */
 
- module.exports = router;
+module.exports = router;
