@@ -1,5 +1,3 @@
-
-
 /**
  * @class Pool
  *
@@ -96,8 +94,34 @@ class Pool {
 
         if (this.argv.debug) console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: ${payload}`);
 
-        if (ws.auth.t === 'inst') {
+        try {
+            payload = JSON.parse(payload);
+        } catch (err) {
+            return ws.send(JSON.stringify({
+                message: 'error',
+                data: {
+                    error: 'Failed to parse JSON',
+                    detailed: `JSON.stringify Error ${err.message}`
+                }
+            }));
+        }
 
+        if (payload.action && config.schemas[payload.action]) {
+            let valid = true;
+            valid = config.schemas[payload.action](payload);
+
+            if (!valid) {
+                return ws.send(JSON.stringify({
+                    message: 'error',
+                    data: {
+                        error: 'Failed Schema Check',
+                        detailed: JSON.stringify(config.schemas[payload.action].errors)
+                    }
+                }));
+            }
+        }
+
+        if (ws.auth.t === 'inst') {
             if (!this.has_gpu(ws.auth.i)) {
                 return ws.send(JSON.stringify({
                     message: 'error',

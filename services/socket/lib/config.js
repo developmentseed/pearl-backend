@@ -1,4 +1,7 @@
-
+const Ajv = require('ajv');
+const ajv = new Ajv({
+    allErrors: true
+});
 
 const pkg = require('../package.json');
 const API = require('./api');
@@ -54,6 +57,12 @@ class Config {
                 console.error(`ok - retrying... (${maxretry - retry}/${maxretry})`);
             }
         } while (!this.Timeout);
+
+        this.schemas = (await this.api.schemas()).body;
+        console.error(this.schemas);
+        for (const key of Object.keys(this.schemas)) {
+            this.schemas[key] = ajv.compile(this.schemas[key])
+        }
 
         this.Alive = args.alive || 30 * 1000; // default 30s
 

@@ -33,7 +33,7 @@ class API {
     }
 
     async schemas() {
-        const url = new URL(this.base + '/api/schemas');
+        const url = new URL(this.base + '/api/websocket');
 
         console.error(`ok - GET ${url}`);
         const res = await request({
