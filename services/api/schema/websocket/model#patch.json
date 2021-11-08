@@ -1,0 +1,42 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "action",
+        "data"
+    ],
+    "properties": {
+        "action": {
+            "type": "string",
+            "enum": ["model#patch"]
+        },
+        "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "class",
+                        "brush"
+                    ]
+                },
+                "checkpoint_id": {
+                    "type": "integer",
+                    "description": "Checkpoint ID to repredict with if using 'type: brush'"
+                },
+                "class": {
+                    "type": "integer",
+                    "description": "Class element ID to set data in polygon to if using 'type: class'"
+                },
+                "polygon": {
+                    "$ref": "../util/polygon.json"
+                }
+            }
+        }
+    }
+}
+

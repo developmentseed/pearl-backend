@@ -1,0 +1,29 @@
+{
+    "type": "object",
+    "required": [
+        "action",
+        "data"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "action": {
+            "type": "string",
+            "enum": [
+                "model#checkpoint"
+            ]
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "Checkpoint ID to load"
+                }
+            }
+        }
+    }
+}

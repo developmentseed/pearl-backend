@@ -33,3 +33,42 @@
  * @apiSchema (Body) {jsonschema=../schema/websocket/model#prediction.json} apiParam
  */
 
+/**
+ * @api {post} websocket Model#Patch
+ * @apiVersion 1.0.0
+ * @apiName Model-Patch
+ * @apiGroup Websockets
+ * @apiPermission user
+ *
+ * @apiSchema (Body) {jsonschema=../schema/websocket/model#patch.json} apiParam
+ */
+
+/**
+ * @api {post} websocket Model#Status
+ * @apiVersion 1.0.0
+ * @apiName Model-Status
+ * @apiGroup Websockets
+ * @apiPermission user
+ *
+ * @apiSchema (Body) {jsonschema=../schema/websocket/model#status.json} apiParam
+ */
+
+/**
+ * @api {post} websocket Model#Checkpoint
+ * @apiVersion 1.0.0
+ * @apiName Model-Checkpoint
+ * @apiGroup Websockets
+ * @apiPermission user
+ *
+ * @apiSchema (Body) {jsonschema=../schema/websocket/model#checkpoint.json} apiParam
+ */
+
+/**
+ * @api {post} websocket Model#AOI
+ * @apiVersion 1.0.0
+ * @apiName Model-AOI
+ * @apiGroup Websockets
+ * @apiPermission user
+ *
+ * @apiSchema (Body) {jsonschema=../schema/websocket/model#aoi.json} apiParam
+ */
