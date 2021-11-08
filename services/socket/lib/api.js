@@ -32,6 +32,20 @@ class API {
         return res;
     }
 
+    async schemas() {
+        const url = new URL(this.base + '/api/schemas');
+
+        console.error(`ok - GET ${url}`);
+        const res = await request({
+            json: true,
+            method: 'GET',
+            url: url
+        });
+        console.error(`ok - RES ${url} ${res.statusCode}`);
+
+        return res;
+    }
+
     async deactivate() {
         const url = new URL(this.base + '/api/instance');
 
