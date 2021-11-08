@@ -12,6 +12,23 @@
             "enum": [ "Polygon" ]
         },
         "coordinates": {
+            "type": "array",
+            "items": {
+                "type": "array",
+                "description": "Outer/Inner Polygon rings",
+                "minLength": 1,
+                "items": {
+                    "type": "array",
+                    "description": "Polygon Ring",
+                    "minLength": 4,
+                    "items": {
+                        "type": "number",
+                        "minLength": 2,
+                        "maxLength": 2,
+                        "description": "X,Y Coordinate Pair"
+                    }
+                }
+            }
         }
     }
 }
