@@ -1,4 +1,9 @@
 {
+    "GET /schema": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
     "GET /project/:projectid/aoi/:aoiid/patch": {
         "body": false,
         "query": true,
@@ -309,11 +314,6 @@
         "query": false,
         "res": true
     },
-    "GET /schema": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
     "POST /user": {
         "body": false,
         "query": false,
@@ -331,7 +331,7 @@
     },
     "GET /tiles/:layer/:z/:x/:y.mvt": {
         "body": false,
-        "query": false,
+        "query": true,
         "res": false
     },
     "GET /token": {
@@ -355,6 +355,11 @@
         "res": false
     },
     "GET /user/me": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /websocket": {
         "body": false,
         "query": false,
         "res": true

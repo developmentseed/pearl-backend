@@ -1,0 +1,4 @@
+{
+    "type": "object",
+    "description": "Key/Value where the key is the name of the actions, and the value is the schema"
+}

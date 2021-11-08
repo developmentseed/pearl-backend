@@ -1,4 +1,36 @@
-// This file is purely used by APIDoc to document websockets
+const fs = require('fs');
+const path = require('path');
+const { Err } = require('@openaddresses/batch-schema');
+
+async function router(schema, config) {
+    /**
+     * @api {get} /websocket Schemas
+     * @apiVersion 1.0.0
+     * @apiName Schemas
+     * @apiGroup Websockets
+     * @apiPermission public
+     *
+     * @apiDescription
+     *   Return an object containing all the schemas used by the websocket router
+     *
+     * @apiSchema (Body) {jsonschema=../schema/websocket/model#osm.json} apiParam
+     */
+    await schema.get('/websocket', {
+        res: 'res.Websocket.json'
+    }, async (req, res) => {
+        try {
+            const map = {};
+
+            fs.readdirSync(path.resolve(__dirname, '../schema/websocket')).forEach((s) => {
+                map[path.parse(s).name] = require(path.resolve(__dirname, '../schema/websocket/', s));
+            });
+
+            res.json(map);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+}
 
 /**
  * @api {post} websocket Model#OSM
@@ -72,3 +104,5 @@
  *
  * @apiSchema (Body) {jsonschema=../schema/websocket/model#aoi.json} apiParam
  */
+
+ module.exports = router;
