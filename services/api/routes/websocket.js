@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { Err } = require('@openaddresses/batch-schema');
 
-async function router(schema, config) {
+async function router(schema) {
     /**
      * @api {get} /websocket Schemas
      * @apiVersion 1.0.0
