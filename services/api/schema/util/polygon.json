@@ -11,6 +11,14 @@
             "type": "string",
             "enum": [ "Polygon" ]
         },
+        "bbox": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+                "type": "number"
+            }
+        },
         "coordinates": {
             "type": "array",
             "description": "Outer/Inner Polygon rings",
