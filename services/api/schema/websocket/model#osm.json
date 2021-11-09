@@ -24,10 +24,10 @@
                 },
                 "bounds": {
                     "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
                     "items": {
-                        "type": "number",
-                        "minItems": 4,
-                        "maxItems": 4
+                        "type": "number"
                     }
                 },
                 "classes": {
