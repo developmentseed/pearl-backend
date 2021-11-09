@@ -74,7 +74,27 @@
             "description": "Generic key/value store for additional model metadata"
         },
         "osmtag": {
-            "$ref": "./util/osm-tagmap.json"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "tags",
+                    "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Class Name"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "./util/osm-tagmap-item.json"
+                        }
+                    }
+                }
+            }
         },
         "osmtag_id": {
             "type": ["integer", "null"],
