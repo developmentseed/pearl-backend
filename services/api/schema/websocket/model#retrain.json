@@ -8,7 +8,7 @@
     "properties": {
         "action": {
             "type": "string",
-            "enum": ["model#osm"]
+            "enum": ["model#retrain"]
         },
         "data": {
             "type": "object",
