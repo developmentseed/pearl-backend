@@ -60,7 +60,7 @@ class Config {
 
         this.schemas = (await this.api.schemas()).body;
         for (const key of Object.keys(this.schemas)) {
-            this.schemas[key] = ajv.compile(this.schemas[key])
+            this.schemas[key] = ajv.compile(this.schemas[key]);
         }
 
         this.Alive = args.alive || 30 * 1000; // default 30s

@@ -106,16 +106,16 @@ class Pool {
             }));
         }
 
-        if (payload.action && config.schemas[payload.action]) {
+        if (payload.action && this.config.schemas[payload.action]) {
             let valid = true;
-            valid = config.schemas[payload.action](payload);
+            valid = this.config.schemas[payload.action](payload);
 
             if (!valid) {
                 return ws.send(JSON.stringify({
                     message: 'error',
                     data: {
                         error: 'Failed Schema Check',
-                        detailed: JSON.stringify(config.schemas[payload.action].errors)
+                        detailed: JSON.stringify(this.config.schemas[payload.action].errors)
                     }
                 }));
             }
