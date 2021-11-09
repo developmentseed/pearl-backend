@@ -94,8 +94,9 @@ class Pool {
 
         if (this.argv.debug) console.log(`ok - ${ws.auth.t === 'admin' ? 'GPU' : 'Client'} #${ws.auth.i}: ${payload}`);
 
+        let jpayload;
         try {
-            payload = JSON.parse(payload);
+            jpayload = JSON.parse(payload);
         } catch (err) {
             return ws.send(JSON.stringify({
                 message: 'error',
@@ -106,16 +107,16 @@ class Pool {
             }));
         }
 
-        if (payload.action && this.config.schemas[payload.action]) {
+        if (jpayload.action && this.config.schemas[jpayload.action]) {
             let valid = true;
-            valid = this.config.schemas[payload.action](payload);
+            valid = this.config.schemas[jpayload.action](jpayload);
 
             if (!valid) {
                 return ws.send(JSON.stringify({
                     message: 'error',
                     data: {
                         error: 'Failed Schema Check',
-                        detailed: JSON.stringify(this.config.schemas[payload.action].errors)
+                        detailed: JSON.stringify(this.config.schemas[jpayload.action].errors)
                     }
                 }));
             }
