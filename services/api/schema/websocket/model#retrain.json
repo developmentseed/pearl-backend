@@ -29,8 +29,7 @@
                         "additionalProperties": false,
                         "required": [
                             "name",
-                            "color",
-                            "tagmap"
+                            "color"
                         ],
                         "properties": {
                             "name": {
