@@ -59,7 +59,6 @@ class Config {
         } while (!this.Timeout);
 
         this.schemas = (await this.api.schemas()).body;
-        console.error(this.schemas);
         for (const key of Object.keys(this.schemas)) {
             this.schemas[key] = ajv.compile(this.schemas[key])
         }
