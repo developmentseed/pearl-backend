@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
 
+# v0.7.1
+
+## Fixes
+- Refactor OSMTag [`#585`](https://github.com/developmentseed/lulc-infra/pull/585)
+- Schemas [`#582`](https://github.com/developmentseed/lulc-infra/pull/582)
+- OSM Retrain Fix [`#580`](https://github.com/developmentseed/lulc-infra/pull/580)
+- Update Schemas [`#577`](https://github.com/developmentseed/lulc-infra/pull/577)
+- Add deeplabv3plus [`#576`](https://github.com/developmentseed/lulc-infra/pull/576)
+- read auth0 url from github secrets and pass into deployment [`#572`](https://github.com/developmentseed/lulc-infra/pull/572)
+
 # v0.7.0
 
 ## Fixes

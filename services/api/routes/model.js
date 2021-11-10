@@ -219,7 +219,17 @@ async function router(schema, config) {
         try {
             const model = await Model.from(config.pool, req.params.modelid);
 
-            if (model.osmtag_id) model.osmtag = (await OSMTag.from(config.pool, req.params.modelid)).serialize().tagmap;
+            if (model.osmtag_id) {
+                model.osmtag = [];
+
+                const tagmap = await OSMTag.from(config.pool, req.params.modelid);
+                for (const key of Object.keys(tagmap.tagmap)) {
+                    model.osmtag.push({
+                        name: model.classes[parseInt(key)].name,
+                        tags: tagmap.tagmap[key]
+                    });
+                }
+            }
 
             return res.json(model.serialize());
         } catch (err) {
