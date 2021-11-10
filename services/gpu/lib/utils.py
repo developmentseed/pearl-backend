@@ -78,17 +78,19 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1, bounds=None):
     pxs = []
 
     for i, coord in enumerate(coords):
-        if bounds is not None:
-            if bounds[0] > coords[0] or bounds[1] < coords[1] or bounds[2] < coords[0] or bounds[3] < coords[1]:
-                if websocket is not False:
-                    websocket.send(
-                        json.dumps(
-                            {
-                                "message": "model#retrain#progress",
-                                "data": {"total": total, "processed": curr + i + 1},
-                            }
-                        )
+        if bounds is not None and (bounds[0] > coords[0] or bounds[1] < coords[1] or bounds[2] < coords[0] or bounds[3] < coords[1]):
+            print(coords, bounds);
+
+            if websocket is not False:
+                websocket.send(
+                    json.dumps(
+                        {
+                            "message": "model#retrain#progress",
+                            "data": {"total": total, "processed": curr + i + 1},
+                        }
                     )
+                )
+
             continue
 
         xy = ll2xy(coord[0], coord[1])
