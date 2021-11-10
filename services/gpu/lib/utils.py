@@ -72,12 +72,25 @@ def geom2coords(geom):
     return coords
 
 
-def geom2px(coords, modelsrv, websocket=False, total=0, curr=1):
+def geom2px(coords, modelsrv, websocket=False, total=0, curr=1, bounds=None):
     zoom = modelsrv.api.model["model_zoom"]
 
     pxs = []
 
     for i, coord in enumerate(coords):
+        if bounds is not None:
+            if bounds[0] > coords[0] or bounds[1] < coords[1] or bounds[2] < coords[0] or bounds[3] < coords[1]:
+                if websocket is not False:
+                    websocket.send(
+                        json.dumps(
+                            {
+                                "message": "model#retrain#progress",
+                                "data": {"total": total, "processed": curr + i + 1},
+                            }
+                        )
+                    )
+            continue
+
         xy = ll2xy(coord[0], coord[1])
         xyz = mercantile.tile(coord[0], coord[1], zoom)
 
