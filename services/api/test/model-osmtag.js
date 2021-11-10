@@ -235,12 +235,12 @@ test('GET /api/model/1', async (t) => {
             bounds: [-180, -90, 180, 90],
             meta: {},
             osmtag_id: 1,
-            osmtag: {
-                0: [{ key: 'natural', value: 'water' }],
-                1: [{ key: 'natural', value: 'forest' }],
-                2: [{ key: 'natural', value: 'field' }],
-                3: [{ key: 'building', value: 'yes' }]
-            }
+            osmtag: [
+                { name: 'Water', tags: [{ key: 'natural', value: 'water' }] },
+                { name: 'Tree Canopy', tags: [{ key: 'natural', value: 'forest' }] },
+                { name: 'Field', tags: [{ key: 'natural', value: 'field' }] },
+                { name: 'Built', tags: [{ key: 'building', value: 'yes' }] }
+            ]
         });
     } catch (err) {
         t.error(err, 'no errors');

@@ -25,7 +25,8 @@
             "enum": [
                 "random_forest",
                 "pytorch_example",
-                "pytorch_solar"
+                "pytorch_solar",
+                "deeplabv3plus"
             ]
         },
         "model_zoom": {

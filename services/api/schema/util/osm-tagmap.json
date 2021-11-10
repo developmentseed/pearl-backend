@@ -5,22 +5,7 @@
         "^[0-9]+$": {
             "type": "array",
             "items": {
-                "type": "object",
-                "required": [
-                    "key",
-                    "value"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                    "key": {
-                        "type": "string",
-                        "description": "OSM Key"
-                    },
-                    "value": {
-                        "type": "string",
-                        "description": "Regexp Pattern for matching OSM Value"
-                    }
-                }
+                "$ref": "./osm-tagmap-item.json"
             }
         }
     }
