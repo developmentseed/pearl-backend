@@ -78,36 +78,26 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1, bounds=None):
     pxs = []
 
     for i, coord in enumerate(coords):
-        if bounds is not None and (bounds[0] > coords[0] or bounds[1] < coords[1] or bounds[2] < coords[0] or bounds[3] < coords[1]):
-            print(coords, bounds);
+        inside = True
+        if bounds is not None and (bounds[0] > coord[0] or bounds[1] > coord[1] or bounds[2] < coord[0] or bounds[3] < coord[1]):
+            inside = False
 
-            if websocket is not False:
-                websocket.send(
-                    json.dumps(
-                        {
-                            "message": "model#retrain#progress",
-                            "data": {"total": total, "processed": curr + i + 1},
-                        }
-                    )
-                )
+        if inside:
+            xy = ll2xy(coord[0], coord[1])
+            xyz = mercantile.tile(coord[0], coord[1], zoom)
 
-            continue
+            transform = from_bounds(*mercantile.xy_bounds(xyz), 256, 256)
 
-        xy = ll2xy(coord[0], coord[1])
-        xyz = mercantile.tile(coord[0], coord[1], zoom)
+            pixels = rowcol(transform, *xy)
 
-        transform = from_bounds(*mercantile.xy_bounds(xyz), 256, 256)
+            in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat="npy")
 
-        pixels = rowcol(transform, *xy)
+            retrain = modelsrv.model.run(in_memraster.data)
+            retrain = retrain[32:288, 32:288, :]
 
-        in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat="npy")
+            value = retrain[pixels[0], pixels[1]]
 
-        retrain = modelsrv.model.run(in_memraster.data)
-        retrain = retrain[32:288, 32:288, :]
-
-        value = retrain[pixels[0], pixels[1]]
-
-        pxs.append(PX(coord, xy, xyz, pixels, value))
+            pxs.append(PX(coord, xy, xyz, pixels, value))
 
         if websocket is not False:
             websocket.send(
