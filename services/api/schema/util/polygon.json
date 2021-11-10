@@ -11,21 +11,30 @@
             "type": "string",
             "enum": [ "Polygon" ]
         },
+        "bbox": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+                "type": "number"
+            }
+        },
         "coordinates": {
             "type": "array",
+            "description": "Outer/Inner Polygon rings",
+            "minItems": 1,
             "items": {
                 "type": "array",
-                "description": "Outer/Inner Polygon rings",
-                "minLength": 1,
+                "description": "Polygon Ring",
+                "minItems": 4,
                 "items": {
                     "type": "array",
-                    "description": "Polygon Ring",
-                    "minLength": 4,
+                    "description": "X,Y Coordinate Pair",
+                    "minItems": 2,
+                    "maxItems": 2,
                     "items": {
                         "type": "number",
-                        "minLength": 2,
-                        "maxLength": 2,
-                        "description": "X,Y Coordinate Pair"
+                        "description": "Coordinate"
                     }
                 }
             }

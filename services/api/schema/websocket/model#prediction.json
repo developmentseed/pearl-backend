@@ -23,8 +23,7 @@
                     "description": "Human readable name of the AOI"
                 },
                 "polygon": {
-                    "type": "object",
-                    "description": "GeoJSON Polygon Geometry"
+                    "$ref": "../util/polygon.json"
                 }
             }
         }

@@ -1,8 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 const { Err } = require('@openaddresses/batch-schema');
+const $RefParser = require('json-schema-ref-parser');
 
 async function router(schema) {
+    const map = {};
+
+    fs.readdirSync(path.resolve(__dirname, '../schema/websocket')).forEach(async (s) => {
+        map[path.parse(s).name] = await $RefParser.dereference(
+            path.resolve(__dirname, '../schema/websocket', s)
+        );
+    });
+
     /**
      * @api {get} /websocket Schemas
      * @apiVersion 1.0.0
@@ -19,12 +28,6 @@ async function router(schema) {
         res: 'res.Websocket.json'
     }, async (req, res) => {
         try {
-            const map = {};
-
-            fs.readdirSync(path.resolve(__dirname, '../schema/websocket')).forEach((s) => {
-                map[path.parse(s).name] = require(path.resolve(__dirname, '../schema/websocket/', s));
-            });
-
             res.json(map);
         } catch (err) {
             return Err.respond(err, res);
