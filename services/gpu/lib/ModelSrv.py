@@ -540,9 +540,11 @@ class ModelSrv:
 
             done_processing(self)
 
-            self.retrain(
-                {"name": body.get("name"), "classes": body.get("classes")}, websocket
-            )
+            self.retrain({
+                "name": body.get("name"),
+                "classes": body.get("classes"),
+                "bounds": body.get("bounds")
+            }, websocket)
 
         except Exception as e:
             done_processing(self)
@@ -599,7 +601,7 @@ class ModelSrv:
             curr = 0
             for cls in body["classes"]:
                 cls["retrain_geometry"] = geom2px(
-                    cls["retrain_geometry"], self, websocket, total, curr
+                    cls["retrain_geometry"], self, websocket, total, curr, body.get('bounds')
                 )
 
                 curr += len(cls["retrain_geometry"])
