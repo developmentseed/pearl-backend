@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
 
+# v0.7.2
+## Fixes
+- #588 from developmentseed/bbox-filter [`26441d2`](https://github.com/developmentseed/lulc-infra/commit/26441d27eb15bbe1fa8a8d9590a164b144af0811)
+- #590 from developmentseed/fix-osmtag-query [`2554bb9`](https://github.com/developmentseed/lulc-infra/commit/2554bb9c16c8723437228720eeaa05324ba4a904)
+
 # v0.7.1
 
 ## Fixes
