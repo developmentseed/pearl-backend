@@ -222,7 +222,7 @@ async function router(schema, config) {
             if (model.osmtag_id) {
                 model.osmtag = [];
 
-                const tagmap = await OSMTag.from(config.pool, req.params.modelid);
+                const tagmap = await OSMTag.from(config.pool, model.osmtag_id);
                 for (const key of Object.keys(tagmap.tagmap)) {
                     model.osmtag.push({
                         name: model.classes[parseInt(key)].name,
