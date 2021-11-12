@@ -598,6 +598,8 @@ class ModelSrv:
 
                 total += len(cls["retrain_geometry"])
 
+            LOGGER.info("ok - generated {} sample pts", total)
+
             curr = 0
             for cls in body["classes"]:
                 cls["retrain_geometry"] = geom2px(
@@ -605,6 +607,8 @@ class ModelSrv:
                 )
 
                 curr += len(cls["retrain_geometry"])
+
+            LOGGER.info("ok - generated {} PXs", total)
 
             self.model.retrain(body["classes"])
 
