@@ -598,7 +598,7 @@ class ModelSrv:
 
                 total += len(cls["retrain_geometry"])
 
-            LOGGER.info("ok - generated {} sample pts", total)
+            LOGGER.info("ok - generated %s sample pts", total)
 
             curr = 0
             for cls in body["classes"]:
@@ -608,7 +608,7 @@ class ModelSrv:
 
                 curr += len(cls["retrain_geometry"])
 
-            LOGGER.info("ok - generated {} PXs", total)
+            LOGGER.info("ok - generated %s PXs", total)
 
             self.model.retrain(body["classes"])
 
