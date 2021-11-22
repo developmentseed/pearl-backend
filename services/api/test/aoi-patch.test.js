@@ -110,7 +110,13 @@ test('POST /api/project/1/aoi', async (t) => {
                     [-79.37724530696869, 38.83455550411051],
                     [-79.37724530696869, 38.83428180092151]
                 ]]
-            }
+            },
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ]
         });
     } catch (err) {
         t.error(err, 'no errors');

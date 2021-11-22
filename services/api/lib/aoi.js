@@ -256,8 +256,6 @@ class AOI extends Generic {
                 WHERE
                     a.id = ${id}
                 AND
-                    a.checkpoint_id = c.id
-                AND
                     a.archived = false
             `);
         } catch (err) {
@@ -279,6 +277,7 @@ class AOI extends Generic {
      * @param {String} aoi.name - Human Readable Name
      * @param {Number} aoi.checkpoint_id - Checkpoint ID
      * @param {Object} aoi.bounds - Bounds GeoJSON
+     * @param {Array[]} aoi.classes - Classes Object
      */
     static async generate(pool, aoi) {
         let pgres;
@@ -288,12 +287,14 @@ class AOI extends Generic {
                     project_id,
                     name,
                     checkpoint_id,
-                    bounds
+                    bounds,
+                    classes
                 ) VALUES (
                     ${aoi.project_id},
                     ${aoi.name},
                     ${aoi.checkpoint_id},
-                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
+                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)}),
+                    ${JSON.stringify(aoi.classes)}
                 ) RETURNING
                     id,
                     name,
@@ -306,7 +307,8 @@ class AOI extends Generic {
                     created,
                     storage,
                     patches,
-                    px_stats
+                    px_stats,
+                    classes
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create AOI');

@@ -386,6 +386,10 @@ async function router(schema, config) {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
+
+            const chkpt = await Checkpoint.from(config.pool, req.body.checkpoint_id);
+            req.body.classes = chkpt.classes;
+
             const a = await AOI.generate(config.pool, req.body);
 
             return res.json(a.serialize());

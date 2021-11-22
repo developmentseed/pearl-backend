@@ -12,7 +12,8 @@
         "created",
         "storage",
         "patches",
-        "px_stats"
+        "px_stats",
+        "classes"
     ],
     "additionalProperties": false,
     "properties": {
