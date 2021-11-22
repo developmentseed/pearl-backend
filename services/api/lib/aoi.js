@@ -12,10 +12,6 @@ class AOI extends Generic {
     static _res = require('../schema/res.AOI.json');
     static _patch = require('../schema/req.body.PatchAOI.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Return a list of aois
      *

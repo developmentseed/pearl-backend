@@ -12,10 +12,6 @@ class CheckPoint extends Generic {
     static _res = require('../schema/res.Checkpoint.json');
     static _patch = require('../schema/req.body.PatchCheckpoint.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
