@@ -410,6 +410,41 @@ test('PATCH /api/project/1/aoi/1 - unbookmarking', async (t) => {
     t.end();
 });
 
+test('PATCH /api/project/1/aoi/1 - update classes', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/1',
+            method: 'PATCH',
+            auth: {
+                bearer: flight.token.ingalls
+            },
+            body: {
+                classes: [
+                    { name: 'Water', color: '#0000FF' },
+                    { name: 'Tree Canopy', color: '#008100' },
+                    { name: 'Field', color: '#FFF' },
+                    { name: 'Buildings', color: '#806060' }
+                ]
+            }
+        }, t);
+
+        t.deepEqual(
+          res.body.classes,
+          [
+              { name: 'Water', color: '#0000FF' },
+              { name: 'Tree Canopy', color: '#008100' },
+              { name: 'Field', color: '#FFF' },
+              { name: 'Buildings', color: '#806060' }
+          ]
+      );
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('GET /api/project/1/aoi/1/patch/1', async (t) => {
     try {
         const res = await flight.request({
