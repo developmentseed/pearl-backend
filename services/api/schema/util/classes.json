@@ -7,14 +7,14 @@
         "required": [
             "name",
             "color"
-        ],  
+        ],
         "properties": {
             "name": {
                 "type": "string"
             },
             "color": {
                 "type": "string"
-            }   
-        }   
-    }   
+            }
+        }
+    }
 }
