@@ -19,7 +19,7 @@
         "@openaddresses/batch-schema": "^1.0.1",
         "@turf/bbox": "^6.3.0",
         "@turf/bbox-polygon": "^6.3.0",
-        "apidoc": "0.50.1",
+        "apidoc": "^0.50.1",
         "apidoc-plugin-schema2": "0.1.8",
         "body-parser": "^1.19.0",
         "busboy": "^0.3.1",
