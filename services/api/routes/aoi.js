@@ -563,6 +563,10 @@ async function router(schema, config) {
         try {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
+            if (req.body.classes && req.body.classes.length !== a.classes.length) {
+                throw new Err(400, null, 'Cannot change number of classes on an existing AOI');
+            }
+
             a.patch(req.body);
             await a.commit(config.pool);
 
