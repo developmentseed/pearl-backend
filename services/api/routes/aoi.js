@@ -698,8 +698,8 @@ async function router(schema, config) {
             const tiffurl = await aoi.url(config);
 
             const cmap = {};
-            for (let i = 0; i < a.classes.length; i++) {
-                cmap[i] = a.classes[i].color;
+            for (let i = 0; i < aoi.classes.length; i++) {
+                cmap[i] = aoi.classes[i].color;
             }
 
             const patchurls = [];
