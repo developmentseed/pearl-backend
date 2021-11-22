@@ -49,19 +49,19 @@ class AOI extends Generic {
             pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
-                    a.id AS id,
-                    a.name AS name,
-                    a.patches AS patches,
-                    a.px_stats AS px_stats,
-                    a.bookmarked AS bookmarked,
-                    a.bookmarked_at AS bookmarked_at,
-                    a.bounds AS bounds,
+                    a.id                                AS id,
+                    a.name                              AS name,
+                    a.patches                           AS patches,
+                    a.px_stats                          AS px_stats,
+                    a.bookmarked                        AS bookmarked,
+                    a.bookmarked_at                     AS bookmarked_at,
+                    a.bounds                            AS bounds,
                     Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.created AS created,
-                    a.storage AS storage,
-                    a.checkpoint_id AS checkpoint_id,
-                    c.name AS checkpoint_name,
-                    c.classes AS classes
+                    a.created                           AS created,
+                    a.storage                           AS storage,
+                    a.checkpoint_id                     AS checkpoint_id,
+                    a.classes                           AS classes,
+                    c.name                              AS checkpoint_name
                 FROM
                     aois a,
                     checkpoints c
@@ -238,22 +238,21 @@ class AOI extends Generic {
         try {
             pgres = await pool.query(sql`
                SELECT
-                    a.id AS id,
-                    a.name AS name,
-                    a.bounds AS bounds,
+                    a.id                                AS id,
+                    a.name                              AS name,
+                    a.bounds                            AS bounds,
                     Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.project_id AS project_id,
-                    a.bookmarked AS bookmarked,
-                    a.bookmarked_at AS bookmarked_at,
-                    a.checkpoint_id AS checkpoint_id,
-                    a.created AS created,
-                    a.storage AS storage,
-                    a.patches AS patches,
-                    a.px_stats AS px_stats,
-                    c.classes as classes
+                    a.project_id                        AS project_id,
+                    a.bookmarked                        AS bookmarked,
+                    a.bookmarked_at                     AS bookmarked_at,
+                    a.checkpoint_id                     AS checkpoint_id,
+                    a.created                           AS created,
+                    a.storage                           AS storage,
+                    a.patches                           AS patches,
+                    a.px_stats                          AS px_stats,
+                    a.classes                           AS classes
                 FROM
-                    aois a,
-                    checkpoints c
+                    aois a
                 WHERE
                     a.id = ${id}
                 AND
