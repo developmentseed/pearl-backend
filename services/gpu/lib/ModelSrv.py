@@ -610,7 +610,8 @@ class ModelSrv:
 
             LOGGER.info("ok - generated %s PXs", total)
 
-            self.model.retrain(body["classes"])
+            if total != 0:
+                self.model.retrain(body["classes"])
 
             LOGGER.info("ok - done retrain")
 
