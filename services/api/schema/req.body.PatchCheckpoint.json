@@ -11,24 +11,7 @@
             "description": "Has the checkpoint been bookmarked in the frontend"
         },
         "classes": {
-            "type": "array",
-            "description": "Named output classes & their associated colours. NOTE: Patching cannot change the number of classes",
-            "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                    "name",
-                    "color"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "color": {
-                        "type": "string"
-                    }
-                }
-            }
+            "$ref": "./util/classes.json"
         }
     }
 }

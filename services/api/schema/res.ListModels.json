@@ -54,7 +54,7 @@
                         "description": "Generic key/value store for additional model metadata"
                     },
                     "classes": {
-                        "$ref": "./util/model-classes.json"
+                        "$ref": "./util/classes.json"
                     }
                 }
             }

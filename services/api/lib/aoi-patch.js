@@ -12,10 +12,6 @@ class AOIPatch extends Generic {
     static _patch = require('../schema/req.body.PatchPatch.json');
     static _res = require('../schema/res.Patch.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Return a list of AOI Patches
      *

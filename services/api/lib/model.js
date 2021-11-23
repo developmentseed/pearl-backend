@@ -13,10 +13,6 @@ class Model extends Generic {
     static _res = require('../schema/res.Model.json');
     static _patch = require('../schema/req.body.PatchModel.json');
 
-    constructor() {
-        super();
-    }
-
     serialize() {
         const res = super.serialize();
 

@@ -13,10 +13,6 @@ class Instance extends Generic {
     static _patch = require('../schema/req.body.PatchInstance.json');
     static _res = require('../schema/res.Instance.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *

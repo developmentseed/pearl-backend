@@ -12,10 +12,6 @@ class AOI extends Generic {
     static _res = require('../schema/res.AOI.json');
     static _patch = require('../schema/req.body.PatchAOI.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Return a list of aois
      *
@@ -49,19 +45,19 @@ class AOI extends Generic {
             pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
-                    a.id AS id,
-                    a.name AS name,
-                    a.patches AS patches,
-                    a.px_stats AS px_stats,
-                    a.bookmarked AS bookmarked,
-                    a.bookmarked_at AS bookmarked_at,
-                    a.bounds AS bounds,
+                    a.id                                AS id,
+                    a.name                              AS name,
+                    a.patches                           AS patches,
+                    a.px_stats                          AS px_stats,
+                    a.bookmarked                        AS bookmarked,
+                    a.bookmarked_at                     AS bookmarked_at,
+                    a.bounds                            AS bounds,
                     Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.created AS created,
-                    a.storage AS storage,
-                    a.checkpoint_id AS checkpoint_id,
-                    c.name AS checkpoint_name,
-                    c.classes AS classes
+                    a.created                           AS created,
+                    a.storage                           AS storage,
+                    a.checkpoint_id                     AS checkpoint_id,
+                    a.classes                           AS classes,
+                    c.name                              AS checkpoint_name
                 FROM
                     aois a,
                     checkpoints c
@@ -238,26 +234,23 @@ class AOI extends Generic {
         try {
             pgres = await pool.query(sql`
                SELECT
-                    a.id AS id,
-                    a.name AS name,
-                    a.bounds AS bounds,
+                    a.id                                AS id,
+                    a.name                              AS name,
+                    a.bounds                            AS bounds,
                     Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.project_id AS project_id,
-                    a.bookmarked AS bookmarked,
-                    a.bookmarked_at AS bookmarked_at,
-                    a.checkpoint_id AS checkpoint_id,
-                    a.created AS created,
-                    a.storage AS storage,
-                    a.patches AS patches,
-                    a.px_stats AS px_stats,
-                    c.classes as classes
+                    a.project_id                        AS project_id,
+                    a.bookmarked                        AS bookmarked,
+                    a.bookmarked_at                     AS bookmarked_at,
+                    a.checkpoint_id                     AS checkpoint_id,
+                    a.created                           AS created,
+                    a.storage                           AS storage,
+                    a.patches                           AS patches,
+                    a.px_stats                          AS px_stats,
+                    a.classes                           AS classes
                 FROM
-                    aois a,
-                    checkpoints c
+                    aois a
                 WHERE
                     a.id = ${id}
-                AND
-                    a.checkpoint_id = c.id
                 AND
                     a.archived = false
             `);
@@ -280,6 +273,7 @@ class AOI extends Generic {
      * @param {String} aoi.name - Human Readable Name
      * @param {Number} aoi.checkpoint_id - Checkpoint ID
      * @param {Object} aoi.bounds - Bounds GeoJSON
+     * @param {Array[]} aoi.classes - Classes Object
      */
     static async generate(pool, aoi) {
         let pgres;
@@ -289,12 +283,14 @@ class AOI extends Generic {
                     project_id,
                     name,
                     checkpoint_id,
-                    bounds
+                    bounds,
+                    classes
                 ) VALUES (
                     ${aoi.project_id},
                     ${aoi.name},
                     ${aoi.checkpoint_id},
-                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
+                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)}),
+                    ${JSON.stringify(aoi.classes)}
                 ) RETURNING
                     id,
                     name,
@@ -307,7 +303,8 @@ class AOI extends Generic {
                     created,
                     storage,
                     patches,
-                    px_stats
+                    px_stats,
+                    classes
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to create AOI');

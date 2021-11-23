@@ -39,10 +39,9 @@ async function router(schema, config) {
                 `/api/share/${aoi.uuid}/tiles/{z}/{x}/{y}`
             ];
         } else {
-            const chkpt = await Checkpoint.from(config.pool, aoi.checkpoint_id);
             const cmap = {};
-            for (let i = 0; i < chkpt.classes.length; i++) {
-                cmap[i] = chkpt.classes[i].color;
+            for (let i = 0; i < aoi.classes.length; i++) {
+                cmap[i] = aoi.classes[i].color;
             }
 
             req.query.colormap = JSON.stringify(cmap);
@@ -208,10 +207,8 @@ async function router(schema, config) {
 
                     const tiffurl = await a.url(config);
 
-                    const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
-
                     const histo = [];
-                    for (let i = 0; i <= chkpt.classes.length; i++) {
+                    for (let i = 0; i <= a.classes.length; i++) {
                         histo[i] = i + 1;
                     }
 
@@ -232,7 +229,7 @@ async function router(schema, config) {
 
                     if (pres && pres.body && pres.body.length && pres.body[0].valid_pixels) {
                         const totalpx = pres.body[0].valid_pixels;
-                        for (let i = 0; i < chkpt.classes.length; i++) {
+                        for (let i = 0; i < a.classes.length; i++) {
                             px_stats[i] = (pres.body[0].categories[i] || 0) / totalpx;
                         }
                     } else {
@@ -299,10 +296,9 @@ async function router(schema, config) {
 
             const tiffurl = await a.url(config);
 
-            const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
             const cmap = {};
-            for (let i = 0; i < chkpt.classes.length; i++) {
-                cmap[i] = chkpt.classes[i].color;
+            for (let i = 0; i < a.classes.length; i++) {
+                cmap[i] = a.classes[i].color;
             }
 
             const patchurls = [];
@@ -386,6 +382,10 @@ async function router(schema, config) {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
+
+            const chkpt = await Checkpoint.from(config.pool, req.body.checkpoint_id);
+            req.body.classes = chkpt.classes;
+
             const a = await AOI.generate(config.pool, req.body);
 
             return res.json(a.serialize());
@@ -415,10 +415,9 @@ async function router(schema, config) {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const chkpt = await Checkpoint.from(config.pool, a.checkpoint_id);
             const cmap = {};
-            for (let i = 0; i < chkpt.classes.length; i++) {
-                cmap[i] = chkpt.classes[i].color;
+            for (let i = 0; i < a.classes.length; i++) {
+                cmap[i] = a.classes[i].color;
             }
 
             const patchurls = [];
@@ -564,6 +563,10 @@ async function router(schema, config) {
         try {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
+            if (req.body.classes && req.body.classes.length !== a.classes.length) {
+                throw new Err(400, null, 'Cannot change number of classes on an existing AOI');
+            }
+
             a.patch(req.body);
             await a.commit(config.pool);
 
@@ -698,10 +701,9 @@ async function router(schema, config) {
             const aoi = await AOI.from(config.pool, share.aoi_id);
             const tiffurl = await aoi.url(config);
 
-            const chkpt = await Checkpoint.from(config.pool, share.checkpoint_id);
             const cmap = {};
-            for (let i = 0; i < chkpt.classes.length; i++) {
-                cmap[i] = chkpt.classes[i].color;
+            for (let i = 0; i < aoi.classes.length; i++) {
+                cmap[i] = aoi.classes[i].color;
             }
 
             const patchurls = [];

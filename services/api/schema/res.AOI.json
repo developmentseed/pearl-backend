@@ -12,7 +12,8 @@
         "created",
         "storage",
         "patches",
-        "px_stats"
+        "px_stats",
+        "classes"
     ],
     "additionalProperties": false,
     "properties": {
@@ -56,23 +57,7 @@
             "type": "object"
         },
         "classes": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "color"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "color": {
-                        "type": "string"
-                    }
-                }
-            }
+            "$ref": "./util/classes.json"
         },
         "shares": {
             "type": "array",

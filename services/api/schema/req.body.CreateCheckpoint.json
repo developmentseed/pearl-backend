@@ -38,24 +38,7 @@
             }
         },
         "classes": {
-            "type": "array",
-            "description": "Named output classes & their associated colours",
-            "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                    "name",
-                    "color"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "color": {
-                        "type": "string"
-                    }
-                }
-            }
+            "$ref": "./util/classes.json"
         },
         "retrain_geoms": {
             "type": "array",

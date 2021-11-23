@@ -11,10 +11,6 @@ class Batch extends Generic {
     static _patch = require('../schema/req.body.PatchBatch.json');
     static _res = require('../schema/res.Batch.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *

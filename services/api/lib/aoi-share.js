@@ -11,10 +11,6 @@ class AOIShare extends Generic {
     static _patch = require('../schema/req.body.PatchShare.json');
     static _res = require('../schema/res.Share.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Return a list of AOI Shares
      *
