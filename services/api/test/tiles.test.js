@@ -69,7 +69,26 @@ test('GET /api/tiles/qa-latest/17/100/100.mvt', async (t) => {
     t.end();
 });
 
-test('GET /api/tiles/qa-latest/17/100/100.mvt?types=Point', async (t) => {
+test('GET /api/tiles/qa-latest/13/100/100.mvt', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/tiles/qa-latest/13/100/100.mvt',
+            method: 'GET',
+            encoding: null,
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
+        t.equals(res.statusCode, 204);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/tiles/qa-latest/17/36634/50171.mvt?types=Point', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/tiles/qa-latest/17/36634/50171.mvt?types=Point',
