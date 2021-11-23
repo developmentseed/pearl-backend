@@ -430,14 +430,14 @@ test('PATCH /api/project/1/aoi/1 - update classes', async (t) => {
         }, t);
 
         t.deepEqual(
-          res.body.classes,
-          [
-              { name: 'Water', color: '#0000FF' },
-              { name: 'Tree Canopy', color: '#008100' },
-              { name: 'Field', color: '#FFF' },
-              { name: 'Buildings', color: '#806060' }
-          ]
-      );
+            res.body.classes,
+            [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008100' },
+                { name: 'Field', color: '#FFF' },
+                { name: 'Buildings', color: '#806060' }
+            ]
+        );
     } catch (err) {
         t.error(err, 'no errors');
     }
