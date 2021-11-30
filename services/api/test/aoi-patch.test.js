@@ -445,6 +445,55 @@ test('PATCH /api/project/1/aoi/1 - update classes', async (t) => {
     t.end();
 });
 
+test('GET /api/project/1/aoi/1 - should return the classes field updated', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/1',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, t);
+
+        delete res.body.created;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            area: 1238,
+            storage: false,
+            project_id: 1,
+            checkpoint_id: 1,
+            bookmarked: false,
+            bookmarked_at: null,
+            patches: [1],
+            shares: [],
+            name: 'New test AOI',
+            px_stats: {},
+            bounds: {
+                type: 'Polygon',
+                coordinates: [[
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
+                ]]
+            },
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008100' },
+                { name: 'Field', color: '#FFF' },
+                { name: 'Buildings', color: '#806060' }
+            ]
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('GET /api/project/1/aoi/1/patch/1', async (t) => {
     try {
         const res = await flight.request({

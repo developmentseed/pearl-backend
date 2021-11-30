@@ -206,7 +206,8 @@ class AOI extends Generic {
                         bookmarked = ${this.bookmarked},
                         bookmarked_at = ${bookmarked_at},
                         patches = ${this.patches ? sql.array(this.patches, sql`BIGINT[]`) : null},
-                        px_stats = ${this.px_stats ? JSON.stringify(this.px_stats) : null}::JSONB
+                        px_stats = ${this.px_stats ? JSON.stringify(this.px_stats) : null}::JSONB,
+                        classes = ${this.classes ? JSON.stringify(this.classes) : null}::JSONB
                     WHERE
                         id = ${this.id}
                     RETURNING
