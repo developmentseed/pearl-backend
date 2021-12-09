@@ -101,7 +101,7 @@ async function router(schema, config) {
      * @api {post} /api/model/:modelid/upload UploadModel
      * @apiVersion 1.0.0
      * @apiName UploadModel
-     * @apiGroup AOI
+     * @apiGroup Model
      * @apiPermission admin
      *
      * @apiDescription
