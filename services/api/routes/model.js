@@ -156,13 +156,27 @@ async function router(schema, config) {
      * @apiDescription
      *     List information about a set of models
      *
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListModels.json} apiParam
      * @apiSchema {jsonschema=../schema/res.ListModels.json} apiSuccess
      */
     await schema.get('/model', {
+        query: 'req.query.ListModels.json',
         res: 'res.ListModels.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            res.json(await Model.list(config.pool));
+            if (req.auth && req.auth.access === 'admin') {
+                for (const t of ['active', 'storage']) {
+                    if (req.query[t] === 'all') req.query[t] = null;
+                    else if (req.query[t] === 'false') req.query[t] = false;
+                    else if (req.query[t] === 'true') req.query[t] = true;
+                    else req.query[t] = true;
+                }
+            } else {
+                req.query.storage = true;
+                req.query.active = true;
+            }
+
+            res.json(await Model.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
