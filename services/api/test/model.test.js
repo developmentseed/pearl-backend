@@ -7,6 +7,7 @@ const flight = new Flight();
 flight.init(test);
 flight.takeoff(test);
 flight.user(test, 'ingalls', true);
+flight.user(test, 'non_admin', false);
 
 test('GET /api/model (empty)', async (t) => {
     try {
@@ -137,6 +138,47 @@ test('GET /api/model (storage: false)', async (t) => {
     t.end();
 });
 
+test('GET /api/model?storage=all (storage: false)', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/model?storage=all',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, t);
+
+        t.equals(res.body.total, 1);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/model?storage=all (storage: false, non_admin)', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/model?storage=all',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.non_admin
+            }
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 0,
+            models: []
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('GET /api/model/1/osmtag - No OSMTags', async (t) => {
     try {
         const res = await flight.request({
@@ -190,7 +232,7 @@ test('GET /api/model (storage: true)', async (t) => {
         t.equals(res.body.models.length, 1, '1 model');
 
         for (const model of res.body.models) {
-            t.deepEquals(Object.keys(model).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'name', 'uid']);
+            t.deepEquals(Object.keys(model).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'name', 'storage', 'uid']);
 
             t.ok(parseInt(model.id), 'id is int');
             t.ok(parseInt(model.uid), 'uid is int');

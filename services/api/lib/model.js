@@ -27,9 +27,15 @@ class Model extends Generic {
      * Return a list of active & uploaded models
      *
      * @param {Pool} pool - Instantiated Postgres Pool
+     * @param {Object} params
+     * @param {Boolean} [params.storage=true]
+     * @param {Boolean} [params.active=true]
      */
-    static async list(pool) {
+    static async list(pool, params = {}) {
         let pgres;
+
+        if (params.storage === undefined) params.storage = true;
+        if (params.active === undefined) params.active = true;
 
         try {
             pgres = await pool.query(sql`
@@ -41,12 +47,13 @@ class Model extends Generic {
                     name,
                     meta,
                     classes,
-                    bounds
+                    bounds,
+                    storage
                 FROM
                     models
                 WHERE
-                    active = true
-                    AND storage = true
+                    (${params.storage}::BOOLEAN IS NULL OR storage = ${params.storage}::BOOLEAN)
+                    AND (${params.active}::BOOLEAN IS NULL OR active = ${params.active}::BOOLEAN)
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');

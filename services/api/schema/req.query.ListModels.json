@@ -1,0 +1,26 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "storage": {
+            "type": "string",
+            "description": "Admins are allowed to filter by storage status - other users default to true",
+            "default": "true",
+            "enum": [
+                "true",
+                "false",
+                "all"
+            ]
+        },
+        "active": {
+            "type": "string",
+            "description": "Admins are allowed to filter by active status - other users default to true",
+            "default": "true",
+            "enum": [
+                "true",
+                "false",
+                "all"
+            ]
+        }
+    }
+}
