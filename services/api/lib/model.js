@@ -27,15 +27,28 @@ class Model extends Generic {
      * Return a list of active & uploaded models
      *
      * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Object} params
-     * @param {Boolean} [params.storage=true]
-     * @param {Boolean} [params.active=true]
+     * @param {Object} query - Query Object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Page to return
+     * @param {String} [query.order=asc] Sort Order (asc/desc)
+     * @param {Boolean} [query.storage=true]
+     * @param {Boolean} [query.active=true]
      */
-    static async list(pool, params = {}) {
+    static async list(pool, query = {}) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 0;
+
+        if (!query.sort || query.sort === 'desc') {
+            query.sort = sql`desc`;
+        } else {
+            query.sort = sql`asc`;
+        }
+
         let pgres;
 
-        if (params.storage === undefined) params.storage = true;
-        if (params.active === undefined) params.active = true;
+        if (query.storage === undefined) query.storage = true;
+        if (query.active === undefined) query.active = true;
 
         try {
             pgres = await pool.query(sql`
@@ -52,8 +65,14 @@ class Model extends Generic {
                 FROM
                     models
                 WHERE
-                    (${params.storage}::BOOLEAN IS NULL OR storage = ${params.storage}::BOOLEAN)
-                    AND (${params.active}::BOOLEAN IS NULL OR active = ${params.active}::BOOLEAN)
+                    (${query.storage}::BOOLEAN IS NULL OR storage = ${query.storage}::BOOLEAN)
+                    AND (${query.active}::BOOLEAN IS NULL OR active = ${query.active}::BOOLEAN)
+                ORDER BY
+                    created ${query.sort}
+                LIMIT
+                    ${query.limit}
+                OFFSET
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
