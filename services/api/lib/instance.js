@@ -74,9 +74,8 @@ class Instance extends Generic {
             batch_id = parseInt(query.batch);
         }
 
-        let pgres;
         try {
-            pgres = await pool.query(sql`
+            const pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -103,11 +102,11 @@ class Instance extends Generic {
                 OFFSET
                     ${query.page * query.limit}
             `);
+
+            return this.deserialize(pgres.rows);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list instances');
         }
-
-        return this.deserialize(pgres.rows);
     }
 
     /**

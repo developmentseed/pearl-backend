@@ -67,11 +67,11 @@ test('POST /api/project/1/instance', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/instance', async (t) => {
+test('GET /api/project/1/instance?status=all', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/instance',
+            url: '/api/project/1/instance?status=all',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -89,6 +89,58 @@ test('GET /api/project/1/instance', async (t) => {
                 batch: null,
                 type: 'gpu'
             }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET /api/project/1/instance?status=inactive', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/instance?status=inactive',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.ok(res.body.instances[0].created, '.instances[0].created: <date>');
+        delete res.body.instances[0].created;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            instances: [{
+                id: 1,
+                active: false,
+                batch: null,
+                type: 'gpu'
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET /api/project/1/instance?status=active', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/instance?status=active',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 0,
+            instances: []
         });
     } catch (err) {
         t.error(err, 'no error');

@@ -315,8 +315,8 @@ test('POST /api/project/1/batch - invalid checkpoint', async (t) => {
         }, false);
 
         t.deepEquals(res.body, {
-            status: 404, message:
-            'Checkpoint not found',
+            status: 404,
+            message: 'Checkpoint not found',
             messages: []
         });
 
@@ -431,7 +431,10 @@ test('GET /api/project/1/instance - batch: 1', async (t) => {
         t.deepEquals(res.body, {
             total: 1,
             instances: [{
-                id: 1, batch: 1, active: false, type: 'gpu'
+                id: 1,
+                batch: 1,
+                active: false,
+                type: 'gpu'
             }]
         });
 
