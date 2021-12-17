@@ -172,9 +172,9 @@ test('PATCH /api/project/1/checkpoint/1', async (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
-        t.ok(res.body.center.length, 2)
+        t.ok(res.body.center.length, 2);
         delete res.body.center;
-        t.ok(res.body.bounds.length, 4)
+        t.ok(res.body.bounds.length, 4);
         delete res.body.bounds;
 
         t.deepEquals(res.body, {
@@ -230,9 +230,9 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
-        t.ok(res.body.center.length, 2)
+        t.ok(res.body.center.length, 2);
         delete res.body.center;
-        t.ok(res.body.bounds.length, 4)
+        t.ok(res.body.bounds.length, 4);
         delete res.body.bounds;
 
 
@@ -413,9 +413,9 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.center.length, 2)
+        t.ok(res.body.center.length, 2);
         delete res.body.center;
-        t.ok(res.body.bounds.length, 4)
+        t.ok(res.body.bounds.length, 4);
         delete res.body.bounds;
 
         t.deepEquals(res.body, {
@@ -423,7 +423,7 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', async (t) => {
             name: 'checkpoint-1',
             version: '1.0.0',
             scheme: 'xyz',
-            tiles: ['/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt'],
+            tiles: ['/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt']
         });
     } catch (err) {
         t.error(err, 'no errors');
