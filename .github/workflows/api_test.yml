@@ -37,7 +37,7 @@ jobs:
       - name: Docker API Test
         run: docker run --network lulc-infra_default
           -e "Postgres=postgres://docker:docker@postgis:5432/gis"
-          -e AZURE_STORAGE_CONNECTION_STRING
+          -e "AZURE_STORAGE_CONNECTION_STRING=${{ secrets.LULCCI_ASCS }}"
           api npm test
 
       - name: Docker Cleanup
