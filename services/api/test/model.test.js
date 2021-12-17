@@ -384,6 +384,18 @@ test('DELETE /api/model/1', async (t) => {
             message: 'Model deleted'
         });
 
+        const getRes = await flight.request({
+            json: true,
+            url: '/api/model',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, t);
+
+        t.equals(getRes.body.total, 0);
+        t.equals(getRes.body.models.length, 0);
+
     } catch (err) {
         t.error(err, 'no errors');
     }

@@ -212,15 +212,22 @@ class Model extends Generic {
      */
     async delete(pool) {
         let pgres;
+        const modelProjects = await pool.query(sql`
+            SELECT COUNT(*) FROM
+                projects
+            WHERE
+                model_id = ${this.id}
+        `);
+        if (modelProjects > 0) {
+          new Err(403, null, 'Model is being used in other projects and can not be deleted');
+        }
+
         try {
             pgres = await pool.query(sql`
-                UPDATE
+                DELETE FROM
                     models
-                SET
-                    active = false
                 WHERE
                     id = ${this.id}
-                RETURNING *
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
