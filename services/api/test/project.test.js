@@ -155,6 +155,12 @@ test('POST /api/project/1/aoi', async (t) => {
             bookmarked: false,
             bookmarked_at: null,
             px_stats: {},
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' } 
+            ],
             bounds: {
                 type: 'Polygon',
                 coordinates: [[

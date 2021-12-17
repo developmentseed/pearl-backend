@@ -75,6 +75,12 @@ test('POST /api/project/1/aoi', async (t) => {
             patches: [],
             name: 'Test AOI',
             px_stats: {},
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
@@ -388,6 +394,12 @@ test('POST /api/project/1/aoi', async (t) => {
             patches: [],
             name: 'Test AOI 2',
             px_stats: {},
+            classes: [
+                { name: 'Water', color: '#0000FF' },
+                { name: 'Tree Canopy', color: '#008000' },
+                { name: 'Field', color: '#80FF80' },
+                { name: 'Built', color: '#806060' }
+            ],
             bounds: {
                 type: 'Polygon',
                 coordinates: [[
