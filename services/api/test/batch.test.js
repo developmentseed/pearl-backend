@@ -315,8 +315,8 @@ test('POST /api/project/1/batch - invalid checkpoint', async (t) => {
         }, false);
 
         t.deepEquals(res.body, {
-            status: 404, message:
-            'Checkpoint not found',
+            status: 404,
+            message: 'Checkpoint not found',
             messages: []
         });
 
@@ -327,11 +327,11 @@ test('POST /api/project/1/batch - invalid checkpoint', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/instance - all instances', async (t) => {
+test('GET /api/project/1/instance?status=all - all instances', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/instance',
+            url: '/api/project/1/instance?status=all',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -363,7 +363,7 @@ test('GET /api/project/1/instance - batch: true', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/instance?batch=true',
+            url: '/api/project/1/instance?batch=true&status=all',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -418,7 +418,7 @@ test('GET /api/project/1/instance - batch: 1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/instance?batch=1',
+            url: '/api/project/1/instance?batch=1&status=all',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -431,7 +431,10 @@ test('GET /api/project/1/instance - batch: 1', async (t) => {
         t.deepEquals(res.body, {
             total: 1,
             instances: [{
-                id: 1, batch: 1, active: false, type: 'gpu'
+                id: 1,
+                batch: 1,
+                active: false,
+                type: 'gpu'
             }]
         });
 

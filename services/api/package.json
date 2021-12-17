@@ -10,7 +10,7 @@
         "lint": "eslint index.js lib/**.js routes/**.js test/**.js",
         "prod": "node --trace-warnings ./index.js --prod",
         "dev": "nodemon ./index.js",
-        "test": "tape test/**.test.js | tap-dot"
+        "test": "./test/runner"
     },
     "dependencies": {
         "@azure/storage-blob": "12.7.0",

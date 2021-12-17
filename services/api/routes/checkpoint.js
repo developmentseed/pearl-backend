@@ -90,7 +90,7 @@ async function router(schema, config) {
                 tilejson: '2.2.0',
                 name: `checkpoint-${req.params.checkpointid}`,
                 version: '1.0.0',
-                schema: 'xyz',
+                scheme: 'xyz',
                 tiles: [
                     `/project/${req.params.projectid}/checkpoint/${req.params.checkpointid}/tiles/{z}/{x}/{y}.mvt`
                 ],
