@@ -53,7 +53,7 @@ class Model extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
-                    count(*) AS count,
+                    count(*) OVER() AS count,
                     id,
                     created,
                     active,
