@@ -219,7 +219,7 @@ class Model extends Generic {
                 model_id = ${this.id}
         `);
         if (modelProjects > 0) {
-          new Err(403, null, 'Model is being used in other projects and can not be deleted');
+            new Err(403, null, 'Model is being used in other projects and can not be deleted');
         }
 
         try {
