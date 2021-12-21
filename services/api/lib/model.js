@@ -177,7 +177,8 @@ class Model extends Generic {
                     SET
                         storage = ${this.storage},
                         bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)}),
-                        osmtag_id = ${this.osmtag_id}
+                        osmtag_id = ${this.osmtag_id},
+                        active = ${this.active}
                     WHERE
                         id = ${this.id}
                     RETURNING *

@@ -391,4 +391,39 @@ test('DELETE /api/model/1', async (t) => {
     t.end();
 });
 
+test('GET and PATCH /api/model/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/model/1',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, t);
+
+        t.equals(res.statusCode, 200, 'status: 200');
+        t.equals(res.body.active, false);
+
+        const patchRes = await flight.request({
+            json: true,
+            url: '/api/model/1',
+            method: 'PATCH',
+            auth: {
+                bearer: flight.token.ingalls
+            },
+            body: {
+                active: true
+            }
+        }, t);
+        t.equals(patchRes.statusCode, 200, 'status: 200');
+        t.equals(patchRes.body.active, true);
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
