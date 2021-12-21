@@ -33,8 +33,8 @@ module "resources" {
 
   admin_email          = "sanjay@developmentseed.org"
   gpu_count            = 16
-  placeholder_is_gpu   = true
-  placeholder_num_gpus = 2
+  placeholder_is_gpu   = false
+  placeholder_num_gpus = 0
 
   nginx_enabled = true
   frontend_domain = "landcover.io"
