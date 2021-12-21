@@ -214,13 +214,14 @@ class Model extends Generic {
     async delete(pool) {
         let pgres;
         const modelProjects = await pool.query(sql`
-            SELECT COUNT(*) FROM
+            SELECT id FROM
                 projects
             WHERE
                 model_id = ${this.id}
         `);
-        if (modelProjects > 0) {
-            new Err(403, null, 'Model is being used in other projects and can not be deleted');
+
+        if (modelProjects.rows.length > 0) {
+            throw new Err(403, null, 'Model is being used in other projects and can not be deleted');
         }
 
         try {
