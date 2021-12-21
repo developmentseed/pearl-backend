@@ -11,10 +11,6 @@ class OSMTag extends Generic {
     static _patch = false;
     static _res = require('../schema/res.OSMTag.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *

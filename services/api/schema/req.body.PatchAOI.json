@@ -6,6 +6,9 @@
             "type": "string",
             "description": "The human readable name of the AOI"
         },
+        "classes": {
+            "$ref": "./util/classes.json"
+        },
         "bookmarked": {
             "type": "boolean",
             "description": "Has the checkpoint been bookmarked in the frontend"

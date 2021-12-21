@@ -13,10 +13,6 @@ class Instance extends Generic {
     static _patch = require('../schema/req.body.PatchInstance.json');
     static _res = require('../schema/res.Instance.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
@@ -78,9 +74,8 @@ class Instance extends Generic {
             batch_id = parseInt(query.batch);
         }
 
-        let pgres;
         try {
-            pgres = await pool.query(sql`
+            const pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
                     id,
@@ -107,11 +102,11 @@ class Instance extends Generic {
                 OFFSET
                     ${query.page * query.limit}
             `);
+
+            return this.deserialize(pgres.rows);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list instances');
         }
-
-        return this.deserialize(pgres.rows);
     }
 
     /**

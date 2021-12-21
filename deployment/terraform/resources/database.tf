@@ -10,6 +10,9 @@ resource "azurerm_postgresql_flexible_server" "lulc" {
   private_dns_zone_id    = azurerm_private_dns_zone.lulc.id
   delegated_subnet_id    = azurerm_subnet.postgres.id
   depends_on = [azurerm_private_dns_zone_virtual_network_link.lulc]
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "azurerm_postgresql_flexible_server_database" "lulc" {

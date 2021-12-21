@@ -27,10 +27,7 @@
             "description": "If the checkpoint was derived from a parent checkpoint will contain the ID of the parent"
         },
         "classes": {
-            "type": "array",
-            "items": {
-                "type": "object"
-            }
+            "$ref": "./util/classes.json"
         },
         "created": {
             "$ref": "./util/created.json"

@@ -10,10 +10,6 @@ class Project extends Generic {
     static _patch = require('../schema/req.body.PatchProject.json');
     static _res = require('../schema/res.Project.json');
 
-    constructor() {
-        super();
-    }
-
     /**
      * Ensure a user can only access their own projects (or is an admin and can access anything)
      *

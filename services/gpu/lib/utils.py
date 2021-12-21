@@ -95,9 +95,10 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1, bounds=None):
             retrain = modelsrv.model.run(in_memraster.data)
             retrain = retrain[32:288, 32:288, :]
 
-            value = retrain[pixels[0], pixels[1]]
+            value = retrain[pixels[0], pixels[1]].copy()
 
-            pxs.append(PX(coord, xy, xyz, pixels, value))
+            px = PX(coord, xy, xyz, pixels, value)
+            pxs.append(px)
 
         if websocket is not False:
             websocket.send(

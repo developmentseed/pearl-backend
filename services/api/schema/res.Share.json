@@ -39,10 +39,7 @@
             "type": "integer"
         },
         "classes": {
-            "type": "array",
-            "items": {
-                "type": "object"
-            }
+            "$ref": "./util/classes.json"
         }
     }
 }

@@ -22,7 +22,8 @@
                     "name",
                     "meta",
                     "classes",
-                    "bounds"
+                    "bounds",
+                    "storage"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -54,7 +55,10 @@
                         "description": "Generic key/value store for additional model metadata"
                     },
                     "classes": {
-                        "$ref": "./util/model-classes.json"
+                        "$ref": "./util/classes.json"
+                    },
+                    "storage": {
+                        "type": "boolean"
                     }
                 }
             }

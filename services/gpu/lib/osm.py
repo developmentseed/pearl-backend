@@ -40,6 +40,7 @@ class OSM:
         cache = tempfile.NamedTemporaryFile(delete=False, mode="w")
 
         tiles = mercantile.tiles(*bounds, 17)
+
         for tile in tiles:
             geojson = self.tile2geojson(
                 self.tile(tile.x, tile.y, tile.z), tile.x, tile.y, tile.z

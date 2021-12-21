@@ -13,10 +13,6 @@ class Model extends Generic {
     static _res = require('../schema/res.Model.json');
     static _patch = require('../schema/req.body.PatchModel.json');
 
-    constructor() {
-        super();
-    }
-
     serialize() {
         const res = super.serialize();
 
@@ -31,13 +27,33 @@ class Model extends Generic {
      * Return a list of active & uploaded models
      *
      * @param {Pool} pool - Instantiated Postgres Pool
+     * @param {Object} query - Query Object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Page to return
+     * @param {String} [query.order=asc] Sort Order (asc/desc)
+     * @param {Boolean} [query.storage=true]
+     * @param {Boolean} [query.active=true]
      */
-    static async list(pool) {
+    static async list(pool, query = {}) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 0;
+
+        if (!query.sort || query.sort === 'desc') {
+            query.sort = sql`desc`;
+        } else {
+            query.sort = sql`asc`;
+        }
+
         let pgres;
+
+        if (query.storage === undefined) query.storage = true;
+        if (query.active === undefined) query.active = true;
 
         try {
             pgres = await pool.query(sql`
                 SELECT
+                    count(*) OVER() AS count,
                     id,
                     created,
                     active,
@@ -45,12 +61,19 @@ class Model extends Generic {
                     name,
                     meta,
                     classes,
-                    bounds
+                    bounds,
+                    storage
                 FROM
                     models
                 WHERE
-                    active = true
-                    AND storage = true
+                    (${query.storage}::BOOLEAN IS NULL OR storage = ${query.storage}::BOOLEAN)
+                    AND (${query.active}::BOOLEAN IS NULL OR active = ${query.active}::BOOLEAN)
+                ORDER BY
+                    created ${query.sort}
+                LIMIT
+                    ${query.limit}
+                OFFSET
+                    ${query.page * query.limit}
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
@@ -154,7 +177,8 @@ class Model extends Generic {
                     SET
                         storage = ${this.storage},
                         bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)}),
-                        osmtag_id = ${this.osmtag_id}
+                        osmtag_id = ${this.osmtag_id},
+                        active = ${this.active}
                     WHERE
                         id = ${this.id}
                     RETURNING *
@@ -189,15 +213,23 @@ class Model extends Generic {
      */
     async delete(pool) {
         let pgres;
+        const modelProjects = await pool.query(sql`
+            SELECT id FROM
+                projects
+            WHERE
+                model_id = ${this.id}
+        `);
+
+        if (modelProjects.rows.length > 0) {
+            throw new Err(403, null, 'Model is being used in other projects and can not be deleted');
+        }
+
         try {
             pgres = await pool.query(sql`
-                UPDATE
+                DELETE FROM
                     models
-                SET
-                    active = false
                 WHERE
                     id = ${this.id}
-                RETURNING *
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');

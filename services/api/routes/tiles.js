@@ -105,6 +105,10 @@ async function router(schema, config) {
             }
 
             let mvt = await arequest(preq);
+
+            if (mvt.statusCode === 204) return res.status(204).send();
+            if (mvt.statusCode === 404) return res.status(404).send();
+
             mvt = await gunzip(mvt.body);
             mvt = new VectorTile(new Protobuf(mvt));
 

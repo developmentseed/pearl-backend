@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+# v0.8.0
+
+## Fixes
+- Fix position of model upload docs [`#604`](https://github.com/developmentseed/lulc-infra/pull/604)
+- Patch AOI request wasn't updating its classes in the database [`#603`](https://github.com/developmentseed/lulc-infra/pull/603)
+- tell tf to ignore db changes [`#602`](https://github.com/developmentseed/lulc-infra/pull/602)
+- Avoid div by 0 [`#601`](https://github.com/developmentseed/lulc-infra/pull/601)
+- Fix tile 5xx [`#600`](https://github.com/developmentseed/lulc-infra/pull/600)
+- Make DELETE model endpoint actually delete it [`#611`](https://github.com/developmentseed/lulc-infra/pull/611)
+- Allow to update the active field of Model with PATCH [`#610`](https://github.com/developmentseed/lulc-infra/pull/610)
+- Model Total [`#613`](https://github.com/developmentseed/lulc-infra/pull/613)
+- Model Count Fix [`#612`](https://github.com/developmentseed/lulc-infra/pull/612)
+- Model Pagination [`#608`](https://github.com/developmentseed/lulc-infra/pull/608)
+- Admin List All Models [`#606`](https://github.com/developmentseed/lulc-infra/pull/606)
+
+## Improvements
+- Admin List All Models [`#606`](https://github.com/developmentseed/lulc-infra/pull/606)
+- Shallow Copy of Pxs [`#596`](https://github.com/developmentseed/lulc-infra/pull/596)
+- More Logs [`#595`](https://github.com/developmentseed/lulc-infra/pull/595)
+- Websocket Schema Validation [`#583`](https://github.com/developmentseed/lulc-infra/pull/583)
+
+## Features
+- AOI Classes [`#599`](https://github.com/developmentseed/lulc-infra/pull/599)
 
 # v0.7.2
 ## Fixes
