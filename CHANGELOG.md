@@ -10,6 +10,12 @@ All notable changes to this project will be documented in this file. Dates are d
 - tell tf to ignore db changes [`#602`](https://github.com/developmentseed/lulc-infra/pull/602)
 - Avoid div by 0 [`#601`](https://github.com/developmentseed/lulc-infra/pull/601)
 - Fix tile 5xx [`#600`](https://github.com/developmentseed/lulc-infra/pull/600)
+- Make DELETE model endpoint actually delete it [`#611`](https://github.com/developmentseed/lulc-infra/pull/611)
+- Allow to update the active field of Model with PATCH [`#610`](https://github.com/developmentseed/lulc-infra/pull/610)
+- Model Total [`#613`](https://github.com/developmentseed/lulc-infra/pull/613)
+- Model Count Fix [`#612`](https://github.com/developmentseed/lulc-infra/pull/612)
+- Model Pagination [`#608`](https://github.com/developmentseed/lulc-infra/pull/608)
+- Admin List All Models [`#606`](https://github.com/developmentseed/lulc-infra/pull/606)
 
 ## Improvements
 - Admin List All Models [`#606`](https://github.com/developmentseed/lulc-infra/pull/606)
