@@ -1,0 +1,9 @@
+#!/bin/bash
+set -xeuo pipefail
+
+npx tape test/**.test.js | npx tap-dot
+
+#
+# This file exists as tape can exit with 130 - skipping
+# running a bunch of the tests and report exit code green
+# when run in package.json without pipe protection

@@ -172,6 +172,11 @@ test('PATCH /api/project/1/checkpoint/1', async (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
+        t.ok(res.body.center.length, 2);
+        delete res.body.center;
+        t.ok(res.body.bounds.length, 4);
+        delete res.body.bounds;
+
         t.deepEquals(res.body, {
             id: 1,
             name: 'NEW NAME',
@@ -180,8 +185,6 @@ test('PATCH /api/project/1/checkpoint/1', async (t) => {
             storage: false,
             bookmarked: true,
             parent: null,
-            center: [-80.33203125, 43.0326369600212],
-            bounds: [-86.8359375, 34.8859309407532, -73.828125, 51.1793429792893],
             classes: [
                 { name: 'Water', color: '#FF00FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -227,6 +230,11 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
+        t.ok(res.body.center.length, 2);
+        delete res.body.center;
+        t.ok(res.body.bounds.length, 4);
+        delete res.body.bounds;
+
 
         t.deepEquals(res.body, {
             id: 1,
@@ -242,8 +250,6 @@ test('GET /api/project/1/checkpoint/1', async (t) => {
                 { name: 'Built', color: '#806060' }
             ],
             storage: false,
-            center: [-80.33203125, 43.0326369600212],
-            bounds: [-86.8359375, 34.8859309407532, -73.828125, 51.1793429792893],
             retrain_geoms: [
                 { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317]] },
                 { type: 'MultiPoint', coordinates: [[-86.8359375, 34.88593094075317], [-73.828125, 51.17934297928927]] },
@@ -407,14 +413,17 @@ test('GET /api/project/1/checkpoint/1/tiles - geometries', async (t) => {
             }
         }, t);
 
+        t.ok(res.body.center.length, 2);
+        delete res.body.center;
+        t.ok(res.body.bounds.length, 4);
+        delete res.body.bounds;
+
         t.deepEquals(res.body, {
             tilejson: '2.2.0',
             name: 'checkpoint-1',
             version: '1.0.0',
-            schema: 'xyz',
-            tiles: ['/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt'],
-            bounds: [-86.8359375, 34.8859309407532, -73.828125, 51.1793429792893],
-            center: [-80.33203125, 43.0326369600212]
+            scheme: 'xyz',
+            tiles: ['/project/1/checkpoint/1/tiles/{z}/{x}/{y}.mvt']
         });
     } catch (err) {
         t.error(err, 'no errors');

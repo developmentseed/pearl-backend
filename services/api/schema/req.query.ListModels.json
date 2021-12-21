@@ -2,6 +2,17 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "desc",
+            "description": "Sorting order for listing projects based on created timestamp. Allowed 'desc' and 'asc'. Default desc."
+        },
         "storage": {
             "type": "string",
             "description": "Admins are allowed to filter by storage status - other users default to true",

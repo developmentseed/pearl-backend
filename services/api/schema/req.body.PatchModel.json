@@ -5,6 +5,9 @@
         "storage": {
             "type": "boolean"
         },
+        "active": {
+            "type": "boolean"
+        },
         "bounds": {
             "type": ["array", "null"],
             "description": "Recommended geographic area on which this model can be used",
