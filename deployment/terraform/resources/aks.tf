@@ -57,8 +57,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "gpunodepool" {
   vm_size               = "Standard_NC12"
   vnet_subnet_id = azurerm_subnet.aks.id
   enable_auto_scaling   = true
-  min_count             = 1
-  max_count             = 10
+  min_count             = 0
+  max_count             = 1
   tags = {
     Environment = var.environment
     ManagedBy   = "AI4E"
