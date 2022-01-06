@@ -1,9 +1,9 @@
 const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {get} /api/project/:projectid/instance Create Instance
@@ -28,7 +28,7 @@ async function router(schema, config) {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
-            req.body.uid = req.auth.uid;
+            req.body.uid = req.auth.id;
             const inst = await Instance.generate(config, req.body);
 
             res.json(inst.serialize());
@@ -54,7 +54,7 @@ async function router(schema, config) {
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
             instance.patch(req.body);
@@ -138,7 +138,7 @@ async function router(schema, config) {
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
 
@@ -162,7 +162,7 @@ async function router(schema, config) {
      */
     await schema.delete('/instance', config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             await Instance.reset(config.pool);
 

@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "name",
+        "created"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./util/id.json"
+        },
+        "name": {
+            "type": "string"
+        },
+        "created": {
+            "$ref": "./util/created.json"
+        },
+        "token": {
+            "type": "string"
+        }
+    }
+}

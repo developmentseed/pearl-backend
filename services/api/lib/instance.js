@@ -120,7 +120,7 @@ class Instance extends Generic {
     gen_token(config, auth) {
         return jwt.sign({
             t: 'inst',
-            u: auth.uid,
+            u: auth.id,
             p: parseInt(this.project_id),
             i: parseInt(this.id)
         }, config.SigningSecret, {

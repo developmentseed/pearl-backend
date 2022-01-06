@@ -15,6 +15,8 @@ const bodyparser = require('body-parser');
 const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 const Kube = require('./lib/kube');
+const User = require('./lib/user');
+const Token = require('./lib/token');
 
 const { Schema, Err } = require('@openaddresses/batch-schema');
 
@@ -63,9 +65,6 @@ async function server(args, config, cb) {
         schemas: path.resolve(__dirname, 'schema')
     });
     await schema.api();
-
-    const auth = new (require('./lib/auth').Auth)(config);
-    const authtoken = new (require('./lib/auth').AuthToken)(config);
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -174,7 +173,7 @@ async function server(args, config, cb) {
      */
     const validateApiToken = async (req, res, next) => {
         try {
-            req.auth = await authtoken.validate(req.jwt.token);
+            req.auth = await Token.validate(config, req.jwt.token);
             req.auth.type = 'api';
             next();
         } catch (err) {
@@ -222,7 +221,7 @@ async function server(args, config, cb) {
             if (req.jwt.type === 'auth0') {
                 try {
                     // Load user from database, if exists
-                    const user = await auth.user(req.user.sub, 'auth0_id');
+                    const user = await User.from(config.pool, req.user.sub, 'auth0_id');
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
@@ -235,7 +234,7 @@ async function server(args, config, cb) {
                     });
 
                     // Create user, add to request
-                    req.auth = await auth.create({
+                    req.auth = await User.generate(config.pool, {
                         access: 'user',
                         auth0Id: auth0User.sub,
                         username: auth0User.name,

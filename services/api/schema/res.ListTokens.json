@@ -1,0 +1,24 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "id",
+            "created",
+            "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "id": {
+                "$ref": "./util/id.json"
+            },
+            "name": {
+                "type": "string",
+                "description": "Human readable token name"
+            },
+            "created": {
+                "$ref": "./util/created.json"
+            }
+        }
+    }
+}

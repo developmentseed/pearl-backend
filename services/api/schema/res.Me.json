@@ -1,12 +1,16 @@
 {
     "type": "object",
     "required": [
+        "id",
         "username",
         "email",
         "access"
     ],
     "additionalProperties": false,
     "properties": {
+        "id": {
+            "type": "integer" 
+        },
         "username": {
             "type": "string" 
         },

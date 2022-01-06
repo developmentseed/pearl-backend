@@ -26,7 +26,7 @@ async function router(schema, config) {
         res: 'res.ListProjects.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const results = await Project.list(config.pool, req.auth.uid, req.query);
+            const results = await Project.list(config.pool, req.auth.id, req.query);
             if (results.projects && results.projects.length) {
                 for (let index = 0; index < results.projects.length; index++) {
                     const p = results.projects[index];
@@ -101,7 +101,7 @@ async function router(schema, config) {
         try {
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
-            const proj = await Project.generate(config.pool, req.auth.uid, req.body);
+            const proj = await Project.generate(config.pool, req.auth.id, req.body);
             return res.json(proj.serialize());
         } catch (err) {
             return Err.respond(err, res);
