@@ -346,28 +346,6 @@ test('[meta] Set model.storage: true', async (t) => {
     t.end();
 });
 
-if (process.env.AZURE_STORAGE_CONNECTION_STRING) {
-    test('GET /api/model/1/download', async (t) => {
-        try {
-            const res = await flight.request({
-                json: true,
-                url: '/api/model/1/download',
-                method: 'GET',
-                auth: {
-                    bearer: flight.token.ingalls
-                }
-            }, false);
-
-            t.equals(res.statusCode, 200, 'status: 200');
-            t.equals(res.headers['transfer-encoding'], 'chunked');
-        } catch (err) {
-            t.error(err, 'no errors');
-        }
-
-        t.end();
-    });
-}
-
 test('DELETE /api/model/1', async (t) => {
     try {
         const res = await flight.request({
