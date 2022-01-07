@@ -3,7 +3,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
   location            = azurerm_resource_group.lulc.location
   resource_group_name = azurerm_resource_group.lulc.name
   dns_prefix          = "${local.prefix}-cluster"
-  kubernetes_version  = "1.20.7"
+  kubernetes_version  = "1.20.13"
 
   addon_profile {
     kube_dashboard {
