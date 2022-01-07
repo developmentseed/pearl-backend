@@ -169,42 +169,37 @@ async function server(args, config, cb) {
     });
 
     /*
-     * Validate API tokens
-     */
-    const validateApiToken = async (req, res, next) => {
-        try {
-            req.auth = await Token.validate(config, req.jwt.token);
-            req.auth.type = 'api';
-            next();
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    };
-
-    /*
      * Auth middleware
      */
     config.requiresAuth = [
-        (req, res, next) => {
-            if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-                const token = req.headers.authorization.split(' ')[1];
-
-                // Self-signed tokens are prefixed with 'api.'
-                if (token.indexOf('api.') ===  0) {
-                    req.jwt = {
-                        type: 'api',
-                        token: token.substr(4) // remove prefix
-                    };
-                } else {
-                    req.jwt = {
-                        type: 'auth0',
-                        token: token
-                    };
-                }
-
-                req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
-            } else {
+        async (req, res, next) => {
+            if (!req.headers || !req.headers.authorization || req.headers.authorization.split(' ')[0] !== 'Bearer') {
                 return Err.respond(new Err(401, null, 'Authentication Required'), res);
+            }
+
+            const token = req.headers.authorization.split(' ')[1];
+
+            // Self-signed tokens are prefixed with 'api.'
+            if (token.indexOf('api.') ===  0) {
+                req.jwt = {
+                    type: 'api',
+                    token: token.substr(4) // remove prefix
+                };
+
+                try {
+                    req.auth = await Token.validate(config, req.jwt.token);
+                    req.auth.type = 'api';
+                    return next();
+                } catch (err) {
+                    return Err.respond(err, res);
+                }
+            } else {
+                req.jwt = {
+                    type: 'auth0',
+                    token: token
+                };
+
+                return validateAuth0Token(req, res, next);
             }
         },
         (err, req, res, next) => {

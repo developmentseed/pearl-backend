@@ -64,7 +64,7 @@ class Token extends Generic {
         }
     }
 
-    async validate(config, token) {
+    static async validate(config, token) {
         let pgres, decoded;
         try {
             decoded = jwt.verify(token, config.SigningSecret);
@@ -86,8 +86,7 @@ class Token extends Generic {
                     users.id AS id,
                     users.username,
                     users.access,
-                    users.email,
-                    users.flags
+                    users.email
                 FROM
                     users_tokens INNER JOIN users
                         ON users.id = users_tokens.uid
@@ -137,7 +136,12 @@ class Token extends Generic {
                     NOW(),
                     ${opts.uid},
                     ${opts.name}
-                ) RETURNING *
+                ) RETURNING
+                    id,
+                    'api.'||token AS token,
+                    created,
+                    uid,
+                    name
             `);
 
             return this.deserialize(pgres.rows[0]);

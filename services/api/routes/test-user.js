@@ -12,7 +12,7 @@ async function router(schema, config) {
                 const tkn = await Token.generate(config.pool, {
                     uid: usr.id,
                     name: 'auth0'
-                }, 'Test Token');
+                }, config.SigningSecret);
 
                 usr.token = tkn.token;
 

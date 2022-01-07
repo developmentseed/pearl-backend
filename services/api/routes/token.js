@@ -43,9 +43,9 @@ async function router(schema, config) {
         body: 'req.body.CreateToken.json',
         res: 'res.Token.json'
     }, config.requiresAuth, async (req, res) => {
-        if (!req.auth.type !== 'auth0') throw new Err(400, null, 'Only an Auth0 token can create a API token');
-
         try {
+            if (!req.auth.type !== 'auth0') throw new Err(400, null, 'Only an Auth0 token can create a API token');
+
             const token = await Token.generate(config.pool, {
                 uid: req.auth.id,
                 name: req.body.name
