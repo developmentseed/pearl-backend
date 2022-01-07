@@ -10,12 +10,10 @@
         },
         "checkpointid": {
             "type": "integer",
-            "default": 0,
             "description": "Only return AOIs for a specific checkpoint"
         },
         "bookmarked": {
-            "type": "string",
-            "default": "",
+            "type": "boolean",
             "description": "Filter AOIs based on bookmarked. Allowed 'true' or 'false'. By default returns all."
         },
         "sort": {

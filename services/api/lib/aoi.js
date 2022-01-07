@@ -75,7 +75,7 @@ class AOI extends Generic {
                     ${query.page * query.limit}
             `);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to list AOIs');
+            throw new Err(500, err, 'Failed to list AOIs');
         }
 
         const list = this.deserialize(pgres.rows);
