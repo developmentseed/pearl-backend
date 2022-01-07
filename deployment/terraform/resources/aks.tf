@@ -46,11 +46,22 @@ resource "azurerm_kubernetes_cluster_node_pool" "tiler" {
   }
 }
 
-# add a node pool for the gpu
-# FIXME currently it's not possible to use custom headers via terraform
-# so https://stackoverflow.com/questions/66117018/is-it-possible-to-use-aks-custom-headers-with-the-azurerm-kubernetes-cluster-res
-# we might have to run a Daemonset to install nvidia drivers https://docs.microsoft.com/en-us/azure/aks/gpu-cluster#manually-install-the-nvidia-device-plugin
+# add a cpu only nodepool for running ML tasks
+resource "azurerm_kubernetes_cluster_node_pool" "cpunodepool" {
+  name                  = "cpunodepool"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
+  vm_size               = "Standard_DS3_v2"
+  vnet_subnet_id = azurerm_subnet.aks.id
+  enable_auto_scaling   = true
+  min_count             = 0
+  max_count             = 1
+  tags = {
+    Environment = var.environment
+    ManagedBy   = "AI4E"
+  }
+}
 
+# add a node pool for the gpu
 resource "azurerm_kubernetes_cluster_node_pool" "gpunodepool" {
   name                  = "gpunodepool"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
