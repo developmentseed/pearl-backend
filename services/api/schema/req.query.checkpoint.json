@@ -10,7 +10,6 @@
         },
         "bookmarked": {
             "type": "string",
-            "default": "",
             "description": "Only return bookmarked checkpoints. true or false."
         },
         "sort": {
