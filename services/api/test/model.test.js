@@ -403,7 +403,7 @@ test('DELETE /api/model/1', async (t) => {
     t.end();
 });
 
-test('GET and PATCH /api/model/1', async (t) => {
+test('GET /api/model/1 - fully deleted since no projects depend on it', async (t) => {
     try {
         const res = await flight.request({
             json: true,
@@ -412,29 +412,12 @@ test('GET and PATCH /api/model/1', async (t) => {
             auth: {
                 bearer: flight.token.ingalls
             }
-        }, t);
+        }, false);
 
-        t.equals(res.statusCode, 200, 'status: 200');
-        t.equals(res.body.active, false);
-
-        const patchRes = await flight.request({
-            json: true,
-            url: '/api/model/1',
-            method: 'PATCH',
-            auth: {
-                bearer: flight.token.ingalls
-            },
-            body: {
-                active: true
-            }
-        }, t);
-        t.equals(patchRes.statusCode, 200, 'status: 200');
-        t.equals(patchRes.body.active, true);
-
+        t.equals(res.statusCode, 404, 'status: 404');
     } catch (err) {
-        t.error(err, 'no errors');
+        t.error(err, 'mo errors');
     }
-
     t.end();
 });
 
