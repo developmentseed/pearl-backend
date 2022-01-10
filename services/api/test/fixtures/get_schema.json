@@ -336,23 +336,23 @@
     },
     "GET /token": {
         "body": false,
-        "query": false,
-        "res": false
+        "query": true,
+        "res": true
     },
     "POST /token": {
         "body": true,
         "query": false,
-        "res": false
+        "res": true
     },
     "DELETE /token/:tokenid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
     },
     "GET /user": {
         "body": false,
         "query": true,
-        "res": false
+        "res": true
     },
     "GET /user/me": {
         "body": false,

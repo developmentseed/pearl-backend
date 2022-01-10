@@ -20,7 +20,7 @@ class Project extends Generic {
     static async has_auth(pool, auth, projectid) {
         const proj = await Project.from(pool, projectid);
 
-        if (auth.access !== 'admin' && auth.uid !== proj.uid) {
+        if (auth.access !== 'admin' && auth.id !== proj.uid) {
             throw new Err(403, null, 'Cannot access a project you are not the owner of');
         }
 
