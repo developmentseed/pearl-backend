@@ -146,11 +146,14 @@ class Instance extends Generic {
 
         const kube = new Kube(config, 'default');
 
-        let podList = [];
+        // FIXME going to keep this commented for now
+        // We need this in a new PR when we do some gpu tracking
 
-        if (config.Environment !== 'local') {
-            podList = await kube.listPods();
-        }
+        // let podList = [];
+
+        // if (config.Environment !== 'local') {
+        //     podList = await kube.listPods();
+        // }
 
         // let type = 'gpu';
         // if (podList.length) {
