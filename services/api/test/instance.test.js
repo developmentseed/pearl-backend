@@ -58,7 +58,7 @@ test('POST /api/project/1/instance', async (t) => {
             checkpoint_id: null,
             active: false,
             pod: {},
-            type: 'gpu'
+            type: 'cpu'
         });
     } catch (err) {
         t.error(err, 'no error');
@@ -87,7 +87,7 @@ test('GET /api/project/1/instance?status=all', async (t) => {
                 id: 1,
                 active: false,
                 batch: null,
-                type: 'gpu'
+                type: 'cpu'
             }]
         });
     } catch (err) {
@@ -117,7 +117,7 @@ test('GET /api/project/1/instance?status=inactive', async (t) => {
                 id: 1,
                 active: false,
                 batch: null,
-                type: 'gpu'
+                type: 'cpu'
             }]
         });
     } catch (err) {
@@ -179,7 +179,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             status: {},
             pod: {},
             active: true,
-            type: 'gpu'
+            type: 'cpu'
         });
 
     } catch (err) {
@@ -219,7 +219,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: false,
-            type: 'gpu'
+            type: 'cpu'
         });
 
     } catch (err) {
@@ -268,7 +268,7 @@ test('GET /api/project/1/instance?status=active', async (t) => {
                 id: 1,
                 batch: null,
                 active: true,
-                type: 'gpu'
+                type: 'cpu'
             }]
         });
     } catch (err) {
@@ -298,7 +298,7 @@ test('GET /api/project/1/instance', async (t) => {
                 id: 1,
                 active: true,
                 batch: null,
-                type: 'gpu'
+                type: 'cpu'
             }]
         });
     } catch (err) {
@@ -328,7 +328,7 @@ test('GET /api/project/1/instance/1', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            type: 'gpu',
+            type: 'cpu',
             project_id: 1,
             batch: null,
             aoi_id: null,
@@ -365,7 +365,7 @@ test('GET /api/instance/1', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            type: 'gpu',
+            type: 'cpu',
             project_id: 1,
             batch: null,
             aoi_id: null,
@@ -414,7 +414,7 @@ test('PATCH /api/project/1/instance/1', async (t) => {
             aoi_id: null,
             checkpoint_id: 1,
             active: true,
-            type: 'gpu'
+            type: 'cpu'
         }, t);
 
     } catch (err) {

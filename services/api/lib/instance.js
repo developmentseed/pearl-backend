@@ -152,17 +152,17 @@ class Instance extends Generic {
             podList = await kube.listPods();
         }
 
-        let type = 'gpu';
-        if (podList.length) {
-            const activePods = podList.filter((p) => {
-                return p.status.phase === 'Running';
-            });
+        // let type = 'gpu';
+        // if (podList.length) {
+        //     const activePods = podList.filter((p) => {
+        //         return p.status.phase === 'Running';
+        //     });
 
-            console.log('# activePods', activePods.length);
-            type = activePods.length < config.GpuCount ? 'gpu' : 'cpu';
-        }
+        //     console.log('# activePods', activePods.length);
+        //     type = activePods.length < config.GpuCount ? 'gpu' : 'cpu';
+        // }
 
-        console.log('# type', type);
+        console.log('# type', instance.type);
 
         try {
             const pgres = await config.pool.query(sql`
@@ -177,7 +177,7 @@ class Instance extends Generic {
                     ${instance.aoi_id || null},
                     ${instance.checkpoint_id || null},
                     ${instance.batch || null},
-                    ${type}
+                    ${instance.type}
                 ) RETURNING *
             `);
 
@@ -185,7 +185,7 @@ class Instance extends Generic {
 
             let pod = {};
             if (config.Environment !== 'local') {
-                const podSpec = kube.makePodSpec(instanceId, type, [{
+                const podSpec = kube.makePodSpec(instanceId, instance.type, [{
                     name: 'INSTANCE_ID',
                     value: instanceId.toString()
                 },{

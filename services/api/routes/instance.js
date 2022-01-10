@@ -29,6 +29,8 @@ async function router(schema, config) {
 
             req.body.project_id = req.params.projectid;
             req.body.uid = req.auth.uid;
+            req.body.type = req.body.type ? req.body.type : 'cpu';
+            console.log('## BODY', req.body);
             const inst = await Instance.generate(config, req.body);
 
             res.json(inst.serialize());
