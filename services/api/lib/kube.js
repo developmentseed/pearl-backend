@@ -66,12 +66,12 @@ class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    cpu: '3',
-                    memory: '10Gi'
+                    cpu: '1500m',
+                    memory: '4Gi'
                 },
                 limits: {
-                    cpu: '3',
-                    memory: '10Gi'
+                    cpu: '1500m',
+                    memory: '6i'
                 }
             };
         }
