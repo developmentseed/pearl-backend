@@ -134,7 +134,7 @@ test('GET /api/project/1/instance/1', async (t) => {
             aoi_id: null,
             checkpoint_id: null,
             active: false,
-            type: 'gpu',
+            type: 'cpu',
             pod: {},
             status: {}
         });
@@ -346,9 +346,9 @@ test('GET /api/project/1/instance?status=all - all instances', async (t) => {
         t.deepEquals(res.body, {
             total: 2,
             instances: [{
-                id: 1, batch: 1, active: false, type: 'gpu'
+                id: 1, batch: 1, active: false, type: 'cpu'
             },{
-                id: 2, batch: 2, active: false, type: 'gpu'
+                id: 2, batch: 2, active: false, type: 'cpu'
             }]
         });
 
@@ -378,9 +378,9 @@ test('GET /api/project/1/instance - batch: true', async (t) => {
         t.deepEquals(res.body, {
             total: 2,
             instances: [{
-                id: 1, batch: 1, active: false, type: 'gpu'
+                id: 1, batch: 1, active: false, type: 'cpu'
             },{
-                id: 2, batch: 2, active: false, type: 'gpu'
+                id: 2, batch: 2, active: false, type: 'cpu'
             }]
         });
 
@@ -434,7 +434,7 @@ test('GET /api/project/1/instance - batch: 1', async (t) => {
                 id: 1,
                 batch: 1,
                 active: false,
-                type: 'gpu'
+                type: 'cpu'
             }]
         });
 
