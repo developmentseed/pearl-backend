@@ -32,9 +32,11 @@ module "resources" {
   auth0BaseUrl         = var.auth0BaseUrl
 
   admin_email          = "sanjay@developmentseed.org"
-  gpu_count            = 16
   placeholder_is_gpu   = false
   placeholder_num_gpus = 0
+
+  api_node_selector_value = "cpunodepool"
+  placeholder_node_selector_name = "cpunodepool"
 
   nginx_enabled = true
   frontend_domain = "landcover.io"
