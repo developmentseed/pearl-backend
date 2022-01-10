@@ -1,7 +1,7 @@
 const { Err } = require('@openaddresses/batch-schema');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {get} /api/user List Users
@@ -13,25 +13,15 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a list of users that have registered with the service
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.user-list.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "users": [{
-     *           "id": 1,
-     *           "username": "example",
-     *           "email": "example@example.com",
-     *           "access": "user",
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListUsers.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListUsers.json} apiSuccess
      */
     await schema.get('/user', {
-        query: 'req.query.user-list.json'
+        query: 'req.query.ListUsers.json',
+        res: 'res.ListUsers.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const users = await auth.list(req.query);
+            const users = await User.list(config.pool, req.query);
 
             return res.json(users);
         } catch (err) {
@@ -55,6 +45,7 @@ async function router(schema, config) {
         res: 'res.Me.json'
     }, config.requiresAuth, async (req, res) => {
         return res.json({
+            id: req.auth.id,
             username: req.auth.username,
             email: req.auth.email,
             access: req.auth.access

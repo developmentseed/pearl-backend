@@ -6,9 +6,9 @@ const Checkpoint = require('../lib/checkpoint');
 const AOIPatch = require('../lib/aoi-patch');
 const AOIShare = require('../lib/aoi-share');
 const Proxy = require('../lib/proxy');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     const getAoiTileJSON = async (aoi, req) => {
         let tiffurl;
@@ -184,7 +184,7 @@ async function router(schema, config) {
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const busboy = new Busboy({
                 headers: req.headers,

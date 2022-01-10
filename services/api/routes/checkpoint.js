@@ -4,9 +4,9 @@ const Project = require('../lib/project');
 const AOI = require('../lib/aoi');
 const Checkpoint = require('../lib/checkpoint');
 const OSMTag = require('../lib/osmtag');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {get} /api/project/:projectid/checkpoint/:checkpointid Get Checkpoint
@@ -149,7 +149,7 @@ async function router(schema, config) {
         res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const busboy = new Busboy({
                 headers: req.headers,

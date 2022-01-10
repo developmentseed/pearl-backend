@@ -15,6 +15,8 @@ const bodyparser = require('body-parser');
 const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 const Kube = require('./lib/kube');
+const User = require('./lib/user');
+const Token = require('./lib/token');
 
 const { Schema, Err } = require('@openaddresses/batch-schema');
 
@@ -63,9 +65,6 @@ async function server(args, config, cb) {
         schemas: path.resolve(__dirname, 'schema')
     });
     await schema.api();
-
-    const auth = new (require('./lib/auth').Auth)(config);
-    const authtoken = new (require('./lib/auth').AuthToken)(config);
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -170,42 +169,37 @@ async function server(args, config, cb) {
     });
 
     /*
-     * Validate API tokens
-     */
-    const validateApiToken = async (req, res, next) => {
-        try {
-            req.auth = await authtoken.validate(req.jwt.token);
-            req.auth.type = 'api';
-            next();
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    };
-
-    /*
      * Auth middleware
      */
     config.requiresAuth = [
-        (req, res, next) => {
-            if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-                const token = req.headers.authorization.split(' ')[1];
-
-                // Self-signed tokens are prefixed with 'api.'
-                if (token.indexOf('api.') ===  0) {
-                    req.jwt = {
-                        type: 'api',
-                        token: token.substr(4) // remove prefix
-                    };
-                } else {
-                    req.jwt = {
-                        type: 'auth0',
-                        token: token
-                    };
-                }
-
-                req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
-            } else {
+        async (req, res, next) => {
+            if (!req.headers || !req.headers.authorization || req.headers.authorization.split(' ')[0] !== 'Bearer') {
                 return Err.respond(new Err(401, null, 'Authentication Required'), res);
+            }
+
+            const token = req.headers.authorization.split(' ')[1];
+
+            // Self-signed tokens are prefixed with 'api.'
+            if (token.indexOf('api.') ===  0) {
+                req.jwt = {
+                    type: 'api',
+                    token: token.substr(4) // remove prefix
+                };
+
+                try {
+                    req.auth = await Token.validate(config, req.jwt.token);
+                    req.auth.type = 'api';
+                    return next();
+                } catch (err) {
+                    return Err.respond(err, res);
+                }
+            } else {
+                req.jwt = {
+                    type: 'auth0',
+                    token: token
+                };
+
+                return validateAuth0Token(req, res, next);
             }
         },
         (err, req, res, next) => {
@@ -222,7 +216,7 @@ async function server(args, config, cb) {
             if (req.jwt.type === 'auth0') {
                 try {
                     // Load user from database, if exists
-                    const user = await auth.user(req.user.sub, 'auth0_id');
+                    const user = await User.from(config.pool, req.user.sub, 'auth0_id');
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
@@ -235,7 +229,7 @@ async function server(args, config, cb) {
                     });
 
                     // Create user, add to request
-                    req.auth = await auth.create({
+                    req.auth = await User.generate(config.pool, {
                         access: 'user',
                         auth0Id: auth0User.sub,
                         username: auth0User.name,

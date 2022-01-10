@@ -195,7 +195,7 @@ class Flight {
                             SET
                                 access = 'admin'
                             WHERE
-                                id = ${new_user.body.uid}
+                                id = ${new_user.body.id}
                     `);
                 }
 
