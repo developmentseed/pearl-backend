@@ -263,7 +263,9 @@ class Instance extends Generic {
             throw new Err(500, err, 'Internal Instance Error');
         }
 
-        const podName = `${config.Deployment}-gpu-${instanceid}`;
+        if (!pgres.rows.length) throw new Err(404, null, 'Instance not found');
+
+        const podName = `${config.Deployment}-instance-${pgres.rows[0].type}-${instanceid}`;
         let podStatus;
         let pod = false;
 
