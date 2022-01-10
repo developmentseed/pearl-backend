@@ -71,7 +71,7 @@ class Kube {
                 },
                 limits: {
                     cpu: '1500m',
-                    memory: '6i'
+                    memory: '6Gi'
                 }
             };
         }
