@@ -101,10 +101,14 @@ class Storage {
     async download(path, res) {
         path = this.config.AzurePrefix + path;
 
-        const blob = this.client.getBlockBlobClient(path);
-        const dwn = await blob.download(0);
+        try {
+            const blob = this.client.getBlockBlobClient(path);
+            const dwn = await blob.download(0);
 
-        dwn.readableStreamBody.pipe(res);
+            dwn.readableStreamBody.pipe(res);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to download');
+        }
     }
 
     /**

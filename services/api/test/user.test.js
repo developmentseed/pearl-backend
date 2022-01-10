@@ -20,6 +20,7 @@ test('GET /api/user/me (valid token - 200 success)', async (t) => {
         }, t);
 
         t.deepEquals(res.body, {
+            id: 1,
             username: 'ingalls',
             email: 'ingalls@example.com',
             access: 'user'
