@@ -66,12 +66,12 @@ class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    cpu: '4',
-                    memory: '8Gi'
+                    cpu: '1500m',
+                    memory: '4Gi'
                 },
                 limits: {
-                    cpu: '8',
-                    memory: '16Gi'
+                    cpu: '1500m',
+                    memory: '6Gi'
                 }
             };
         }
@@ -99,7 +99,7 @@ class Kube {
             apiVersion: 'v1',
             kind: 'Pod',
             metadata: {
-                name: `${deploymentName}-gpu-${name}`,
+                name: `${deploymentName}-instance-${type}-${name}`,
                 annotations: {
                     'janitor/ttl': '2h'
                 },
@@ -110,7 +110,7 @@ class Kube {
             },
             spec: {
                 containers: [{
-                    name: `gpu-${name}`,
+                    name: `instace-${type}-${name}`,
                     image: `${gpuImageName}:${gpuImageTag}`,
                     resources: resources,
                     env: env,

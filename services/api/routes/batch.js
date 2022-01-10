@@ -76,6 +76,7 @@ async function router(schema, config) {
             req.body.project_id = req.params.projectid;
             req.body.batch = batch.id;
 
+            req.body.type = req.params.type ? req.params.type : 'cpu';
 
             req.body.uid = req.auth.id;
             const inst = await Instance.generate(config, req.body);

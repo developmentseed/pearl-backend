@@ -15,6 +15,11 @@
         },
         "bounds": {
             "$ref": "./util/polygon.json"
+        },
+        "type": {
+            "type": "string",
+            "description": "The instance type to be used for this batch job. cpu or gpu. cpu is default",
+            "default": "cpu"
         }
     }
 }

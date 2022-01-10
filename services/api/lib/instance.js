@@ -146,23 +146,26 @@ class Instance extends Generic {
 
         const kube = new Kube(config, 'default');
 
-        let podList = [];
+        // FIXME going to keep this commented for now
+        // We need this in a new PR when we do some gpu tracking
 
-        if (config.Environment !== 'local') {
-            podList = await kube.listPods();
-        }
+        // let podList = [];
 
-        let type = 'gpu';
-        if (podList.length) {
-            const activePods = podList.filter((p) => {
-                return p.status.phase === 'Running';
-            });
+        // if (config.Environment !== 'local') {
+        //     podList = await kube.listPods();
+        // }
 
-            console.log('# activePods', activePods.length);
-            type = activePods.length < config.GpuCount ? 'gpu' : 'cpu';
-        }
+        // let type = 'gpu';
+        // if (podList.length) {
+        //     const activePods = podList.filter((p) => {
+        //         return p.status.phase === 'Running';
+        //     });
 
-        console.log('# type', type);
+        //     console.log('# activePods', activePods.length);
+        //     type = activePods.length < config.GpuCount ? 'gpu' : 'cpu';
+        // }
+
+        console.log('# type', instance.type);
 
         try {
             const pgres = await config.pool.query(sql`
@@ -177,7 +180,7 @@ class Instance extends Generic {
                     ${instance.aoi_id || null},
                     ${instance.checkpoint_id || null},
                     ${instance.batch || null},
-                    ${type}
+                    ${instance.type}
                 ) RETURNING *
             `);
 
@@ -185,7 +188,7 @@ class Instance extends Generic {
 
             let pod = {};
             if (config.Environment !== 'local') {
-                const podSpec = kube.makePodSpec(instanceId, type, [{
+                const podSpec = kube.makePodSpec(instanceId, instance.type, [{
                     name: 'INSTANCE_ID',
                     value: instanceId.toString()
                 },{
@@ -263,7 +266,9 @@ class Instance extends Generic {
             throw new Err(500, err, 'Internal Instance Error');
         }
 
-        const podName = `${config.Deployment}-gpu-${instanceid}`;
+        if (!pgres.rows.length) throw new Err(404, null, 'Instance not found');
+
+        const podName = `${config.Deployment}-instance-${pgres.rows[0].type}-${instanceid}`;
         let podStatus;
         let pod = false;
 

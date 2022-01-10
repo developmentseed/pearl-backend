@@ -10,7 +10,11 @@
         "checkpoint_id": {
             "type": "integer",
             "description": "The current checkpoint loaded on the instance"
+        },
+        "type": {
+            "type": "string",
+            "description": "The type of the instance. cpu or gpu",
+            "default": "cpu"
         }
-
     }
 }
