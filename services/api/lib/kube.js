@@ -99,7 +99,7 @@ class Kube {
             apiVersion: 'v1',
             kind: 'Pod',
             metadata: {
-                name: `${deploymentName}-gpu-${name}`,
+                name: `${deploymentName}-instance-${type}-${name}`,
                 annotations: {
                     'janitor/ttl': '2h'
                 },
@@ -110,7 +110,7 @@ class Kube {
             },
             spec: {
                 containers: [{
-                    name: `gpu-${name}`,
+                    name: `instace-${type}-${name}`,
                     image: `${gpuImageName}:${gpuImageTag}`,
                     resources: resources,
                     env: env,
