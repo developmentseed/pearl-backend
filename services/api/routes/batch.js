@@ -76,8 +76,10 @@ async function router(schema, config) {
             req.body.project_id = req.params.projectid;
             req.body.batch = batch.id;
 
+            req.body.type = req.params.type ? req.params.type : 'cpu';
 
             req.body.uid = req.auth.id;
+            req.b
             const inst = await Instance.generate(config, req.body);
 
             const batch_json = batch.serialize();
