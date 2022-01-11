@@ -208,9 +208,12 @@ async function server(args, config, cb) {
                 return Err.respond(new Err(err.status, err.code, err.message), res);
             } else if (err instanceof ValidationError) {
                 return Err.respond(new Err(400, null, 'validation error'), res, err.validationErrors.body);
+            } else if (err) {
+                console.error(err);
+                return Err.respond(new Err(500, err, 'Generic Internal Error'), res);
+            } else {
+                next();
             }
-
-            next();
         },
         async (req, res, next) => {
             if (req.jwt.type === 'auth0') {
@@ -220,24 +223,29 @@ async function server(args, config, cb) {
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
-                    const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${req.jwt.token}`
-                        }
-                    });
+                    try {
+                        const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${req.jwt.token}`
+                            }
+                        });
 
-                    // Create user, add to request
-                    req.auth = await User.generate(config.pool, {
-                        access: 'user',
-                        auth0Id: auth0User.sub,
-                        username: auth0User.name,
-                        email: auth0User.email
-                    });
+                        // Create user, add to request
+                        req.auth = await User.generate(config.pool, {
+                            access: 'user',
+                            auth0Id: auth0User.sub,
+                            username: auth0User.name,
+                            email: auth0User.email
+                        });
 
-                    // Set auth type
-                    req.auth.type = 'auth0';
+                        // Set auth type
+                        req.auth.type = 'auth0';
+                    } catch (err) {
+                        console.error(err);
+                        return Err.respond(new Err(500, null, 'Failed to create Auth0 User'), res);
+                    }
                 }
             }
             next();
