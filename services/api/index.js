@@ -169,37 +169,42 @@ async function server(args, config, cb) {
     });
 
     /*
+     * Validate API tokens
+     */
+    const validateApiToken = async (req, res, next) => {
+        try {
+            req.auth = await Token.validate(config, req.jwt.token);
+            req.auth.type = 'api';
+            next();
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    };
+
+    /*
      * Auth middleware
      */
     config.requiresAuth = [
-        async (req, res, next) => {
-            if (!req.headers || !req.headers.authorization || req.headers.authorization.split(' ')[0] !== 'Bearer') {
-                return Err.respond(new Err(401, null, 'Authentication Required'), res);
-            }
+        (req, res, next) => {
+            if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+                const token = req.headers.authorization.split(' ')[1];
 
-            const token = req.headers.authorization.split(' ')[1];
-
-            // Self-signed tokens are prefixed with 'api.'
-            if (token.indexOf('api.') ===  0) {
-                req.jwt = {
-                    type: 'api',
-                    token: token.substr(4) // remove prefix
-                };
-
-                try {
-                    req.auth = await Token.validate(config, req.jwt.token);
-                    req.auth.type = 'api';
-                    return next();
-                } catch (err) {
-                    return Err.respond(err, res);
+                // Self-signed tokens are prefixed with 'api.'
+                if (token.indexOf('api.') ===  0) {
+                    req.jwt = {
+                        type: 'api',
+                        token: token.substr(4) // remove prefix
+                    };
+                } else {
+                    req.jwt = {
+                        type: 'auth0',
+                        token: token
+                    };
                 }
-            } else {
-                req.jwt = {
-                    type: 'auth0',
-                    token: token
-                };
 
-                return validateAuth0Token(req, res, next);
+                req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
+            } else {
+                return Err.respond(new Err(401, null, 'Authentication Required'), res);
             }
         },
         (err, req, res, next) => {
@@ -209,8 +214,7 @@ async function server(args, config, cb) {
             } else if (err instanceof ValidationError) {
                 return Err.respond(new Err(400, null, 'validation error'), res, err.validationErrors.body);
             } else if (err) {
-                console.error(err);
-                return Err.respond(new Err(500, err, 'Generic Internal Error'), res);
+                return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
             } else {
                 next();
             }
@@ -223,34 +227,30 @@ async function server(args, config, cb) {
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
-                    try {
-                        const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${req.jwt.token}`
-                            }
-                        });
+                    const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${req.jwt.token}`
+                        }
+                    });
 
-                        // Create user, add to request
-                        req.auth = await User.generate(config.pool, {
-                            access: 'user',
-                            auth0Id: auth0User.sub,
-                            username: auth0User.name,
-                            email: auth0User.email
-                        });
+                    // Create user, add to request
+                    req.auth = await User.generate(config.pool, {
+                        access: 'user',
+                        auth0Id: auth0User.sub,
+                        username: auth0User.name,
+                        email: auth0User.email
+                    });
 
-                        // Set auth type
-                        req.auth.type = 'auth0';
-                    } catch (err) {
-                        console.error(err);
-                        return Err.respond(new Err(500, null, 'Failed to create Auth0 User'), res);
-                    }
+                    // Set auth type
+                    req.auth.type = 'auth0';
                 }
             }
             next();
         }
     ];
+
 
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
