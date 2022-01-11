@@ -3,6 +3,8 @@
     "required": [
         "id",
         "username",
+        "created",
+        "updated",
         "email",
         "access"
     ],
@@ -10,6 +12,12 @@
     "properties": {
         "id": {
             "type": "integer" 
+        },
+        "created": {
+            "$ref": "./util/created.json"
+        },
+        "updated": {
+            "$ref": "./util/updated.json"
         },
         "username": {
             "type": "string" 

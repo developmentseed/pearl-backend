@@ -354,7 +354,17 @@
         "query": true,
         "res": true
     },
+    "PATCH /user/:userid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
     "GET /user/me": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /user/:userid": {
         "body": false,
         "query": false,
         "res": true

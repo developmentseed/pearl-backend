@@ -92,6 +92,8 @@ class User extends Generic {
             const pgres = await pool.query(sql`
                 SELECT
                     id,
+                    created,
+                    updated,
                     username,
                     access,
                     email
