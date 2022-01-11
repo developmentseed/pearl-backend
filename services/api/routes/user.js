@@ -21,6 +21,8 @@ async function router(schema, config) {
         res: 'res.ListUsers.json'
     }, config.requiresAuth, async (req, res) => {
         try {
+            await User.is_admin(req);
+
             const users = await User.list(config.pool, req.query);
 
             return res.json(users);
@@ -47,13 +49,17 @@ async function router(schema, config) {
         body: 'req.body.PatchUser.json',
         res: 'res.User.json'
     }, config.requiresAuth, async (req, res) => {
-        await User.is_admin(req);
+        try {
+            await User.is_admin(req);
 
-        const user = await User.from(config.pool, req.params.userid);
-        user.patch(req.body);
-        await user.commit(config.pool);
+            const user = await User.from(config.pool, req.params.userid);
+            user.patch(req.body);
+            await user.commit(config.pool);
 
-        return res.json(user.serialize());
+            return res.json(user.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 
     /**
@@ -97,10 +103,13 @@ async function router(schema, config) {
         ':userid': 'integer',
         res: 'res.User.json'
     }, config.requiresAuth, async (req, res) => {
-        await User.is_admin(req);
-
-        const user = await User.from(config.pool, req.params.userid);
-        return res.json(user.serialize());
+        try {
+            await User.is_admin(req);
+            const user = await User.from(config.pool, req.params.userid);
+            return res.json(user.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
     });
 }
 
