@@ -7,6 +7,7 @@ const flight = new Flight();
 flight.init(test);
 flight.takeoff(test);
 flight.user(test, 'ingalls');
+flight.user(test, 'admin', true);
 
 test('GET /api/user/me (valid token - 200 success)', async (t) => {
     try {
@@ -18,6 +19,11 @@ test('GET /api/user/me (valid token - 200 success)', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
+
+        t.ok(res.body.created);
+        delete (res.body.created);
+        t.ok(res.body.updated);
+        delete (res.body.updated);
 
         t.deepEquals(res.body, {
             id: 1,
@@ -103,5 +109,116 @@ test('POST /api/token', async (t) => {
     t.end();
 });
 
+test('GET /api/user', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/user',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.admin}`
+            },
+            body: {
+                name: 'API Token'
+            }
+        }, t);
+
+        t.deepEquals(res.body.total, 2);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/user/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/user/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.admin}`
+            }
+        }, t);
+
+        t.ok(res.body.created);
+        delete (res.body.created);
+        t.ok(res.body.updated);
+        delete (res.body.updated);
+
+        t.deepEquals(res.body, {
+            id: 1,
+            username: 'ingalls',
+            access: 'user',
+            email: 'ingalls@example.com'
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/user/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/user/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.admin}`
+            },
+            body: {
+                access: 'admin'
+            }
+        }, t);
+
+        t.ok(res.body.created);
+        delete (res.body.created);
+        t.ok(res.body.updated);
+        delete (res.body.updated);
+
+        t.deepEquals(res.body, {
+            id: 1,
+            username: 'ingalls',
+            access: 'admin',
+            email: 'ingalls@example.com'
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/user/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/user/1',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.admin}`
+            }
+        }, t);
+
+        t.ok(res.body.created);
+        delete (res.body.created);
+        t.ok(res.body.updated);
+        delete (res.body.updated);
+
+        t.deepEquals(res.body, {
+            id: 1,
+            username: 'ingalls',
+            access: 'admin',
+            email: 'ingalls@example.com'
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
 
 flight.landing(test);

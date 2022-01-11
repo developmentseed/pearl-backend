@@ -13,6 +13,9 @@
         "id": {
             "$ref": "./util/id.json"
         },
+        "username": {
+            "type": "string"
+        },
         "created": {
             "$ref": "./util/created.json"
         },
