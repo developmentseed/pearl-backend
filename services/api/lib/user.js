@@ -105,7 +105,7 @@ class User extends Generic {
                 throw new Err(404, null, 'User not found');
             }
 
-            this.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Internal Error');
         }
