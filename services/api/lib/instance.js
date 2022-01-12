@@ -1,9 +1,9 @@
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const Project = require('./project');
 const jwt = require('jsonwebtoken');
 const Kube = require('./kube');
 const { sql } = require('slonik');
-const Generic = require('./generic');
 
 /**
  * @class

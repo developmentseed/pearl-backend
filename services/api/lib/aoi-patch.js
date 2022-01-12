@@ -1,8 +1,8 @@
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const AOI = require('./aoi');
 const Storage = require('./storage');
 const { sql } = require('slonik');
-const Generic = require('./generic');
 
 /**
  * @class
