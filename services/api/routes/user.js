@@ -83,7 +83,8 @@ async function router(schema, config) {
             email: req.auth.email,
             access: req.auth.access,
             created: req.auth.created,
-            updated: req.auth.updated
+            updated: req.auth.updated,
+            flags: req.auth.flags
         });
     });
 

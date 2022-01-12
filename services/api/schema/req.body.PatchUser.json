@@ -4,6 +4,9 @@
     "properties": {
         "access": {
             "type": "string"
+        },
+        "flags": {
+            "$ref": "./util/user-flags.json"
         }
     }
 }
