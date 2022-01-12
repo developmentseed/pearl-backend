@@ -29,7 +29,8 @@ test('GET /api/user/me (valid token - 200 success)', async (t) => {
             id: 1,
             username: 'ingalls',
             email: 'ingalls@example.com',
-            access: 'user'
+            access: 'user',
+            flags: {}
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -151,7 +152,8 @@ test('GET /api/user/1', async (t) => {
             id: 1,
             username: 'ingalls',
             access: 'user',
-            email: 'ingalls@example.com'
+            email: 'ingalls@example.com',
+            flags: {}
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -170,7 +172,10 @@ test('PATCH /api/user/1', async (t) => {
                 Authorization: `Bearer ${flight.token.admin}`
             },
             body: {
-                access: 'admin'
+                access: 'admin',
+                flags: {
+                    gpu: true
+                }
             }
         }, t);
 
@@ -183,7 +188,10 @@ test('PATCH /api/user/1', async (t) => {
             id: 1,
             username: 'ingalls',
             access: 'admin',
-            email: 'ingalls@example.com'
+            email: 'ingalls@example.com',
+            flags: {
+                gpu: true
+            }
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -212,7 +220,10 @@ test('GET /api/user/1', async (t) => {
             id: 1,
             username: 'ingalls',
             access: 'admin',
-            email: 'ingalls@example.com'
+            email: 'ingalls@example.com',
+            flags: {
+                gpu: true
+            }
         });
     } catch (err) {
         t.error(err, 'no errors');

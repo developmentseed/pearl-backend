@@ -88,7 +88,8 @@ class Token extends Generic {
                     users.access,
                     users.email,
                     users.created,
-                    users.updated
+                    users.updated,
+                    users.flags
                 FROM
                     users_tokens INNER JOIN users
                         ON users.id = users_tokens.uid
@@ -118,7 +119,8 @@ class Token extends Generic {
             access: pgres.rows[0].access,
             email: pgres.rows[0].email,
             created: pgres.rows[0].created,
-            updated: pgres.rows[0].updated
+            updated: pgres.rows[0].updated,
+            flags: pgres.rows[0].flags
         };
     }
 

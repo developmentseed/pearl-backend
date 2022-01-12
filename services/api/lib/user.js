@@ -50,7 +50,8 @@ class User extends Generic {
                     updated,
                     username,
                     access,
-                    email
+                    email,
+                    flags
                 FROM
                     users
                 WHERE
@@ -76,6 +77,7 @@ class User extends Generic {
                 UPDATE users
                     SET
                         access = ${this.access},
+                        flags = ${JSON.stringify(this.flags)},
                         updated = NOW()
                     WHERE
                         id = ${this.id}
@@ -96,7 +98,8 @@ class User extends Generic {
                     updated,
                     username,
                     access,
-                    email
+                    email,
+                    flags
                 FROM
                     users
                 WHERE
@@ -117,6 +120,7 @@ class User extends Generic {
         if (!user.username) throw new Err(400, null, 'username required');
         if (!user.email) throw new Err(400, null, 'email required');
         if (!user.access) user.access = 'user';
+        if (!user.flags) user.flags = {};
 
         if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
@@ -126,12 +130,14 @@ class User extends Generic {
                     username,
                     email,
                     auth0_id,
-                    access
+                    access,
+                    flags
                 ) VALUES (
                     ${user.username},
                     ${user.email},
                     ${user.auth0Id},
-                    ${user.access}
+                    ${user.access},
+                    ${JSON.stringify(user.flags)}
                 ) RETURNING *
             `);
 

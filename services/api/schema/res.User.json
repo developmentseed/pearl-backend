@@ -6,7 +6,8 @@
         "updated",
         "username",
         "access",
-        "email"
+        "email",
+        "flags"
     ],
     "additionalProperties": false,
     "properties": {
@@ -27,6 +28,9 @@
         },
         "email": {
             "type": "string"
+        },
+        "flags": {
+            "$ref": "./util/user-flags.json"
         }
     }
 }
