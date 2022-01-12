@@ -1,0 +1,10 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "gpu": {
+            "type": "boolean",
+            "description": "Does the user have access to GPU resources"
+        }
+    }
+}
