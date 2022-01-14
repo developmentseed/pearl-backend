@@ -308,6 +308,28 @@ test('GET /api/project/1/instance', async (t) => {
     t.end();
 });
 
+test('GET /api/project/1/instance?type=gpu', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/instance?type=gpu',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 0,
+            instances: []
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
 test('GET /api/project/1/instance/1', async (t) => {
     try {
         const res = await flight.request({

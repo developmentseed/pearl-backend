@@ -50,7 +50,7 @@ class Instance extends Generic {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (query.type === undefined) query.type = null;
+        if (query.type === undefined || query.type === 'all') query.type = null;
         if (query.batch === undefined) query.batch = null;
 
         let active = null;

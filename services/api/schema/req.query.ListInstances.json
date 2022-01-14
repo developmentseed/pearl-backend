@@ -18,6 +18,16 @@
                 "all"
             ]
         },
+        "type": {
+            "type": "string",
+            "default": "all",
+            "description": "Filter instances by type",
+            "enum": [
+                "all",
+                "cpu",
+                "gpu"
+            ]
+        },
         "batch": {
             "type": ["boolean", "integer"],
             "description": "Filter batch instances, if a boolean - show hide batch instances, if an integer, only show specific instance with a given batch id"
