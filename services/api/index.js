@@ -108,12 +108,14 @@ async function server(args, config, cb) {
         if (config.Environment !== 'local') {
             const kube = new Kube(config, 'default');
             podList = await kube.listPods();
-            active_gpus = podList.filter((p) => {
-                return (p.status.phase === 'Running' && p.labels.hasOwnProperty('type') && p.labels.type === 'gpu')
-            }).length
-            active_cpus = podList.filter((p) => {
-                return (p.status.phase === 'Running' && p.labels.hasOwnProperty('type') && p.labels.type === 'cpu')
-            }).length
+            if (podList.length) {
+                active_gpus = podList.filter((p) => {
+                    return (p.status.phase === 'Running' && p.labels.type === 'gpu')
+                }).length
+                active_cpus = podList.filter((p) => {
+                    return (p.status.phase === 'Running' && p.labels.type === 'cpu')
+                }).length
+            }
         }
 
         return res.json({
