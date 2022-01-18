@@ -45,6 +45,7 @@ class Config {
         this.nodeSelectorKey = process.env.nodeSelectorKey || 'agentpool';
         this.nodeSelectorValue = process.env.nodeSelectorValue || 'gpunodepool';
         this.GpuCount = process.env.GpuCount ? Number(process.env.GpuCount) : 2;
+        this.CpuCount = process.env.CpuCount ? Number(process.env.GpuCount) : 10;
 
         this.ApiUrl = process.env.ApiUrl || '';
         this.SocketUrl = process.env.SocketUrl || '';

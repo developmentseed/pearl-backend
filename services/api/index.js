@@ -116,6 +116,7 @@ async function server(args, config, cb) {
                 max_inference: 200000000,
                 instance_window: 600,
                 total_gpus: config.GpuCount,
+                total_cpus: config.CpuCount,
                 active_gpus: podList.filter((p) => p.status.phase === 'Running').length
             }
         });
