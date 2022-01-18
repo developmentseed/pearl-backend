@@ -103,9 +103,17 @@ async function server(args, config, cb) {
      */
     app.get('/api', async (req, res) => {
         let podList = [];
+        let active_gpus = 0;
+        let active_cpus = 0;
         if (config.Environment !== 'local') {
             const kube = new Kube(config, 'default');
             podList = await kube.listPods();
+            active_gpus = podList.filter((p) => {
+                return (p.status.phase === 'Running' && p.labels.hasOwnProperty('type') && p.labels.type === 'gpu')
+            }).length
+            active_cpus = podList.filter((p) => {
+                return (p.status.phase === 'Running' && p.labels.hasOwnProperty('type') && p.labels.type === 'cpu')
+            }).length
         }
 
         return res.json({
@@ -117,7 +125,8 @@ async function server(args, config, cb) {
                 instance_window: 600,
                 total_gpus: config.GpuCount,
                 total_cpus: config.CpuCount,
-                active_gpus: podList.filter((p) => p.status.phase === 'Running').length
+                active_gpus: active_gpus,
+                active_cpus: active_cpus
             }
         });
     });
