@@ -25,7 +25,7 @@ class Kube {
      * @returns {Object[]}
      */
     async listPods() {
-        const res = await this.k8sApi.listNamespacedPod(this.namespace);
+        const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, "false", undefined, undefined, "workload=ml");
         console.log('# LIST PODS', JSON.stringify(res));
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
@@ -106,7 +106,8 @@ class Kube {
                 },
                 labels: {
                     type: type,
-                    app: 'lulc-helm'
+                    app: 'lulc-helm',
+                    workload: 'ml'
                 }
             },
             spec: {
