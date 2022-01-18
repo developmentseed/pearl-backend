@@ -37,6 +37,11 @@ variable "gpu_count" {
   default = 15
 }
 
+variable "cpu_count" {
+  type = number
+  default = 10
+}
+
 variable "tiles_debug" {
   type = string
   default = "false"

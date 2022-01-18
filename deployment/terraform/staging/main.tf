@@ -37,6 +37,7 @@ module "resources" {
   api_node_selector_value = "cpunodepool"
   placeholder_node_selector_name = "cpunodepool"
 
+  gpu_count = 2
   domain = "lulc-staging.ds.io"
 }
 

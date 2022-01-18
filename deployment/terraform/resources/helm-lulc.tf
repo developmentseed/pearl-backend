@@ -52,6 +52,11 @@ resource "helm_release" "lulc" {
   }
 
   set {
+    name  = "api.env.CpuCount"
+    value = var.cpu_count
+  }
+
+  set {
     name = "api.env.auth0BaseUrl"
     value = var.auth0BaseUrl
   }
