@@ -49,8 +49,8 @@ class Kube {
      * @returns {Object}
      */
     makePodSpec(name, type, env) {
-        const nodeSelectorKey = this.config.nodeSelectorKey;
-        const nodeSelectorValue = this.config.nodeSelectorValue;
+        // const nodeSelectorKey = this.config.nodeSelectorKey;
+        // const nodeSelectorValue = this.config.nodeSelectorValue; // not used anymore
         const deploymentName = this.config.Deployment;
         const gpuImageName = this.config.GpuImageName;
         const gpuImageTag = this.config.GpuImageTag;
@@ -78,7 +78,7 @@ class Kube {
         }
 
         const nodeSelector = {};
-        nodeSelector[nodeSelectorKey] = nodeSelectorValue;
+        nodeSelector['agentpool'] = type === 'cpu' ? 'cpunodepool' : 'gpunodepool';
 
         let volumes = [];
         let volumeMounts = [];
