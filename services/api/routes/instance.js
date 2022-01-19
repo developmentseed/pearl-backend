@@ -34,7 +34,7 @@ async function router(schema, config) {
             let podList = [];
             let active_cpus = 0;
             let active_gpus = 0;
-            const availability = {
+            let availability = {
                 'cpu': true,
                 'gpu': true
             };
