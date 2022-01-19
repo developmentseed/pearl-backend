@@ -110,11 +110,11 @@ async function server(args, config, cb) {
             podList = await kube.listPods();
             if (podList.length) {
                 active_gpus = podList.filter((p) => {
-                    return (p.status.phase === 'Running' && p.metadata.labels.type === 'gpu')
-                }).length
+                    return (p.status.phase === 'Running' && p.metadata.labels.type === 'gpu');
+                }).length;
                 active_cpus = podList.filter((p) => {
-                    return (p.status.phase === 'Running' && p.metadata.labels.type === 'cpu')
-                }).length
+                    return (p.status.phase === 'Running' && p.metadata.labels.type === 'cpu');
+                }).length;
             }
         }
 

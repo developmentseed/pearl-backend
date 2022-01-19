@@ -44,16 +44,16 @@ async function router(schema, config) {
                 podList = await kube.listPods();
                 if (podList.length) {
                     active_gpus = podList.filter((p) => {
-                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'gpu')
-                    }).length
+                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'gpu');
+                    }).length;
                     active_cpus = podList.filter((p) => {
-                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'cpu')
-                    }).length
+                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'cpu');
+                    }).length;
 
                     availability = {
                         'cpu': config.CpuCount - active_cpus > 0 ? true : false,
-                        'gpu': config.GpuCount - active_gpus > 0 ? true : false,
-                    }
+                        'gpu': config.GpuCount - active_gpus > 0 ? true : false
+                    };
 
                     if (!availability[req.body.type]) {
                         return Err.respond(new Err(400, null, 'cpu/gpu not available'), res);
