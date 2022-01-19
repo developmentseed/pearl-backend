@@ -35,7 +35,6 @@ module "resources" {
   placeholder_is_gpu   = false
   placeholder_num_gpus = 0
 
-  api_node_selector_value = "cpunodepool"
   placeholder_node_selector_name = "cpunodepool"
 
   gpu_count = 4
