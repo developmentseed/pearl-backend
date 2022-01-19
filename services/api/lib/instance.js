@@ -144,6 +144,7 @@ class Instance extends Generic {
             throw new Err(500, null, 'Server could not determine user id');
         }
 
+        const kube = new Kube(config, 'default');
         console.log('# type', instance.type);
 
         try {
@@ -164,7 +165,6 @@ class Instance extends Generic {
             `);
 
             const instanceId = parseInt(pgres.rows[0].id);
-
             let pod = {};
             if (config.Environment !== 'local') {
                 const podSpec = kube.makePodSpec(instanceId, instance.type, [{
