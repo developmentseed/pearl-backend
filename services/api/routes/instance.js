@@ -2,6 +2,7 @@ const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
 const User = require('../lib/user');
+const Kube = require('../lib/kube');
 
 async function router(schema, config) {
 
