@@ -2,6 +2,7 @@ const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
 const User = require('../lib/user');
+const Kube = require('../lib/kube');
 
 async function router(schema, config) {
 
@@ -30,6 +31,35 @@ async function router(schema, config) {
             req.body.project_id = req.params.projectid;
             req.body.uid = req.auth.id;
             req.body.type = req.body.type ? req.body.type : 'cpu';
+            let podList = [];
+            let active_cpus = 0;
+            let active_gpus = 0;
+            let availability = {
+                'cpu': true,
+                'gpu': true
+            };
+
+            if (config.Environment !== 'local') {
+                const kube = new Kube(config, 'default');
+                podList = await kube.listPods();
+                if (podList.length) {
+                    active_gpus = podList.filter((p) => {
+                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'gpu');
+                    }).length;
+                    active_cpus = podList.filter((p) => {
+                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'cpu');
+                    }).length;
+
+                    availability = {
+                        'cpu': config.CpuCount - active_cpus > 0 ? true : false,
+                        'gpu': config.GpuCount - active_gpus > 0 ? true : false
+                    };
+
+                    if (!availability[req.body.type]) {
+                        return Err.respond(new Err(400, null, 'cpu/gpu not available'), res);
+                    }
+                }
+            }
 
             const inst = await Instance.generate(config, req.body);
 

@@ -25,7 +25,7 @@ class Kube {
      * @returns {Object[]}
      */
     async listPods() {
-        const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, undefined, undefined, undefined, 'type=gpu');
+        const res = await this.k8sApi.listNamespacedPod(this.namespace, undefined, 'false', undefined, undefined, 'workload=ml');
         if (res.statusCode >= 400) {
             return `Request failed: ${res.statusMessage}`;
         }
@@ -48,8 +48,8 @@ class Kube {
      * @returns {Object}
      */
     makePodSpec(name, type, env) {
-        const nodeSelectorKey = this.config.nodeSelectorKey;
-        const nodeSelectorValue = this.config.nodeSelectorValue;
+        // const nodeSelectorKey = this.config.nodeSelectorKey;
+        // const nodeSelectorValue = this.config.nodeSelectorValue; // not used anymore
         const deploymentName = this.config.Deployment;
         const gpuImageName = this.config.GpuImageName;
         const gpuImageTag = this.config.GpuImageTag;
@@ -77,7 +77,7 @@ class Kube {
         }
 
         const nodeSelector = {};
-        nodeSelector[nodeSelectorKey] = nodeSelectorValue;
+        nodeSelector['agentpool'] = type === 'cpu' ? 'cpunodepool' : 'gpunodepool';
 
         let volumes = [];
         let volumeMounts = [];
@@ -105,7 +105,8 @@ class Kube {
                 },
                 labels: {
                     type: type,
-                    app: 'lulc-helm'
+                    app: 'lulc-helm',
+                    workload: 'ml'
                 }
             },
             spec: {

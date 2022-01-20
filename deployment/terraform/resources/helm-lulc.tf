@@ -37,18 +37,13 @@ resource "helm_release" "lulc" {
   }
 
   set {
-    name  = "api.env.nodeSelectorKey"
-    value = var.api_node_selector_key
-  }
-
-  set {
-    name  = "api.env.nodeSelectorValue"
-    value = var.api_node_selector_value
-  }
-
-  set {
     name  = "api.env.GpuCount"
     value = var.gpu_count
+  }
+
+  set {
+    name  = "api.env.CpuCount"
+    value = var.cpu_count
   }
 
   set {
