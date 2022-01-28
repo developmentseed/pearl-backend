@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+# v0.9.0
+## Fixes
+- turn off gpu placeholder for production [`#616`](https://github.com/developmentseed/lulc-infra/pull/616)
+- upgrade cert manager to try and solve ssl issues [`#619`](https://github.com/developmentseed/lulc-infra/pull/619)
+- Hotfix for SSL renewal [`#621`](https://github.com/developmentseed/lulc-infra/pull/621)
+- Patch User [`#635`](https://github.com/developmentseed/lulc-infra/pull/635)
+- available instances [`#641`](https://github.com/developmentseed/lulc-infra/pull/641)
+- Add instance type filtering [`#640`](https://github.com/developmentseed/lulc-infra/pull/640)
+- Generic Std [`#637`](https://github.com/developmentseed/lulc-infra/pull/637)
+
+## Improvements
+- User & Token Generics [`#631`](https://github.com/developmentseed/lulc-infra/pull/631)
+- Debug Info [`#633`](https://github.com/developmentseed/lulc-infra/pull/633)
+- Auth Middleware [`#634`](https://github.com/developmentseed/lulc-infra/pull/634)
+
+## Features
+- cpu first [`#630`](https://github.com/developmentseed/lulc-infra/pull/630)
+- User Flags [`#636`](https://github.com/developmentseed/lulc-infra/pull/636)
+
 # v0.8.0
 
 ## Fixes
