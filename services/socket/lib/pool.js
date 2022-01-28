@@ -1,5 +1,6 @@
+'use strict';
 /**
- * @class Pool
+ * @class
  *
  * @prop {Object} gpus instance_id to websocket connection map of GPU instances
  * @prop {Object} clients instance_id to websocket connection map of clients

@@ -1,21 +1,19 @@
+'use strict';
 const CP = require('child_process');
 
 /**
- * @class
- *
  * Spin up a CPU based GPU worker for tests
  * Assumes that the gpu has been build and tagged as `gpu` in docker
+ *
+ * @class
+ * @param {Object} test Tape Runner
+ * @param {Object} opts Options Object
+ * @param {Number} [opts.instance=1] Instance ID to register worker as
+ * @param {String} [opts.socket='ws://socket:1999'] Socket to connect to
+ * @param {String} [opts.api='http://api:2000'] API to connect to
+ * @param {String} [opts.tiler='http://tiler:8000'] TiTiler to connect to
  */
 class Worker {
-    /**
-     * @constructor
-     * @param {Object} test Tape Runner
-     * @param {Object} opts Options Object
-     * @param {Number} [opts.instance=1] Instance ID to register worker as
-     * @param {String} [opts.socket='ws://socket:1999'] Socket to connect to
-     * @param {String} [opts.api='http://api:2000'] API to connect to
-     * @param {String} [opts.tiler='http://tiler:8000'] TiTiler to connect to
-     */
     constructor(test, opts = {}) {
         if (!opts.instance) opts.instance = 1;
         if (!opts.socket) opts.socket = 'ws://socket:1999';

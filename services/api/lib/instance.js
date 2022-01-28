@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Generic = require('@openaddresses/batch-generic');
 const Project = require('./project');

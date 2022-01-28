@@ -1,3 +1,4 @@
+'use strict';
 const { Term } = require('./lib/term');
 const WebSocket = require('ws');
 const test = require('tape');

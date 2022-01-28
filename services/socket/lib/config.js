@@ -1,3 +1,4 @@
+'use strict';
 const Ajv = require('ajv');
 const ajv = new Ajv({
     allErrors: true
@@ -7,8 +8,7 @@ const pkg = require('../package.json');
 const API = require('./api');
 
 /**
- * @class Config
- *
+ * @class
  * @prop {Number} [API='http://localhost:2000'] URL to the main lulc API
  * @prop {Number} [Port=1999] The port on which the WebSocketServer will listen for connections
  * @prop {Number} Timeout How long a connection can be silent before it's resources are terminated
