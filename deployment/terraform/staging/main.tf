@@ -31,10 +31,12 @@ module "resources" {
   signing_secret       = var.signing_secret
   auth0BaseUrl         = var.auth0BaseUrl
   admin_email          = "sanjay@developmentseed.org"
-  gpu_count            = 10
-  placeholder_is_gpu   = true
+  placeholder_is_gpu   = false
   placeholder_num_gpus = 2
 
+  placeholder_node_selector_name = "cpunodepool"
+
+  gpu_count = 2
   domain = "lulc-staging.ds.io"
 }
 

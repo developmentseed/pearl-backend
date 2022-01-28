@@ -1,9 +1,10 @@
 const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const Instance = require('../lib/instance');
+const User = require('../lib/user');
+const Kube = require('../lib/kube');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {get} /api/project/:projectid/instance Create Instance
@@ -28,7 +29,38 @@ async function router(schema, config) {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             req.body.project_id = req.params.projectid;
-            req.body.uid = req.auth.uid;
+            req.body.uid = req.auth.id;
+            req.body.type = req.body.type ? req.body.type : 'cpu';
+            let podList = [];
+            let active_cpus = 0;
+            let active_gpus = 0;
+            let availability = {
+                'cpu': true,
+                'gpu': true
+            };
+
+            if (config.Environment !== 'local') {
+                const kube = new Kube(config, 'default');
+                podList = await kube.listPods();
+                if (podList.length) {
+                    active_gpus = podList.filter((p) => {
+                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'gpu');
+                    }).length;
+                    active_cpus = podList.filter((p) => {
+                        return (p.status.phase === 'Running' && p.metadata.labels.type === 'cpu');
+                    }).length;
+
+                    availability = {
+                        'cpu': config.CpuCount - active_cpus > 0 ? true : false,
+                        'gpu': config.GpuCount - active_gpus > 0 ? true : false
+                    };
+
+                    if (!availability[req.body.type]) {
+                        return Err.respond(new Err(400, null, 'cpu/gpu not available'), res);
+                    }
+                }
+            }
+
             const inst = await Instance.generate(config, req.body);
 
             res.json(inst.serialize());
@@ -54,7 +86,7 @@ async function router(schema, config) {
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
             instance.patch(req.body);
@@ -138,7 +170,7 @@ async function router(schema, config) {
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
 
@@ -162,7 +194,7 @@ async function router(schema, config) {
      */
     await schema.delete('/instance', config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             await Instance.reset(config.pool);
 

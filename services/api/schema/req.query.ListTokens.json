@@ -8,14 +8,18 @@
         "page": {
             "$ref": "./util/page.json"
         },
-        "bookmarked": {
-            "type": "string",
-            "description": "Only return bookmarked checkpoints. true or false."
+        "order": {
+            "$ref": "./util/order.json"
         },
         "sort": {
             "type": "string",
-            "default": "desc",
-            "description": "Sorting order for listing checkpoints based on created timestamp. Allowed 'desc' and 'asc'"
+            "default": "created",
+            "enum": [
+                "id",
+                "name",
+                "created"
+            ],
+            "description": "Field to sort order by"
         }
     }
 }

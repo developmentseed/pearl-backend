@@ -1,6 +1,6 @@
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const Project = require('./project');
-const Generic = require('./generic');
 const Storage = require('./storage');
 const { sql } = require('slonik');
 
@@ -75,7 +75,7 @@ class AOI extends Generic {
                     ${query.page * query.limit}
             `);
         } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to list AOIs');
+            throw new Err(500, err, 'Failed to list AOIs');
         }
 
         const list = this.deserialize(pgres.rows);

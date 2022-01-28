@@ -32,6 +32,10 @@ module "resources" {
 
   placeholder_is_gpu   = false
   placeholder_num_gpus = 2
+
+  placeholder_node_selector_name = "cpunodepool"
+
+  gpu_count = 2
   domain               = "lulc-test.ds.io"
 }
 

@@ -3,9 +3,9 @@ const Busboy = require('busboy');
 const { Err } = require('@openaddresses/batch-schema');
 const Model = require('../lib/model');
 const OSMTag = require('../lib/osmtag');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {post} /api/model Create Model
@@ -25,9 +25,9 @@ async function router(schema, config) {
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
-            req.body.uid = req.auth.uid;
+            req.body.uid = req.auth.id;
 
             if (req.body.tagmap) {
                 OSMTag.validate(req.body.tagmap, req.body.classes);
@@ -69,7 +69,7 @@ async function router(schema, config) {
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const model = await Model.from(config.pool, req.params.modelid);
 
@@ -114,7 +114,7 @@ async function router(schema, config) {
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const busboy = new Busboy({
                 headers: req.headers,
@@ -200,7 +200,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const model = await Model.from(config.pool, req.params.modelid);
             await model.delete(config.pool);

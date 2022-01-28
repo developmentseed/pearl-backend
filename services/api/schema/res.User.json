@@ -2,16 +2,20 @@
     "type": "object",
     "required": [
         "id",
-        "username",
         "created",
         "updated",
+        "username",
+        "access",
         "email",
-        "access"
+        "flags"
     ],
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer" 
+            "$ref": "./util/id.json"
+        },
+        "username": {
+            "type": "string"
         },
         "created": {
             "$ref": "./util/created.json"
@@ -19,14 +23,14 @@
         "updated": {
             "$ref": "./util/updated.json"
         },
-        "username": {
-            "type": "string" 
+        "access": {
+            "type": "string"
         },
         "email": {
-            "type": "string" 
+            "type": "string"
         },
-        "access": {
-            "type": "string" 
+        "flags": {
+            "$ref": "./util/user-flags.json"
         }
     }
 }

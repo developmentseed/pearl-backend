@@ -3,9 +3,9 @@ const Busboy = require('busboy');
 const AOI = require('../lib/aoi');
 const AOIPatch = require('../lib/aoi-patch');
 const Proxy = require('../lib/proxy');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid/patch List Patches
@@ -255,7 +255,7 @@ async function router(schema, config) {
         res: 'res.Patch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await auth.is_admin(req);
+            await User.is_admin(req);
 
             const busboy = new Busboy({
                 headers: req.headers,

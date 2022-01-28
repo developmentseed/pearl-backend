@@ -15,6 +15,8 @@ const bodyparser = require('body-parser');
 const { ValidationError } = require('express-json-validator-middleware');
 const pkg = require('./package.json');
 const Kube = require('./lib/kube');
+const User = require('./lib/user');
+const Token = require('./lib/token');
 
 const { Schema, Err } = require('@openaddresses/batch-schema');
 
@@ -64,9 +66,6 @@ async function server(args, config, cb) {
     });
     await schema.api();
 
-    const auth = new (require('./lib/auth').Auth)(config);
-    const authtoken = new (require('./lib/auth').AuthToken)(config);
-
     app.disable('x-powered-by');
     app.use(cors({
         origin: true,
@@ -104,9 +103,19 @@ async function server(args, config, cb) {
      */
     app.get('/api', async (req, res) => {
         let podList = [];
+        let active_gpus = 0;
+        let active_cpus = 0;
         if (config.Environment !== 'local') {
             const kube = new Kube(config, 'default');
             podList = await kube.listPods();
+            if (podList.length) {
+                active_gpus = podList.filter((p) => {
+                    return (p.status.phase === 'Running' && p.metadata.labels.type === 'gpu');
+                }).length;
+                active_cpus = podList.filter((p) => {
+                    return (p.status.phase === 'Running' && p.metadata.labels.type === 'cpu');
+                }).length;
+            }
         }
 
         return res.json({
@@ -117,7 +126,9 @@ async function server(args, config, cb) {
                 max_inference: 200000000,
                 instance_window: 600,
                 total_gpus: config.GpuCount,
-                active_gpus: podList.filter((p) => p.status.phase === 'Running').length
+                total_cpus: config.CpuCount,
+                active_gpus: active_gpus,
+                active_cpus: active_cpus
             }
         });
     });
@@ -174,7 +185,7 @@ async function server(args, config, cb) {
      */
     const validateApiToken = async (req, res, next) => {
         try {
-            req.auth = await authtoken.validate(req.jwt.token);
+            req.auth = await Token.validate(config, req.jwt.token);
             req.auth.type = 'api';
             next();
         } catch (err) {
@@ -214,15 +225,17 @@ async function server(args, config, cb) {
                 return Err.respond(new Err(err.status, err.code, err.message), res);
             } else if (err instanceof ValidationError) {
                 return Err.respond(new Err(400, null, 'validation error'), res, err.validationErrors.body);
+            } else if (err) {
+                return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
+            } else {
+                next();
             }
-
-            next();
         },
         async (req, res, next) => {
             if (req.jwt.type === 'auth0') {
                 try {
                     // Load user from database, if exists
-                    const user = await auth.user(req.user.sub, 'auth0_id');
+                    const user = await User.from(config.pool, req.user.sub, 'auth0_id');
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
@@ -235,7 +248,7 @@ async function server(args, config, cb) {
                     });
 
                     // Create user, add to request
-                    req.auth = await auth.create({
+                    req.auth = await User.generate(config.pool, {
                         access: 'user',
                         auth0Id: auth0User.sub,
                         username: auth0User.name,
@@ -249,6 +262,7 @@ async function server(args, config, cb) {
             next();
         }
     ];
+
 
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {

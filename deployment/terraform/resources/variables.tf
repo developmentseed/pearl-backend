@@ -22,19 +22,15 @@ variable "signing_secret" {
 variable "auth0BaseUrl" {
   type = string
 }
-variable "api_node_selector_key" {
-  type = string
-  default = "agentpool"
-}
-
-variable "api_node_selector_value" {
-  type = string
-  default = "gpunodepool"
-}
 
 variable "gpu_count" {
   type = number
-  default = 15
+  default = 4
+}
+
+variable "cpu_count" {
+  type = number
+  default = 10
 }
 
 variable "tiles_debug" {

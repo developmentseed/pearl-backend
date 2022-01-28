@@ -27,7 +27,7 @@ async function router(schema, config) {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            req.query.uid = req.auth.uid;
+            req.query.uid = req.auth.id;
             req.query.projectid = req.params.projectid;
             res.json(await Batch.list(config.pool, req.query));
         } catch (err) {
@@ -69,15 +69,16 @@ async function router(schema, config) {
                 await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
             }
 
-            req.body.uid = req.auth.uid;
+            req.body.uid = req.auth.id;
             req.body.project_id = req.params.projectid;
             const batch = await Batch.generate(config.pool, req.body);
 
             req.body.project_id = req.params.projectid;
             req.body.batch = batch.id;
 
+            req.body.type = req.params.type ? req.params.type : 'cpu';
 
-            req.body.uid = req.auth.uid;
+            req.body.uid = req.auth.id;
             const inst = await Instance.generate(config, req.body);
 
             const batch_json = batch.serialize();

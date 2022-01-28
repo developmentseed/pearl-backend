@@ -1,7 +1,7 @@
 const { Err } = require('@openaddresses/batch-schema');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const auth = new (require('../lib/auth').Auth)(config);
 
     /**
      * @api {get} /api/user List Users
@@ -13,27 +13,50 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a list of users that have registered with the service
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.user-list.json} apiParam
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "total": 1,
-     *       "users": [{
-     *           "id": 1,
-     *           "username": "example",
-     *           "email": "example@example.com",
-     *           "access": "user",
-     *       }]
-     *   }
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListUsers.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ListUsers.json} apiSuccess
      */
     await schema.get('/user', {
-        query: 'req.query.user-list.json'
+        query: 'req.query.ListUsers.json',
+        res: 'res.ListUsers.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const users = await auth.list(req.query);
+            await User.is_admin(req);
+
+            const users = await User.list(config.pool, req.query);
 
             return res.json(users);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {patch} /api/user/:userid Patch User
+     * @apiVersion 1.0.0
+     * @apiName PatchUser
+     * @apiGroup User
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Update information about a user
+     *
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchUser.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.User.json} apiSuccess
+     */
+    await schema.patch('/user/:userid', {
+        ':userid': 'integer',
+        body: 'req.body.PatchUser.json',
+        res: 'res.User.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            await User.is_admin(req);
+
+            const user = await User.from(config.pool, req.params.userid);
+            user.patch(req.body);
+            await user.commit(config.pool);
+
+            return res.json(user.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -55,12 +78,40 @@ async function router(schema, config) {
         res: 'res.Me.json'
     }, config.requiresAuth, async (req, res) => {
         return res.json({
+            id: req.auth.id,
             username: req.auth.username,
             email: req.auth.email,
-            access: req.auth.access
+            access: req.auth.access,
+            created: req.auth.created,
+            updated: req.auth.updated,
+            flags: req.auth.flags
         });
     });
 
+    /**
+     * @api {get} /api/user/:userid Get User
+     * @apiVersion 1.0.0
+     * @apiName GetUser
+     * @apiGroup User
+     * @apiPermission admin
+     *
+     * @apiDescription
+     *     Return all information about a given user
+     *
+     * @apiSchema {jsonschema=../schema/res.User.json} apiSuccess
+     */
+    await schema.get('/user/:userid', {
+        ':userid': 'integer',
+        res: 'res.User.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            await User.is_admin(req);
+            const user = await User.from(config.pool, req.params.userid);
+            return res.json(user.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;

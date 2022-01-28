@@ -1,9 +1,9 @@
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const Project = require('./project');
 const jwt = require('jsonwebtoken');
 const Kube = require('./kube');
 const { sql } = require('slonik');
-const Generic = require('./generic');
 
 /**
  * @class
@@ -50,7 +50,7 @@ class Instance extends Generic {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (query.type === undefined) query.type = null;
+        if (query.type === undefined || query.type === 'all') query.type = null;
         if (query.batch === undefined) query.batch = null;
 
         let active = null;
@@ -120,7 +120,7 @@ class Instance extends Generic {
     gen_token(config, auth) {
         return jwt.sign({
             t: 'inst',
-            u: auth.uid,
+            u: auth.id,
             p: parseInt(this.project_id),
             i: parseInt(this.id)
         }, config.SigningSecret, {
@@ -145,24 +145,7 @@ class Instance extends Generic {
         }
 
         const kube = new Kube(config, 'default');
-
-        let podList = [];
-
-        if (config.Environment !== 'local') {
-            podList = await kube.listPods();
-        }
-
-        let type = 'gpu';
-        if (podList.length) {
-            const activePods = podList.filter((p) => {
-                return p.status.phase === 'Running';
-            });
-
-            console.log('# activePods', activePods.length);
-            type = activePods.length < config.GpuCount ? 'gpu' : 'cpu';
-        }
-
-        console.log('# type', type);
+        console.log('# type', instance.type);
 
         try {
             const pgres = await config.pool.query(sql`
@@ -177,15 +160,14 @@ class Instance extends Generic {
                     ${instance.aoi_id || null},
                     ${instance.checkpoint_id || null},
                     ${instance.batch || null},
-                    ${type}
+                    ${instance.type}
                 ) RETURNING *
             `);
 
             const instanceId = parseInt(pgres.rows[0].id);
-
             let pod = {};
             if (config.Environment !== 'local') {
-                const podSpec = kube.makePodSpec(instanceId, type, [{
+                const podSpec = kube.makePodSpec(instanceId, instance.type, [{
                     name: 'INSTANCE_ID',
                     value: instanceId.toString()
                 },{
@@ -263,7 +245,9 @@ class Instance extends Generic {
             throw new Err(500, err, 'Internal Instance Error');
         }
 
-        const podName = `${config.Deployment}-gpu-${instanceid}`;
+        if (!pgres.rows.length) throw new Err(404, null, 'Instance not found');
+
+        const podName = `${config.Deployment}-instance-${pgres.rows[0].type}-${instanceid}`;
         let podStatus;
         let pod = false;
 

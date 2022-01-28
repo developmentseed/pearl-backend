@@ -1,9 +1,9 @@
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const Storage = require('./storage');
 const poly = require('@turf/bbox-polygon').default;
 const bbox = require('@turf/bbox').default;
 const { sql } = require('slonik');
-const Generic = require('./generic');
 
 /**
  * @class
@@ -212,7 +212,6 @@ class Model extends Generic {
      * @param {Pool} pool Instantiated Postgres Pool
      */
     async delete(pool) {
-        let pgres;
         const modelProjects = await pool.query(sql`
             SELECT id FROM
                 projects
@@ -224,12 +223,14 @@ class Model extends Generic {
             throw new Err(403, null, 'Model is being used in other projects and can not be deleted');
         }
 
+        let pgres;
         try {
             pgres = await pool.query(sql`
                 DELETE FROM
                     models
                 WHERE
                     id = ${this.id}
+                RETURNING *
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal Model Error');
@@ -238,7 +239,6 @@ class Model extends Generic {
         if (!pgres.rows.length) throw new Err(404, null, 'No model found');
 
         this.active = false;
-
         return this;
     }
 }
