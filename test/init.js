@@ -1,3 +1,4 @@
+'use strict';
 const { promisify } = require('util');
 const request = promisify(require('request'));
 const Knex = require('knex');
@@ -20,7 +21,7 @@ function reconnect(test, API) {
     test('pre-run', async (t) => {
         const config = await Config.env();
         try {
-            const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
+            const authtoken = new require('../services/api/lib/token')(config);
             state.token = (await authtoken.generate({
                 type: 'auth0',
                 uid: 1
@@ -89,8 +90,8 @@ function connect(test, API) {
             const knex = Knex(KnexConfig);
             await knex.migrate.latest();
 
-            const auth = new (require('../services/api/lib/auth').Auth)(config);
-            const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
+            const auth = new require('../services/api/lib/user')(config);
+            const authtoken = new require('../services/api/lib/token')(config);
 
             await auth.create({
                 access: 'admin',

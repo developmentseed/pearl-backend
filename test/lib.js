@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 
 const util = require('./lib/util');
 const run = require('./lib/run');
@@ -43,6 +44,7 @@ class LULC {
      * @param {String} subcmd - Subcommand to run
      *
      * @param {Object} payload - Optional API Payload
+     * @param {boolean} [stream=false] Should be out be streamed to a file
      */
     async cmd(cmd, subcmd, payload, stream = false) {
         if (process.env.UPDATE) this.schema = await util.schema(this.url);

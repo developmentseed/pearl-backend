@@ -1,3 +1,4 @@
+'use strict';
 const test = require('tape');
 const { Kube } = require('../lib/kube');
 const Flight = require('./flight');

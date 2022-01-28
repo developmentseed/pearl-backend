@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Mosaic = require('../lib/mosaic');
 const Proxy = require('../lib/proxy');
