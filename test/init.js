@@ -399,7 +399,9 @@ function running(test, API) {
                     max_inference: 200000000,
                     instance_window: 600,
                     total_gpus: 2,
-                    active_gpus: 0
+                    active_gpus: 0,
+                    total_cpus: 10,
+                    active_cpus: 0
                 }
             });
 
