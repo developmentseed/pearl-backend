@@ -25,9 +25,10 @@ function reconnect(test, API) {
 
         try {
             state.token = (await Token.generate(config.pool, {
+                name: 'Default Token',
                 type: 'auth0',
                 uid: 1
-            }, 'API Token')).token;
+            }, config.SigningSecret)).token;
         } catch (err) {
             t.error(err, 'no errors');
         }
@@ -96,15 +97,17 @@ function connect(test, API) {
                 access: 'admin',
                 username: 'example',
                 email: 'example@example.com',
-                auth0Id: 0
+                auth0Id: 0,
+                flags: {}
             });
 
             const user = await User.from(config.pool, 1);
 
             state.token = (await Token.generate(config.pool, {
+                name: 'Default Token',
                 type: 'auth0',
-                uid: user.uid
-            }, 'API Token')).token;
+                uid: user.id
+            }, config.SigningSecret)).token;
 
             await knex.destroy();
             await config.pool.end();
@@ -321,7 +324,7 @@ function connect(test, API) {
                 checkpoint_id: null,
                 active: false,
                 pod: {},
-                type: 'gpu'
+                type: 'cpu'
             }, 'expected body');
 
         } catch (err) {
