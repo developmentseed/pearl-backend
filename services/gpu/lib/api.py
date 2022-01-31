@@ -392,7 +392,7 @@ class API:
     def get_tile(self, z, x, y, iformat="npy", buffer=32, cache=True):
         url = os.environ[
             "TileUrl"
-        ] + "/mosaic/{}/tiles/{}/{}/{}.{}?buffer={}&return_mask=False".format(
+        ] + "/mosaic/{}/tiles/{}/{}/{}.{}?buffer={}&return_mask=False&bidx=1,2,3,4".format(
             self.mosaic_id, z, x, y, iformat, buffer
         )
 
