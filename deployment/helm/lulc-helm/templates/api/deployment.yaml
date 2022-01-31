@@ -16,6 +16,8 @@ spec:
       run: {{ .Release.Name }}-api
   template:
     metadata:
+      annotations:
+        checksum/secret: {{ include (print .Template.BasePath "/api/secret.yaml") . | sha256sum }}
       labels:
         app: {{ template "lulc-helm.name" . }}
         release: {{ .Release.Name }}
@@ -55,9 +57,20 @@ spec:
               memory: {{ .Values.api.resources.limits.memory }}
           env:
             - name: SigningSecret
-              value: {{ .Values.api.env.SigningSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lulc-helm.fullname" . }}-api-secret
+                  key: SigningSecret
             - name: Postgres
-              value: {{ .Values.api.env.Postgres }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lulc-helm.fullname" . }}-api-secret
+                  key: Postgres
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lulc-helm.fullname" . }}-api-secret
+                  key: AZURE_STORAGE_CONNECTION_STRING
             - name: GpuImageName
               value: {{ .Values.gpu.image.name }}
             - name: GpuImageTag
@@ -66,8 +79,6 @@ spec:
               value: {{ .Values.api.env.GpuCount | quote }}
             - name: CpuCount
               value: {{ .Values.api.env.CpuCount | quote }}
-            - name: AZURE_STORAGE_CONNECTION_STRING
-              value: {{ .Values.api.env.AZURE_STORAGE_CONNECTION_STRING}}
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
