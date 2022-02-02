@@ -33,6 +33,7 @@ class Config {
         this.Postgres = process.env.Postgres || 'postgres://postgres@localhost:5432/lulc';
 
         this.TileUrl = process.env.TileUrl || args.tileurl || false;
+        this.PcTileUrl = process.env.PcTileUrl || args.pctileurl || false;
 
         this.Port = args.port || 2000;
 

@@ -186,6 +186,10 @@ class Instance extends Generic {
                 },{
                     name: 'TileUrl',
                     value: config.TileUrl
+                },
+                {
+                    name: 'PcTileUrl',
+                    value: config.PcTileUrl
                 }]);
 
                 pod = await kube.createPod(podSpec);
