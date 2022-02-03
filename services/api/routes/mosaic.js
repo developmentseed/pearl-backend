@@ -45,12 +45,11 @@ async function router(schema, config) {
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        req.url = `/api/data/v1/mosaic/${Mosaic.get_id(req.params.layer)}/tilejson.json`
-
+        req.url = `/api/data/v1/mosaic/${Mosaic.get_id(req.params.layer)}/tilejson.json`;
         req.query = {
             ...Mosaic.default_params(req.params.layer),
             ...req.query
-        }
+        };
 
         try {
             await Proxy.request(req, res, config.PcTileUrl);
@@ -86,11 +85,11 @@ async function router(schema, config) {
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        req.url = req.url.replace(`/mosaic/${req.params.layer}/tiles/`, `/api/data/v1/mosaic/tiles/${Mosaic.get_id(req.params.layer)}/`)
+        req.url = req.url.replace(`/mosaic/${req.params.layer}/tiles/`, `/api/data/v1/mosaic/tiles/${Mosaic.get_id(req.params.layer)}/`);
         req.query = {
             ...Mosaic.default_params(req.params.layer),
             ...req.query
-        }
+        };
 
         try {
             await Proxy.request(req, res, config.PcTileUrl);

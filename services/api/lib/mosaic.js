@@ -17,6 +17,8 @@ class Mosaic {
 
     /**
      * Return a list of Mosaics
+     *
+     * @returns {Object}
      */
     static list() {
         return Object.keys(this.mosaics);
@@ -26,6 +28,7 @@ class Mosaic {
      * Return mosaic SearchID
      *
      * @param {String} mosaic - Mosaic Name
+     * @returns {String}
      */
     static get_id(mosaic) {
         if (this.mosaics[mosaic]  === undefined) throw new Err(404, null, `Mosaic ${mosaic} not found`);
@@ -36,6 +39,7 @@ class Mosaic {
      * Return defaults query parameters
      *
      * @param {String} mosaic - Mosaic Name
+     * @returns {Object}
      */
      static get_query(mosaic) {
         if (this.mosaics[mosaic]  === undefined) throw new Err(404, null, `Mosaic ${mosaic} not found`);
