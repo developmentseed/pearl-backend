@@ -92,7 +92,7 @@ async function router(schema, config) {
         };
 
         try {
-            await Proxy.request(req, res, config.PcTileUrl);
+            Proxy.request(req, res, config.PcTileUrl);
         } catch (err) {
             return Err.respond(err, res);
         }
