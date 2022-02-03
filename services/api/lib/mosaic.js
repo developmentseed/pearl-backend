@@ -1,4 +1,6 @@
 'use strict';
+const { Err } = require('@openaddresses/batch-schema');
+
 /**
  * @class
  */
@@ -41,7 +43,7 @@ class Mosaic {
      * @param {String} mosaic - Mosaic Name
      * @returns {Object}
      */
-     static get_query(mosaic) {
+    static get_query(mosaic) {
         if (this.mosaics[mosaic]  === undefined) throw new Err(404, null, `Mosaic ${mosaic} not found`);
         return this.mosaics[mosaic].default_params;
     }
