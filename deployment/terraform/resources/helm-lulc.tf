@@ -50,6 +50,11 @@ resource "helm_release" "lulc" {
     name = "api.auth0BaseUrl"
     value = var.auth0BaseUrl
   }
+
+  set {
+    name = "api.env.PcTileUrl"
+    value = var.pc_tileurl
+  }
   set {
     name  = "tiles.debug"
     value = var.tiles_debug
