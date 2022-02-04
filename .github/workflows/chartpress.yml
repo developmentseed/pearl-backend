@@ -48,6 +48,8 @@ jobs:
 
     - name: Build & Publish
       run: ./scripts/cipublish
+      env:
+        GITHUB_TOKEN: ${{ secrets.CHART_PUBLISH_TOKEN }}
 
     - name: Deploy -- Dev
       env:
