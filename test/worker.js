@@ -20,7 +20,7 @@ class Worker {
         if (!opts.socket) opts.socket = 'ws://socket:1999';
         if (!opts.api) opts.api = 'http://api:2000';
         if (!opts.tiler) opts.tiler = 'http://tiler:8000';
-        if (!opts.pctiler) opts.tiler = 'https://planetarycomputer.microsoft.com';
+        if (!opts.pctiler) opts.pctiler = 'https://planetarycomputer.microsoft.com';
 
         this.test = test;
         this.opts = opts;
