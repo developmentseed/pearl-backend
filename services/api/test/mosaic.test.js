@@ -20,7 +20,7 @@ test('GET /api/mosaic', async(t) => {
         }, t);
 
         t.deepEquals(res.body, [
-                'naip.latest'
+            'naip.latest'
         ]);
     } catch (err) {
         t.error(err, 'no errors');
