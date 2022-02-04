@@ -23,7 +23,9 @@ class Mosaic {
      * @returns {Object}
      */
     static list() {
-        return Object.keys(this.mosaics);
+        return {
+            mosaics: Object.keys(this.mosaics)
+        };
     }
 
     /**
