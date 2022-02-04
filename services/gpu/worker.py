@@ -75,6 +75,7 @@ def main():
     )
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], "dev-secret")
     os.environ["TileUrl"] = arg([os.environ.get("TileUrl")], "http://localhost:8000")
+    os.environ["PcTileUrl"] = arg([os.environ.get("PcTileUrl")], "https://planetarycomputer.microsoft.com")
 
     api = API(os.environ["API"], os.environ["INSTANCE_ID"])
 
