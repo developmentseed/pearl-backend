@@ -100,7 +100,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            if (!req.body.mosaic || !Mosaic.list().includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
+            if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
             const proj = await Project.generate(config.pool, req.auth.id, req.body);
             return res.json(proj.serialize());
