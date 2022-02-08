@@ -50,7 +50,7 @@ variable "tiles_host" {
 
 variable "pc_tileurl" {
   type = string
-  default = "https://planetarycomputer.microsoft.com"
+  default = "https://planetarycomputer-staging.microsoft.com"
 }
 
 variable "tiles_webconcurrency" {
