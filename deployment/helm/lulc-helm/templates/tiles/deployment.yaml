@@ -47,13 +47,13 @@ spec:
             - name: PORT
               value: {{ .Values.tiles.containerPort | quote }}
             - name: WEB_CONCURRENCY
-              value: {{ .Values.tiles.env.WebConcurrency | quote }}
+              value: {{ .Values.tiles.webConcurrency | quote }}
             - name: TITILER_API_DEBUG
-              value: {{ .Values.tiles.env.Debug | quote }}
+              value: {{ .Values.tiles.debug | quote }}
             - name: MOSAIC_BACKEND
-              value: {{ .Values.tiles.env.Backends }}
+              value: {{ .Values.tiles.mosaicBackends }}
             - name: MOSAIC_HOST
-              value: {{ .Values.tiles.env.Host }}
+              value: {{ .Values.tiles.mosaicHost }}
             - name: CACHE_ENDPOINT
               value: {{ printf  "redis://%s-redis:6379" .Release.Name  }}
 {{- end }}

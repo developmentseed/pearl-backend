@@ -22,51 +22,51 @@ resource "helm_release" "lulc" {
   }
   
   set {
-    name  = "api.env.SigningSecret"
+    name  = "api.signingSecret"
     value = var.signing_secret 
   }
 
   set {
-    name  = "api.env.Postgres"
+    name  = "api.postgresUrl"
     value = "postgres://lulc:${var.postgres_password}@${azurerm_postgresql_flexible_server.lulc.fqdn}/lulc?sslmode=require"
   }
 
   set {
-    name  = "api.env.AZURE_STORAGE_CONNECTION_STRING"
+    name  = "api.azureStorageConnectionString"
     value = azurerm_storage_account.lulc.primary_connection_string
   }
 
   set {
-    name  = "api.env.GpuCount"
+    name  = "api.gpuCount"
     value = var.gpu_count
   }
 
   set {
-    name  = "api.env.CpuCount"
+    name  = "api.cpuCount"
     value = var.cpu_count
   }
 
   set {
-    name = "api.env.auth0BaseUrl"
+    name = "api.auth0BaseUrl"
     value = var.auth0BaseUrl
   }
   set {
-    name  = "tiles.env.Debug"
+    name  = "tiles.debug"
     value = var.tiles_debug
   }
 
   set {
-    name = "tiles.env.Backends"
+    name = "tiles.mosaicBackends"
     value = var.mosaic_backend
   }
 
   set {
-    name = "tiles.env.Host"
+    name = "tiles.mosaicHost"
     value = var.tiles_host
   }
 
   set {
-    name = "tiles.env.WebConcurrency"
+    name = "tiles.webConcurrency"
     value = var.tiles_webconcurrency
   }
 
@@ -96,7 +96,7 @@ resource "helm_release" "lulc" {
   }
 
   set {
-    name = "nginx.env.FRONTEND_DOMAIN"
+    name = "nginx.frontendDomain"
     value = var.frontend_domain
   }
  
