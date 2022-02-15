@@ -87,7 +87,7 @@ async function router(schema, config) {
 
         req.url = req.url.replace(`/mosaic/${req.params.layer}/tiles/`, `/api/data/v1/mosaic/tiles/${Mosaic.get_id(req.params.layer)}/`);
         req.query = {
-            ...Mosaic.default_params(req.params.layer),
+            ...Mosaic.get_query(req.params.layer),
             ...req.query
         };
 
