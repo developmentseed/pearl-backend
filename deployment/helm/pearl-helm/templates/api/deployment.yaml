@@ -84,7 +84,7 @@ spec:
             - name: TileUrl
               value: http://{{ template "lulc-helm.fullname" . }}-tiles
             - name: PcTileUrl
-              valule: {{ .Values.api.env.PcTileUrl }}
+              value: {{ .Values.api.env.PcTileUrl }}
             - name: ApiUrl
               value: http://{{ template "lulc-helm.fullname" . }}-api
             - name: SocketUrl
