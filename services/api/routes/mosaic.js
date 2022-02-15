@@ -47,7 +47,7 @@ async function router(schema, config) {
 
         req.url = `/api/data/v1/mosaic/${Mosaic.get_id(req.params.layer)}/tilejson.json`;
         req.query = {
-            ...Mosaic.default_params(req.params.layer),
+            ...Mosaic.get_query(req.params.layer),
             ...req.query
         };
 
