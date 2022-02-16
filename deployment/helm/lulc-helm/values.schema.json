@@ -55,11 +55,11 @@
                 },
                 "auth0BaseUrl": {
                     "type": "string",
-                    "description": "Base URL for Auth0 account for authentication. Example: (FIXME: add example url)"
+                    "description": "Base URL for Auth0 account for authentication. Example: https://pearl-landcover-staging.us.auth0.com"
                 },
                 "signingSecret": {
                     "type": "string",
-                    "description": "Random secret used by the API to sign tokens. Also used by the socket server to verify tokens (FIXME: is that correct?). Should be a secure random string."
+                    "description": "Random secret used by the API to sign tokens. Also used by the socket server to verify tokens. Should be a secure random string."
                 },
                 "postgresUrl": {
                     "type": "string",
@@ -123,11 +123,11 @@
                 },
                 "mosaicBackends": {
                     "type": "string",
-                    "description": "Backend(s) to fetch tile mosaics. FIXME"
+                    "description": "Backend to store tile mosaics. Default: sqlite:///"
                 },
                 "mosaicHost": {
                     "type": "string",
-                    "description": "Mosaic Host. FIXME"
+                    "description": "URL for database host for storing mosaics. Default: /tmp/data/mosaics.db"
                 },
                 "nodeSelector": {
                     "type": "object",
