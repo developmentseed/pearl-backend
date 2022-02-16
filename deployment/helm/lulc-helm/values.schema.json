@@ -1,0 +1,236 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "required": [
+        "environment",
+        "domain",
+        "adminEmail",
+        "api",
+        "tiles"
+    ],
+    "properties": {
+        "environment": {
+            "type": "string",
+            "description": "String representing the environment - dev, prod, etc. Used in labelling of resources. The only special value is 'local'. If environment is specified as 'local', a NodePort is used instead of ClusterIP to expose services."
+        },
+        "domain": {
+            "type": "string",
+            "description": "Domain name pointed to the cluster. Eg. 'lulc.example.com' - You will need to create an A record for a wildcard of this domain to point to the ClusterIP of your Kubernetes cluster. For eg. if your domain is lulc.example.com, you will need to create an A record for *.lulc.example.com to the Cluster IP. This will then automatically create domains for the various services: api.lulc.example.com, socket.lulc.example.com, tiles.lulc.example.com."
+        },
+        "adminEmail": {
+            "type": "string",
+            "description": "Email address for cluster admin. Used to setup as admin email for services. TODO: clarify exactly what email is used for."
+        },
+        "api": {
+            "type": "object",
+            "required": [
+                "auth0BaseUrl",
+                "signingSecret",
+                "postgresUrl"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether the API service should be enabled or not. Can be useful for debugging."
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "default": 2,
+                    "description": "Number of replicas of the API container to run. Defaults to 2"
+                },
+                "containerPort": {
+                    "type": "number",
+                    "default": 2000,
+                    "description": "Port that the service runs on inside the container. Ideally you should not need to change this."
+                },
+                "gpuCount": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "If using GPUs, the number of total GPU instances available on the cluster - used by the API to calculate available instances, etc."
+                },
+                "cpuCount": {
+                    "type": "number",
+                    "default": 2,
+                    "description": "If using CPUs, the number of total CPU instances available to do model training / inference."
+                },
+                "auth0BaseUrl": {
+                    "type": "string",
+                    "description": "Base URL for Auth0 account for authentication. Example: (FIXME: add example url)"
+                },
+                "signingSecret": {
+                    "type": "string",
+                    "description": "Random secret used by the API to sign tokens. Also used by the socket server to verify tokens (FIXME: is that correct?). Should be a secure random string."
+                },
+                "postgresUrl": {
+                    "type": "string",
+                    "description": "Postgres URL to access Postgres instance. This wuld typically be the URL provided by your managed postgres instance. Should include username and password. Example: postgres://user:pass@rds.example.com:5432/lulcdb"
+                },
+                "image": {
+                    "$ref": "./schema-util/image.json"
+                },
+                "resources": {
+                    "$ref": "./schema-util/resources.json"
+                }
+            }
+        },
+        "socket": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether the socket server is enabled or not. Defaults to true. Change this only for debugging purposes.",
+                    "default": true
+                },
+                "containerPort": {
+                    "type": "number",
+                    "description": "Port that the service runs on inside the container. You should not normally need to change this.",
+                    "default": 1999
+                },
+                "image": {
+                    "$ref": "./schema-util/image.json"
+                },
+                "resources": {
+                    "$ref": "./schema-util/resources.json"
+                }                
+            }
+        },
+        "tiles": {
+            "type": "object",
+            "required": [
+                "mosaicBackends",
+                "mosaicHost"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether the TiTiler server is enabled. Again, only set to false for debugging."
+                },
+                "containerPort": {
+                    "type": "number",
+                    "default": 8000,
+                    "description": "Port that the service runs on inside the container. You should not need to change this."
+                },
+                "webConcurrency": {
+                    "type": "number",
+                    "default": 4,
+                    "description": "No of concurrent requests each TiTiler container can serve. Defaults to 4."
+                },
+                "debug": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to run TiTiler in Debug mode. Not recommended for production, but will give more useful log outputs."
+                },
+                "mosaicBackends": {
+                    "type": "string",
+                    "description": "Backend(s) to fetch tile mosaics. FIXME"
+                },
+                "mosaicHost": {
+                    "type": "string",
+                    "description": "Mosaic Host. FIXME"
+                },
+                "nodeSelector": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Whether to use a node selector for the Tiler instances to force them onto nodes matching given label",
+                            "default": true
+                        },
+                        "labelKey": {
+                            "type": "string",
+                            "description": "Key to use for node selector",
+                            "default": "agentpool"
+                        },
+                        "labelValue": {
+                            "type": "string",
+                            "description": "Value to use for node selector",
+                            "default": "tiler"
+                        },
+                        "image": {
+                            "$ref": "./schema-util/image.json"
+                        },
+                        "resources": {
+                            "$ref": "./schema-util/resources.json"
+                        }                        
+                    }
+                }
+            }
+        },
+        "redis": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable Redis container, used by API to maintain a cache. Is required by the API, so set to false only for debugging purposes."
+                },
+                "resources": {
+                    "$ref": "./schema-util/resources.json"
+                }
+            }
+        },
+        "gpu": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "$ref": "./schema-util/image.json"
+                }
+            }
+        },
+        "placeholder": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether to enable placeholder containers, which ensure faster startup time for inference containers. You can disable this if startup time of inference containers is not important for your use-case."
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "default": 1,
+                    "description": "Number of placeholder replicas to run."
+                },
+                "nodeSelectorName": {
+                    "type": "string",
+                    "default": "gpunodepool",
+                    "description": "Name of node selector to use to ensure placeholders run on same nodes as inference containers."
+                },
+                "isGpu": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether running on GPU instances"
+                },
+                "numGPUs": {
+                    "type": "number",
+                    "default": 2,
+                    "description": "Number of GPUs per instance in your cluster. Used to define size of the placeholder container."
+                },
+                "resources": {
+                    "$ref": "./schema-util/resources.json"
+                }
+            }
+        },
+        "nginx": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to enable an Nginx server to redirect requests to a www. subdomain. For eg. redirect requests from example.com to www.example.com, where www.example.com is configured separately to server the frontend code. You should normally not need this and can leave disabled."
+                },
+                "frontendDomain": {
+                    "type": "string",
+                    "description": "Frontend domain, to redirect to www. - eg: example.com"
+                },
+                "image": {
+                    "$ref": "./schema-util/image.json"
+                }
+            }
+        },
+        "kubejanitor": {
+            "type": "object",
+            "description": "Used to cleanup inference containers that have not been cleanly terminated by the API. See https://github.com/hjacobs/kube-janitor for full options."
+        }
+    }
+ }

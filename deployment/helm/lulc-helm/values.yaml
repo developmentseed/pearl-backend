@@ -50,8 +50,8 @@ tiles:
     tag: 'chartpress_replace'
   nodeSelector:
     enabled: true
-    label_key: agentpool
-    label_value: tiler
+    labelKey: agentpool
+    labelValue: tiler
   resources:
     requests:
       cpu: 400m
@@ -98,8 +98,7 @@ nginx:
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
-  env:
-    FRONTEND_DOMAIN: ''
+  frontendDomain: ''
 
 kubejanitor:
   image:

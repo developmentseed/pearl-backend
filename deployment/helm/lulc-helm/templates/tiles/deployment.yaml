@@ -22,7 +22,7 @@ spec:
     spec:
       {{- if .Values.tiles.nodeSelector.enabled }}
       nodeSelector:
-        {{ .Values.tiles.nodeSelector.label_key }}: {{ .Values.tiles.nodeSelector.label_value }}
+        {{ .Values.tiles.nodeSelector.labelKey }}: {{ .Values.tiles.nodeSelector.labelValue }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}-tiles
