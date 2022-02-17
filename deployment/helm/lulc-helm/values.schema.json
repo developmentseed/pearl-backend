@@ -18,7 +18,7 @@
         },
         "adminEmail": {
             "type": "string",
-            "description": "Email address for cluster admin. Used to setup as admin email for services. TODO: clarify exactly what email is used for."
+            "description": "Email address for cluster admin. Currently used only as the email address for Lets Encrypt when issuing SSL certificates."
         },
         "api": {
             "type": "object",
@@ -63,7 +63,7 @@
                 },
                 "postgresUrl": {
                     "type": "string",
-                    "description": "Postgres URL to access Postgres instance. This wuld typically be the URL provided by your managed postgres instance. Should include username and password. Example: postgres://user:pass@rds.example.com:5432/lulcdb"
+                    "description": "Postgres URL to access Postgres instance. This would typically be the URL provided by your managed postgres instance. Should include username and password. Example: postgres://user:pass@rds.example.com:5432/lulcdb"
                 },
                 "image": {
                     "$ref": "./schema-util/image.json"
@@ -217,7 +217,7 @@
                 "enabled": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Whether to enable an Nginx server to redirect requests to a www. subdomain. For eg. redirect requests from example.com to www.example.com, where www.example.com is configured separately to server the frontend code. You should normally not need this and can leave disabled."
+                    "description": "Whether to enable an Nginx server to redirect requests to a www. subdomain. For eg. redirect requests from example.com to www.example.com, where www.example.com is configured separately to serve the frontend code. You should normally not need this and can leave disabled."
                 },
                 "frontendDomain": {
                     "type": "string",
