@@ -8,9 +8,9 @@ api:
   containerPort: 2000
   gpuCount: 0
   cpuCount: 2
-  auth0BaseUrl: replace_me
-  signingSecret: xxx
-  postgresUrl: xxx
+  auth0BaseUrl: replace_manually
+  signingSecret: replace_manually
+  postgresUrl: replace_manually
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
@@ -43,8 +43,8 @@ tiles:
   containerPort: 8000
   webConcurrency: 4
   debug: false
-  mosaicBackends: xxx
-  mosaicHost: xxx
+  mosaicBackends: sqlite:///
+  mosaicHost: /tmp/data/mosaics.db
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
