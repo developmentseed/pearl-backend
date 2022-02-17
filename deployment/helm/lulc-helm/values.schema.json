@@ -87,10 +87,10 @@
                     "default": 1999
                 },
                 "image": {
-                    "$ref": "./schema-util/image.json"
+                    "$ref": "file://./schema-util/image.json"
                 },
                 "resources": {
-                    "$ref": "./schema-util/resources.json"
+                    "$ref": "file://./schema-util/resources.json"
                 }                
             }
         },
@@ -148,10 +148,10 @@
                             "default": "tiler"
                         },
                         "image": {
-                            "$ref": "./schema-util/image.json"
+                            "$ref": "file://./schema-util/image.json"
                         },
                         "resources": {
-                            "$ref": "./schema-util/resources.json"
+                            "$ref": "file://./schema-util/resources.json"
                         }                        
                     }
                 }
@@ -166,7 +166,7 @@
                     "description": "Enable Redis container, used by API to maintain a cache. Is required by the API, so set to false only for debugging purposes."
                 },
                 "resources": {
-                    "$ref": "./schema-util/resources.json"
+                    "$ref": "file://./schema-util/resources.json"
                 }
             }
         },
@@ -174,7 +174,7 @@
             "type": "object",
             "properties": {
                 "image": {
-                    "$ref": "./schema-util/image.json"
+                    "$ref": "file://./schema-util/image.json"
                 }
             }
         },
@@ -207,7 +207,7 @@
                     "description": "Number of GPUs per instance in your cluster. Used to define size of the placeholder container."
                 },
                 "resources": {
-                    "$ref": "./schema-util/resources.json"
+                    "$ref": "file://./schema-util/resources.json"
                 }
             }
         },
@@ -224,7 +224,7 @@
                     "description": "Frontend domain, to redirect to www. - eg: example.com"
                 },
                 "image": {
-                    "$ref": "./schema-util/image.json"
+                    "$ref": "file://./schema-util/image.json"
                 }
             }
         },
