@@ -96,10 +96,6 @@
         },
         "tiles": {
             "type": "object",
-            "required": [
-                "mosaicBackends",
-                "mosaicHost"
-            ],
             "properties": {
                 "enabled": {
                     "type": "boolean",
@@ -123,11 +119,13 @@
                 },
                 "mosaicBackends": {
                     "type": "string",
-                    "description": "Backend to store tile mosaics. Default: sqlite:///"
+                    "description": "Backend to store tile mosaics. Default: sqlite:///",
+                    "default": "sqlite:///"
                 },
                 "mosaicHost": {
                     "type": "string",
-                    "description": "URL for database host for storing mosaics. Default: /tmp/data/mosaics.db"
+                    "description": "URL for database host for storing mosaics. Default: /tmp/data/mosaics.db",
+                    "default": "/tmp/data/mosaics.db"
                 },
                 "nodeSelector": {
                     "type": "object",
