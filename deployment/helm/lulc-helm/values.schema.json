@@ -66,10 +66,10 @@
                     "description": "Postgres URL to access Postgres instance. This would typically be the URL provided by your managed postgres instance. Should include username and password. Example: postgres://user:pass@rds.example.com:5432/lulcdb"
                 },
                 "image": {
-                    "$ref": "./schema-util/image.json"
+                    "$ref": "file://./schema-util/image.json"
                 },
                 "resources": {
-                    "$ref": "./schema-util/resources.json"
+                    "$ref": "file://./schema-util/resources.json"
                 }
             }
         },
