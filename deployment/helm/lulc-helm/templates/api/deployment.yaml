@@ -76,9 +76,9 @@ spec:
             - name: GpuImageTag
               value: {{ .Values.gpu.image.tag }}
             - name: GpuCount
-              value: {{ .Values.api.env.GpuCount | quote }}
+              value: {{ .Values.api.GpuCount | quote }}
             - name: CpuCount
-              value: {{ .Values.api.env.CpuCount | quote }}
+              value: {{ .Values.api.CpuCount | quote }}
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
@@ -87,10 +87,6 @@ spec:
               value: http://{{ template "lulc-helm.fullname" . }}-api
             - name: SocketUrl
               value: ws://{{ template "lulc-helm.fullname" . }}-socket
-            - name: nodeSelectorKey
-              value: {{ .Values.api.env.nodeSelectorKey }}
-            - name: nodeSelectorValue
-              value: {{ .Values.api.env.nodeSelectorValue }}
             - name: AUTH0_ISSUER_BASE_URL
-              value: {{ .Values.api.env.auth0BaseUrl }}
+              value: {{ .Values.api.auth0BaseUrl }}
 {{- end }}

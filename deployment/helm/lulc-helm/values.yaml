@@ -1,10 +1,16 @@
 environment: dev
 domain: lulc.ds.io
 adminEmail: sanjay@developmentseed.org
+
 api:
   enabled: true
   replicaCount: 2
   containerPort: 2000
+  gpuCount: 0
+  cpuCount: 2
+  auth0BaseUrl: replace_manually
+  signingSecret: replace_manually
+  postgresUrl: replace_manually
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
@@ -15,6 +21,8 @@ api:
     limits:
       cpu: 4
       memory: 12Gi
+
+
 socket:
   enabled: true
   containerPort: 1999
@@ -28,16 +36,22 @@ socket:
     limits:
       cpu: 4
       memory: 8Gi
+
+
 tiles:
   enabled: true
   containerPort: 8000
+  webConcurrency: 4
+  debug: false
+  mosaicBackends: sqlite:///
+  mosaicHost: /tmp/data/mosaics.db
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
   nodeSelector:
     enabled: true
-    label_key: agentpool
-    label_value: tiler
+    labelKey: agentpool
+    labelValue: tiler
   resources:
     requests:
       cpu: 400m
@@ -45,15 +59,6 @@ tiles:
     limits:
       cpu: 800m
       memory: 2Gi
-
-tilesScaler:
-  env:
-    backendPool: replace-with-service-backend-pool-identifier
-    tenantId: replace-with-tenant-id
-    subscriptionId: replace-with-subscription-id
-    resourceGroupName: replace-with-cluster-resource-group
-    activeDirectoryClientId: replace-with-client-id
-    activeDirectoryClientPassword: replace-with-client-secret
 
 redis:
   enabled: true
@@ -79,7 +84,7 @@ placeholder:
   # If false, uses the resource values from below.
   isGpu: true
   numGPUs: 2
-
+  
   resources:
     requests:
       cpu: 1500m
@@ -93,8 +98,8 @@ nginx:
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
-  env:
-    FRONTEND_DOMAIN: ''
+  frontendDomain: ''
+
 kubejanitor:
   image:
     repository: hjacobs/kube-janitor

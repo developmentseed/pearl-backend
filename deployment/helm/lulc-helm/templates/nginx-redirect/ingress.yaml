@@ -10,11 +10,11 @@ metadata:
 spec:
   tls:
     - hosts:
-      - {{ .Values.nginx.env.FRONTEND_DOMAIN }}
+      - {{ .Values.nginx.frontendDomain }}
       secretName: {{ template "lulc-helm.fullname" . }}-secret-nginx
 
   rules:
-  - host: {{ .Values.nginx.env.FRONTEND_DOMAIN }}
+  - host: {{ .Values.nginx.frontendDomain }}
     http:
       paths:
       - path: /

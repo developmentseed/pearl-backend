@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "You should not need to edit this, will use the image specified by the upstream chart. Change only if you wish to specify a custom image for this container."
+        },
+        "tag": {
+            "type": "string",
+            "description": "Tag for docker image. Again, this is specified by upstream. Change this only if you wish to use a custom image / tag combination."
+        }
+    }
+}
