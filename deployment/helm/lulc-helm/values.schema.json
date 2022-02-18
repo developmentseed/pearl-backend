@@ -144,8 +144,8 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
-                                    "description": "No of CPUs requested, eg. 4, or 4000m"
+                                    "type": "number",
+                                    "description": "No of CPUs requested, eg. 4"
                                 },
                                 "memory": {
                                     "type": "string",
@@ -157,7 +157,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
+                                    "type": "number",
                                     "description": "No of CPUs limit"
                                 },
                                 "memory": {
@@ -241,8 +241,8 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
-                                            "type": "string",
-                                            "description": "No of CPUs requested, eg. 4, or 4000m"
+                                            "type": "number",
+                                            "description": "No of CPUs requested, eg. 4"
                                         },
                                         "memory": {
                                             "type": "string",
@@ -254,7 +254,7 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
-                                            "type": "string",
+                                            "type": "number",
                                             "description": "No of CPUs limit"
                                         },
                                         "memory": {
@@ -284,8 +284,8 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
-                                    "description": "No of CPUs requested, eg. 4, or 4000m"
+                                    "type": "number",
+                                    "description": "No of CPUs requested, eg. 4"
                                 },
                                 "memory": {
                                     "type": "string",
@@ -297,7 +297,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
+                                    "type": "number",
                                     "description": "No of CPUs limit"
                                 },
                                 "memory": {
@@ -363,8 +363,8 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
-                                    "description": "No of CPUs requested, eg. 4, or 4000m"
+                                    "type": "number",
+                                    "description": "No of CPUs requested, eg. 4"
                                 },
                                 "memory": {
                                     "type": "string",
@@ -376,7 +376,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
+                                    "type": "number",
                                     "description": "No of CPUs limit"
                                 },
                                 "memory": {
