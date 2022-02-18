@@ -6,7 +6,8 @@
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
         "test": "tape test/**.test.js",
-        "lint": "eslint test/**.js"
+        "lint": "eslint test/**.js",
+        "generate-schema-doc": "pip3 install json-schema-for-humans && generate-schema-doc deployment/helm/lulc-helm/values.schema.json docs/index.html"
     },
     "devDependencies": {
         "cli-progress": "^3.9.0",
