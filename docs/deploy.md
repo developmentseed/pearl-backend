@@ -1,8 +1,9 @@
 ### Deployment and CI
+_This documentation is intended if you are managing the PEARL infrastructure. We assume you are using Azure for deployment_
 
-We deploy the services needed for `lulc-infra` onto an Azure Kubernetes Service Kubernetes cluster. The deployment is maanged by Terraform. Terraform creates necessary resources defined in the `deployment/terraform` directory. 
+We deploy the services needed for PEARL onto an Azure Kubernetes Service cluster. The deployment is managed by Terraform. Terraform creates necessary resources defined in the `deployment/terraform` directory. 
 
-We use [`chartpress`](https://github.com/jupyterhub/chartpress) to handle building, tagging and pushing our Docker images to the Azure Container Registry (ACR), and [`Helm`](https://helm.sh) to handle templating of our Kubernetes YAML templates and deploying onto the cluster. Chartpress is configured in the deployment scripts in `scripts/`. We use the Terraform helm provider to install necessary Helm charts. For example, see `deployment/resources/helm-keda.tf`.
+We use [`chartpress`](https://github.com/jupyterhub/chartpress) to handle building, tagging and publishing our Docker images to the Azure Container Registry (ACR), and [`Helm`](https://helm.sh) to handle templating of our Kubernetes YAML templates and deploying onto the cluster. Chartpress is configured in the deployment scripts in `scripts/`. We use the Terraform helm provider to install necessary Helm charts. For example, see `deployment/resources/helm-keda.tf`.
 
 We use Github Actions for CI, with the Workflow file building docker images that need to be built, pushing to ACR, and finally deploying onto the cluster. These scripts are:
 1. `scripts/cibuild`
