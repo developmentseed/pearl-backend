@@ -85,7 +85,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
+                                    "type": ["string", "number"],
                                     "description": "No of CPUs requested, eg. 4, or 4000m"
                                 },
                                 "memory": {
@@ -98,7 +98,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "string",
+                                    "type": ["string", "number"],
                                     "description": "No of CPUs limit"
                                 },
                                 "memory": {
@@ -144,7 +144,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "number",
+                                    "type": ["number", "string"],
                                     "description": "No of CPUs requested, eg. 4"
                                 },
                                 "memory": {
@@ -157,7 +157,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "number",
+                                    "type": ["number", "string"],
                                     "description": "No of CPUs limit"
                                 },
                                 "memory": {
@@ -241,7 +241,7 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
-                                            "type": "number",
+                                            "type": ["number", "string"],
                                             "description": "No of CPUs requested, eg. 4"
                                         },
                                         "memory": {
@@ -254,7 +254,7 @@
                                     "type": "object",
                                     "properties": {
                                         "cpu": {
-                                            "type": "number",
+                                            "type": ["number", "string"],
                                             "description": "No of CPUs limit"
                                         },
                                         "memory": {
@@ -284,7 +284,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "number",
+                                    "type": ["number", "string"],
                                     "description": "No of CPUs requested, eg. 4"
                                 },
                                 "memory": {
@@ -297,7 +297,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "number",
+                                    "type": ["number", "string"],
                                     "description": "No of CPUs limit"
                                 },
                                 "memory": {
@@ -363,7 +363,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "number",
+                                    "type": ["number", "string"],
                                     "description": "No of CPUs requested, eg. 4"
                                 },
                                 "memory": {
@@ -376,7 +376,7 @@
                             "type": "object",
                             "properties": {
                                 "cpu": {
-                                    "type": "number",
+                                    "type": ["number", "string"],
                                     "description": "No of CPUs limit"
                                 },
                                 "memory": {
