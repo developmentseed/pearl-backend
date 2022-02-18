@@ -1,6 +1,6 @@
 <h1 align=center>PEARL API & Infrastructure</h1>
 
-PEARL is a landcover mapping platform that uses human in the loop machine learning approach. This repository contains the API and infrastructure to run the platform.
+PEARL is a landcover mapping platform that uses human in the loop machine learning approach. This repository contains the API and infrastructure to run the platform. The frontend is maintained at [pearl-frontend](https://github.com/developmentseed/pearl-frontend/).
 ## Overview
 PEARL infrastructure uses Kubernetes to manage resources and provide on-demand GPU support. The following is a high-level architecture. A websocket router manages available GPU/CPU and allocates them to clients.
 
