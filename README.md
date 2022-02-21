@@ -4,7 +4,8 @@ PEARL is a landcover mapping platform that uses human in the loop machine learni
 ## Overview
 PEARL infrastructure uses Kubernetes to manage resources and provide on-demand GPU support. The following is a high-level architecture. A websocket router manages available GPU/CPU and allocates them to clients.
 
-![Diagram](./docs/dia.jpeg)
+![pearl backend](https://user-images.githubusercontent.com/371666/154953888-3410f5de-7355-4d9f-ac8a-ca42f9879496.jpg)
+
 
 ## Development
 
