@@ -1,6 +1,6 @@
 environment: dev
-domain: lulc.ds.io
-adminEmail: sanjay@developmentseed.org
+domain: pearl.example.com
+adminEmail: admin@example.com
 
 api:
   enabled: true

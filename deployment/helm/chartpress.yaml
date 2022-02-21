@@ -1,5 +1,5 @@
 charts:
-  - name: lulc-helm
+  - name: pearl-helm
     imagePrefix: lulcterraformacr.azurecr.io/lulc-
     repo:
        git: developmentseed/pearl-helm-chart
