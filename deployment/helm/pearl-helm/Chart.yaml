@@ -1,4 +1,4 @@
 apiVersion: v1
 description: "Helm Chart to deploy the Pearl Infrastructure"
 name: pearl-helm
-version: 0.0.6-chartpress.replace
+version: 0.0.7-chartpress.replace
