@@ -20,6 +20,10 @@
             "type": "string",
             "description": "Email address for cluster admin. Currently used only as the email address for Lets Encrypt when issuing SSL certificates."
         },
+        "nameOverride": {
+            "type": "string",
+            "description": "overrides the default name prefix for helm resources: defaults to using the chart name, i.e. pearl-helm."
+        },
         "api": {
             "type": "object",
             "required": [

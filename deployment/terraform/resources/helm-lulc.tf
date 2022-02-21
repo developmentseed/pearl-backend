@@ -100,4 +100,9 @@ resource "helm_release" "lulc" {
     value = var.frontend_domain
   }
  
+  set {
+    name = "nameOverride"
+    value = "lulc-helm"
+  }
+  
 }
