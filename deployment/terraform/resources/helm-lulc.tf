@@ -1,6 +1,6 @@
 resource "helm_release" "lulc" {
   name  = "lulc-helm"
-  chart = "../../helm/lulc-helm"
+  chart = "../../helm/pearl-helm"
   wait = false
   depends_on = [
     helm_release.lulc-ingress-nginx,
