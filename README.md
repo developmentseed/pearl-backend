@@ -8,7 +8,7 @@ PEARL infrastructure uses Kubernetes to manage resources and provide on-demand G
 
 ![pearl backend](https://user-images.githubusercontent.com/371666/154953888-3410f5de-7355-4d9f-ac8a-ca42f9879496.jpg)
 
-This repository contains code for the `api`, `gpu`, `socket` and `tiles` services in the [`services`](services/) directory. Code to deploy all the services and infrastructure on Azure can be found in the [`deployment`](deployment/). This includes terraform resource definitions in [`deployment/terraform`](deployment/terraform) and a Helm chart in [`deployment/helm`](deployment/helm/). The Helm chart is published separately at https://devseed.com/pearl-helm-chart and instructions for using the helm chart can be found [here](deployment/helm/pearl-helm/README.md).
+This repository contains code for the `api`, `gpu`, `socket` and `tiles` services in the [`services`](services/) directory. Code to deploy all the services and infrastructure on Azure can be found in the [`deployment`](deployment/) directory. We have also included terraform resource definitions in [`deployment/terraform`](deployment/terraform) and a Helm chart in [`deployment/helm`](deployment/helm/). The Helm chart is published separately at https://devseed.com/pearl-helm-chart and instructions for using the helm chart can be found [here](deployment/helm/pearl-helm/README.md).
 
 ## Development
 
