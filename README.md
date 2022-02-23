@@ -42,3 +42,6 @@ Note: This has currently been tested using AKS on Azure, but should ideally work
 ## Debugging and Logs
 
 Instructions for accessing the Grafana UI to inspect application logs can be found [here](docs/logs.md)
+
+## LICENSE
+[MIT](/LICENSE.md)
