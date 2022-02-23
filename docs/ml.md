@@ -3,7 +3,7 @@
 PEARL's Machine Learning pipeline was orginally developed by Microsoft researcher's Caleb Robinson, Nebojsa Jojic and Kolya Malkin. Development Seed team expanded on this foundation to improve the pipeline and training data management. We are working on making the ML pipeline and training scripts open shortly.
 
 ## Training data
-We worked closely with University of Vermont Spatial Analysis Laboratory and have used a variety of regional datasets for the models that currently availbale on PEARL. The east coast model uses training data from Chespeake Conservancy.
+We worked closely with University of Vermont Spatial Analysis Laboratory and have used a variety of regional datasets for the models that currently available on PEARL. The east coast model uses training data from Chespeake Conservancy.
 
 The LULC data from these sources are first aligned with NAIP imagery tiles or when they are vectors we rasterize before aligning for every AOI. Finally tiled labels are produced for training.
 
