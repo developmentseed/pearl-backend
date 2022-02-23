@@ -1,5 +1,7 @@
 <h1 align=center>PEARL API & Infrastructure</h1>
 
+<img width="1161" alt="image" src="https://user-images.githubusercontent.com/371666/155303281-fafe417e-3e66-46c2-8a1d-20b9d25b89cd.png">
+
 PEARL is a landcover mapping platform that uses human in the loop machine learning approach. This repository contains the API and infrastructure to run the platform. The frontend is maintained at [pearl-frontend](https://github.com/developmentseed/pearl-frontend/).
 
 ## Overview
