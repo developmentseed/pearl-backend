@@ -34,7 +34,7 @@ class Worker {
 
             this.worker = CP.spawn('docker', [
                 'run',
-                '--network', 'lulc-infra_default',
+                '--network', 'pearl-backend_default',
                 '--env', `INSTANCE_ID=${this.opts.instance}`,
                 '--env', `API=${this.opts.api}`,
                 '--env', `SOCKET=${this.opts.socket}`,
