@@ -16,10 +16,10 @@ api:
     tag: 'chartpress_replace'
   resources:
     requests:
-      cpu: 1
+      cpu: "1"
       memory: 4Gi
     limits:
-      cpu: 4
+      cpu: "4"
       memory: 12Gi
 
 
@@ -34,7 +34,7 @@ socket:
       cpu: 1200m
       memory: 4Gi
     limits:
-      cpu: 4
+      cpu: "4"
       memory: 8Gi
 
 
@@ -67,7 +67,7 @@ redis:
       cpu: 1200m
       memory: 4Gi
     limits:
-      cpu: 4
+      cpu: "4"
       memory: 8Gi
 
 gpu:
