@@ -5,12 +5,6 @@ resource "azurerm_kubernetes_cluster" "lulc" {
   dns_prefix          = "${local.prefix}-cluster"
   kubernetes_version  = "1.20.13"
 
-  addon_profile {
-    kube_dashboard {
-      enabled = false
-    }
-  }
-
   default_node_pool {
     name           = "nodepool1"
     vm_size        = "Standard_DS2_v2"
