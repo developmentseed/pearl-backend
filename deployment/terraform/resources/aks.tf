@@ -1,9 +1,6 @@
 resource "azurerm_kubernetes_cluster" "lulc" {
   lifecycle {
-    ignore_changes = [
-      # Ignore changes to cluster updates
-      all,
-    ]
+    ignore_changes = all
   }
   name                = "${local.prefix}-cluster"
   location            = azurerm_resource_group.lulc.location
