@@ -70,10 +70,48 @@
                     "description": "Postgres URL to access Postgres instance. This would typically be the URL provided by your managed postgres instance. Should include username and password. Example: postgres://user:pass@rds.example.com:5432/lulcdb"
                 },
                 "image": {
-                    "$ref": "file://./schema-util/image.json"
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "You should not need to edit this, will use the image specified by the upstream chart. Change only if you wish to specify a custom image for this container."
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "Tag for docker image. Again, this is specified by upstream. Change this only if you wish to use a custom image / tag combination."
+                        }
+                    }
                 },
                 "resources": {
-                    "$ref": "file://./schema-util/resources.json"
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "description": "No of CPUs requested, eg. 4, or 4000m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "RAM requested - eg. 4Gi"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["string", "number"],
+                                    "description": "No of CPUs limit"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -91,11 +129,49 @@
                     "default": 1999
                 },
                 "image": {
-                    "$ref": "file://./schema-util/image.json"
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "You should not need to edit this, will use the image specified by the upstream chart. Change only if you wish to specify a custom image for this container."
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "Tag for docker image. Again, this is specified by upstream. Change this only if you wish to use a custom image / tag combination."
+                        }
+                    }
                 },
                 "resources": {
-                    "$ref": "file://./schema-util/resources.json"
-                }
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["number", "string"],
+                                    "description": "No of CPUs requested, eg. 4"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "RAM requested - eg. 4Gi"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["number", "string"],
+                                    "description": "No of CPUs limit"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit"
+                                }
+                            }
+                        }
+                    }
+                }                
             }
         },
         "tiles": {
@@ -150,11 +226,49 @@
                             "default": "tiler"
                         },
                         "image": {
-                            "$ref": "file://./schema-util/image.json"
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "You should not need to edit this, will use the image specified by the upstream chart. Change only if you wish to specify a custom image for this container."
+                                },
+                                "tag": {
+                                    "type": "string",
+                                    "description": "Tag for docker image. Again, this is specified by upstream. Change this only if you wish to use a custom image / tag combination."
+                                }
+                            }
                         },
                         "resources": {
-                            "$ref": "file://./schema-util/resources.json"
-                        }                      
+                            "type": "object",
+                            "properties": {
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": ["number", "string"],
+                                            "description": "No of CPUs requested, eg. 4"
+                                        },
+                                        "memory": {
+                                            "type": "string",
+                                            "description": "RAM requested - eg. 4Gi"
+                                        }
+                                    }
+                                },
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": ["number", "string"],
+                                            "description": "No of CPUs limit"
+                                        },
+                                        "memory": {
+                                            "type": "string",
+                                            "description": "Memory limit"
+                                        }
+                                    }
+                                }
+                            }
+                        }                       
                     }
                 }
             }
@@ -168,7 +282,35 @@
                     "description": "Enable Redis container, used by API to maintain a cache. Is required by the API, so set to false only for debugging purposes."
                 },
                 "resources": {
-                    "$ref": "file://./schema-util/resources.json"
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["number", "string"],
+                                    "description": "No of CPUs requested, eg. 4"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "RAM requested - eg. 4Gi"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["number", "string"],
+                                    "description": "No of CPUs limit"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -176,7 +318,17 @@
             "type": "object",
             "properties": {
                 "image": {
-                    "$ref": "file://./schema-util/image.json"
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "You should not need to edit this, will use the image specified by the upstream chart. Change only if you wish to specify a custom image for this container."
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "Tag for docker image. Again, this is specified by upstream. Change this only if you wish to use a custom image / tag combination."
+                        }
+                    }
                 }
             }
         },
@@ -209,7 +361,35 @@
                     "description": "Number of GPUs per instance in your cluster. Used to define size of the placeholder container."
                 },
                 "resources": {
-                    "$ref": "file://./schema-util/resources.json"
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["number", "string"],
+                                    "description": "No of CPUs requested, eg. 4"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "RAM requested - eg. 4Gi"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": ["number", "string"],
+                                    "description": "No of CPUs limit"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -226,7 +406,17 @@
                     "description": "Frontend domain, to redirect to www. - eg: example.com"
                 },
                 "image": {
-                    "$ref": "file://./schema-util/image.json"
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "You should not need to edit this, will use the image specified by the upstream chart. Change only if you wish to specify a custom image for this container."
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "Tag for docker image. Again, this is specified by upstream. Change this only if you wish to use a custom image / tag combination."
+                        }
+                    }
                 }
             }
         },
