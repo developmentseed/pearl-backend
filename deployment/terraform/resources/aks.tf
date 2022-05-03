@@ -4,6 +4,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
   resource_group_name = azurerm_resource_group.lulc.name
   dns_prefix          = "${local.prefix}-cluster"
   kubernetes_version  = "1.20.13"
+  role_based_access_control_enabled = false
 
   default_node_pool {
     name           = "nodepool1"
