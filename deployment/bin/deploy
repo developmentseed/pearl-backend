@@ -106,7 +106,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         terraform apply -target=module.resources.azurerm_kubernetes_cluster.lulc -auto-approve
 
         terraform plan
-        terraform apply -auto-aprove
+        terraform apply -auto-approve
     fi
 
 fi
