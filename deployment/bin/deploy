@@ -106,7 +106,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         terraform apply -auto-approve
 
         terraform plan
-        terraform apply -auto--aprove
+        terraform apply -auto-aprove
     fi
 
 fi
