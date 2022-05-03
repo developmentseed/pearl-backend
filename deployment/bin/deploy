@@ -91,6 +91,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         echo "Deploying infrastructure with Terraform..."
         terraform init
 
+
         if [ "${PLAN_ONLY}" ]; then
             terraform plan
             exit 0
@@ -101,7 +102,11 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             exit 0
         fi
 
+        terraform plan -target=module.resources.azurerm_kubernetes_cluster.lulc
         terraform apply -auto-approve
+
+        terraform plan
+        terraform apply -auto--aprove
     fi
 
 fi
