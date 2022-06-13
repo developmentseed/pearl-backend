@@ -12,6 +12,7 @@ const CP = require('child_process');
  * @param {String} [opts.socket='ws://socket:1999'] Socket to connect to
  * @param {String} [opts.api='http://api:2000'] API to connect to
  * @param {String} [opts.tiler='http://tiler:8000'] TiTiler to connect to
+ * @param {String} [opts.pctiler='https://planetarycomputer-staging.microsoft.com'] PlanetaryComputer tiler to connect to
  */
 class Worker {
     constructor(test, opts = {}) {
@@ -19,6 +20,7 @@ class Worker {
         if (!opts.socket) opts.socket = 'ws://socket:1999';
         if (!opts.api) opts.api = 'http://api:2000';
         if (!opts.tiler) opts.tiler = 'http://tiler:8000';
+        if (!opts.pctiler) opts.pctiler = 'https://planetarycomputer-staging.microsoft.com';
 
         this.test = test;
         this.opts = opts;
@@ -39,6 +41,7 @@ class Worker {
                 '--env', `API=${this.opts.api}`,
                 '--env', `SOCKET=${this.opts.socket}`,
                 '--env', `TileUrl=${this.opts.tiler}`,
+                '--env', `PcTileUrl=${this.opts.pctiler}`,
                 'gpu'
             ]);
 
