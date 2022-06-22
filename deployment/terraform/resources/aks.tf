@@ -31,7 +31,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
 resource "azurerm_kubernetes_cluster_node_pool" "tiler" {
   name                  = "tiler"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
-  vm_size               = "Standard_F4s_v2"
+  vm_size               = "Standard_DS2_v2"
   vnet_subnet_id = azurerm_subnet.aks.id
   enable_auto_scaling   = true
   min_count             = 0
