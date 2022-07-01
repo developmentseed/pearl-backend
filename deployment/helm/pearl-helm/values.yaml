@@ -4,7 +4,7 @@ adminEmail: admin@example.com
 
 api:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
   containerPort: 2000
   gpuCount: 0
   cpuCount: 2
