@@ -58,7 +58,8 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
 
         # Run deployment script
         ${DOCKER_COMPOSE} run --rm \
-            deploy bin/deploy --destroy --force \
-            -t "${TERRAFORM_DIR}"
+            deploy bin/deploy --destroy \
+            -t "${TERRAFORM_DIR}" \
+            --auto-approve
     )
 fi
