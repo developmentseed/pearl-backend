@@ -51,19 +51,21 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.CHART_PUBLISH_TOKEN }}
 
-    - name: Deploy -- Dev
-      env:
-        postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
-        auth0BaseUrl: ${{ secrets.STAGING_AUTH0_ISSUER_BASE_URL }}
-      if: startsWith(github.event.head_commit.message, '[deploy]')
-      run: ./scripts/cideploy --dev
+    # Uncomment this section to create a dev stack
+    # - name: Deploy -- Dev
+    #   env:
+    #     postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
+    #     auth0BaseUrl: ${{ secrets.STAGING_AUTH0_ISSUER_BASE_URL }}
+    #   if: startsWith(github.event.head_commit.message, '[deploy]')
+    #   run: ./scripts/cideploy --dev
 
-    - name: Deploy -- Staging
-      env:
-        postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
-        auth0BaseUrl: ${{ secrets.STAGING_AUTH0_ISSUER_BASE_URL }}
-      if: github.ref == 'refs/heads/develop'
-      run: ./scripts/cideploy --staging
+    # Uncomment this section to create a staging stack
+    # - name: Deploy -- Staging
+    #   env:
+    #     postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
+    #     auth0BaseUrl: ${{ secrets.STAGING_AUTH0_ISSUER_BASE_URL }}
+    #   if: github.ref == 'refs/heads/develop'
+    #   run: ./scripts/cideploy --staging
 
     - name: Deploy -- Production
       env:
