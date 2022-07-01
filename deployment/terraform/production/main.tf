@@ -37,7 +37,7 @@ module "resources" {
 
   placeholder_node_selector_name = "cpunodepool"
 
-  gpu_count = 4
+  gpu_count = 0
 
   nginx_enabled = true
   frontend_domain = "landcover.io"
