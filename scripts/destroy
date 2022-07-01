@@ -22,6 +22,10 @@ while [[ "$#" > 0 ]]; do case $1 in
         DEV_DEPLOY=1
         shift
         ;;
+    --staging)
+        STAGING_DEPLOY=1
+        shift
+        ;;
     --help)
         usage
         exit 0
@@ -39,8 +43,10 @@ DOCKER_COMPOSE="docker-compose -f deployment/docker-compose.yml"
 # Set terraform to deploy to dev or staging
 if [ "${DEV_DEPLOY}" = "1" ]; then
     TERRAFORM_DIR=/opt/src/terraform/dev
+elif [ "${STAGING_DEPLOY}" = "1" ]; then
+    TERRAFORM_DIR=/opt/src/terraform/staging
 else
-    echo "Can't destroy any other stack than dev!"
+    echo "Can't destroy any other stack than staging or dev!"
     exit 1
 fi
 

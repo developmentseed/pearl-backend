@@ -56,7 +56,7 @@ jobs:
         postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
         auth0BaseUrl: ${{ secrets.STAGING_AUTH0_ISSUER_BASE_URL }}
       if: startsWith(github.event.head_commit.message, '[deploy]')
-      run: ./scripts/cideploy --dev
+      run: ./scripts/destroy --dev
 
     - name: Deploy -- Staging
       env:
