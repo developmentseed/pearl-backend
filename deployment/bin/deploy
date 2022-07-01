@@ -97,7 +97,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         fi
 
         if [ "${DESTROY}" ]; then
-            terraform destroy
+            terraform destroy --auto-approve
             exit 0
         fi
 
