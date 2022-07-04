@@ -64,11 +64,11 @@ redis:
   enabled: true
   resources:
     requests:
-      cpu: 1200m
-      memory: 4Gi
+      cpu: "0.3"
+      memory: 600Mi
     limits:
-      cpu: "4"
-      memory: 8Gi
+      cpu: "0.3"
+      memory: 600Mi
 
 gpu:
   image:
