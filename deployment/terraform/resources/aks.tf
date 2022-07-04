@@ -12,7 +12,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
     name           = "nodepool1"
     vm_size        = "Standard_DS2_v2"
     vnet_subnet_id = azurerm_subnet.aks.id
-    enable_auto_scaling   = false
+    enable_auto_scaling   = true
     min_count             = 1
     max_count             = 1
   }
@@ -33,7 +33,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "tiler" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
   vm_size               = "Standard_DS2_v2"
   vnet_subnet_id = azurerm_subnet.aks.id
-  enable_auto_scaling   = false
+  enable_auto_scaling   = true
   min_count             = 0
   max_count             = 1
 
@@ -49,7 +49,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "cpunodepool" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
   vm_size               = "Standard_DS2_v2"
   vnet_subnet_id = azurerm_subnet.aks.id
-  enable_auto_scaling   = false
+  enable_auto_scaling   = true
   min_count             = 0
   max_count             = 1
   tags = {
@@ -64,7 +64,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "gpunodepool" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
   vm_size               = "Standard_NC12"
   vnet_subnet_id = azurerm_subnet.aks.id
-  enable_auto_scaling   = false
+  enable_auto_scaling   = true
   min_count             = 0
   max_count             = 2
   tags = {
