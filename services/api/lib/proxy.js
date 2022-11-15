@@ -1,11 +1,11 @@
-const request = require('request');
-const { promisify } = require('util');
-const arequest = promisify(request);
+import request from 'request';
+import { promisify } from 'util';
+import arequest = promisify(request;
 
 /**
  * @class Proxy
  */
-class Proxy {
+export default class Proxy {
     /**
      * Proxy a request to the TiTiler
      *
@@ -54,5 +54,3 @@ class Proxy {
 
     }
 }
-
-module.exports = Proxy;

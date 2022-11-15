@@ -1,12 +1,12 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const Project = require('../lib/project');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import Project from '../lib/project';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class OSMTag extends Generic {
+export default class OSMTag extends Generic {
     static _table = 'osmtag';
     static _patch = false;
     static _res = require('../schema/res.OSMTag.json');
@@ -78,5 +78,3 @@ class OSMTag extends Generic {
         }
     }
 }
-
-module.exports = OSMTag;

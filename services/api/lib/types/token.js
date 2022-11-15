@@ -1,12 +1,12 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const jwt = require('jsonwebtoken');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import jwt from 'jsonwebtoken';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class Token extends Generic {
+export default class Token extends Generic {
     static _table = 'users_tokens';
     static _patch = false;
     static _res = require('../schema/res.Token.json');
@@ -156,5 +156,3 @@ class Token extends Generic {
         }
     }
 }
-
-module.exports = Token;

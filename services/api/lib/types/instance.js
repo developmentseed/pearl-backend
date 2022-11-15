@@ -1,14 +1,14 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const Project = require('./project');
-const jwt = require('jsonwebtoken');
-const Kube = require('./kube');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import Project from './project';
+import jwt from 'jsonwebtoken';
+import Kube from './kube';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class Instance extends Generic {
+export default class Instance extends Generic {
     static _table = 'instances';
     static _patch = require('../schema/req.body.PatchInstance.json');
     static _res = require('../schema/res.Instance.json');
@@ -321,5 +321,3 @@ class Instance extends Generic {
         return true;
     }
 }
-
-module.exports = Instance;

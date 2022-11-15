@@ -1,11 +1,11 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class Project extends Generic {
+export default class Project extends Generic {
     static _table = 'projects';
     static _patch = require('../schema/req.body.PatchProject.json');
     static _res = require('../schema/res.Project.json');
@@ -187,5 +187,3 @@ class Project extends Generic {
         return {};
     }
 }
-
-module.exports = Project;

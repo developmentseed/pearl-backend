@@ -8,7 +8,7 @@
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
         "doc": "apidoc -i ./ -f ./routes/ -f index.js -e node_modules --private",
-        "lint": "eslint index.js lib/**.js routes/**.js test/**.js",
+        "lint": "eslint index.js lib/*.js lib/types/*.js routes/**.js test/**.js",
         "prod": "node --trace-warnings ./index.js --prod",
         "dev": "nodemon ./index.js",
         "test": "./test/runner"

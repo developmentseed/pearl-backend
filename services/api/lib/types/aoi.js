@@ -1,13 +1,13 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const Project = require('./project');
-const Storage = require('./storage');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import Project from './project';
+import Storage from './storage';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class AOI extends Generic {
+export default class AOI extends Generic {
     static _table = 'aois';
     static _res = require('../schema/res.AOI.json');
     static _patch = require('../schema/req.body.PatchAOI.json');
@@ -314,5 +314,3 @@ class AOI extends Generic {
         return this.deserialize(pgres.rows[0]);
     }
 }
-
-module.exports = AOI;

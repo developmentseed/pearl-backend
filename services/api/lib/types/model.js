@@ -1,14 +1,14 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const Storage = require('./storage');
-const poly = require('@turf/bbox-polygon').default;
-const bbox = require('@turf/bbox').default;
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import Storage from './storage';
+import poly from '@turf/bbox-polygon';
+import bbox from '@turf/bbox';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class Model extends Generic {
+export default class Model extends Generic {
     static _table = 'models';
     static _res = require('../schema/res.Model.json');
     static _patch = require('../schema/req.body.PatchModel.json');
@@ -242,5 +242,3 @@ class Model extends Generic {
         return this;
     }
 }
-
-module.exports = Model;

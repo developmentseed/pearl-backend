@@ -1,7 +1,7 @@
 /**
  * @class
  */
-class Mosaic {
+export default class Mosaic {
     static list() {
         return {
             mosaics: [
@@ -10,5 +10,3 @@ class Mosaic {
         };
     }
 }
-
-module.exports = Mosaic;

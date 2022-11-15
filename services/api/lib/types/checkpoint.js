@@ -1,13 +1,13 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const Project = require('./project');
-const Storage = require('./storage');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import Project from './project';
+import Storage from './storage';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class CheckPoint extends Generic {
+export default class CheckPoint extends Generic {
     static _table = 'checkpoints';
     static _res = require('../schema/res.Checkpoint.json');
     static _patch = require('../schema/req.body.PatchCheckpoint.json');
@@ -369,5 +369,3 @@ class CheckPoint extends Generic {
         return pgres.rows[0].mvt;
     }
 }
-
-module.exports = CheckPoint;

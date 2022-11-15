@@ -1,12 +1,12 @@
-const { Err } = require('@openaddresses/batch-schema');
-const Generic = require('@openaddresses/batch-generic');
-const Storage = require('./storage');
-const { sql } = require('slonik');
+import { Err } from '@openaddresses/batch-schema';
+import Generic from '@openaddresses/batch-generic';
+import Storage from './storage';
+import { sql } from 'slonik';
 
 /**
  * @class
  */
-class AOIShare extends Generic {
+export default class AOIShare extends Generic {
     static _table = 'aois_share';
     static _patch = require('../schema/req.body.PatchShare.json');
     static _res = require('../schema/res.Share.json');
@@ -225,5 +225,3 @@ class AOIShare extends Generic {
         return this.deserialize(pgres.rows[0]);
     }
 }
-
-module.exports = AOIShare;
