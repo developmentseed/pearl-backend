@@ -1,6 +1,6 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
-import Storage from './storage';
+import Storage from '../storage.js';
 import { sql } from 'slonik';
 
 /**

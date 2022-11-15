@@ -2,10 +2,11 @@ FROM tiangolo/uvicorn-gunicorn:python3.8
 
 WORKDIR /tmp
 
+
 COPY dynamic_tiler/ dynamic_tiler/
 COPY setup.py setup.py
 
-RUN pip install . rasterio==1.1.8 --no-cache-dir
+RUN pip install . rasterio==1.1.8 markupsafe==2.0.1 --no-cache-dir
 
 RUN rm -rf dynamic_tiler setup.py
 

@@ -51,7 +51,10 @@ spec:
               memory: {{ .Values.socket.resources.limits.memory }}
           env:
             - name: SigningSecret
-              value: {{ .Values.api.env.SigningSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lulc-helm.fullname" . }}-api-secret
+                  key: SigningSecret
             - name: API
               value: https://api.{{ .Values.domain }}
 

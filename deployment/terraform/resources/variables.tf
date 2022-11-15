@@ -48,6 +48,11 @@ variable "tiles_host" {
   default = "/tmp/data/mosaics.db"
 }
 
+variable "pc_tileurl" {
+  type = string
+  default = "https://planetarycomputer.microsoft.com"
+}
+
 variable "tiles_webconcurrency" {
   type = string
   default = "1"

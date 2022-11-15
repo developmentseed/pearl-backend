@@ -30,6 +30,6 @@ spec:
               protocol: TCP
           env:
             - name: FRONTEND_DOMAIN
-              value: {{ .Values.nginx.env.FRONTEND_DOMAIN }}
+              value: {{ .Values.nginx.frontendDomain }}
 
 {{- end }}

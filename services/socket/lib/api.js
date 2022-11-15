@@ -1,9 +1,10 @@
+'use strict';
 const { promisify } = require('util');
 const request = promisify(require('request'));
 const jwt = require('jsonwebtoken');
 
 /**
- * @class API
+ * @class
  */
 class API {
     constructor(base, SigningSecret) {

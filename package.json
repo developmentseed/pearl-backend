@@ -1,18 +1,15 @@
 {
     "name": "lulc",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "private": true,
     "repository": "git@github.com:developmentseed/lulc-infra",
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
         "test": "tape test/**.test.js",
-        "lint": "eslint test/**.js"
+        "lint": "eslint test/**.js",
+        "generate-schema-doc": "pip3 install json-schema-for-humans && generate-schema-doc deployment/helm/lulc-helm/values.schema.json docs/index.html"
     },
     "devDependencies": {
-        "@babel/eslint-parser": "^7.15.0",
-        "@babel/eslint-plugin": "^7.14.5",
-        "@babel/plugin-syntax-class-properties": "^7.12.13",
-        "@babel/preset-env": "^7.15.0",
         "cli-progress": "^3.9.0",
         "eslint": "^8.0.1",
         "eslint-plugin-node": "^11.1.0",

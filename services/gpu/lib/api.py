@@ -25,6 +25,18 @@ LOGGER = logging.getLogger("server")
 tiler = tileschemes.WebMercator()
 
 
+AVAILABLE_MOSAICS = {
+    'naip.latest': {
+        'id': '87b72c66331e136e088004fba817e3e8',
+        'default_params': {
+            'assets': 'image',
+            'asset_bidx': 'image|1,2,3,4',
+            'collection': 'naip',
+        }
+    }
+}
+
+
 class API:
     def __init__(self, url, instance_id):
         self.url = url
@@ -379,10 +391,13 @@ class API:
         return r.json()
 
     def get_tilejson(self):
-        url = os.environ["TileUrl"] + "/mosaic/" + self.mosaic_id + "/tilejson.json"
+        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
+        searchid = _mosaic["id"]
+        params = _mosaic.get("default_params", {})
+        url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/{searchid}/tilejson.json"
 
         LOGGER.info("ok - GET " + url)
-        r = self.requests.get(url)
+        r = self.requests.get(url, params=params)
 
         r.raise_for_status()
 
@@ -390,11 +405,17 @@ class API:
         return r.json()
 
     def get_tile(self, z, x, y, iformat="npy", buffer=32, cache=True):
-        url = os.environ[
-            "TileUrl"
-        ] + "/mosaic/{}/tiles/{}/{}/{}.{}?buffer={}&return_mask=False".format(
-            self.mosaic_id, z, x, y, iformat, buffer
+        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
+        searchid = _mosaic["id"]
+        params = _mosaic.get("default_params", {})
+        params.update(
+            {
+                'return_mask': False,
+                'buffer': buffer,
+            }
         )
+
+        url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
 
         if iformat == "npy":
             tmpfs = "{}/tiles/{}-{}-{}.{}".format(self.tmp_dir, x, y, z, iformat)
@@ -402,7 +423,7 @@ class API:
 
             if not cache or not os.path.isfile(tmpfs):
                 LOGGER.info("ok - GET " + url)
-                r = self.requests.get(url)
+                r = self.requests.get(url, params=params)
 
                 r.raise_for_status()
                 LOGGER.info("ok - Received " + url)
@@ -427,9 +448,7 @@ class API:
             return memraster
         else:
             LOGGER.info("ok - GET " + url)
-            r = self.requests.get(
-                url, headers={"authorization": "Bearer " + self.token}
-            )
+            r = self.requests.get(url, params=params)
 
             r.raise_for_status()
             LOGGER.info("ok - Received " + url)

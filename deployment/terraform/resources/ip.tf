@@ -1,4 +1,7 @@
 resource "azurerm_public_ip" "lulc" {
+  lifecycle {
+    ignore_changes = all
+  }
   name                = "${local.prefix}PublicIP"
   resource_group_name = azurerm_resource_group.lulc.name
   location            = azurerm_resource_group.lulc.location

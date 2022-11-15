@@ -1,8 +1,8 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
-import Project from './project';
+import Project from './project.js';
 import jwt from 'jsonwebtoken';
-import Kube from './kube';
+import Kube from '../kube.js';
 import { sql } from 'slonik';
 
 /**
@@ -185,6 +185,10 @@ export default class Instance extends Generic {
                 },{
                     name: 'TileUrl',
                     value: config.TileUrl
+                },
+                {
+                    name: 'PcTileUrl',
+                    value: config.PcTileUrl
                 }]);
 
                 pod = await kube.createPod(podSpec);

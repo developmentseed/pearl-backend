@@ -1,5 +1,6 @@
+'use strict';
 /**
- * @class Timeout
+ * @class
  */
 class Timeout {
     constructor(config, pool) {

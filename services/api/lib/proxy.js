@@ -1,6 +1,6 @@
 import request from 'request';
 import { promisify } from 'util';
-import arequest = promisify(request;
+const arequest = promisify(request);
 
 /**
  * @class Proxy

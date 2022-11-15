@@ -31,6 +31,7 @@ export default class Config {
         config.Postgres = process.env.Postgres || 'postgres://postgres@localhost:5432/lulc';
 
         config.TileUrl = process.env.TileUrl || args.tileurl || false;
+        config.PcTileUrl = process.env.PcTileUrl || args.pctileurl || false;
 
         config.Port = args.port || 2000;
 

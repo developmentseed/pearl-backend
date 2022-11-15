@@ -1,0 +1,31 @@
+{
+    "type": "object",
+    "properties": {
+        "requests": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "string",
+                    "description": "No of CPUs requested, eg. 4, or 4000m"
+                },
+                "memory": {
+                    "type": "string",
+                    "description": "RAM requested - eg. 4Gi"
+                }
+            }
+        },
+        "limits": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "string",
+                    "description": "No of CPUs limit"
+                },
+                "memory": {
+                    "type": "string",
+                    "description": "Memory limit"
+                }
+            }
+        }
+    }
+}
