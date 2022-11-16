@@ -1,5 +1,5 @@
 import test from 'tape';
-import { Kube } from '../lib/kube.js';
+import Kube from '../lib/kube.js';
 import Flight from './flight.js';
 
 const flight = new Flight();
