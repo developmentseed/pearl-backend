@@ -87,8 +87,7 @@ export default async function router(schema, config) {
                 model.osmtag_id = tagmap.id;
             }
 
-            model.patch(req.body);
-            await model.commit(config.pool);
+            await model.commit(config.pool, req.body);
 
             res.json(model.serialize());
         } catch (err) {

@@ -132,8 +132,7 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
-            proj.patch(req.body);
-            await proj.commit(config.pool);
+            await proj.commit(config.pool, req.body);
 
             return res.json(proj.serialize());
         } catch (err) {

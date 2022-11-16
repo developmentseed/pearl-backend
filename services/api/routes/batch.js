@@ -137,8 +137,7 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
-            batch.patch(req.body);
-            await batch.commit(config.pool);
+            await batch.commit(config.pool, req.body);
 
             return res.json(batch.serialize());
         } catch (err) {

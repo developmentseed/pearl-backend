@@ -370,8 +370,7 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
-            checkpoint.patch(req.body);
-            await checkpoint.commit(config.pool);
+            await checkpoint.commit(config.pool, req.body);
 
             return res.json(checkpoint.serialize());
         } catch (err) {
