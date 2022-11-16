@@ -1,6 +1,5 @@
-
-const pkg = require('../package.json');
-const test = require('tape');
+import pkg from '../package.json';
+import test from 'tape';
 
 test('Package Locked Deps', (t) => {
 

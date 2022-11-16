@@ -1,7 +1,6 @@
-
-const test = require('tape');
-const { Kube } = require('../lib/kube');
-const Flight = require('./flight');
+import test from 'tape';
+import { Kube } from '../lib/kube';
+import Flight from './flight';
 
 const flight = new Flight();
 

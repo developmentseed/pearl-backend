@@ -1,7 +1,6 @@
-
-const fs = require('fs');
-const path = require('path');
-const test = require('tape');
+import fs from 'fs';
+import path from 'path';
+import test from 'tape';
 
 const Flight = require('./flight');
 

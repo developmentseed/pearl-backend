@@ -1,17 +1,18 @@
-
 process.env.StackName = 'test';
 
-const { sql } = require('slonik');
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
-const prequest = promisify(require('request'));
-const api = require('../index');
-const Knex = require('knex');
-const KnexConfig = require('../knexfile');
-const drop = require('./drop');
-const { pathToRegexp } = require('path-to-regexp');
-const Ajv = require('ajv');
+import { sql } from 'slonik';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+import api from '../index';
+import Knex from 'knex';
+import KnexConfig from '../knexfile';
+import drop from './drop';
+import { pathToRegexp } from 'path-to-regexp';
+import Ajv from 'ajv';
+import request from 'request';
+
+const prequest = promisify(request);
 const ajv = new Ajv({
     allErrors: true
 });

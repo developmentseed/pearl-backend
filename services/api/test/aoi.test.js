@@ -1,8 +1,7 @@
-
-const test = require('tape');
-const Flight = require('./flight');
-const fs = require('fs');
-const { sql } = require('slonik');
+import test from 'tape';
+import Flight from './flight';
+import fs from 'fs';
+import { sql } from 'slonik';
 
 const flight = new Flight();
 

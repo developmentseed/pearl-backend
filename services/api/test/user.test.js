@@ -1,7 +1,6 @@
-
 /* eslint-disable strict */
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight';
 
 const flight = new Flight();
 

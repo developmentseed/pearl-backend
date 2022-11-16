@@ -1,5 +1,4 @@
-
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 async function drop() {
     const pool = new Pool({
