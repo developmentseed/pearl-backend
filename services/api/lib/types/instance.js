@@ -192,7 +192,7 @@ export default class Instance extends Generic {
                 pod = await kube.createPod(podSpec);
             }
 
-            const inst = this.deserialize(pool, pgres);
+            const inst = this.deserialize(config.pool, pgres);
             inst.token = inst.gen_token(config, instance.uid);
             inst.pod = pod;
 
@@ -266,7 +266,7 @@ export default class Instance extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
-        const inst = this.deserialize(pool, pgres);
+        const inst = this.deserialize(config.pool, pgres);
         inst.token = inst.gen_token(config, auth);
 
         inst.status = podStatus && podStatus.status ? podStatus.status : {};

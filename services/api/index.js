@@ -1,5 +1,4 @@
 #! /usr/bin/env node
-'use strict';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -13,6 +12,7 @@ import cors from 'cors';
 import minify from 'express-minify';
 import { ValidationError } from 'express-json-validator-middleware';
 import minimist from 'minimist';
+import { Pool } from '@openaddresses/batch-generic';
 
 import { fetchJSON } from './lib/util.js';
 import Kube from './lib/kube.js';
@@ -31,8 +31,8 @@ const argv = minimist(process.argv, {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
     try {
-        const config = await Config.env(args);
-        server(args, config);
+        const config = await Config.env(argv);
+        server(config);
     } catch (err) {
         console.error(err);
         process.exit(1);

@@ -1,4 +1,4 @@
-'use strict';
+
 const pkg = require('../package.json');
 const test = require('tape');
 

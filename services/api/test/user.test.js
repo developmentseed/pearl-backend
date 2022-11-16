@@ -1,4 +1,4 @@
-'use strict';
+
 /* eslint-disable strict */
 const test = require('tape');
 const Flight = require('./flight');
