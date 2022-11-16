@@ -1,19 +1,19 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Proxy = require('../lib/proxy');
-const Tiles = require('../lib/tiles');
-const VectorTile = require('@mapbox/vector-tile').VectorTile;
-const Protobuf = require('pbf');
-const zlib = require('zlib');
-const { promisify } = require('util');
-const request = require('request');
+import Err from '@openaddresses/batch-error';
+import Proxy from '../lib/proxy.js';
+import Tiles from '../lib/tiles.js';
+import { VectorTile } from '@mapbox/vector-tile';
+import Protobuf from 'pbf';
+import zlib from 'zlib';
+import { promisify } from 'util';
+import request from 'request';
+import geojsonvt from 'geojson-vt';
+import vtpbf from 'vt-pbf';
+
+const arequest = promisify(request);
 const gunzip = promisify(zlib.gunzip);
 const gzip = promisify(zlib.gzip);
-const arequest = promisify(request);
-const geojsonvt = require('geojson-vt');
-const vtpbf = require('vt-pbf');
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/tiles
      * @apiVersion 1.0.0
@@ -146,5 +146,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

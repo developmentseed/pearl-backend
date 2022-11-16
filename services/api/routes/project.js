@@ -1,13 +1,12 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Mosaic = require('../lib/mosaic');
-const Project = require('../lib/project');
-const AOI = require('../lib/aoi');
-const Model = require('../lib/model');
-const Instance = require('../lib/instance');
-const Checkpoint = require('../lib/checkpoint');
+import Err from '@openaddresses/batch-error';
+import Mosaic from '../lib/mosaic.js';
+import Project from '../lib/types/project.js';
+import AOI from '../lib/types/aoi.js';
+import Model from '../lib/types/model.js';
+import Instance from '../lib/types/instance.js';
+import Checkpoint from '../lib/types/checkpoint.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {post} /api/project List Projects
@@ -189,5 +188,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

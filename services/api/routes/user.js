@@ -1,8 +1,7 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import User from '../lib/types/user.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/user List Users
@@ -114,5 +113,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

@@ -1,11 +1,10 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Batch = require('../lib/batch');
-const Project = require('../lib/project');
-const Instance = require('../lib/instance');
-const Checkpoint = require('../lib/checkpoint');
+import Err from '@openaddresses/batch-error';
+import Batch from '../lib/batch.js';
+import Project from '../lib/types/project.js';
+import Instance from '../lib/types/instance.js';
+import Checkpoint from '../lib/types/checkpoint.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/project/:projectid/batch List Batch
@@ -147,5 +146,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

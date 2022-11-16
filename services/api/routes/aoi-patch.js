@@ -1,12 +1,11 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Busboy = require('busboy');
-const AOI = require('../lib/aoi');
-const AOIPatch = require('../lib/aoi-patch');
-const Proxy = require('../lib/proxy');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Busboy from 'busboy';
+import AOI from '../lib/types/aoi.js';
+import AOIPatch from '../lib/types/aoi-patch.js';
+import Proxy from '../lib/proxy.js';
+import User from '../lib/types/user.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/project/:project/aoi/:aoiid/patch List Patches
@@ -288,5 +287,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

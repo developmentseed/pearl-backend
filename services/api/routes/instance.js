@@ -1,11 +1,10 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Project = require('../lib/project');
-const Instance = require('../lib/instance');
-const User = require('../lib/user');
-const Kube = require('../lib/kube');
+import Err from '@openaddresses/batch-error';
+import Project from '../lib/types/project.js';
+import Instance from '../lib/types/instance.js';
+import User from '../lib/types/user.js';
+import Kube from '../lib/kube.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/project/:projectid/instance Create Instance
@@ -208,5 +207,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

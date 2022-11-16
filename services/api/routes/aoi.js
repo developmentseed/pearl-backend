@@ -1,16 +1,14 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Busboy = require('busboy');
-const Project = require('../lib/project');
-const AOI = require('../lib/aoi');
-const Checkpoint = require('../lib/checkpoint');
-const AOIPatch = require('../lib/aoi-patch');
-const AOIShare = require('../lib/aoi-share');
-const Proxy = require('../lib/proxy');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Busboy from 'busboy';
+import Project from '../lib/types/project.js';
+import AOI from '../lib/types/aoi.js';
+import Checkpoint from '../lib/types/checkpoint.js';
+import AOIPatch from '../lib/types/aoi-patch.js';
+import AOIShare from '../lib/types/aoi-share.js';
+import Proxy from '../lib/proxy.js';
+import User from '../lib/types/user.js';
 
-async function router(schema, config) {
-
+export default async function router(schema, config) {
     const getAoiTileJSON = async (aoi, req) => {
         let tiffurl;
         if (aoi.uuid) {
@@ -729,5 +727,3 @@ async function router(schema, config) {
     });
 
 }
-
-module.exports = router;

@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Mosaic = require('../lib/mosaic');
-const Proxy = require('../lib/proxy');
+import Err from '@openaddresses/batch-error';
+import Mosaic from '../lib/mosaic.js';
+import Proxy from '../lib/proxy.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/mosaic List Mosaics
@@ -99,5 +98,3 @@ async function router(schema, config) {
     });
 
 }
-
-module.exports = router;

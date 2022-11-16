@@ -1,10 +1,9 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const { Err } = require('@openaddresses/batch-schema');
-const $RefParser = require('json-schema-ref-parser');
+import fs from 'fs';
+import path from 'path';
+import Err from '@openaddresses/batch-error';
+import $RefParser from 'json-schema-ref-parser';
 
-async function router(schema) {
+export default async function router(schema) {
     const map = {};
 
     fs.readdirSync(path.resolve(__dirname, '../schema/websocket')).forEach(async (s) => {
@@ -108,5 +107,3 @@ async function router(schema) {
  *
  * @apiSchema (Body) {jsonschema=../schema/websocket/model#aoi.json} apiParam
  */
-
-module.exports = router;

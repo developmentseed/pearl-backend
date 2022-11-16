@@ -1,13 +1,12 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Busboy = require('busboy');
-const Project = require('../lib/project');
-const AOI = require('../lib/aoi');
-const Checkpoint = require('../lib/checkpoint');
-const OSMTag = require('../lib/osmtag');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Busboy from 'busboy';
+import Project from '../lib/types/project.js';
+import AOI from '../lib/types/aoi.js';
+import Checkpoint from '../lib/types/checkpoint.js';
+import OSMTag from '../lib/types/osmtag.js';
+import User from '../lib/types/user.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/project/:projectid/checkpoint/:checkpointid Get Checkpoint
@@ -380,5 +379,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

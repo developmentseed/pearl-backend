@@ -1,12 +1,10 @@
-'use strict';
-const Busboy = require('busboy');
+import Busboy from 'busboy';
+import Err from '@openaddresses/batch-error';
+import Model from '../lib/types/model.js';
+import OSMTag from '../lib/types/osmtag.js';
+import User from '../lib/types/user.js';
 
-const { Err } = require('@openaddresses/batch-schema');
-const Model = require('../lib/model');
-const OSMTag = require('../lib/osmtag');
-const User = require('../lib/user');
-
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {post} /api/model Create Model
@@ -302,5 +300,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;
