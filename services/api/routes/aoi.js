@@ -235,7 +235,7 @@ export default async function router(schema, config) {
                         console.log('PX_Stats Error:', JSON.stringify(pres.body));
                     }
 
-                    await a.commit(config.pool, {
+                    await a.commit({
                         px_stats
                     });
 
@@ -564,7 +564,7 @@ export default async function router(schema, config) {
                 throw new Err(400, null, 'Cannot change number of classes on an existing AOI');
             }
 
-            await a.commit(config.pool, req.body);
+            await a.commit(req.body);
 
             return res.json(a.serialize());
         } catch (err) {

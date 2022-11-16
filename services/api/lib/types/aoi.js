@@ -154,15 +154,10 @@ export default class AOI extends Generic {
         return await storage.download(`aoi-${this.id}.tiff`, res);
     }
 
-    /**
-     * Delete an AOI
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     */
-    async delete(pool) {
+    async delete() {
         let pgres;
         try {
-            pgres = await pool.query(sql`
+            pgres = await this._pool.query(sql`
                 UPDATE aois
                     SET
                         archived = true

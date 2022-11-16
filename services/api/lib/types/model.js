@@ -206,12 +206,12 @@ export default class Model extends Generic {
 
     /**
      * Set a model as inactive and unusable
-     *
-     * @param {Pool} pool Instantiated Postgres Pool
      */
-    async delete(pool) {
-        const modelProjects = await pool.query(sql`
-            SELECT id FROM
+    async delete() {
+        const modelProjects = await this._pool.query(sql`
+            SELECT
+                id
+            FROM
                 projects
             WHERE
                 model_id = ${this.id}
@@ -223,7 +223,7 @@ export default class Model extends Generic {
 
         let pgres;
         try {
-            pgres = await pool.query(sql`
+            pgres = await this._pool.query(sql`
                 DELETE FROM
                     models
                 WHERE

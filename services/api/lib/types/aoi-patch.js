@@ -122,7 +122,7 @@ export default class AOIPatch extends Generic {
     async delete(config) {
         let pgres;
         try {
-            pgres = await config.pool.query(sql`
+            pgres = await this._pool.query(sql`
                 DELETE
                     FROM
                         aoi_patch

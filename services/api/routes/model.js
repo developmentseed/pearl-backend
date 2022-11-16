@@ -74,8 +74,9 @@ export default async function router(schema, config) {
 
             if (req.body.tagmap && model.osmtag_id) {
                 const tagmap = await OSMTag.from(config.pool, model.osmtag_id);
-                tagmap.tagmap = req.body.tagmap;
-                await tagmap.commit(config.pool);
+                await tagmap.commit({
+                    tagmap: req.body.tapmap
+                });
                 delete req.body.tagmap;
             } else if (req.body.tagmap) {
                 const tagmap = await OSMTag.generate(config.pool, {
@@ -87,7 +88,7 @@ export default async function router(schema, config) {
                 model.osmtag_id = tagmap.id;
             }
 
-            await model.commit(config.pool, req.body);
+            await model.commit(req.body);
 
             res.json(model.serialize());
         } catch (err) {

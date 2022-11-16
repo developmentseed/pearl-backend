@@ -105,7 +105,7 @@ export default class AOIShare extends Generic {
     async delete(config) {
         let pgres;
         try {
-            pgres = await config.pool.query(sql`
+            pgres = await this._pool.query(sql`
                 DELETE
                     FROM
                         aois_share

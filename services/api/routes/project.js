@@ -68,14 +68,17 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = (await Project.has_auth(config.pool, req.auth, req.params.projectid)).serialize();
+            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid)
+
+            const json = proj.serialize();
 
             const checkpoints = await Checkpoint.list(config.pool, req.params.projectid, { bookmarked: true });
-            // remove reduntant project id
+            // remove redundant project id
             delete checkpoints.project_id;
-            proj['checkpoints'] = checkpoints.checkpoints;
+            json.checkpoints = checkpoints.checkpoints;
+            json.model_name = proj.model_name;
 
-            return res.json(proj);
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -132,9 +135,9 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
-            await proj.commit(config.pool, req.body);
+            await proj.commit(req.body);
 
-            return res.json(proj.serialize());
+            return res.json(proj);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -165,23 +168,23 @@ export default async function router(schema, config) {
 
                 const instance = new Instance();
                 instance.id = inst.id;
-                await instance.delete(config.pool);
+                await instance.delete();
             }
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
             const aois = await AOI.list(config.pool, req.params.projectid);
             aois.aois.forEach(async (a) => {
                 const aoi = await AOI.from(config.pool, a.id);
-                await aoi.delete(config.pool);
+                await aoi.delete();
             });
 
             const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
             chkpts.checkpoints.forEach(async (c) => {
                 const ch = await Checkpoint.from(config.pool, c.id);
-                await ch.delete(config.pool);
+                await ch.delete();
             });
 
-            await proj.delete(config.pool);
+            await proj.delete();
             return res.json({
                 status: 200,
                 message: 'Project Deleted'

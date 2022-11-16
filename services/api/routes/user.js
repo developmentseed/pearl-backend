@@ -52,7 +52,7 @@ export default async function router(schema, config) {
             await User.is_admin(req);
 
             const user = await User.from(config.pool, req.params.userid);
-            await user.commit(config.pool, req.body);
+            await user.commit(req.body);
 
             return res.json(user.serialize());
         } catch (err) {

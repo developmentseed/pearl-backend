@@ -206,12 +206,10 @@ export default class Instance extends Generic {
      * Remove an instance from the database
      *
      * Note: Does not check for active state - the caller should ensure the instance is not active
-     *
-     * @param {Pool} pool - Instantianted Postgres Pool
      */
-    async delete(pool) {
+    async delete() {
         try {
-            await pool.query(sql`
+            await this._pool.query(sql`
                 DELETE
                     FROM
                         instances

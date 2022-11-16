@@ -89,7 +89,7 @@ export default async function router(schema, config) {
             await User.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
-            await instance.commit(config.pool, req.body);
+            await instance.commit(req.body);
 
             return res.json(instance.serialize());
         } catch (err) {

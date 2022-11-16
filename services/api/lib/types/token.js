@@ -46,9 +46,9 @@ export default class Token extends Generic {
         }
     }
 
-    async delete(pool) {
+    async delete() {
         try {
-            await pool.query(sql`
+            await this._pool.query(sql`
                 DELETE FROM
                     users_tokens
                 WHERE

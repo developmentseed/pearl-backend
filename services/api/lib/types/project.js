@@ -112,34 +112,13 @@ export default class Project extends Generic {
     }
 
     /**
-     * Update Project Properties
-     *
-     * @param {Pool} pool Instantiated Postgres Pool
-     */
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE projects
-                    SET
-                        name = ${this.name}
-                    WHERE
-                        id = ${this.id}
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to commit Project');
-        }
-
-        return this;
-    }
-
-    /**
      * Delete Project
      *
      * @param {Pool} pool Instantiated Postgres Pool
      */
-    async delete(pool) {
+    async delete() {
         try {
-            await pool.query(sql`
+            await this._pool.query(sql`
                 UPDATE projects
                     SET
                         archived = true

@@ -111,15 +111,10 @@ export default class CheckPoint extends Generic {
         return list;
     }
 
-    /**
-     * Delete a Checkpoint
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     */
-    async delete(pool) {
+    async delete() {
         let pgres;
         try {
-            pgres = await pool.query(sql`
+            pgres = await this._pool.query(sql`
                 UPDATE checkpoints
                     SET
                         archived = true
