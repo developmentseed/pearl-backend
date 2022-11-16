@@ -1,5 +1,5 @@
 import test from 'tape';
-import Flight from './flight';
+import Flight from './flight.js';
 import { sql } from 'slonik';
 
 const flight = new Flight();

@@ -16,8 +16,8 @@ import { Pool } from '@openaddresses/batch-generic';
 
 import { fetchJSON } from './lib/util.js';
 import Kube from './lib/kube.js';
-import User from './lib/user.js';
-import Token from './lib/token.js';
+import User from './lib/types/user.js';
+import Token from './lib/types/token.js';
 import Config from './lib/config.js';
 import Err from '@openaddresses/batch-error';
 import Schema from '@openaddresses/batch-schema';

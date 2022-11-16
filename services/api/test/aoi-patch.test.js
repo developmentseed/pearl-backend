@@ -1,5 +1,5 @@
 import test from 'tape';
-import Flight from './flight';
+import Flight from './flight.js';
 import fs from 'fs';
 import path from 'path';
 
