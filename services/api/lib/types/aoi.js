@@ -124,9 +124,10 @@ export default class AOI extends Generic {
 
         const storage = new Storage(config, 'aois');
         await storage.upload(file, `aoi-${this.id}.tiff`);
-        this.storage = true;
 
-        return await this.commit(config.pool);
+        return await this.commit({
+            storage: true
+        });
     }
 
     /**
@@ -176,10 +177,8 @@ export default class AOI extends Generic {
 
     /**
      * Update AOI properties
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
      */
-    async commit(pool) {
+    async commit() {
         let bookmarked_at;
         if (this.bookmarked && !this.bookmarked_at) {
             bookmarked_at = sql`NOW()`;
@@ -191,7 +190,7 @@ export default class AOI extends Generic {
 
         let pgres;
         try {
-            pgres = await pool.query(sql`
+            pgres = await this._pool.query(sql`
                 UPDATE aois
                     SET
                         storage = ${this.storage},

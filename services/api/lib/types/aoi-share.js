@@ -80,8 +80,9 @@ export default class AOIShare extends Generic {
         const storage = new Storage(config, 'aois');
         await storage.upload(file, `share-${this.uuid}.tiff`);
 
-        this.storage = true;
-        return await this.commit(config.pool);
+        return await this.commit({
+            storage: true
+        });
     }
 
     /**
@@ -126,31 +127,6 @@ export default class AOIShare extends Generic {
         }
 
         return true;
-    }
-
-    /**
-     * Update AOI Share properties
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     */
-    async commit(pool) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                UPDATE aois_share
-                    SET
-                        storage = ${this.storage}
-                    WHERE
-                        uuid = ${this.uuid}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update AOI Share');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
-
-        return this;
     }
 
     /**

@@ -68,7 +68,7 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid)
+            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
             const json = proj.serialize();
 
@@ -76,7 +76,8 @@ export default async function router(schema, config) {
             // remove redundant project id
             delete checkpoints.project_id;
             json.checkpoints = checkpoints.checkpoints;
-            json.model_name = proj.model_name;
+            const model = await Model.from(config.pool, json.model_id);
+            json.model_name = model.name;
 
             return res.json(json);
         } catch (err) {
@@ -109,7 +110,10 @@ export default async function router(schema, config) {
                 uid: req.auth.id
             });
 
-            return res.json(proj.serialize());
+            const json = proj.serialize();
+            const model = await Model.from(config.pool, json.model_id);
+            json.model_name = model.name;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -137,7 +141,10 @@ export default async function router(schema, config) {
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
             await proj.commit(req.body);
 
-            return res.json(proj);
+            const json = proj.serialize();
+            const model = await Model.from(config.pool, json.model_id);
+            json.model_name = model.name;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }

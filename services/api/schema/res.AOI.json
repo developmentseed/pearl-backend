@@ -12,6 +12,7 @@
         "storage",
         "patches",
         "px_stats",
+        "area",
         "classes"
     ],
     "additionalProperties": false,

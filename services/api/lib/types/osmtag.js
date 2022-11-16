@@ -1,7 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import Project from './project.js';
-import { sql } from 'slonik';
 
 /**
  * @class
@@ -38,21 +37,5 @@ export default class OSMTag extends Generic {
         }
 
         return true;
-    }
-
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE osmtag
-                    SET
-                        tagmap = ${JSON.stringify(this.tagmap)}
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to update OSMTag');
-        }
     }
 }

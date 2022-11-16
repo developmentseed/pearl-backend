@@ -77,41 +77,6 @@ export default class Project extends Generic {
     }
 
     /**
-     * Get a specific project
-     *
-     * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Integer} projectid - Project Id to get
-     */
-    static async from(pool, projectid) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    p.id AS id,
-                    p.uid AS uid,
-                    p.name AS name,
-                    p.model_id AS model_id,
-                    p.mosaic AS mosaic,
-                    p.created AS created,
-                    m.name AS model_name
-                FROM
-                    projects p,
-                    models m
-                WHERE
-                    p.id = ${projectid}
-                    AND p.model_id = m.id
-                    AND archived = false
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to get project');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'No project found');
-
-        return this.deserialize(pool, pgres);
-    }
-
-    /**
      * Delete Project
      *
      * @param {Pool} pool Instantiated Postgres Pool

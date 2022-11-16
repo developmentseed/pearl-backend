@@ -275,14 +275,12 @@ export default class Instance extends Generic {
 
     /**
      * Update Instance Properties
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
      */
-    async commit(pool) {
+    async commit() {
         let pgres;
 
         try {
-            pgres = await pool.query(sql`
+            pgres = await this._pool.query(sql`
                 UPDATE instances
                     SET
                         active = ${this.active},

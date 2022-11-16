@@ -97,8 +97,9 @@ export default class AOIPatch extends Generic {
         const storage = new Storage(config, 'aois');
         await storage.upload(file, `aoi-${this.aoi_id}-patch-${this.id}.tiff`);
 
-        this.storage = true;
-        return await this.commit(config.pool);
+        return await this.commit({
+            storage: true
+        });
     }
 
     /**
@@ -142,30 +143,5 @@ export default class AOIPatch extends Generic {
         }
 
         return true;
-    }
-
-    /**
-     * Update AOI Patch properties
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     */
-    async commit(pool) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                UPDATE aoi_patch
-                    SET
-                        storage = ${this.storage}
-                    WHERE
-                        id = ${this.id}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update AOI Patch');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
-
-        return this;
     }
 }

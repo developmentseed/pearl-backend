@@ -155,39 +155,9 @@ export default class Model extends Generic {
         const storage = new Storage(config, 'models');
         await storage.upload(file, `model-${this.id}.zip`, 'application/zip');
 
-        this.storage = true;
-        return await this.commit(config.pool);
-    }
-
-    /**
-     * Update Model Properties
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     */
-    async commit(pool) {
-        let pgres;
-
-        if (Array.isArray(this.bounds)) this.bounds = poly(this.bounds).geometry;
-
-        try {
-            pgres = await pool.query(sql`
-                UPDATE models
-                    SET
-                        storage = ${this.storage},
-                        bounds = ST_GeomFromGeoJSON(${JSON.stringify(this.bounds)}),
-                        osmtag_id = ${this.osmtag_id},
-                        active = ${this.active}
-                    WHERE
-                        id = ${this.id}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update Model');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'Model not found');
-
-        return this;
+        return await this.commit({
+            storage: true
+        });
     }
 
     /**

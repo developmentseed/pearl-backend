@@ -90,9 +90,9 @@ export default class Batch extends Generic {
         return this.deserialize_list(pgres);
     }
 
-    async commit(pool) {
+    async commit() {
         try {
-            await pool.query(sql`
+            await this._pool.query(sql`
                 UPDATE batch
                     SET
                         aoi         = ${this.aoi},

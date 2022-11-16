@@ -69,9 +69,9 @@ export default class User extends Generic {
         }
     }
 
-    async commit(pool) {
+    async commit() {
         try {
-            await pool.query(sql`
+            await this._pool.query(sql`
                 UPDATE users
                     SET
                         access = ${this.access},

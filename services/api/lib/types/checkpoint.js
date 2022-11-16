@@ -143,8 +143,9 @@ export default class CheckPoint extends Generic {
         const storage = new Storage(config, 'checkpoints');
         await storage.upload(file, `checkpoint-${this.id}`, 'application/octet-stream');
 
-        this.storage = true;
-        return await this.commit(config.pool);
+        return await this.commit({
+            storage: true
+        });
     }
 
     /**
@@ -174,7 +175,7 @@ export default class CheckPoint extends Generic {
         }
 
         try {
-            pgres = await pool.query(sql`
+            pgres = await this._pool.query(sql`
                 UPDATE checkpoints
                     SET
                         storage = ${this.storage},
