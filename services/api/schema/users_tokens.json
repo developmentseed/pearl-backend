@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./users_tokens/id.json"
+        },
+        "name": {
+            "$ref": "./users_tokens/name.json"
+        },
+        "token": {
+            "$ref": "./users_tokens/token.json"
+        },
+        "created": {
+            "$ref": "./users_tokens/created.json"
+        },
+        "uid": {
+            "$ref": "./users_tokens/uid.json"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "token",
+        "created",
+        "uid"
+    ]
+}

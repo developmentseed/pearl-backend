@@ -1,0 +1,60 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./aois/id.json"
+        },
+        "name": {
+            "$ref": "./aois/name.json"
+        },
+        "checkpoint_id": {
+            "$ref": "./aois/checkpoint_id.json"
+        },
+        "project_id": {
+            "$ref": "./aois/project_id.json"
+        },
+        "bounds": {
+            "$ref": "./aois/bounds.json"
+        },
+        "created": {
+            "$ref": "./aois/created.json"
+        },
+        "storage": {
+            "$ref": "./aois/storage.json"
+        },
+        "bookmarked": {
+            "$ref": "./aois/bookmarked.json"
+        },
+        "patches": {
+            "$ref": "./aois/patches.json"
+        },
+        "px_stats": {
+            "$ref": "./aois/px_stats.json"
+        },
+        "archived": {
+            "$ref": "./aois/archived.json"
+        },
+        "bookmarked_at": {
+            "$ref": "./aois/bookmarked_at.json"
+        },
+        "classes": {
+            "$ref": "./aois/classes.json"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "checkpoint_id",
+        "project_id",
+        "bounds",
+        "created",
+        "storage",
+        "bookmarked",
+        "patches",
+        "px_stats",
+        "archived",
+        "bookmarked_at",
+        "classes"
+    ]
+}

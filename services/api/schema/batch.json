@@ -1,0 +1,60 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./batch/id.json"
+        },
+        "uid": {
+            "$ref": "./batch/uid.json"
+        },
+        "project_id": {
+            "$ref": "./batch/project_id.json"
+        },
+        "created": {
+            "$ref": "./batch/created.json"
+        },
+        "updated": {
+            "$ref": "./batch/updated.json"
+        },
+        "aoi": {
+            "$ref": "./batch/aoi.json"
+        },
+        "name": {
+            "$ref": "./batch/name.json"
+        },
+        "bounds": {
+            "$ref": "./batch/bounds.json"
+        },
+        "completed": {
+            "$ref": "./batch/completed.json"
+        },
+        "progress": {
+            "$ref": "./batch/progress.json"
+        },
+        "abort": {
+            "$ref": "./batch/abort.json"
+        },
+        "error": {
+            "$ref": "./batch/error.json"
+        },
+        "status": {
+            "$ref": "./batch/status.json"
+        }
+    },
+    "required": [
+        "id",
+        "uid",
+        "project_id",
+        "created",
+        "updated",
+        "aoi",
+        "name",
+        "bounds",
+        "completed",
+        "progress",
+        "abort",
+        "error",
+        "status"
+    ]
+}

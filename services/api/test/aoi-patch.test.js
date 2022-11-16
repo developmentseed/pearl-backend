@@ -219,7 +219,7 @@ test('POST: /api/project/1/aoi/1/patch/1/upload', async (t) => {
                 bearer: flight.token.ingalls
             },
             formData : {
-                file : fs.createReadStream(path.resolve(__dirname, './fixtures/asset'))
+                file : fs.createReadStream(new URL('./fixtures/asset', import.meta.url))
             }
         }, t);
 

@@ -65,7 +65,7 @@ export default class Flight {
      */
     fixture(test, name, auth) {
         test(`Fixture: ${name}`, async (t) => {
-            const req = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/', name)));
+            const req = JSON.parse(fs.readFileSync(new URL('./fixtures/' + name, import.meta.url)));
             if (auth) req.auth = {
                 bearer: this.token[auth]
             };
@@ -154,10 +154,13 @@ export default class Flight {
     takeoff(test, custom = {}) {
         test('test server takeoff', async (t) => {
             this.config = Config.env({
+                test: true,
                 silent: true,
             });
 
             Object.assign(this.config, custom);
+
+            this.base = `http://localhost:${this.config.Port}`;
 
             this.srv = await api(this.config);
 

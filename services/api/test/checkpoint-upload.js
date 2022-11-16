@@ -110,7 +110,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
                 bearer: flight.token.ingalls
             },
             formData : {
-                file : fs.createReadStream(path.resolve(__dirname, './fixtures/asset'))
+                file : fs.createReadStream(new URL('./fixtures/asset', import.meta.url))
             }
         }, t);
     } catch (err) {
