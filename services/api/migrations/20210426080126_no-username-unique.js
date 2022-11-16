@@ -1,11 +1,11 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE users
             DROP CONSTRAINT users_username_key;
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE users
             ADD CONSTRAINT users_username_key UNIQUE (username);

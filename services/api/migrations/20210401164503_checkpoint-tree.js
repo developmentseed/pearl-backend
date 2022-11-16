@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE checkpoints
             ADD COLUMN parent BIGINT;
@@ -10,7 +10,7 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE checkpoints
             DROP CONSTRAINT fk_parent;

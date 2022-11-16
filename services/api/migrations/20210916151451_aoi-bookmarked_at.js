@@ -1,11 +1,11 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE aois
             ADD COLUMN bookmarked_at TIMESTAMP;
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE aois
             DROP COLUMN bookmarked_at;
