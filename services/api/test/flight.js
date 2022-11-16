@@ -2,7 +2,6 @@ process.env.StackName = 'test';
 
 import { sql } from 'slonik';
 import fs from 'fs';
-import path from 'path';
 import { promisify } from 'util';
 import api from '../index.js';
 import Knex from 'knex';
@@ -155,7 +154,7 @@ export default class Flight {
         test('test server takeoff', async (t) => {
             this.config = Config.env({
                 test: true,
-                silent: true,
+                silent: true
             });
 
             Object.assign(this.config, custom);

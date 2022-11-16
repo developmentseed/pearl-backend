@@ -2,7 +2,6 @@ import Err from '@openaddresses/batch-error';
 import User from '../lib/types/user.js';
 
 export default async function router(schema, config) {
-
     /**
      * @api {get} /api/user List Users
      * @apiVersion 1.0.0
