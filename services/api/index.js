@@ -31,7 +31,7 @@ const argv = minimist(process.argv, {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
     try {
-        const config = await Config.env(argv);
+        const config = Config.env(argv);
         server(config);
     } catch (err) {
         console.error(err);
@@ -282,7 +282,7 @@ export default async function server(config) {
             if (err) return reject(err);
 
             if (!config.silent) console.log(`ok - http://localhost:${config.Port}`);
-            return resolve([srv, config]);
+            return resolve(srv);
         });
     });
 

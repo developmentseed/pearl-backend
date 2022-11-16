@@ -11,6 +11,7 @@ import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
 import Ajv from 'ajv';
 import request from 'request';
+import Config from '../lib/config.js';
 
 const prequest = promisify(request);
 const ajv = new Ajv({
@@ -44,7 +45,7 @@ export default class Flight {
                 t.error(err);
             }
 
-            this.schema = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/get_schema.json')));
+            this.schema = JSON.parse(fs.readFileSync(new URL('./fixtures/get_schema.json', import.meta.url)));
             this.routes = {};
 
             for (const route of Object.keys(this.schema)) {
@@ -151,20 +152,16 @@ export default class Flight {
      * @param {Object} custom custom config options
      */
     takeoff(test, custom = {}) {
-        test('test server takeoff', (t) => {
-            api(Object.assign({
+        test('test server takeoff', async (t) => {
+            this.config = Config.env({
                 silent: true,
-                test: true
-            }, custom), (srv, config) => {
-                t.ok(srv, 'server object returned');
-                t.ok(config, 'config object returned');
-
-                this.srv = srv;
-                this.base = `http://localhost:${config.Port}`;
-                this.config = config;
-
-                t.end();
             });
+
+            Object.assign(this.config, custom);
+
+            this.srv = await api(this.config);
+
+            t.end();
         });
     }
 

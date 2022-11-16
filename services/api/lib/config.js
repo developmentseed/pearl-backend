@@ -2,7 +2,7 @@
  * @class
  */
 export default class Config {
-    static async env(args = {}) {
+    static env(args = {}) {
         const config = new Config();
 
         if (args.prod && !process.env.SigningSecret) {
