@@ -8,8 +8,6 @@ import { sql } from 'slonik';
  */
 export default class Token extends Generic {
     static _table = 'users_tokens';
-    static _patch = false;
-    static _res = require('../schema/res.Token.json');
 
     static async list(pool, uid, query = {}) {
         if (!query.limit) query.limit = 100;
@@ -42,7 +40,7 @@ export default class Token extends Generic {
                     ${query.page * query.limit}
             `);
 
-            return this.deserialize(pgres.rows, 'tokens');
+            return this.deserialize_list(pgres, 'tokens');
         } catch (err) {
             throw new Err(500, err, 'Failed to list tokens');
         }
@@ -150,7 +148,7 @@ export default class Token extends Generic {
                     name
             `);
 
-            return this.deserialize(pgres.rows[0]);
+            return this.deserialize(pool, pgres);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');
         }

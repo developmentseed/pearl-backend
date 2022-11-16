@@ -8,8 +8,6 @@ import { sql } from 'slonik';
  */
 export default class AOIShare extends Generic {
     static _table = 'aois_share';
-    static _patch = require('../schema/req.body.PatchShare.json');
-    static _res = require('../schema/res.Share.json');
 
     /**
      * Return a list of AOI Shares
@@ -53,7 +51,7 @@ export default class AOIShare extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOI Shares');
         }
 
-        const list = this.deserialize(pgres.rows, 'shares');
+        const list = this.deserialize_list(pgres, 'shares');
         list.project_id = projectid;
         return list;
     }
@@ -192,7 +190,7 @@ export default class AOIShare extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 
 
@@ -222,6 +220,6 @@ export default class AOIShare extends Generic {
             throw new Err(500, err, 'Failed to create AOI Share');
         }
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 }

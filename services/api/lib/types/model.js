@@ -10,8 +10,6 @@ import { sql } from 'slonik';
  */
 export default class Model extends Generic {
     static _table = 'models';
-    static _res = require('../schema/res.Model.json');
-    static _patch = require('../schema/req.body.PatchModel.json');
 
     serialize() {
         const res = super.serialize();
@@ -79,7 +77,7 @@ export default class Model extends Generic {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        const models = this.deserialize(pgres.rows);
+        const models = this.deserialize_list(pgres);
 
         models.models = models.models.map((m) => {
             m.bounds = bbox(m.bounds);
@@ -142,7 +140,7 @@ export default class Model extends Generic {
             throw new Err(500, err, 'Internal Model Error');
         }
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 
     /**

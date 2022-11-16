@@ -9,8 +9,6 @@ import { sql } from 'slonik';
  */
 export default class AOI extends Generic {
     static _table = 'aois';
-    static _res = require('../schema/res.AOI.json');
-    static _patch = require('../schema/req.body.PatchAOI.json');
 
     /**
      * Return a list of aois
@@ -78,7 +76,7 @@ export default class AOI extends Generic {
             throw new Err(500, err, 'Failed to list AOIs');
         }
 
-        const list = this.deserialize(pgres.rows);
+        const list = this.deserialize_list(pgres);
         list.project_id = projectid;
 
         return list;
@@ -261,56 +259,6 @@ export default class AOI extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'aoi not found');
 
-        return this.deserialize(pgres.rows[0]);
-    }
-
-    /**
-     * Create a new AOI
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     *
-     * @param {Object} aoi - AOI Object
-     * @param {Number} aoi.project_id - Project the AOI is part of
-     * @param {String} aoi.name - Human Readable Name
-     * @param {Number} aoi.checkpoint_id - Checkpoint ID
-     * @param {Object} aoi.bounds - Bounds GeoJSON
-     * @param {Array[]} aoi.classes - Classes Object
-     */
-    static async generate(pool, aoi) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO aois (
-                    project_id,
-                    name,
-                    checkpoint_id,
-                    bounds,
-                    classes
-                ) VALUES (
-                    ${aoi.project_id},
-                    ${aoi.name},
-                    ${aoi.checkpoint_id},
-                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)}),
-                    ${JSON.stringify(aoi.classes)}
-                ) RETURNING
-                    id,
-                    name,
-                    bounds,
-                    Round(ST_Area(bounds::GEOGRAPHY)) AS area,
-                    project_id,
-                    bookmarked,
-                    bookmarked_at,
-                    checkpoint_id,
-                    created,
-                    storage,
-                    patches,
-                    px_stats,
-                    classes
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to create AOI');
-        }
-
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 }

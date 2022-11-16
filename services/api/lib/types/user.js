@@ -7,8 +7,6 @@ import { sql } from 'slonik';
  */
 export default class User extends Generic {
     static _table = 'users';
-    static _patch = require('../schema/req.body.PatchUser.json');
-    static _res = require('../schema/res.User.json');
 
     static async is_admin(req) {
         if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
@@ -65,7 +63,7 @@ export default class User extends Generic {
                     ${query.page * query.limit}
             `);
 
-            return this.deserialize(pgres.rows);
+            return this.deserialize_list(pgres);
         } catch (err) {
             throw new Err(500, err, 'Internal error');
         }
@@ -110,7 +108,7 @@ export default class User extends Generic {
                 throw new Err(404, null, 'User not found');
             }
 
-            return this.deserialize(pgres.rows[0]);
+            return this.deserialize(pool, pgres);
         } catch (err) {
             throw new Err(500, err, 'Internal Error');
         }
@@ -141,7 +139,7 @@ export default class User extends Generic {
                 ) RETURNING *
             `);
 
-            return this.deserialize(pgres.rows[0]);
+            return this.deserialize(pool, pgres);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, err, 'Cannot create duplicate user');

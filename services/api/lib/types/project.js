@@ -7,8 +7,6 @@ import { sql } from 'slonik';
  */
 export default class Project extends Generic {
     static _table = 'projects';
-    static _patch = require('../schema/req.body.PatchProject.json');
-    static _res = require('../schema/res.Project.json');
 
     /**
      * Ensure a user can only access their own projects (or is an admin and can access anything)
@@ -75,39 +73,7 @@ export default class Project extends Generic {
             throw new Err(500, new Error(err), 'Failed to list projects');
         }
 
-        return this.deserialize(pgres.rows);
-    }
-
-    /**
-     * Create a new project
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Number} uid - User ID that is creating project
-     * @param {Object} project - Project Object
-     * @param {Object} project.name - Project Name
-     * @param {Object} project.model_id - Model ID
-     * @param {Object} project.mosaic - Mosaic String
-     */
-    static async generate(pool, uid, project) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO projects (
-                    uid,
-                    name,
-                    model_id,
-                    mosaic
-                ) VALUES (
-                    ${uid},
-                    ${project.name},
-                    ${project.model_id},
-                    ${project.mosaic}
-                ) RETURNING *
-            `);
-
-            return this.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate project');
-        }
+        return this.deserialize_list(pgres);
     }
 
     /**
@@ -142,7 +108,7 @@ export default class Project extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No project found');
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 
     /**

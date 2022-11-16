@@ -8,8 +8,6 @@ import { sql } from 'slonik';
  */
 export default class Batch extends Generic {
     static _table = 'batch';
-    static _patch = require('../schema/req.body.PatchBatch.json');
-    static _res = require('../schema/res.Batch.json');
 
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
@@ -89,7 +87,7 @@ export default class Batch extends Generic {
             throw new Err(500, err, 'Internal Batch Error');
         }
 
-        return this.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     async commit(pool) {
@@ -110,28 +108,6 @@ export default class Batch extends Generic {
             return this;
         } catch (err) {
             throw new Err(500, err, 'Failed to save Batch');
-        }
-    }
-
-    static async generate(pool, batch) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO batch (
-                    uid,
-                    project_id,
-                    name,
-                    bounds
-                ) VALUES (
-                    ${batch.uid},
-                    ${batch.project_id},
-                    ${batch.name},
-                    ST_GeomFromGeoJSON(${JSON.stringify(batch.bounds)})
-                ) RETURNING *
-            `);
-
-            return this.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate Batch');
         }
     }
 }

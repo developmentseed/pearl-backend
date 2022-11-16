@@ -101,7 +101,11 @@ export default async function router(schema, config) {
         try {
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
-            const proj = await Project.generate(config.pool, req.auth.id, req.body);
+            const proj = await Project.generate(config.pool, {
+                ...req.body
+                uid: req.auth.id
+            });
+
             return res.json(proj.serialize());
         } catch (err) {
             return Err.respond(err, res);

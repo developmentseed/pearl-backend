@@ -8,8 +8,6 @@ import { sql } from 'slonik';
  */
 export default class OSMTag extends Generic {
     static _table = 'osmtag';
-    static _patch = false;
-    static _res = require('../schema/res.OSMTag.json');
 
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
@@ -55,26 +53,6 @@ export default class OSMTag extends Generic {
             return this;
         } catch (err) {
             throw new Err(500, err, 'Failed to update OSMTag');
-        }
-    }
-
-    static async generate(pool, osmtag) {
-        try {
-            if (!osmtag.project_id) osmtag.project_id = null;
-
-            const pgres = await pool.query(sql`
-                INSERT INTO osmtag (
-                    project_id,
-                    tagmap
-                ) VALUES (
-                    ${osmtag.project_id},
-                    ${JSON.stringify(osmtag.tagmap)}
-                ) RETURNING *
-            `);
-
-            return this.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate OSMTag');
         }
     }
 }

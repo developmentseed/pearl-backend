@@ -9,8 +9,6 @@ import { sql } from 'slonik';
  */
 export default class AOIPatch extends Generic {
     static _table = 'aoi_patch';
-    static _patch = require('../schema/req.body.PatchPatch.json');
-    static _res = require('../schema/res.Patch.json');
 
     /**
      * Return a list of AOI Patches
@@ -49,7 +47,7 @@ export default class AOIPatch extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOI Patches');
         }
 
-        const list = this.deserialize(pgres.rows, 'patches');
+        const list = this.deserialize_list(pgres, 'patches');
         list.project_id = projectid;
         list.aoi_id = aoiid;
         return list;
@@ -169,32 +167,5 @@ export default class AOIPatch extends Generic {
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Patch not found');
 
         return this;
-    }
-
-    /**
-     * Create a new AOI Patch
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Object} patch - AOIS related to a specific aoi
-     * @param {Number} patch.project_id Project ID
-     * @param {Number} patch.aoi_id AOI ID
-     */
-    static async generate(pool, patch) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO aoi_patch (
-                    project_id,
-                    aoi_id
-                ) VALUES (
-                    ${patch.project_id},
-                    ${patch.aoi_id}
-                ) RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to create AOI Patch');
-        }
-
-        return this.deserialize(pgres.rows[0]);
     }
 }

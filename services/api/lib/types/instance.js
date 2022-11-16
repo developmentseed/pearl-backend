@@ -10,8 +10,6 @@ import { sql } from 'slonik';
  */
 export default class Instance extends Generic {
     static _table = 'instances';
-    static _patch = require('../schema/req.body.PatchInstance.json');
-    static _res = require('../schema/res.Instance.json');
 
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
@@ -103,7 +101,7 @@ export default class Instance extends Generic {
                     ${query.page * query.limit}
             `);
 
-            return this.deserialize(pgres.rows);
+            return this.deserialize_list(pgres);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to list instances');
         }
@@ -194,7 +192,7 @@ export default class Instance extends Generic {
                 pod = await kube.createPod(podSpec);
             }
 
-            const inst = this.deserialize(pgres.rows[0]);
+            const inst = this.deserialize(pool, pgres);
             inst.token = inst.gen_token(config, instance.uid);
             inst.pod = pod;
 
@@ -268,7 +266,7 @@ export default class Instance extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'No instance found');
 
-        const inst = this.deserialize(pgres.rows[0]);
+        const inst = this.deserialize(pool, pgres);
         inst.token = inst.gen_token(config, auth);
 
         inst.status = podStatus && podStatus.status ? podStatus.status : {};

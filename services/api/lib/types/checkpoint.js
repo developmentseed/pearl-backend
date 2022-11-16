@@ -9,8 +9,6 @@ import { sql } from 'slonik';
  */
 export default class CheckPoint extends Generic {
     static _table = 'checkpoints';
-    static _res = require('../schema/res.Checkpoint.json');
-    static _patch = require('../schema/req.body.PatchCheckpoint.json');
 
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
@@ -108,7 +106,7 @@ export default class CheckPoint extends Generic {
             throw new Err(500, new Error(err), 'Failed to list checkpoints');
         }
 
-        const list = this.deserialize(pgres.rows);
+        const list = this.deserialize_list(pgres);
         list.project_id = projectid;
         return list;
     }
@@ -252,7 +250,7 @@ export default class CheckPoint extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 
     /**
@@ -292,7 +290,7 @@ export default class CheckPoint extends Generic {
                 ) RETURNING *
             `);
 
-            return this.deserialize(pgres.rows[0]);
+            return this.deserialize(pool, pgres);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23503') throw new Err(400, err, 'Parent does not exist');
             throw new Err(500, err, 'Failed to create checkpoint');
