@@ -6,9 +6,10 @@ import $RefParser from 'json-schema-ref-parser';
 export default async function router(schema) {
     const map = {};
 
-    fs.readdirSync(path.resolve(__dirname, '../schema/websocket')).forEach(async (s) => {
+    fs.readdirSync(new URL('../schema/websocket/', import.meta.url)).forEach(async (s) => {
+        const url = new URL('../schema/websocket/' + s, import.meta.url);
         map[path.parse(s).name] = await $RefParser.dereference(
-            path.resolve(__dirname, '../schema/websocket', s)
+            url.pathname + url.hash
         );
     });
 

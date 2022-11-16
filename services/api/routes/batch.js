@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Batch from '../lib/batch.js';
+import Batch from '../lib/types/batch.js';
 import Project from '../lib/types/project.js';
 import Instance from '../lib/types/instance.js';
 import Checkpoint from '../lib/types/checkpoint.js';

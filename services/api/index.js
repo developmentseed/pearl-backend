@@ -65,7 +65,7 @@ export default async function server(config) {
     });
 
     const schema = new Schema(express.Router(), {
-        schemas: path.resolve(__dirname, 'schema')
+        schemas: new URL('./schema', import.meta.url)
     });
 
     await schema.api();
