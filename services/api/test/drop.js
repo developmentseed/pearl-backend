@@ -1,6 +1,7 @@
-import { Pool } from 'pg';
+import pkg from 'pg';
+const { Pool } = pkg;
 
-async function drop() {
+export default async function drop() {
     const pool = new Pool({
         connectionString: process.env.Postgres || 'postgres://postgres@localhost:5432/lulc'
     });
@@ -21,5 +22,3 @@ async function drop() {
 
     await pool.end();
 }
-
-module.exports = drop;

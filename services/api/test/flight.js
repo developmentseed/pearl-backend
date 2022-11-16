@@ -20,8 +20,7 @@ const ajv = new Ajv({
 /**
  * @class
  */
-class Flight {
-
+export default class Flight {
     constructor() {
         this.srv;
         this.base = false;
@@ -230,5 +229,3 @@ class Flight {
         });
     }
 }
-
-module.exports = Flight;
