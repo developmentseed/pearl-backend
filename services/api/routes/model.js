@@ -3,6 +3,7 @@ import Err from '@openaddresses/batch-error';
 import Model from '../lib/types/model.js';
 import OSMTag from '../lib/types/osmtag.js';
 import User from '../lib/types/user.js';
+import poly from '@turf/bbox-polygon';
 
 export default async function router(schema, config) {
     await schema.post('/model', {
@@ -30,7 +31,13 @@ export default async function router(schema, config) {
                 req.body.osmtag_id = tagmap.id;
             }
 
-            const model = await Model.generate(config.pool, req.body);
+            if (!req.body.bounds) req.body.bounds = [-180, -90, 180, 90];
+            req.body.bounds = poly(req.body.bounds).geometry;
+
+            const model = await Model.generate(config.pool, {
+                storage: false,
+                ...req.body
+            });
 
             return res.json(model.serialize());
         } catch (err) {
@@ -69,6 +76,7 @@ export default async function router(schema, config) {
                 model.osmtag_id = tagmap.id;
             }
 
+            if (Array.isArray(req.body.bounds)) req.body.bounds = poly(req.body.bounds).geometry;
             await model.commit(req.body);
 
             res.json(model.serialize());

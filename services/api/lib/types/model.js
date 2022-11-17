@@ -87,62 +87,6 @@ export default class Model extends Generic {
         return models;
     }
 
-
-    /**
-     * Create a new model
-     *
-     * @param {Pool} pool Instantiated Postres Pool
-     * @param {Object} model Model Object
-     * @param {Number} model.uid
-     * @param {String} model.name
-     * @param {Boolean} model.active
-     * @param {String} model.model_type
-     * @param {Number[]} model.model_inputshape
-     * @param {Number} model.model_zoom
-     * @param {Object[]} model.classes
-     * @param {Object} model.meta
-     * @param {Number[]} model.bounds
-     */
-    static async generate(pool, model) {
-        if (!model.bounds) model.bounds = [-180, -90, 180, 90];
-        model.bounds = poly(model.bounds).geometry;
-
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO models (
-                    uid,
-                    name,
-                    active,
-                    model_type,
-                    model_inputshape,
-                    model_zoom,
-                    storage,
-                    classes,
-                    meta,
-                    bounds,
-                    osmtag_id
-                ) VALUES (
-                    ${model.uid},
-                    ${model.name},
-                    ${model.active},
-                    ${model.model_type},
-                    ${sql.array(model.model_inputshape, 'int8')},
-                    ${model.model_zoom},
-                    False,
-                    ${JSON.stringify(model.classes)}::JSONB,
-                    ${JSON.stringify(model.meta)}::JSONB,
-                    ST_GeomFromGeoJSON(${JSON.stringify(model.bounds)}::JSON),
-                    ${model.osmtag_id || null}
-                ) RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Internal Model Error');
-        }
-
-        return this.deserialize(pool, pgres);
-    }
-
     /**
      * Upload a Model and mark the Model storage property as true
      *
