@@ -1,5 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import User from '../lib/types/user.js';
+import { sql } from 'slonik';
 
 export default async function router(schema, config) {
     await schema.get('/user', {
@@ -34,7 +35,11 @@ export default async function router(schema, config) {
             await User.is_admin(req);
 
             const user = await User.from(config.pool, req.params.userid);
-            await user.commit(req.body);
+
+            await user.commit({
+                ...req.body,
+                updated: sql`NOW()`
+            });
 
             return res.json(user.serialize());
         } catch (err) {

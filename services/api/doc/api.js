@@ -36,14 +36,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch GET /project/:projectid/aoi/:aoiid/patch
+* @api {get} /project/:projectid/aoi/:aoiid/patch List Patches
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/patch
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all patches for a given API
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -55,14 +55,14 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/patch POST /project/:projectid/aoi/:aoiid/patch
+* @api {post} /project/:projectid/aoi/:aoiid/patch Create Patch
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/aoi/:aoiid/patch
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Create a new patch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -74,14 +74,14 @@
 
 
 /**
-* @api {delete} /project/:projectid/aoi/:aoiid/patch/:patchid DELETE /project/:projectid/aoi/:aoiid/patch/:patchid
+* @api {delete} /project/:projectid/aoi/:aoiid/patch/:patchid Delete Patch
 * @apiVersion 1.0.0
 * @apiName DELETE-/project/:projectid/aoi/:aoiid/patch/:patchid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Delete a given patch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -94,14 +94,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid GET /project/:projectid/aoi/:aoiid/patch/:patchid
+* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid Get Patch
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Get a specific patch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -114,14 +114,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/tiles GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles
+* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/tiles TileJSON Patch
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid/tiles
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Get the TileJSON for a given AOI Patch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -134,14 +134,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y
+* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y Tile Patch
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a Tile for a given AOI Patch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -157,14 +157,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/download GET /project/:projectid/aoi/:aoiid/patch/:patchid/download
+* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/download Download Patch
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid/download
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Download a Tiff Patch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -177,14 +177,14 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/patch/:patchid/upload POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload
+* @api {post} /project/:projectid/aoi/:aoiid/patch/:patchid/upload Upload Patch
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/aoi/:aoiid/patch/:patchid/upload
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOIPatch
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Upload a new AOI Patch asset to the API
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -197,14 +197,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid GET /project/:projectid/aoi/:aoiid
+* @api {get} /project/:projectid/aoi/:aoiid Get AOI
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all information about a given AOI
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -216,14 +216,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/tiles GET /project/:projectid/aoi/:aoiid/tiles
+* @api {get} /project/:projectid/aoi/:aoiid/tiles TileJSON AOI
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/tiles
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a TileJSON for a given AOI
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -235,14 +235,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y
+* @api {get} /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y Tile AOI
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a Tile for a given AOI
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -257,14 +257,14 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/upload POST /project/:projectid/aoi/:aoiid/upload
+* @api {post} /project/:projectid/aoi/:aoiid/upload Upload AOI
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/aoi/:aoiid/upload
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Upload a new GeoTIFF to the API
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -276,14 +276,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/download/raw GET /project/:projectid/aoi/:aoiid/download/raw
+* @api {get} /project/:projectid/aoi/:aoiid/download/raw Download Raw AOI
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/download/raw
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Return the AOI Fabric as a GeoTIFF
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -295,14 +295,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/download/color GET /project/:projectid/aoi/:aoiid/download/color
+* @api {get} /project/:projectid/aoi/:aoiid/download/color Download Color AOI
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid/download/color
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return the colourized aoi fabric geotiff - but doesn't save it to share page
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -314,14 +314,14 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi GET /project/:projectid/aoi
+* @api {get} /project/:projectid/aoi List AOIs
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all AOIs for a given instance
 *
 * @apiParam {integer} projectid param
 *
@@ -332,14 +332,17 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi POST /project/:projectid/aoi
+* @api {post} /project/:projectid/aoi Create AOI
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/aoi
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*
+Create a new AOI during an instance
+Note: this is an internal API that is called by the websocket GPU
+
 *
 * @apiParam {integer} projectid param
 *
@@ -350,14 +353,14 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/share POST /project/:projectid/aoi/:aoiid/share
+* @api {post} /project/:projectid/aoi/:aoiid/share Create Share
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/aoi/:aoiid/share
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Export an AOI & it's patches to share
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -369,14 +372,14 @@
 
 
 /**
-* @api {delete} /project/:projectid/aoi/:aoiid/share/:shareuuid DELETE /project/:projectid/aoi/:aoiid/share/:shareuuid
+* @api {delete} /project/:projectid/aoi/:aoiid/share/:shareuuid Delete Share
 * @apiVersion 1.0.0
 * @apiName DELETE-/project/:projectid/aoi/:aoiid/share/:shareuuid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Delete a shared AOI
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -389,14 +392,14 @@
 
 
 /**
-* @api {get} /project/:projectid/share GET /project/:projectid/share
+* @api {get} /project/:projectid/share List Shares
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/share
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all shares for a given project
 *
 * @apiParam {integer} projectid param
 *
@@ -407,14 +410,14 @@
 
 
 /**
-* @api {delete} /project/:projectid/aoi/:aoiid DELETE /project/:projectid/aoi/:aoiid
+* @api {delete} /project/:projectid/aoi/:aoiid Delete AOI
 * @apiVersion 1.0.0
 * @apiName DELETE-/project/:projectid/aoi/:aoiid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Delete an existing AOI
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -426,14 +429,14 @@
 
 
 /**
-* @api {patch} /project/:projectid/aoi/:aoiid PATCH /project/:projectid/aoi/:aoiid
+* @api {patch} /project/:projectid/aoi/:aoiid Patch AOI
 * @apiVersion 1.0.0
 * @apiName PATCH-/project/:projectid/aoi/:aoiid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup AOI
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Update an AOI
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -445,14 +448,14 @@
 
 
 /**
-* @api {get} /share/:shareuuid GET /share/:shareuuid
+* @api {get} /share/:shareuuid Get Share
 * @apiVersion 1.0.0
 * @apiName GET-/share/:shareuuid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return all information about a given AOI Export using the UUID
 *
 * @apiParam {string} shareuuid param
 *
@@ -463,14 +466,14 @@
 
 
 /**
-* @api {get} /share/:shareuuid/tiles GET /share/:shareuuid/tiles
+* @api {get} /share/:shareuuid/tiles TileJSON
 * @apiVersion 1.0.0
 * @apiName GET-/share/:shareuuid/tiles
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return tilejson for a given AOI using uuid
 *
 * @apiParam {string} shareuuid param
 *
@@ -481,14 +484,14 @@
 
 
 /**
-* @api {get} /share/:shareuuid/tiles/:z/:x/:y GET /share/:shareuuid/tiles/:z/:x/:y
+* @api {get} /share/:shareuuid/tiles/:z/:x/:y Tiles
 * @apiVersion 1.0.0
 * @apiName GET-/share/:shareuuid/tiles/:z/:x/:y
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a Tile for a given AOI using uuid
 *
 * @apiParam {string} shareuuid param
 * @apiParam {integer} z param
@@ -502,14 +505,14 @@
 
 
 /**
-* @api {get} /share/:shareuuid/download/raw GET /share/:shareuuid/download/raw
+* @api {get} /share/:shareuuid/download/raw Download Raw AOI
 * @apiVersion 1.0.0
 * @apiName GET-/share/:shareuuid/download/raw
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return the aoi fabric geotiff
 *
 * @apiParam {string} shareuuid param
 *
@@ -520,14 +523,14 @@
 
 
 /**
-* @api {get} /share/:shareuuid/download/color GET /share/:shareuuid/download/color
+* @api {get} /share/:shareuuid/download/color Download Color AOI
 * @apiVersion 1.0.0
 * @apiName GET-/share/:shareuuid/download/color
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Share
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return the colourized aoi fabric geotiff
 *
 * @apiParam {string} shareuuid param
 *
@@ -538,14 +541,14 @@
 
 
 /**
-* @api {get} /project/:projectid/batch GET /project/:projectid/batch
+* @api {get} /project/:projectid/batch List Batch
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/batch
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Batch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a list of all batches for a given user
 *
 * @apiParam {integer} projectid param
 *
@@ -556,14 +559,14 @@
 
 
 /**
-* @api {post} /project/:projectid/batch POST /project/:projectid/batch
+* @api {post} /project/:projectid/batch Create Batch
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/batch
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Batch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Create a new batch
 *
 * @apiParam {integer} projectid param
 *
@@ -574,14 +577,14 @@
 
 
 /**
-* @api {get} /project/:projectid/batch/:batchid GET /project/:projectid/batch/:batchid
+* @api {get} /project/:projectid/batch/:batchid Get Batch
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/batch/:batchid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Batch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a single batch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} batchid param
@@ -593,14 +596,14 @@
 
 
 /**
-* @api {patch} /project/:projectid/batch/:batchid PATCH /project/:projectid/batch/:batchid
+* @api {patch} /project/:projectid/batch/:batchid Patch Batch
 * @apiVersion 1.0.0
 * @apiName PATCH-/project/:projectid/batch/:batchid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Batch
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Update a batch
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} batchid param
@@ -612,14 +615,14 @@
 
 
 /**
-* @api {get} /project/:projectid/checkpoint/:checkpointid GET /project/:projectid/checkpoint/:checkpointid
+* @api {get} /project/:projectid/checkpoint/:checkpointid Get Checkpoint
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/checkpoint/:checkpointid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a given checkpoint for a given instance
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -631,14 +634,14 @@
 
 
 /**
-* @api {get} /project/:projectid/checkpoint/:checkpointid/osmtag GET /project/:projectid/checkpoint/:checkpointid/osmtag
+* @api {get} /project/:projectid/checkpoint/:checkpointid/osmtag Get OSMTags
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/checkpoint/:checkpointid/osmtag
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return OSMTags for a Checkpoint if they exist
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -650,14 +653,14 @@
 
 
 /**
-* @api {get} /project/:projectid/checkpoint/:checkpointid/tiles GET /project/:projectid/checkpoint/:checkpointid/tiles
+* @api {get} /project/:projectid/checkpoint/:checkpointid/tiles TileJSON Checkpoint
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/checkpoint/:checkpointid/tiles
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return tilejson for a given Checkpoint
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -669,14 +672,14 @@
 
 
 /**
-* @api {get} /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt GET /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt
+* @api {get} /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt Tile Checkpoint
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a tile for a given Checkpoint
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -691,14 +694,14 @@
 
 
 /**
-* @api {post} /project/:projectid/checkpoint/:checkpointid/upload POST /project/:projectid/checkpoint/:checkpointid/upload
+* @api {post} /project/:projectid/checkpoint/:checkpointid/upload Upload Checkpoint
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/checkpoint/:checkpointid/upload
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Upload a new checkpoint asset to the API
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -710,14 +713,14 @@
 
 
 /**
-* @api {get} /project/:projectid/checkpoint/:checkpointid/download GET /project/:projectid/checkpoint/:checkpointid/download
+* @api {get} /project/:projectid/checkpoint/:checkpointid/download Download Checkpoint
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/checkpoint/:checkpointid/download
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Download a checkpoint asset from the API
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -729,14 +732,14 @@
 
 
 /**
-* @api {get} /project/:projectid/checkpoint GET /project/:projectid/checkpoint
+* @api {get} /project/:projectid/checkpoint List Checkpoints
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/checkpoint
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all checkpoints for a given instance
 *
 * @apiParam {integer} projectid param
 *
@@ -747,14 +750,17 @@
 
 
 /**
-* @api {post} /project/:projectid/checkpoint POST /project/:projectid/checkpoint
+* @api {post} /project/:projectid/checkpoint Create Checkpoint
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/checkpoint
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*
+Create a new checkpont during an instance
+Note: this is an internal API that is called by the websocket GPU
+
 *
 * @apiParam {integer} projectid param
 *
@@ -765,14 +771,17 @@
 
 
 /**
-* @api {delete} /project/:projectid/checkpoint/:checkpointid DELETE /project/:projectid/checkpoint/:checkpointid
+* @api {delete} /project/:projectid/checkpoint/:checkpointid Delete Checkpoint
 * @apiVersion 1.0.0
 * @apiName DELETE-/project/:projectid/checkpoint/:checkpointid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Delete an existing Checkpoint
+NOTE: This will also delete AOIs that depend on the given checkpoint
+
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -784,14 +793,14 @@
 
 
 /**
-* @api {patch} /project/:projectid/checkpoint/:checkpointid PATCH /project/:projectid/checkpoint/:checkpointid
+* @api {patch} /project/:projectid/checkpoint/:checkpointid Patch Checkpoint
 * @apiVersion 1.0.0
 * @apiName PATCH-/project/:projectid/checkpoint/:checkpointid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Checkpoints
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update a checkpoint
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} checkpointid param
@@ -803,14 +812,17 @@
 
 
 /**
-* @api {post} /project/:projectid/instance POST /project/:projectid/instance
+* @api {post} /project/:projectid/instance Create Instance
 * @apiVersion 1.0.0
 * @apiName POST-/project/:projectid/instance
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Instance
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Instruct the GPU pool to start a new model instance and return a time limited session
+token for accessing the websockets GPU API
+
 *
 * @apiParam {integer} projectid param
 *
@@ -821,14 +833,14 @@
 
 
 /**
-* @api {patch} /project/:projectid/instance/:instanceid PATCH /project/:projectid/instance/:instanceid
+* @api {patch} /project/:projectid/instance/:instanceid Patch Instance
 * @apiVersion 1.0.0
 * @apiName PATCH-/project/:projectid/instance/:instanceid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Instance
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update an instance state
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} instanceid param
@@ -840,14 +852,17 @@
 
 
 /**
-* @api {get} /project/:projectid/instance GET /project/:projectid/instance
+* @api {get} /project/:projectid/instance List Instances
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/instance
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Instance
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Return a list of instances. Note that users can only get their own instances and use of the `uid`
+field will be pinned to their own uid. Admins can filter by any uid or none.
+
 *
 * @apiParam {integer} projectid param
 *
@@ -858,14 +873,14 @@
 
 
 /**
-* @api {get} /project/:projectid/instance/:instanceid GET /project/:projectid/instance/:instanceid
+* @api {get} /project/:projectid/instance/:instanceid Get Instance
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/instance/:instanceid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Instance
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all information about a given instance
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} instanceid param
@@ -877,14 +892,17 @@
 
 
 /**
-* @api {get} /instance/:instanceid GET /instance/:instanceid
+* @api {get} /instance/:instanceid Self Instance
 * @apiVersion 1.0.0
 * @apiName GET-/instance/:instanceid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Instance
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*
+A newly instantiated GPU Instance does not know what it's project id is. This API
+allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project
+
 *
 * @apiParam {integer} instanceid param
 *
@@ -895,14 +913,14 @@
 
 
 /**
-* @api {delete} /instance DELETE /instance
+* @api {delete} /instance Deactivate Instances
 * @apiVersion 1.0.0
 * @apiName DELETE-/instance
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Instance
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Set all instances to active: false - used by the socket server upon initial api connection
 *
 
 *
@@ -913,14 +931,14 @@
 
 
 /**
-* @api {post} /model POST /model
+* @api {post} /model Create Model
 * @apiVersion 1.0.0
 * @apiName POST-/model
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Create a new model in the system
 *
 
 *
@@ -931,14 +949,14 @@
 
 
 /**
-* @api {patch} /model/:modelid PATCH /model/:modelid
+* @api {patch} /model/:modelid Update Model
 * @apiVersion 1.0.0
 * @apiName PATCH-/model/:modelid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update a model
 *
 * @apiParam {integer} modelid param
 *
@@ -949,14 +967,14 @@
 
 
 /**
-* @api {post} /model/:modelid/upload POST /model/:modelid/upload
+* @api {post} /model/:modelid/upload Upload Model
 * @apiVersion 1.0.0
 * @apiName POST-/model/:modelid/upload
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Upload a new model asset
 *
 * @apiParam {integer} modelid param
 *
@@ -967,14 +985,14 @@
 
 
 /**
-* @api {get} /model GET /model
+* @api {get} /model List Models
 * @apiVersion 1.0.0
 * @apiName GET-/model
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   List information about a set of models
 *
 
 *
@@ -985,14 +1003,17 @@
 
 
 /**
-* @api {delete} /model/:modelid DELETE /model/:modelid
+* @api {delete} /model/:modelid Delete Model
 * @apiVersion 1.0.0
 * @apiName DELETE-/model/:modelid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*
+Mark a model as inactive, and disallow subsequent instances of this model
+Note: this will not affect currently running instances of the model
+
 *
 * @apiParam {integer} modelid param
 *
@@ -1003,14 +1024,14 @@
 
 
 /**
-* @api {get} /model/:modelid GET /model/:modelid
+* @api {get} /model/:modelid Get Model
 * @apiVersion 1.0.0
 * @apiName GET-/model/:modelid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all information about a single model
 *
 * @apiParam {integer} modelid param
 *
@@ -1021,14 +1042,14 @@
 
 
 /**
-* @api {get} /model/:modelid/osmtag GET /model/:modelid/osmtag
+* @api {get} /model/:modelid/osmtag Get OSMTags
 * @apiVersion 1.0.0
 * @apiName GET-/model/:modelid/osmtag
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return OSMTags for a model if they exist
 *
 * @apiParam {integer} modelid param
 *
@@ -1039,14 +1060,14 @@
 
 
 /**
-* @api {get} /model/:modelid/download GET /model/:modelid/download
+* @api {get} /model/:modelid/download Download Model
 * @apiVersion 1.0.0
 * @apiName GET-/model/:modelid/download
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Model
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return the model itself
 *
 * @apiParam {integer} modelid param
 *
@@ -1057,14 +1078,14 @@
 
 
 /**
-* @api {get} /mosaic GET /mosaic
+* @api {get} /mosaic List Mosaics
 * @apiVersion 1.0.0
 * @apiName GET-/mosaic
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Mosaic
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a list of currently supported mosaic layers
 *
 
 *
@@ -1075,14 +1096,14 @@
 
 
 /**
-* @api {get} /mosaic/:layer GET /mosaic/:layer
+* @api {get} /mosaic/:layer Get TileJSON
 * @apiVersion 1.0.0
 * @apiName GET-/mosaic/:layer
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Mosaic
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return a TileJSON object for a given mosaic layer
 *
 * @apiParam {string} layer param
 *
@@ -1093,14 +1114,14 @@
 
 
 /**
-* @api {get} /mosaic/:layer/tiles/:z/:x/:y.:format GET /mosaic/:layer/tiles/:z/:x/:y.:format
+* @api {get} /mosaic/:layer/tiles/:z/:x/:y.:format Get Tile
 * @apiVersion 1.0.0
 * @apiName GET-/mosaic/:layer/tiles/:z/:x/:y.:format
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Mosaic
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return an aerial imagery tile for a given set of mercator coordinates
 *
 * @apiParam {string} layer param
 * @apiParam {string} format param
@@ -1115,14 +1136,14 @@
 
 
 /**
-* @api {get} /project GET /project
+* @api {get} /project List Projects
 * @apiVersion 1.0.0
 * @apiName GET-/project
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Projects
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a list of all projects
 *
 
 *
@@ -1133,14 +1154,14 @@
 
 
 /**
-* @api {get} /project/:projectid GET /project/:projectid
+* @api {get} /project/:projectid Get Project
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Projects
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return all information about a given project
 *
 * @apiParam {integer} projectid param
 *
@@ -1151,14 +1172,14 @@
 
 
 /**
-* @api {post} /project POST /project
+* @api {post} /project Create Project
 * @apiVersion 1.0.0
 * @apiName POST-/project
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Projects
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Create a new project
 *
 
 *
@@ -1169,14 +1190,14 @@
 
 
 /**
-* @api {patch} /project/:projectid PATCH /project/:projectid
+* @api {patch} /project/:projectid Patch Project
 * @apiVersion 1.0.0
 * @apiName PATCH-/project/:projectid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Projects
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Update an existing project
 *
 * @apiParam {integer} projectid param
 *
@@ -1187,14 +1208,14 @@
 
 
 /**
-* @api {delete} /project/:projectid DELETE /project/:projectid
+* @api {delete} /project/:projectid Delete Project
 * @apiVersion 1.0.0
 * @apiName DELETE-/project/:projectid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Projects
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Archive a project
 *
 * @apiParam {integer} projectid param
 *
@@ -1223,14 +1244,14 @@
 
 
 /**
-* @api {get} /tiles GET /tiles
+* @api {get} /tiles List Tiles
 * @apiVersion 1.0.0
 * @apiName GET-/tiles
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Tiles
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a list of all supported Vector Tile Layers
 *
 
 *
@@ -1241,14 +1262,14 @@
 
 
 /**
-* @api {get} /tiles/:layer GET /tiles/:layer
+* @api {get} /tiles/:layer TileJSON
 * @apiVersion 1.0.0
 * @apiName GET-/tiles/:layer
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Tiles
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return a TileJSON for the given layer
 *
 * @apiParam {string} layer param
 *
@@ -1259,14 +1280,18 @@
 
 
 /**
-* @api {get} /tiles/:layer/:z/:x/:y.mvt GET /tiles/:layer/:z/:x/:y.mvt
+* @api {get} /tiles/:layer/:z/:x/:y.mvt Get MVT
 * @apiVersion 1.0.0
 * @apiName GET-/tiles/:layer/:z/:x/:y.mvt
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Tiles
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*
+Return an MVT for the given layer
+This endpoint will request the upstream vector tile and parse it in place
+Adding a `feature.properties.@ftype = '<GeoJSON Geometry Type>'` property
+
 *
 * @apiParam {string} layer param
 * @apiParam {integer} z param
@@ -1280,14 +1305,14 @@
 
 
 /**
-* @api {get} /token GET /token
+* @api {get} /token List Tokens
 * @apiVersion 1.0.0
 * @apiName GET-/token
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Token
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   List Tokens
 *
 
 *
@@ -1298,14 +1323,14 @@
 
 
 /**
-* @api {post} /token POST /token
+* @api {post} /token Create Tokens
 * @apiVersion 1.0.0
 * @apiName POST-/token
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Token
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Create a new API token to perform API requests with
 *
 
 *
@@ -1316,14 +1341,14 @@
 
 
 /**
-* @api {delete} /token/:tokenid DELETE /token/:tokenid
+* @api {delete} /token/:tokenid Delete Token
 * @apiVersion 1.0.0
 * @apiName DELETE-/token/:tokenid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Token
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Delete an existing token
 *
 * @apiParam {integer} tokenid param
 *
@@ -1334,14 +1359,14 @@
 
 
 /**
-* @api {get} /user GET /user
+* @api {get} /user List Users
 * @apiVersion 1.0.0
 * @apiName GET-/user
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Return a list of users that have registered with the service
 *
 
 *
@@ -1352,14 +1377,14 @@
 
 
 /**
-* @api {patch} /user/:userid PATCH /user/:userid
+* @api {patch} /user/:userid Patch User
 * @apiVersion 1.0.0
 * @apiName PATCH-/user/:userid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Update information about a user
 *
 * @apiParam {integer} userid param
 *
@@ -1370,14 +1395,14 @@
 
 
 /**
-* @api {get} /user/me GET /user/me
+* @api {get} /user/me Session Metadata
 * @apiVersion 1.0.0
 * @apiName GET-/user/me
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission user
 *
 * @apidescription
-*   No Description
+*   Return basic user information about the currently authenticated user
 *
 
 *
@@ -1388,14 +1413,14 @@
 
 
 /**
-* @api {get} /user/:userid GET /user/:userid
+* @api {get} /user/:userid Get User
 * @apiVersion 1.0.0
 * @apiName GET-/user/:userid
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup User
+* @apiPermission admin
 *
 * @apidescription
-*   No Description
+*   Return all information about a given user
 *
 * @apiParam {integer} userid param
 *
@@ -1406,14 +1431,14 @@
 
 
 /**
-* @api {get} /websocket GET /websocket
+* @api {get} /websocket Schemas
 * @apiVersion 1.0.0
 * @apiName GET-/websocket
-* @apiGroup Default
-* @apiPermission Unknown
+* @apiGroup Websockets
+* @apiPermission public
 *
 * @apidescription
-*   No Description
+*   Return an object containing all the schemas used by the websocket router
 *
 
 *

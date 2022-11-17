@@ -69,24 +69,6 @@ export default class User extends Generic {
         }
     }
 
-    async commit() {
-        try {
-            await this._pool.query(sql`
-                UPDATE users
-                    SET
-                        access = ${this.access},
-                        flags = ${JSON.stringify(this.flags)},
-                        updated = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to update user');
-        }
-    }
-
     static async from(pool, uid, idField = 'id') {
         try {
             const pgres = await pool.query(sql`
