@@ -7,21 +7,11 @@ import Instance from '../lib/types/instance.js';
 import Checkpoint from '../lib/types/checkpoint.js';
 
 export default async function router(schema, config) {
-
-    /**
-     * @api {post} /api/project List Projects
-     * @apiVersion 1.0.0
-     * @apiName ListProjects
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a list of projects
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListProjects.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
-     */
     await schema.get('/project', {
+        name: 'List Projects',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Return a list of all projects',
         query: 'req.query.ListProjects.json',
         res: 'res.ListProjects.json'
     }, config.requiresAuth, async (req, res) => {
@@ -51,19 +41,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid Get Project
-     * @apiVersion 1.0.0
-     * @apiName GetProject
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all information about a given project
-     *
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
-     */
     await schema.get('/project/:projectid', {
+        name: 'Get Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Return all information about a given project',
         ':projectid': 'integer',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
@@ -85,20 +67,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project Create Project
-     * @apiVersion 1.0.0
-     * @apiName CreateProject
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new project
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateProject.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
-     */
     await schema.post('/project', {
+        name: 'Create Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Create a new project',
         body: 'req.body.CreateProject.json',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
@@ -119,20 +92,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/project/:projectid Patch Project
-     * @apiVersion 1.0.0
-     * @apiName PatchProject
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Update an existing Project
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchProject.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
-     */
     await schema.patch('/project/:projectid', {
+        name: 'Patch Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Update an existing project',
         ':projectid': 'integer',
         body: 'req.body.PatchProject.json',
         res: 'res.Project.json'
@@ -150,19 +114,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/project/:projectid Delete Project
-     * @apiVersion 1.0.0
-     * @apiName DeleteProject
-     * @apiGroup Project
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Archive a project
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/project/:projectid', {
+        name: 'Delete Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Archive a project',
         ':projectid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
