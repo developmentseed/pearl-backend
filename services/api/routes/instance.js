@@ -5,22 +5,14 @@ import User from '../lib/types/user.js';
 import Kube from '../lib/kube.js';
 
 export default async function router(schema, config) {
-
-    /**
-     * @api {get} /api/project/:projectid/instance Create Instance
-     * @apiVersion 1.0.0
-     * @apiName CreateInstance
-     * @apiGroup Instance
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Instruct the GPU pool to start a new model instance and return a time limited session
-     *     token for accessing the websockets GPU API
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateInstance.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
-     */
     await schema.post('/project/:projectid/instance', {
+        name: 'Create Instance',
+        group: 'Instance',
+        auth: 'user',
+        description: `
+            Instruct the GPU pool to start a new model instance and return a time limited session
+            token for accessing the websockets GPU API
+        `,
         ':projectid': 'integer',
         body: 'req.body.CreateInstance.json',
         res: 'res.Instance.json'
@@ -69,17 +61,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/project/:projectid/instance/:instance Patch Instance
-     * @apiVersion 1.0.0
-     * @apiName PatchInstance
-     * @apiGroup Instance
-     * @apiPermission admin
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchInstance.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
-     */
     await schema.patch('/project/:projectid/instance/:instanceid', {
+        name: 'Patch Instance',
+        group: 'Instance',
+        auth: 'admin',
+        description: 'Update an instance state',
         ':projectid': 'integer',
         ':instanceid': 'integer',
         body: 'req.body.PatchInstance.json',
@@ -97,21 +83,14 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/instance List Instances
-     * @apiVersion 1.0.0
-     * @apiName ListInstances
-     * @apiGroup Instance
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a list of instances. Note that users can only get their own instances and use of the `uid`
-     *     field will be pinned to their own uid. Admins can filter by any uid or none.
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListInstances.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListInstances.json} apiSuccess
-     */
     await schema.get('/project/:projectid/instance', {
+        name: 'List Instances',
+        group: 'Instance',
+        auth: 'user',
+        description: `
+            Return a list of instances. Note that users can only get their own instances and use of the `uid`
+            field will be pinned to their own uid. Admins can filter by any uid or none.
+        `,
         ':projectid': 'integer',
         query: 'req.query.ListInstances.json',
         res: 'res.ListInstances.json'
@@ -125,19 +104,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/instance/:instanceid Get Instance
-     * @apiVersion 1.0.0
-     * @apiName GetInstance
-     * @apiGroup Instance
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all information about a given instance
-     *
-     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
-     */
     await schema.get('/project/:projectid/instance/:instanceid', {
+        name: 'Get Instance',
+        group: 'Instance',
+        auth: 'user',
+        description: 'Return all information about a given instance',
         ':projectid': 'integer',
         ':instanceid': 'integer',
         res: 'res.Instance.json'
@@ -151,20 +122,14 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/instance/:instanceid Self Instance
-     * @apiVersion 1.0.0
-     * @apiName SelfInstance
-     * @apiGroup Instance
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     A newly instantiated GPU Instance does not know what it's project id is. This API
-     *     allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project
-     *
-     * @apiSchema {jsonschema=../schema/res.Instance.json} apiSuccess
-     */
     await schema.get('/instance/:instanceid', {
+        name: 'Self Instance',
+        group: 'Instance',
+        auth: 'admin',
+        description: `
+            A newly instantiated GPU Instance does not know what it's project id is. This API
+            allows ONLY AN ADMIN TOKEN to fetch any instance, regardless of project
+        `,
         ':instanceid': 'integer',
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
@@ -179,19 +144,12 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/instance Deactivate Instances
-     * @apiVersion 1.0.0
-     * @apiName DeactivateInstance
-     * @apiGroup Instance
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Set all instances to active: false - used by the socket server upon initial api connection
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
-    await schema.delete('/instance', config.requiresAuth, async (req, res) => {
+    await schema.delete('/instance', {
+        name: 'Deactivate Instances',
+        group: 'Instance',
+        auth: 'admin',
+        description: 'Set all instances to active: false - used by the socket server upon initial api connection'
+    }, config.requiresAuth, async (req, res) => {
         try {
             await User.is_admin(req);
 
