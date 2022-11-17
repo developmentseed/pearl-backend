@@ -3,6 +3,7 @@ import Project from '../lib/types/project.js';
 import Instance from '../lib/types/instance.js';
 import User from '../lib/types/user.js';
 import Kube from '../lib/kube.js';
+import { sql } from 'slonik';
 
 export default async function router(schema, config) {
     await schema.post('/project/:projectid/instance', {
@@ -75,7 +76,10 @@ export default async function router(schema, config) {
             await User.is_admin(req);
 
             const instance = await Instance.from(config, req.auth, req.params.instanceid);
-            await instance.commit(req.body);
+            await instance.commit({
+                ...req.body,
+                last_update: sql`NOW()`
+            });
 
             return res.json(instance.serialize());
         } catch (err) {

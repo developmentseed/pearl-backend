@@ -274,33 +274,6 @@ export default class Instance extends Generic {
     }
 
     /**
-     * Update Instance Properties
-     */
-    async commit() {
-        let pgres;
-
-        try {
-            pgres = await this._pool.query(sql`
-                UPDATE instances
-                    SET
-                        active = ${this.active},
-                        aoi_id = ${this.aoi_id},
-                        checkpoint_id = ${this.checkpoint_id},
-                        last_update = NOW()
-                    WHERE
-                        id = ${this.id}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update Instance');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'Instance not found');
-
-        return this;
-    }
-
-    /**
      * Set all instance states to active: false
      *
      * @param {Pool} pool - Instantiated Postgres Instance
