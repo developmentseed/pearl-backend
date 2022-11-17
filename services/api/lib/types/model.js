@@ -1,7 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import Storage from '../storage.js';
-import poly from '@turf/bbox-polygon';
 import bbox from '@turf/bbox';
 import { sql } from 'slonik';
 

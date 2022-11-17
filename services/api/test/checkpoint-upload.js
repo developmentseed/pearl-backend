@@ -1,7 +1,6 @@
 import fs from 'fs';
 import test from 'tape';
-
-const Flight = require('./flight');
+import Flight from './flight.js';
 
 const flight = new Flight();
 
