@@ -6,21 +6,11 @@ import Proxy from '../lib/proxy.js';
 import User from '../lib/types/user.js';
 
 export default async function router(schema, config) {
-
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid/patch List Patches
-     * @apiVersion 1.0.0
-     * @apiName ListPatches
-     * @apiGroup AOIPatch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all patches for a given API
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListPatches.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListPatches.json} apiSuccess
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/patch', {
+        name: 'List Patches',
+        group: 'AOIPatch',
+        auth: 'user',
+        description: 'Return all patches for a given API',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         query: 'req.query.ListPatches.json',
@@ -35,20 +25,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:project/aoi/:aoiid/patch Create Patch
-     * @apiVersion 1.0.0
-     * @apiName CreatePatch
-     * @apiGroup AOIPatch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new Patch
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreatePatch.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
-     */
     await schema.post('/project/:projectid/aoi/:aoiid/patch', {
+        name: 'Create Patch',
+        group: 'AOIPatch',
+        auth: 'user',
+        description: 'Create a new patch',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         body: 'req.body.CreatePatch.json',
@@ -68,19 +49,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/project/:project/aoi/:aoiid/patch/:patchid Delete Patch
-     * @apiVersion 1.0.0
-     * @apiName DeletePatch
-     * @apiGroup AOIPatch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete a given patch
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/project/:projectid/aoi/:aoiid/patch/:patchid', {
+        name: 'Delete Patch',
+        group: 'AOIPatch',
+        auth: 'user',
+        description: 'Delete a given patch',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':patchid': 'integer',
@@ -99,19 +72,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid Get Patch
-     * @apiVersion 1.0.0
-     * @apiName GetPatch
-     * @apiGroup AOIPatch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Get a specific patch
-     *
-     * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid', {
+        name: 'Get Patch',
+        group: 'AOIPatch',
+        auth: 'user',
+        description: 'Get a specific patch',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':patchid': 'integer',
@@ -126,19 +91,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid/tiles TileJSON Patch
-     * @apiVersion 1.0.0
-     * @apiName TileJSONPatch
-     * @apiGroup AOIPatch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Get the TileJSON for a given AOI Patch
-     *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles', {
+        name: 'TileJSON Patch',
+        group: 'AOIPatch',
+        auth: 'user',
+        description: 'Get the TileJSON for a given AOI Patch',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':patchid': 'integer',
@@ -180,17 +137,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y Tile Patch
-     * @apiVersion 1.0.0
-     * @apiName TilePatch
-     * @apiGroup AOIPatch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a Tile for a given AOI Patch
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y', {
+        name: 'Tile Patch',
+        group: 'AOIPatch',
+        auth: 'user',
+        description: 'Return a Tile for a given AOI Patch',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':patchid': 'integer',
@@ -212,17 +163,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid/patch/:patchid/download Download Patch
-     * @apiVersion 1.0.0
-     * @apiName DownloadPatch
-     * @apiGroup AOIPatch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Download a Tiff Patch
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/patch/:patchid/download', {
+        name: 'Download Patch',
+        group: 'AOIPatch',
+        auth: 'user',
+        description: 'Download a Tiff Patch',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':patchid': 'integer'
@@ -236,19 +181,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:projectid/aoi/:aoiid/patch/:patchid/upload Upload Patch
-     * @apiVersion 1.0.0
-     * @apiName UploadPatch
-     * @apiGroup AOIPatch
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Upload a new AOI Patch asset to the API
-     *
-     * @apiSchema {jsonschema=../schema/res.Patch.json} apiSuccess
-     */
     await schema.post('/project/:projectid/aoi/:aoiid/patch/:patchid/upload', {
+        name: 'Upload Patch',
+        group: 'AOIPatch',
+        auth: 'admin',
+        description: 'Upload a new AOI Patch asset to the API',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':patchid': 'integer',

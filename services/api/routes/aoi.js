@@ -72,19 +72,11 @@ export default async function router(schema, config) {
     };
 
 
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid Get AOI
-     * @apiVersion 1.0.0
-     * @apiName GetAOI
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all information about a given AOI
-     *
-     * @apiSchema {jsonschema=../schema/res.ListBatches.json} apiSuccess
-     */
     await schema.get('/project/:projectid/aoi/:aoiid', {
+        name: 'Get AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Return all information about a given AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         res: 'res.AOI.json'
@@ -106,19 +98,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid/tiles TileJSON AOI
-     * @apiVersion 1.0.0
-     * @apiName TileJSONAOI
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return tilejson for a given AOI
-     *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/tiles', {
+        name: 'TileJSON AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Return a TileJSON for a given AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         res: 'res.TileJSON.json'
@@ -135,17 +119,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/aoi/:aoiid/tiles/:z/:x/:y Tile AOI
-     * @apiVersion 1.0.0
-     * @apiName TileAOI
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a Tile for a given AOI
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', {
+        name: 'Tile AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Return a Tile for a given AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':z': 'integer',
@@ -166,19 +144,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:projectid/aoi/:aoiid/upload Upload AOI
-     * @apiVersion 1.0.0
-     * @apiName UploadAOI
-     * @apiGroup AOI
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Upload a new GeoTiff to the API
-     *
-     * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
-     */
     await schema.post('/project/:projectid/aoi/:aoiid/upload', {
+        name: 'Upload AOI',
+        group: 'AOI',
+        auth: 'admin',
+        description: 'Upload a new GeoTIFF to the API',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         res: 'res.AOI.json'
@@ -252,17 +222,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/aoi/:aoiid/download/raw Download Raw AOI
-     * @apiVersion 1.0.0
-     * @apiName DownloadRawAOI
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return the aoi fabric geotiff
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/download/raw', {
+        name: 'Download Raw AOI',
+        group: 'AOI',
+        auth: 'admin',
+        description: 'Return the AOI Fabric as a GeoTIFF',
         ':projectid': 'integer',
         ':aoiid': 'integer'
     }, config.requiresAuth, async (req, res) => {
@@ -275,17 +239,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/aoi/:aoiid/download/color Download Color AOI
-     * @apiVersion 1.0.0
-     * @apiName DownloadColorAOI
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return the colourized aoi fabric geotiff - but doesn't save it to share page
-     */
     await schema.get('/project/:projectid/aoi/:aoiid/download/color', {
+        name: 'Download Color AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Return the colourized aoi fabric geotiff - but doesn\'t save it to share page',
         ':projectid': 'integer',
         ':aoiid': 'integer'
     }, config.requiresAuth, async (req, res) => {
@@ -320,20 +278,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/aoi List AOIs
-     * @apiVersion 1.0.0
-     * @apiName ListAOIs
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all aois for a given instance
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.aoi.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListAOIs.json} apiSuccess
-     */
     await schema.get('/project/:projectid/aoi', {
+        name: 'List AOIs',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Return all AOIs for a given instance',
         ':projectid': 'integer',
         query: 'req.query.aoi.json',
         res: 'res.ListAOIs.json'
@@ -357,21 +306,14 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:projectid/aoi Create AOI
-     * @apiVersion 1.0.0
-     * @apiName CreateAOI
-     * @apiGroup AOI
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Create a new AOI during an instance
-     *     Note: this is an internal API that is called by the websocket GPU
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateAOI.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
-     */
     await schema.post('/project/:projectid/aoi', {
+        name: 'Create AOI',
+        group: 'AOI',
+        auth: 'admin',
+        description: `
+            Create a new AOI during an instance
+            Note: this is an internal API that is called by the websocket GPU
+        `,
         ':projectid': 'integer',
         body: 'req.body.CreateAOI.json',
         res: 'res.AOI.json'
@@ -394,19 +336,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:projectid/aoi/:aoiid/share Create Share
-     * @apiVersion 1.0.0
-     * @apiName ShareAOI
-     * @apiGroup Share
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Export an AOI & it's patches to share
-     *
-     * @apiSchema {jsonschema=../schema/res.Share.json} apiSuccess
-     */
     await schema.post('/project/:projectid/aoi/:aoiid/share', {
+        name: 'Create Share',
+        group: 'Share',
+        auth: 'user',
+        description: 'Export an AOI & it\'s patches to share',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         res: 'res.Share.json'
@@ -450,19 +384,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/project/:projectid/aoi/:aoiid/share/:shareuuid Delete Share
-     * @apiVersion 1.0.0
-     * @apiName DeleteShare
-     * @apiGroup Share
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete a Shared AOI
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/project/:projectid/aoi/:aoiid/share/:shareuuid', {
+        name: 'Delete Share',
+        group: 'Share',
+        auth: 'user',
+        description: 'Delete a shared AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':shareuuid': 'string',
@@ -483,20 +409,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/share List Shares
-     * @apiVersion 1.0.0
-     * @apiName ListShares
-     * @apiGroup Share
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all shares for a given project
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.Share.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListShare.json} apiSuccess
-     */
     await schema.get('/project/:projectid/share', {
+        name: 'List Shares',
+        group: 'Share',
+        auth: 'user',
+        description: 'Return all shares for a given project',
         ':projectid': 'integer',
         query: 'req.query.Share.json',
         res: 'res.ListShare.json'
@@ -510,19 +427,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/project/:projectid/aoi/:aoiid Delete AOI
-     * @apiVersion 1.0.0
-     * @apiName DeleteAOI
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete an existing AOI
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/project/:projectid/aoi/:aoiid', {
+        name: 'Delete AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Delete an existing AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         res: 'res.Standard.json'
@@ -541,20 +450,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/project/:projectid/aoi/:aoiid Patch AOI
-     * @apiVersion 1.0.0
-     * @apiName PatchAOI
-     * @apiGroup AOI
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Update an AOI
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchAOI.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
-     */
     await schema.patch('/project/:projectid/aoi/:aoiid', {
+        name: 'Patch AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Update an AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         body: 'req.body.PatchAOI.json',
@@ -575,19 +475,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/share/:shareuuid Get Share
-     * @apiVersion 1.0.0
-     * @apiName GetShare
-     * @apiGroup Share
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return all information about a given AOI Export using the UUID
-     *
-     * @apiSchema {jsonschema=../schema/res.Share.json} apiSuccess
-     */
     await schema.get('/share/:shareuuid', {
+        name: 'Get Share',
+        group: 'Share',
+        auth: 'public',
+        description: 'Return all information about a given AOI Export using the UUID',
         ':shareuuid': 'string',
         res: 'res.Share.json'
     }, async (req, res) => {
@@ -599,19 +491,12 @@ export default async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
-    /**
-     * @api {get} /api/share/:shareuuid/tiles TileJSON
-     * @apiVersion 1.0.0
-     * @apiName TileJSON
-     * @apiGroup Share
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return tilejson for a given AOI using uuid
-     *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
-     */
+
     await schema.get('/share/:shareuuid/tiles', {
+        name: 'TileJSON',
+        group: 'Share',
+        auth: 'public',
+        description: 'Return tilejson for a given AOI using uuid',
         ':shareuuid': 'string',
         res: 'res.TileJSON.json'
     }, async (req, res) => {
@@ -627,17 +512,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/share/:shareuuid/tiles/:z/:x/:y Tiles
-     * @apiVersion 1.0.0
-     * @apiName Tile
-     * @apiGroup Share
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return a Tile for a given AOI using uuid
-     */
     await schema.get('/share/:shareuuid/tiles/:z/:x/:y', {
+        name: 'Tiles',
+        group: 'Share',
+        auth: 'public',
+        description: 'Return a Tile for a given AOI using uuid',
         ':shareuuid': 'string',
         ':z': 'integer',
         ':x': 'integer',
@@ -656,17 +535,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/share/:shareuuid/download/raw Download Raw AOI
-     * @apiVersion 1.0.0
-     * @apiName DownloadRawAOI
-     * @apiGroup Share
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return the aoi fabric geotiff
-     */
     await schema.get('/share/:shareuuid/download/raw', {
+        name: 'Download Raw AOI',
+        group: 'Share',
+        auth: 'public',
+        description: 'Return the aoi fabric geotiff',
         ':shareuuid': 'string'
     }, async (req, res) => {
         try {
@@ -680,17 +553,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/share/:shareuuid/download/color Download Color AOI
-     * @apiVersion 1.0.0
-     * @apiName DownloadColorAOI
-     * @apiGroup Share
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return the colourized aoi fabric geotiff
-     */
     await schema.get('/share/:shareuuid/download/color', {
+        name: 'Download Color AOI',
+        group: 'Share',
+        auth: 'public',
+        description: 'Return the colourized aoi fabric geotiff',
         ':shareuuid': 'string'
     }, async (req, res) => {
         try {
