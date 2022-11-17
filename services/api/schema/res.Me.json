@@ -6,7 +6,8 @@
         "created",
         "updated",
         "email",
-        "access"
+        "access",
+        "flags"
     ],
     "additionalProperties": false,
     "properties": {
@@ -27,6 +28,9 @@
         },
         "access": {
             "type": "string" 
+        },
+        "flags": {
+            "type": "object" 
         }
     }
 }

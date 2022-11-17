@@ -25,7 +25,7 @@ test('POST /api/project/1/aoi/1/patch - no project', async (t) => {
         t.equals(res.statusCode, 404, 'status: 404');
         t.deepEquals(res.body, {
             status: 404,
-            message: 'No project found',
+            message: 'projects not found',
             messages: []
         });
 

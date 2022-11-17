@@ -76,7 +76,8 @@ test('POST /api/login', async (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'API endpoint does not exist!'
+            message: 'API endpoint does not exist!',
+            messages: []
         }, false);
     } catch (err) {
         t.error(err, 'no errors');

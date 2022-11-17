@@ -98,6 +98,7 @@ export default async function router(schema, config) {
 
             const a_json = a.serialize();
             a_json.shares = shares.shares;
+            a_json.area = a.area;
 
             return res.json(a_json);
         } catch (err) {
@@ -384,8 +385,10 @@ export default async function router(schema, config) {
             req.body.classes = chkpt.classes;
 
             const a = await AOI.generate(config.pool, req.body);
+            const json = a.serialize();
+            json.area = a.area;
 
-            return res.json(a.serialize());
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
