@@ -2,17 +2,11 @@ import Err from '@openaddresses/batch-error';
 import Token from '../lib/types/token.js';
 
 export default async function router(schema, config) {
-    /**
-     * @api {get} /api/token List Tokens
-     * @apiVersion 1.0.0
-     * @apiName ListTokens
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListTokens.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListTokens.json} apiSuccess
-     */
     await schema.get('/token', {
+        name: 'List Tokens',
+        group: 'Token',
+        auth: 'user',
+        description: 'List Tokens',
         query: 'req.query.ListTokens.json',
         res: 'res.ListTokens.json'
     }, config.requiresAuth, async (req, res) => {
@@ -26,20 +20,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/token Create Token
-     * @apiVersion 1.0.0
-     * @apiName CreateToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new API token to perform API requests with
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateToken.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Token.json} apiSuccess
-     */
     await schema.post('/token', {
+        name: 'Create Tokens',
+        group: 'Token',
+        auth: 'user',
+        description: 'Create a new API token to perform API requests with',
         body: 'req.body.CreateToken.json',
         res: 'res.Token.json'
     }, config.requiresAuth, async (req, res) => {
@@ -56,19 +41,11 @@ export default async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/token/:id Delete Token
-     * @apiVersion 1.0.0
-     * @apiName DeleteToken
-     * @apiGroup Token
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete an existing token
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/token/:tokenid', {
+        name: 'Delete Token',
+        group: 'Token',
+        auth: 'user',
+        description: 'Delete an existing token',
         ':tokenid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
