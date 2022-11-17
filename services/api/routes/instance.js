@@ -88,7 +88,7 @@ export default async function router(schema, config) {
         group: 'Instance',
         auth: 'user',
         description: `
-            Return a list of instances. Note that users can only get their own instances and use of the `uid`
+            Return a list of instances. Note that users can only get their own instances and use of the \`uid\`
             field will be pinned to their own uid. Admins can filter by any uid or none.
         `,
         ':projectid': 'integer',

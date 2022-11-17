@@ -13,19 +13,11 @@ export default async function router(schema) {
         );
     });
 
-    /**
-     * @api {get} /websocket Schemas
-     * @apiVersion 1.0.0
-     * @apiName Schemas
-     * @apiGroup Websockets
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return an object containing all the schemas used by the websocket router
-     *
-     * @apiSchema (Body) {jsonschema=../schema/websocket/model#osm.json} apiParam
-     */
     await schema.get('/websocket', {
+        name: 'Schemas',
+        group: 'Websockets',
+        auth: 'public',
+        description: 'Return an object containing all the schemas used by the websocket router',
         res: 'res.Websocket.json'
     }, async (req, res) => {
         try {

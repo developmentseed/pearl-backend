@@ -9,7 +9,7 @@ export default async function router(schema, config) {
         name: 'Create Model',
         group: 'Model',
         auth: 'admin',
-        description: 'Create a new model in the system'
+        description: 'Create a new model in the system',
         body: 'req.body.CreateModel.json',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
@@ -43,7 +43,7 @@ export default async function router(schema, config) {
         name: 'Update Model',
         group: 'Model',
         auth: 'admin',
-        description: 'Update a model'
+        description: 'Update a model',
         ':modelid': 'integer',
         body: 'req.body.PatchModel.json',
         res: 'res.Model.json'
@@ -81,7 +81,7 @@ export default async function router(schema, config) {
         name: 'Upload Model',
         group: 'Model',
         auth: 'admin',
-        description: 'Upload a new model asset'
+        description: 'Upload a new model asset',
         ':modelid': 'integer',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
@@ -122,7 +122,7 @@ export default async function router(schema, config) {
         name: 'List Models',
         group: 'Model',
         auth: 'user',
-        description: 'List information about a set of models'
+        description: 'List information about a set of models',
         query: 'req.query.ListModels.json',
         res: 'res.ListModels.json'
     }, config.requiresAuth, async (req, res) => {

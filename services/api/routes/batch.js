@@ -9,7 +9,7 @@ export default async function router(schema, config) {
         name: 'List Batch',
         group: 'Batch',
         auth: 'user',
-        description: 'Return a list of all batches for a given user'
+        description: 'Return a list of all batches for a given user',
         ':projectid': 'integer',
         query: 'req.query.ListBatches.json',
         res: 'res.ListBatches.json'
