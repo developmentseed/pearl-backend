@@ -268,7 +268,9 @@ export default async function router(schema, config) {
 
             aois.aois.forEach(async (a) => {
                 const aoi = await AOI.from(config.pool, a.id);
-                await aoi.delete(config.pool);
+                await aoi.commit({
+                    archived: true
+                });
             });
 
             await checkpoint.delete(config.pool, req.params.checkpointid);

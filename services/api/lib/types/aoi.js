@@ -161,26 +161,6 @@ export default class AOI extends Generic {
         return await storage.download(`aoi-${this.id}.tiff`, res);
     }
 
-    async delete() {
-        let pgres;
-        try {
-            pgres = await this._pool.query(sql`
-                UPDATE aois
-                    SET
-                        archived = true
-                    WHERE
-                        id = ${this.id}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to delete AOI');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
-
-        return true;
-    }
-
     /**
      * Return a single aoi
      *

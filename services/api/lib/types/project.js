@@ -22,6 +22,10 @@ export default class Project extends Generic {
             throw new Err(403, null, 'Cannot access a project you are not the owner of');
         }
 
+        if (proj.archived) {
+            throw new Err(404, null, 'No project found');
+        }
+
         return proj;
     }
 
@@ -74,26 +78,5 @@ export default class Project extends Generic {
         }
 
         return this.deserialize_list(pgres);
-    }
-
-    /**
-     * Delete Project
-     *
-     * @param {Pool} pool Instantiated Postgres Pool
-     */
-    async delete() {
-        try {
-            await this._pool.query(sql`
-                UPDATE projects
-                    SET
-                        archived = true
-                    WHERE
-                        id = ${this.id}
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to archive Project');
-        }
-
-        return {};
     }
 }

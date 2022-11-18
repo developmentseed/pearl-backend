@@ -328,7 +328,7 @@ export default async function router(schema, config) {
 
             const a = await AOI.from(config.pool, (await AOI.generate(config.pool, req.body)).id);
 
-            return res.json(a);
+            return res.json(a.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -437,7 +437,9 @@ export default async function router(schema, config) {
         try {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            await a.delete(config.pool);
+            await a.commit({
+                archived: true
+            });
 
             return res.json({
                 status: 200,

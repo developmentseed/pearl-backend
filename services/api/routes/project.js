@@ -138,7 +138,9 @@ export default async function router(schema, config) {
             const aois = await AOI.list(config.pool, req.params.projectid);
             aois.aois.forEach(async (a) => {
                 const aoi = await AOI.from(config.pool, a.id);
-                await aoi.delete();
+                await aoi.commit({
+                    archived: true
+                });
             });
 
             const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
@@ -147,7 +149,10 @@ export default async function router(schema, config) {
                 await ch.delete();
             });
 
-            await proj.delete();
+            await proj.commit({
+                archived: true
+            });
+
             return res.json({
                 status: 200,
                 message: 'Project Deleted'
