@@ -273,7 +273,9 @@ export default async function router(schema, config) {
                 });
             });
 
-            await checkpoint.delete(config.pool, req.params.checkpointid);
+            await checkpoint.commit({
+                archived: true
+            });
 
             return res.json({
                 status: 200,
@@ -296,6 +298,11 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+
+            if (req.body.classes && checkpoint.classes.length !== req.body.classes.length) {
+                throw new Err(400, null, 'Cannot change the number of classes once a checkpoint is created');
+            }
+
             await checkpoint.commit(req.body);
 
             return res.json(checkpoint.serialize());

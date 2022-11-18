@@ -146,7 +146,9 @@ export default async function router(schema, config) {
             const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
             chkpts.checkpoints.forEach(async (c) => {
                 const ch = await Checkpoint.from(config.pool, c.id);
-                await ch.delete();
+                await ch.commit({
+                    archived: true
+                });
             });
 
             await proj.commit({

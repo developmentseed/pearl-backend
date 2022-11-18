@@ -111,26 +111,6 @@ export default class CheckPoint extends Generic {
         return list;
     }
 
-    async delete() {
-        let pgres;
-        try {
-            pgres = await this._pool.query(sql`
-                UPDATE checkpoints
-                    SET
-                        archived = true
-                    WHERE
-                        id = ${this.id}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to archive Checkpoint');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
-
-        return true;
-    }
-
     /**
      * Upload a Checkpoint and mark the Checkpoint storage property as true
      *
@@ -159,40 +139,6 @@ export default class CheckPoint extends Generic {
 
         const storage = new Storage(config, 'checkpoints');
         await storage.download(`checkpoint-${this.id}`, res);
-    }
-
-    /**
-     * Update Checkpoint Properties
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     */
-    async commit(pool) {
-        let pgres;
-
-        const current = await CheckPoint.from(pool, this.id);
-        if (current.classes.length !== this.classes.length) {
-            throw new Err(400, null, 'Cannot change the number of classes once a checkpoint is created');
-        }
-
-        try {
-            pgres = await this._pool.query(sql`
-                UPDATE checkpoints
-                    SET
-                        storage = ${this.storage},
-                        name = ${this.name},
-                        bookmarked = ${this.bookmarked},
-                        classes = ${this.classes ? JSON.stringify(this.classes) : null}::JSONB
-                    WHERE
-                        id = ${this.id}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update Checkpoint');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
-
-        return this;
     }
 
     /**
@@ -247,50 +193,6 @@ export default class CheckPoint extends Generic {
         if (!pgres.rows.length) throw new Err(404, null, 'Checkpoint not found');
 
         return this.deserialize(pool, pgres);
-    }
-
-    /**
-     * Create a new Checkpoint
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Object} checkpoint - Checkpoint Object
-     * @param {Number} checkpoint.project_id - Project the checkpoint belongs to
-     * @param {String} checkpoint.name - Human readable name
-     * @param {Number} checkpoint.parent - Parent Checkpoint ID
-     * @param {Object[]} checkpoint.classes - Checkpoint Class names
-     * @param {Object[]} checkpoint.geoms - GeoJSON MultiPoint Geometries
-     * @param {Object} checkpoint.analytics - Checkpoint Analytics
-     * @param {Number} checkpoint.osmtag_id - optional ID of OSMTAgs used
-     */
-    static async generate(pool, checkpoint) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO checkpoints (
-                    project_id,
-                    parent,
-                    name,
-                    classes,
-                    retrain_geoms,
-                    input_geoms,
-                    analytics,
-                    osmtag_id
-                ) VALUES (
-                    ${checkpoint.project_id},
-                    ${checkpoint.parent ? checkpoint.parent : null},
-                    ${checkpoint.name},
-                    ${JSON.stringify(checkpoint.classes)}::JSONB,
-                    ${sql.array(checkpoint.retrain_geoms.map((e) => JSON.stringify(e)), 'json')}::JSONB[],
-                    ${sql.array(checkpoint.input_geoms.map((e) => JSON.stringify(e)), 'json')}::JSONB[],
-                    ${checkpoint.analytics ? JSON.stringify(checkpoint.analytics) : null}::JSONB,
-                    ${checkpoint.osmtag_id || null}
-                ) RETURNING *
-            `);
-
-            return this.deserialize(pool, pgres);
-        } catch (err) {
-            if (err.originalError && err.originalError.code && err.originalError.code === '23503') throw new Err(400, err, 'Parent does not exist');
-            throw new Err(500, err, 'Failed to create checkpoint');
-        }
     }
 
     /**
