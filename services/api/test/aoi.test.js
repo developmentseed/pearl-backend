@@ -200,6 +200,12 @@ test('GET /api/project/1/aoi', async (t) => {
         t.deepEquals(res.body.aois[0].px_stats, {});
         t.deepEquals(res.body.aois[0].bounds, {
             type: 'Polygon',
+            bounds: [
+                -79.37724530696869,
+                38.83428180092151,
+                -79.37677592039108,
+                38.83455550411051
+            ],
             coordinates: [[
                 [-79.37724530696869, 38.83428180092151],
                 [-79.37677592039108, 38.83428180092151],

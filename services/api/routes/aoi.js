@@ -7,6 +7,7 @@ import AOIPatch from '../lib/types/aoi-patch.js';
 import AOIShare from '../lib/types/aoi-share.js';
 import Proxy from '../lib/proxy.js';
 import User from '../lib/types/user.js';
+import { sql } from 'slonik';
 
 export default async function router(schema, config) {
     const getAoiTileJSON = async (aoi, req) => {
@@ -90,7 +91,6 @@ export default async function router(schema, config) {
 
             const a_json = a.serialize();
             a_json.shares = shares.shares;
-            a_json.area = a.area;
 
             return res.json(a_json);
         } catch (err) {
@@ -326,11 +326,9 @@ export default async function router(schema, config) {
             const chkpt = await Checkpoint.from(config.pool, req.body.checkpoint_id);
             req.body.classes = chkpt.classes;
 
-            const a = await AOI.generate(config.pool, req.body);
-            const json = a.serialize();
-            json.area = a.area;
+            const a = await AOI.from(config.pool, (await AOI.generate(config.pool, req.body)).id);
 
-            return res.json(json);
+            return res.json(a);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -467,9 +465,14 @@ export default async function router(schema, config) {
                 throw new Err(400, null, 'Cannot change number of classes on an existing AOI');
             }
 
-            await a.commit(req.body);
+            if (req.body.bookmarked && !a.bookmarked_at) {
+                req.body.bookmarked_at = sql`NOW()`;
+            } else if (req.body.bookarmed === false) {
+                req.body.bookmarked_at = sql`NULL`;
+            }
 
-            return res.json(a.serialize());
+            await a.commit(req.body);
+            return res.json(a);
         } catch (err) {
             return Err.respond(err, res);
         }

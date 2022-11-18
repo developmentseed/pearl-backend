@@ -82,6 +82,12 @@ export default class AOI extends Generic {
         return list;
     }
 
+    serialize() {
+        const json = super.serialize();
+        json.area = this.area;
+        return json;
+    }
+
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
@@ -173,47 +179,6 @@ export default class AOI extends Generic {
         if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
 
         return true;
-    }
-
-    /**
-     * Update AOI properties
-     */
-    async commit() {
-        let bookmarked_at;
-        if (this.bookmarked && !this.bookmarked_at) {
-            bookmarked_at = sql`NOW()`;
-        } else if (this.bookmarked) {
-            bookmarked_at = sql`bookmarked_at`;
-        } else {
-            bookmarked_at = null;
-        }
-
-        let pgres;
-        try {
-            pgres = await this._pool.query(sql`
-                UPDATE aois
-                    SET
-                        storage = ${this.storage},
-                        name = ${this.name},
-                        bookmarked = ${this.bookmarked},
-                        bookmarked_at = ${bookmarked_at},
-                        patches = ${this.patches ? sql.array(this.patches, sql`BIGINT[]`) : null},
-                        px_stats = ${this.px_stats ? JSON.stringify(this.px_stats) : null}::JSONB,
-                        classes = ${this.classes ? JSON.stringify(this.classes) : null}::JSONB
-                    WHERE
-                        id = ${this.id}
-                    RETURNING
-                        *
-            `);
-        } catch (err) {
-            throw new Err(500, new Error(err), 'Failed to update AOI');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'AOI not found');
-
-        this.bookmarked_at = pgres.rows[0].bookmarked_at;
-
-        return this;
     }
 
     /**
