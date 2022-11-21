@@ -61,9 +61,8 @@ export default async function router(schema, config) {
             const model = await Model.from(config.pool, req.params.modelid);
 
             if (req.body.tagmap && model.osmtag_id) {
-                const tagmap = await OSMTag.from(config.pool, model.osmtag_id);
-                await tagmap.commit({
-                    tagmap: req.body.tapmap
+                await OSMTag.commit(config.pool, model.osmtag_id, {
+                    tagmap: req.body.tagmap
                 });
                 delete req.body.tagmap;
             } else if (req.body.tagmap) {
@@ -188,7 +187,7 @@ export default async function router(schema, config) {
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const model = await Model.from(config.pool, req.params.modelid);
+            const model = (await Model.from(config.pool, req.params.modelid)).serialize();
 
             if (model.osmtag_id) {
                 model.osmtag = [];
@@ -202,7 +201,7 @@ export default async function router(schema, config) {
                 }
             }
 
-            return res.json(model.serialize());
+            return res.json(model);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -221,9 +220,7 @@ export default async function router(schema, config) {
 
             if (!model.osmtag_id) throw new Err(404, null, 'Model does not have OSMTags');
 
-            const tags = await OSMTag.from(config.pool, model.osmtag_id);
-
-            return res.json(tags.serialize());
+            return res.json(await OSMTag.from(config.pool, model.osmtag_id));
         } catch (err) {
             return Err.respond(err, res);
         }
