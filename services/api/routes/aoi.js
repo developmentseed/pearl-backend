@@ -491,7 +491,11 @@ export default async function router(schema, config) {
         try {
             const share = await AOIShare.from(config.pool, req.params.shareuuid);
 
-            return res.json(share.serialize());
+            const json = share.serialize();
+            json.checkpoint_id = share.checkpoint_id;
+            json.classes = share.classes;
+
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
