@@ -1,6 +1,6 @@
-const { promisify } = require('util');
-const arequest = promisify(require('request'));
-const request = require('request');
+import { promisify } from 'util';
+import request from 'request';
+const arequest = promisify(request);
 
 async function run(api, schema, method, url, payload, stream = false) {
     const req = {

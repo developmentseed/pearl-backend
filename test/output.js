@@ -1,15 +1,13 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const Ajv = require('ajv');
-const ajv = new Ajv({
-    allErrors: true
-});
+import fs from 'fs';
+import path from 'path';
+import Ajv from 'ajv';
+
+const ajv = new Ajv({ allErrors: true });
 
 /**
  * @class
  */
-class Output {
+export default class Output {
     /**
      * @constructor
      * @param {Object} t Instantiated tape test runner
@@ -72,5 +70,3 @@ class Output {
         this.log.close();
     }
 }
-
-module.exports = Output;

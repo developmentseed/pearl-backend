@@ -66,7 +66,8 @@ test('POST /api/project', async (t) => {
             uid: 1,
             name: 'Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
 
     } catch (err) {

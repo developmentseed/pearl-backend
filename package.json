@@ -1,5 +1,6 @@
 {
     "name": "lulc",
+    "type": "module",
     "version": "0.9.1",
     "private": true,
     "repository": "git@github.com:developmentseed/lulc-infra",

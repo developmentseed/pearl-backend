@@ -1,13 +1,14 @@
-'use strict';
-const { promisify } = require('util');
-const request = promisify(require('request'));
-const Knex = require('knex');
-const Config = require('../services/api/lib/config');
+import { promisify } from 'util';
+import request from 'request';
+import Knex from 'knex';
+import Config from '../services/api/lib/config.js';
 
-const drop = require('../services/api/test/drop');
-const KnexConfig = require('../services/api/knexfile');
-const Token = require('../services/api/lib/token');
-const User = new require('../services/api/lib/user');
+import drop from '../services/api/test/drop.js';
+import KnexConfig from '../services/api/knexfile.js';
+import Token from '../services/api/lib/types/token.js';
+import User from '../services/api/lib/types/user.js';
+
+const prequest = promisify(request);
 
 const state = {
     project: 1,
@@ -17,7 +18,7 @@ const state = {
     aois: []
 };
 
-function reconnect(test, API) {
+export function reconnect(test, API) {
     running(test, API);
 
     test('pre-run', async (t) => {
@@ -38,7 +39,7 @@ function reconnect(test, API) {
 
     test('Instance 1', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: API + '/api/project/1/instance/1',
@@ -82,7 +83,7 @@ function reconnect(test, API) {
     return state;
 }
 
-function connect(test, API) {
+export function connect(test, API) {
     test('pre-run', async (t) => {
         try {
             await drop();
@@ -122,7 +123,7 @@ function connect(test, API) {
 
     test('new model', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'POST',
                 json: true,
                 url: API + '/api/model',
@@ -190,7 +191,7 @@ function connect(test, API) {
 
     test('new model - storage: true', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'PATCH',
                 json: true,
                 url: API + '/api/model/1',
@@ -242,7 +243,7 @@ function connect(test, API) {
 
     test('Project 1', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'POST',
                 json: true,
                 url: API + '/api/project',
@@ -282,7 +283,7 @@ function connect(test, API) {
 
     test('Instance 1', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'POST',
                 json: true,
                 url: API + '/api/project/1/instance',
@@ -342,7 +343,7 @@ function connect(test, API) {
 function populate(test, API, state) {
     test('Checkpoints', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: API + `/api/project/${state.project}/checkpoint`,
@@ -363,7 +364,7 @@ function populate(test, API, state) {
 
     test('AOIs', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: API + `/api/project/${state.project}/aoi`,
@@ -386,7 +387,7 @@ function populate(test, API, state) {
 function running(test, API) {
     test('api running', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: `${API}/api`
@@ -415,8 +416,3 @@ function running(test, API) {
         t.end();
     });
 }
-
-module.exports = {
-    connect,
-    reconnect
-};
