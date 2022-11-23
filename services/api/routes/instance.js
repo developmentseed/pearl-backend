@@ -55,8 +55,11 @@ export default async function router(schema, config) {
             }
 
             const inst = await Instance.generate(config, req.body);
-
-            res.json(inst.serialize());
+            const json = inst.serialize();
+            json.token = inst.token;
+            json.status = inst.status;
+            json.pod = inst.pod;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -75,13 +78,17 @@ export default async function router(schema, config) {
         try {
             await User.is_admin(req);
 
-            const instance = await Instance.from(config, req.auth, req.params.instanceid);
-            await instance.commit({
+            const inst = await Instance.from(config, req.auth, req.params.instanceid);
+            await inst.commit({
                 ...req.body,
                 last_update: sql`NOW()`
             });
 
-            return res.json(instance.serialize());
+            const json = inst.serialize();
+            json.token = inst.token;
+            json.status = inst.status;
+            json.pod = inst.pod;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -102,7 +109,7 @@ export default async function router(schema, config) {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            res.json(await Instance.list(config.pool, req.params.projectid, req.query));
+            return res.json(await Instance.list(config.pool, req.params.projectid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -118,9 +125,13 @@ export default async function router(schema, config) {
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const instance = await Instance.has_auth(config, req.auth, req.params.projectid, req.params.instanceid);
+            const inst = await Instance.has_auth(config, req.auth, req.params.projectid, req.params.instanceid);
 
-            return res.json(instance.serialize());
+            const json = inst.serialize();
+            json.token = inst.token;
+            json.status = inst.status;
+            json.pod = inst.pod;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -140,9 +151,13 @@ export default async function router(schema, config) {
         try {
             await User.is_admin(req);
 
-            const instance = await Instance.from(config, req.auth, req.params.instanceid);
+            const inst = await Instance.from(config, req.auth, req.params.instanceid);
 
-            return res.json(instance.serialize());
+            const json = inst.serialize();
+            json.token = inst.token;
+            json.status = inst.status;
+            json.pod = inst.pod;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
