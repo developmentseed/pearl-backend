@@ -2,7 +2,7 @@
 import util from './lib/util.js';
 import run from './lib/run.js';
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     (async () => {
         if (process.env.UPDATE) {
             console.log('ok - updating schema');

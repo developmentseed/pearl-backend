@@ -9,7 +9,7 @@ import minimist from 'minimist';
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'ws://localhost:1999';
 
-const { connect, reconnect } = require('./init');
+import { connect, reconnect } from './init.js';
 
 const argv = minimist(process.argv, {
     string: ['postgres'],
