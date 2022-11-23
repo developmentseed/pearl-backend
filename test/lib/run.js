@@ -2,7 +2,7 @@ import { promisify } from 'util';
 import request from 'request';
 const arequest = promisify(request);
 
-async function run(api, schema, method, url, payload, stream = false) {
+export default async function run(api, schema, method, url, payload, stream = false) {
     const req = {
         json: true,
         url: url,
@@ -49,5 +49,3 @@ async function run(api, schema, method, url, payload, stream = false) {
         throw err;
     }
 }
-
-module.exports = run;
