@@ -469,7 +469,7 @@ export default async function router(schema, config) {
 
             if (req.body.bookmarked && !a.bookmarked_at) {
                 req.body.bookmarked_at = sql`NOW()`;
-            } else if (req.body.bookarmed === false) {
+            } else if (req.body.bookmarked === false) {
                 req.body.bookmarked_at = sql`NULL`;
             }
 
