@@ -89,25 +89,4 @@ export default class Batch extends Generic {
 
         return this.deserialize_list(pgres);
     }
-
-    async commit() {
-        try {
-            await this._pool.query(sql`
-                UPDATE batch
-                    SET
-                        aoi         = ${this.aoi},
-                        error       = ${this.error},
-                        abort       = ${this.abort},
-                        completed   = ${this.completed},
-                        progress    = ${this.progress},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save Batch');
-        }
-    }
 }

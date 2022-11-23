@@ -3,6 +3,7 @@ import Batch from '../lib/types/batch.js';
 import Project from '../lib/types/project.js';
 import Instance from '../lib/types/instance.js';
 import Checkpoint from '../lib/types/checkpoint.js';
+import { sql } from 'slonik';
 
 export default async function router(schema, config) {
     await schema.get('/project/:projectid/batch', {
@@ -48,16 +49,20 @@ export default async function router(schema, config) {
 
             if (req.body.checkpoint_id) {
                 await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
+                delete req.body.checkpoint_id;
             }
 
             req.body.uid = req.auth.id;
             req.body.project_id = req.params.projectid;
+
+            const type = req.body.type;
+            delete req.body.type;
             const batch = await Batch.generate(config.pool, req.body);
 
             req.body.project_id = req.params.projectid;
             req.body.batch = batch.id;
 
-            req.body.type = req.params.type ? req.params.type : 'cpu';
+            req.body.type = req.params.type || type || 'cpu';
 
             req.body.uid = req.auth.id;
             const inst = await Instance.generate(config, req.body);
@@ -101,7 +106,10 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
-            await batch.commit(req.body);
+            await batch.commit({
+                ...req.body,
+                updated: sql`Now()`
+            });
 
             return res.json(batch.serialize());
         } catch (err) {
