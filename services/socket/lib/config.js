@@ -42,7 +42,6 @@ export default class Config {
                 await sleep(5000);
 
                 const meta = await this.api.meta();
-                if (meta.statusCode !== 200) throw new Error(meta.body);
 
                 this.Timeout = meta.body.limits.instance_window * 1000;
                 console.error(`ok - Timeout: ${this.Timeout}`);
@@ -59,7 +58,7 @@ export default class Config {
             }
         } while (!this.Timeout);
 
-        this.schemas = (await this.api.schemas()).body;
+        this.schemas = await this.api.schemas();
         for (const key of Object.keys(this.schemas)) {
             this.schemas[key] = ajv.compile(this.schemas[key]);
         }
