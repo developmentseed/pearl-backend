@@ -1,11 +1,10 @@
-'use strict';
 /**
  * @class
  *
  * @prop {Object} gpus instance_id to websocket connection map of GPU instances
  * @prop {Object} clients instance_id to websocket connection map of clients
  */
-class Pool {
+export default class Pool {
     constructor(config, argv) {
         this.config = config;
         this.argv = argv;
@@ -178,5 +177,3 @@ class Pool {
         return this.clients.get(parseInt(instance_id));
     }
 }
-
-module.exports = Pool;

@@ -1,17 +1,18 @@
 #! /usr/bin/env node
-'use strict';
 
-const express = require('express');
-const WebSocket = require('ws');
-const jwt = require('jsonwebtoken');
-const Pool = require('./lib/pool');
-const argv = require('minimist')(process.argv, {
+import express from 'express';
+import WebSocket from 'ws';
+import jwt from 'jsonwebtoken';
+import Pool from './lib/pool.js';
+import minimist from 'minimist';
+
+const argv = minimist(process.argv, {
     boolean: ['prod', 'help', 'debug']
 });
 
-const Timeout = require('./lib/timeout');
+import Timeout from './lib/timeout.js';
+import Config from './lib/config.js';
 
-const Config = require('./lib/config');
 const app = express();
 
 if (require.main === module) {
@@ -20,7 +21,7 @@ if (require.main === module) {
     configure(argv);
 }
 
-async function configure(argv = {}, cb) {
+export async function configure(argv = {}, cb) {
     try {
         const config = await Config.env(argv);
         return server(argv, config, cb);
@@ -35,7 +36,7 @@ async function configure(argv = {}, cb) {
  * @param {Config} config
  * @param {function} cb
  */
-async function server(argv, config, cb) {
+export async function server(argv, config, cb) {
     const pool = new Pool(config, argv);
 
     app.get('/health', (req, res) => {
@@ -107,9 +108,3 @@ async function server(argv, config, cb) {
     });
 
 }
-
-module.exports = {
-    Config,
-    configure,
-    server
-};

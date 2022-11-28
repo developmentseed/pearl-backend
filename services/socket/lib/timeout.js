@@ -1,8 +1,7 @@
-'use strict';
 /**
  * @class
  */
-class Timeout {
+export default class Timeout {
     constructor(config, pool) {
         this.config = config;
         this.pool = pool;
@@ -39,5 +38,3 @@ class Timeout {
         clearInterval(this.timeout);
     }
 }
-
-module.exports = Timeout;

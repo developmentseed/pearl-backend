@@ -1,11 +1,12 @@
-'use strict';
-const Ajv = require('ajv');
+import Ajv from 'ajv';
+import fs from 'fs';
+import API from './api.js';
+
 const ajv = new Ajv({
     allErrors: true
 });
 
-const pkg = require('../package.json');
-const API = require('./api');
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
@@ -14,7 +15,7 @@ const API = require('./api');
  * @prop {Number} Timeout How long a connection can be silent before it's resources are terminated
  * @prop {Number} [Alive=30000] How often the client must ping/pong to retain an active connection
  */
-class Config {
+export default class Config {
 
     /**
      * Combine cli arguments, environment variables and defaults into a single Config object
@@ -96,5 +97,3 @@ function sleep(ms) {
         setTimeout(resolve, ms);
     });
 }
-
-module.exports = Config;
