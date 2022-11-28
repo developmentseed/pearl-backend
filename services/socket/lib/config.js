@@ -43,7 +43,7 @@ export default class Config {
 
                 const meta = await this.api.meta();
 
-                this.Timeout = meta.body.limits.instance_window * 1000;
+                this.Timeout = meta.limits.instance_window * 1000;
                 console.error(`ok - Timeout: ${this.Timeout}`);
             } catch (err) {
                 console.error(err);
