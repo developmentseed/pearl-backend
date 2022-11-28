@@ -2,6 +2,7 @@ import { promisify } from 'util';
 import request from 'request';
 import Knex from 'knex';
 import Config from '../services/api/lib/config.js';
+import { Pool } from '@openaddresses/batch-generic';
 
 import drop from '../services/api/test/drop.js';
 import KnexConfig from '../services/api/knexfile.js';
@@ -23,6 +24,9 @@ export function reconnect(test, API) {
 
     test('pre-run', async (t) => {
         const config = await Config.env();
+        config.pool = await Pool.connect(config.Postgres, {
+            parsing: { geometry: true }
+        });
 
         try {
             state.token = (await Token.generate(config.pool, {
@@ -89,6 +93,9 @@ export function connect(test, API) {
             await drop();
 
             const config = await Config.env();
+            config.pool = await Pool.connect(config.Postgres, {
+                parsing: { geometry: true }
+            });
 
             KnexConfig.connection = config.Postgres;
             const knex = Knex(KnexConfig);
@@ -260,8 +267,8 @@ export function connect(test, API) {
             t.equals(res.statusCode, 200, '200 status code');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'created', 'id', 'model_id', 'mosaic', 'name', 'uid'
-            ], 'expected props');
+                'created', 'id', 'model_id', 'mosaic', 'name', 'uid', 'model_name'
+            ].sort(), 'expected props');
 
             t.ok(res.body.created, 'created: <date>');
 
@@ -272,7 +279,8 @@ export function connect(test, API) {
                 uid: 1,
                 name: 'Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest'
+                mosaic: 'naip.latest',
+                model_name: 'NAIP Supervised'
             }, 'expected body');
         } catch (err) {
             t.error(err, 'no error');
