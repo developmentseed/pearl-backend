@@ -1,0 +1,6 @@
+{
+    "type": "string",
+    "format": "uuid",
+    "description": "",
+    "$comment": "uuid"
+}

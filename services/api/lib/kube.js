@@ -1,10 +1,9 @@
-'use strict';
-const k8s = require('@kubernetes/client-node');
+import k8s from '@kubernetes/client-node';
 
 /**
  * @class Kube
  */
-class Kube {
+export default class Kube {
 
     /**
      * Kubernetes Client
@@ -183,5 +182,3 @@ class Kube {
         return res.body;
     }
 }
-
-module.exports = Kube;

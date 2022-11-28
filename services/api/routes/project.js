@@ -1,28 +1,17 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Mosaic = require('../lib/mosaic');
-const Project = require('../lib/project');
-const AOI = require('../lib/aoi');
-const Model = require('../lib/model');
-const Instance = require('../lib/instance');
-const Checkpoint = require('../lib/checkpoint');
+import Err from '@openaddresses/batch-error';
+import Mosaic from '../lib/mosaic.js';
+import Project from '../lib/types/project.js';
+import AOI from '../lib/types/aoi.js';
+import Model from '../lib/types/model.js';
+import Instance from '../lib/types/instance.js';
+import Checkpoint from '../lib/types/checkpoint.js';
 
-async function router(schema, config) {
-
-    /**
-     * @api {post} /api/project List Projects
-     * @apiVersion 1.0.0
-     * @apiName ListProjects
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a list of projects
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListProjects.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
-     */
+export default async function router(schema, config) {
     await schema.get('/project', {
+        name: 'List Projects',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Return a list of all projects',
         query: 'req.query.ListProjects.json',
         res: 'res.ListProjects.json'
     }, config.requiresAuth, async (req, res) => {
@@ -52,105 +41,84 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid Get Project
-     * @apiVersion 1.0.0
-     * @apiName GetProject
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all information about a given project
-     *
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
-     */
     await schema.get('/project/:projectid', {
+        name: 'Get Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Return all information about a given project',
         ':projectid': 'integer',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = (await Project.has_auth(config.pool, req.auth, req.params.projectid)).serialize();
+            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
+
+            const json = proj.serialize();
 
             const checkpoints = await Checkpoint.list(config.pool, req.params.projectid, { bookmarked: true });
-            // remove reduntant project id
+            // remove redundant project id
             delete checkpoints.project_id;
-            proj['checkpoints'] = checkpoints.checkpoints;
+            json.checkpoints = checkpoints.checkpoints;
+            const model = await Model.from(config.pool, json.model_id);
+            json.model_name = model.name;
 
-            return res.json(proj);
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
-    /**
-     * @api {post} /api/project Create Project
-     * @apiVersion 1.0.0
-     * @apiName CreateProject
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new project
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateProject.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
-     */
     await schema.post('/project', {
+        name: 'Create Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Create a new project',
         body: 'req.body.CreateProject.json',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
-            const proj = await Project.generate(config.pool, req.auth.id, req.body);
-            return res.json(proj.serialize());
+            const proj = await Project.generate(config.pool, {
+                ...req.body,
+                uid: req.auth.id
+            });
+
+            const json = proj.serialize();
+            const model = await Model.from(config.pool, json.model_id);
+            json.model_name = model.name;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
-    /**
-     * @api {patch} /api/project/:projectid Patch Project
-     * @apiVersion 1.0.0
-     * @apiName PatchProject
-     * @apiGroup Projects
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Update an existing Project
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchProject.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
-     */
     await schema.patch('/project/:projectid', {
+        name: 'Patch Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Update an existing project',
         ':projectid': 'integer',
         body: 'req.body.PatchProject.json',
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
-            proj.patch(req.body);
-            await proj.commit(config.pool);
+            await proj.commit(req.body);
 
-            return res.json(proj.serialize());
+            const json = proj.serialize();
+            const model = await Model.from(config.pool, json.model_id);
+            json.model_name = model.name;
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
-    /**
-     * @api {delete} /api/project/:projectid Delete Project
-     * @apiVersion 1.0.0
-     * @apiName DeleteProject
-     * @apiGroup Project
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Archive a project
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/project/:projectid', {
+        name: 'Delete Project',
+        group: 'Projects',
+        auth: 'user',
+        description: 'Archive a project',
         ':projectid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
@@ -163,23 +131,30 @@ async function router(schema, config) {
 
                 const instance = new Instance();
                 instance.id = inst.id;
-                await instance.delete(config.pool);
+                await instance.delete();
             }
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
             const aois = await AOI.list(config.pool, req.params.projectid);
             aois.aois.forEach(async (a) => {
                 const aoi = await AOI.from(config.pool, a.id);
-                await aoi.delete(config.pool);
+                await aoi.commit({
+                    archived: true
+                });
             });
 
             const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
             chkpts.checkpoints.forEach(async (c) => {
                 const ch = await Checkpoint.from(config.pool, c.id);
-                await ch.delete(config.pool);
+                await ch.commit({
+                    archived: true
+                });
             });
 
-            await proj.delete(config.pool);
+            await proj.commit({
+                archived: true
+            });
+
             return res.json({
                 status: 200,
                 message: 'Project Deleted'
@@ -189,5 +164,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

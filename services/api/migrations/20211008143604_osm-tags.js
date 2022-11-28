@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         CREATE TABLE osmtag (
             id          BIGSERIAL PRIMARY KEY,
@@ -18,7 +18,7 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE models DROP column osmtag_id;
         ALTER TABLE checkpoints DROP column osmtag_id;

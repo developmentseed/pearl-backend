@@ -1,27 +1,17 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Busboy = require('busboy');
-const Project = require('../lib/project');
-const AOI = require('../lib/aoi');
-const Checkpoint = require('../lib/checkpoint');
-const OSMTag = require('../lib/osmtag');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Busboy from 'busboy';
+import Project from '../lib/types/project.js';
+import AOI from '../lib/types/aoi.js';
+import Checkpoint from '../lib/types/checkpoint.js';
+import OSMTag from '../lib/types/osmtag.js';
+import User from '../lib/types/user.js';
 
-async function router(schema, config) {
-
-    /**
-     * @api {get} /api/project/:projectid/checkpoint/:checkpointid Get Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName GetCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a given checkpoint for a given instance
-     *
-     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
-     */
+export default async function router(schema, config) {
     await schema.get('/project/:projectid/checkpoint/:checkpointid', {
+        name: 'Get Checkpoint',
+        group: 'Checkpoints',
+        auth: 'user',
+        description: 'Return a given checkpoint for a given instance',
         ':projectid': 'integer',
         ':checkpointid': 'integer',
         res: 'res.Checkpoint.json'
@@ -35,19 +25,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/checkpoint/:checkpointid/osmtag Get OSMTags
-     * @apiVersion 1.0.0
-     * @apiName GetOSMTags
-     * @apiGroup Checkpoints
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return OSMTags for a Checkpoint if they exist
-     *
-     * @apiSchema {jsonschema=../schema/res.OSMTag.json} apiSuccess
-     */
     await schema.get('/project/:projectid/checkpoint/:checkpointid/osmtag', {
+        name: 'Get OSMTags',
+        group: 'Checkpoints',
+        auth: 'user',
+        description: 'Return OSMTags for a Checkpoint if they exist',
         ':projectid': 'integer',
         ':checkpointid': 'integer',
         res: 'res.OSMTag.json'
@@ -65,19 +47,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles TileJSON Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName TileJSONCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return tilejson for a given Checkpoint
-     *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
-     */
     await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles', {
+        name: 'TileJSON Checkpoint',
+        group: 'Checkpoints',
+        auth: 'user',
+        description: 'Return tilejson for a given Checkpoint',
         ':projectid': 'integer',
         ':checkpointid': 'integer',
         res: 'res.TileJSON.json'
@@ -103,17 +77,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:project/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt Tile Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName TileCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a Tile for a given AOI
-     */
     await schema.get('/project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt', {
+        name: 'Tile Checkpoint',
+        group: 'Checkpoints',
+        auth: 'user',
+        description: 'Return a tile for a given Checkpoint',
         ':projectid': 'integer',
         ':checkpointid': 'integer',
         ':z': 'integer',
@@ -132,19 +100,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:projectid/checkpoint/:checkpointid/upload Upload Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName UploadCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Upload a new checkpoint asset to the API
-     *
-     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
-     */
     await schema.post('/project/:projectid/checkpoint/:checkpointid/upload', {
+        name: 'Upload Checkpoint',
+        group: 'Checkpoints',
+        auth: 'admin',
+        description: 'Upload a new checkpoint asset to the API',
         ':projectid': 'integer',
         ':checkpointid': 'integer',
         res: 'res.Checkpoint.json'
@@ -183,17 +143,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/checkpoint/:checkpointid/download Download Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName DownloadCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Download a checkpoint asset from the API
-     */
     await schema.get('/project/:projectid/checkpoint/:checkpointid/download', {
+        name: 'Download Checkpoint',
+        group: 'Checkpoints',
+        auth: 'user',
+        description: 'Download a checkpoint asset from the API',
         ':projectid': 'integer',
         ':checkpointid': 'integer'
     }, config.requiresAuth, async (req, res) => {
@@ -207,20 +161,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/checkpoint List Checkpoints
-     * @apiVersion 1.0.0
-     * @apiName ListCheckpoints
-     * @apiGroup Checkpoints
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return all checkpoints for a given instance
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.checkpoint.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListCheckpoints.json} apiSuccess
-     */
     await schema.get('/project/:projectid/checkpoint', {
+        name: 'List Checkpoints',
+        group: 'Checkpoints',
+        auth: 'user',
+        description: 'Return all checkpoints for a given instance',
         ':projectid': 'integer',
         query: 'req.query.checkpoint.json',
         res: 'res.ListCheckpoints.json'
@@ -234,21 +179,14 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:projectid/checkpoint Create Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName CreateCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Create a new Checkpoint during an instance
-     *     Note: this is an internal API that is called by the websocket GPU
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateCheckpoint.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
-     */
     await schema.post('/project/:projectid/checkpoint', {
+        name: 'Create Checkpoint',
+        group: 'Checkpoints',
+        auth: 'admin',
+        description: `
+            Create a new checkpont during an instance
+            Note: this is an internal API that is called by the websocket GPU
+        `,
         ':projectid': 'integer',
         body: 'req.body.CreateCheckpoint.json',
         res: 'res.Checkpoint.json'
@@ -305,24 +243,21 @@ async function router(schema, config) {
 
             return res.json(checkpoint.serialize());
         } catch (err) {
+            if (String(err.err).match(/ForeignKeyIntegrityConstraintViolationError/)) {
+                return Err.respond(new Err(400, null, 'Parent does not exist'), res);
+            }
             return Err.respond(err, res);
         }
     });
 
-    /**
-     * @api {delete} /api/project/:projectid/checkpoint/:checkpointid Delete Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName DeleteCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Delete an existing Checkpoint
-     *     NOTE: This will also delete AOIs that depend on the given checkpoint
-     *
-     * * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/project/:projectid/checkpoint/:checkpointid', {
+        name: 'Delete Checkpoint',
+        group: 'Checkpoints',
+        auth: 'user',
+        description: `
+            Delete an existing Checkpoint
+            NOTE: This will also delete AOIs that depend on the given checkpoint
+        `,
         ':projectid': 'integer',
         ':checkpointid': 'integer',
         res: 'res.Standard.json'
@@ -336,10 +271,14 @@ async function router(schema, config) {
 
             aois.aois.forEach(async (a) => {
                 const aoi = await AOI.from(config.pool, a.id);
-                await aoi.delete(config.pool);
+                await aoi.commit({
+                    archived: true
+                });
             });
 
-            await checkpoint.delete(config.pool, req.params.checkpointid);
+            await checkpoint.commit({
+                archived: true
+            });
 
             return res.json({
                 status: 200,
@@ -350,20 +289,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/project/:projectid/checkpoint/:checkpointid Patch Checkpoint
-     * @apiVersion 1.0.0
-     * @apiName PatchCheckpoint
-     * @apiGroup Checkpoints
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Update a checkpoint
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.body.PatchCheckpoint.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Checkpoint.json} apiSuccess
-     */
     await schema.patch('/project/:projectid/checkpoint/:checkpointid', {
+        name: 'Patch Checkpoint',
+        group: 'Checkpoints',
+        auth: 'admin',
+        description: 'Update a checkpoint',
         ':projectid': 'integer',
         ':checkpointid': 'integer',
         body: 'req.body.PatchCheckpoint.json',
@@ -371,8 +301,12 @@ async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
-            checkpoint.patch(req.body);
-            await checkpoint.commit(config.pool);
+
+            if (req.body.classes && checkpoint.classes.length !== req.body.classes.length) {
+                throw new Err(400, null, 'Cannot change the number of classes once a checkpoint is created');
+            }
+
+            await checkpoint.commit(req.body);
 
             return res.json(checkpoint.serialize());
         } catch (err) {
@@ -380,5 +314,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

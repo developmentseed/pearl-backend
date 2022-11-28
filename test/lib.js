@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-'use strict';
+import util from './lib/util.js';
+import run from './lib/run.js';
 
-const util = require('./lib/util');
-const run = require('./lib/run');
-
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     (async () => {
         if (process.env.UPDATE) {
             console.log('ok - updating schema');
@@ -16,7 +14,7 @@ if (require.main === module) {
 /**
  * @class
  */
-class LULC {
+export default class LULC {
 
     /**
      * @param {Object} api Global API Settings Object
@@ -79,5 +77,3 @@ class LULC {
         return await run(this, schema, method, url, payload, stream);
     }
 }
-
-module.exports = LULC;

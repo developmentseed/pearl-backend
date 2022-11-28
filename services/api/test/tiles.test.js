@@ -1,6 +1,5 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -8,7 +7,9 @@ flight.init(test);
 flight.takeoff(test);
 flight.user(test, 'ingalls', true);
 
-test('GET /api/tiles', async (t) => {
+/** NOTE: We currently don't have a QA Tiles sources so this has been commented out **/
+
+test.skip('GET /api/tiles', async (t) => {
     try {
         const res = await flight.request({
             json: true,
@@ -31,7 +32,7 @@ test('GET /api/tiles', async (t) => {
     t.end();
 });
 
-test('GET /api/tiles/qa-latest', async (t) => {
+test.skip('GET /api/tiles/qa-latest', async (t) => {
     try {
         await flight.request({
             json: true,
@@ -48,7 +49,7 @@ test('GET /api/tiles/qa-latest', async (t) => {
     t.end();
 });
 
-test('GET /api/tiles/qa-latest/17/100/100.mvt', async (t) => {
+test.skip('GET /api/tiles/qa-latest/17/100/100.mvt', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/tiles/qa-latest/17/36634/50171.mvt',
@@ -70,7 +71,7 @@ test('GET /api/tiles/qa-latest/17/100/100.mvt', async (t) => {
     t.end();
 });
 
-test('GET /api/tiles/qa-latest/13/100/100.mvt', async (t) => {
+test.skip('GET /api/tiles/qa-latest/13/100/100.mvt', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/tiles/qa-latest/13/100/100.mvt',
@@ -89,7 +90,7 @@ test('GET /api/tiles/qa-latest/13/100/100.mvt', async (t) => {
     t.end();
 });
 
-test('GET /api/tiles/qa-latest/17/36634/50171.mvt?types=Point', async (t) => {
+test.skip('GET /api/tiles/qa-latest/17/36634/50171.mvt?types=Point', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/tiles/qa-latest/17/36634/50171.mvt?types=Point',
@@ -109,7 +110,7 @@ test('GET /api/tiles/qa-latest/17/36634/50171.mvt?types=Point', async (t) => {
     t.end();
 });
 
-test('GET /api/tiles/qa-latest/17/100/100.mvt?types=Point,Polygon', async (t) => {
+test.skip('GET /api/tiles/qa-latest/17/100/100.mvt?types=Point,Polygon', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/tiles/qa-latest/17/36634/50171.mvt?types=Point,Polygon',

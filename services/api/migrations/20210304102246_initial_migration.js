@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         CREATE EXTENSION IF NOT EXISTS POSTGIS;
         CREATE EXTENSION IF NOT EXISTS PGCrypto;
@@ -101,6 +101,6 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(``);
 }

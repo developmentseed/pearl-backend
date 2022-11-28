@@ -1,6 +1,5 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -105,7 +104,8 @@ test('POST /api/project', async (t) => {
             uid: 1,
             name: 'Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
 
     } catch (err) {
@@ -164,6 +164,7 @@ test('POST /api/project/1/aoi', async (t) => {
             ],
             bounds: {
                 type: 'Polygon',
+                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],
@@ -280,7 +281,8 @@ test('POST /api/project (sort)', async (t) => {
             uid: 1,
             name: 'LULC Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
     } catch (err) {
         t.error(err, 'no errors');

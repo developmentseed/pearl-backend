@@ -1,8 +1,6 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const test = require('tape');
-const Flight = require('./flight');
+import fs from 'fs';
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -15,17 +13,17 @@ test('GET: api/schema', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema',
-            method: 'GET',
-            json: true
+            json: true,
+            method: 'GET'
         }, t);
 
-        const fixture = path.resolve(__dirname, './fixtures/get_schema.json');
-
-        t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
+        const fixture = new URL('./fixtures/get_schema.json', import.meta.url);
 
         if (UPDATE) {
             fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
+
+        t.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
     } catch (err) {
         t.error(err, 'no error');
     }
@@ -37,23 +35,23 @@ test('GET: api/schema?method=FAKE', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema?method=fake',
-            method: 'GET',
-            json: true
+            json: true,
+            method: 'GET'
         }, false);
 
-        t.equals(res.statusCode, 400, 'http: 400');
+        t.equal(res.statusCode, 400, 'http: 400');
 
-        t.deepEquals(res.body, {
+        t.deepEqual(res.body, {
             status: 400,
             message: 'validation error',
             messages: [{
                 keyword: 'enum',
-                dataPath: '.method',
+                instancePath: '/method',
                 schemaPath: '#/properties/method/enum',
                 params: {
                     allowedValues: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
                 },
-                message: 'should be equal to one of the allowed values'
+                message: 'must be equal to one of the allowed values'
             }]
         });
     } catch (err) {
@@ -67,12 +65,12 @@ test('GET: api/schema?method=GET', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema?method=GET',
-            method: 'GET',
-            json: true
+            json: true,
+            method: 'GET'
         }, false);
 
-        t.equals(res.statusCode, 400, 'http: 400');
-        t.deepEquals(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
@@ -81,45 +79,22 @@ test('GET: api/schema?method=GET', async (t) => {
     } catch (err) {
         t.error(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/schema?url=123', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema?url=123',
-            method: 'GET',
-            json: true
+            json: true,
+            method: 'GET'
         }, false);
 
-        t.equals(res.statusCode, 400, 'http: 400');
-        t.deepEquals(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
         });
-    } catch (err) {
-        t.error(err, 'no error');
-    }
-
-    t.end();
-});
-
-test('GET: api/schema?method=POST&url=/login', async (t) => {
-    try {
-        const res = await flight.request({
-            url: '/api/schema?method=GET&url=/schema',
-            method: 'GET',
-            json: true
-        }, t);
-
-        t.deepEquals(res.body, {
-            query: require('../schema/req.query.ListSchema.json'),
-            res: require('../schema/res.ListSchema.json'),
-            body: null
-        });
-
     } catch (err) {
         t.error(err, 'no error');
     }

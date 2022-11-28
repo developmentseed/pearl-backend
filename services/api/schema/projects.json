@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./projects/id.json"
+        },
+        "uid": {
+            "$ref": "./projects/uid.json"
+        },
+        "name": {
+            "$ref": "./projects/name.json"
+        },
+        "created": {
+            "$ref": "./projects/created.json"
+        },
+        "model_id": {
+            "$ref": "./projects/model_id.json"
+        },
+        "mosaic": {
+            "$ref": "./projects/mosaic.json"
+        },
+        "archived": {
+            "$ref": "./projects/archived.json"
+        }
+    },
+    "required": [
+        "id",
+        "uid",
+        "name",
+        "created",
+        "model_id",
+        "mosaic",
+        "archived"
+    ]
+}

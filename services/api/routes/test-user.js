@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
-const Token = require('../lib/token');
+import Err from '@openaddresses/batch-error';
+import User from '../lib/types/user.js';
+import Token from '../lib/types/token.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     if (config.test) {
         await schema.post('/user', {}, async (req, res) => {
             try {
@@ -24,5 +23,3 @@ async function router(schema, config) {
         });
     }
 }
-
-module.exports = router;

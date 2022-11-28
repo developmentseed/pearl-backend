@@ -1,13 +1,15 @@
-'use strict';
-const { promisify } = require('util');
-const request = promisify(require('request'));
-const Knex = require('knex');
-const Config = require('../services/api/lib/config');
+import { promisify } from 'util';
+import request from 'request';
+import Knex from 'knex';
+import Config from '../services/api/lib/config.js';
+import { Pool } from '@openaddresses/batch-generic';
 
-const drop = require('../services/api/test/drop');
-const KnexConfig = require('../services/api/knexfile');
-const Token = require('../services/api/lib/token');
-const User = new require('../services/api/lib/user');
+import drop from '../services/api/test/drop.js';
+import KnexConfig from '../services/api/knexfile.js';
+import Token from '../services/api/lib/types/token.js';
+import User from '../services/api/lib/types/user.js';
+
+const prequest = promisify(request);
 
 const state = {
     project: 1,
@@ -17,11 +19,14 @@ const state = {
     aois: []
 };
 
-function reconnect(test, API) {
+export function reconnect(test, API) {
     running(test, API);
 
     test('pre-run', async (t) => {
         const config = await Config.env();
+        config.pool = await Pool.connect(config.Postgres, {
+            parsing: { geometry: true }
+        });
 
         try {
             state.token = (await Token.generate(config.pool, {
@@ -38,7 +43,7 @@ function reconnect(test, API) {
 
     test('Instance 1', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: API + '/api/project/1/instance/1',
@@ -82,12 +87,15 @@ function reconnect(test, API) {
     return state;
 }
 
-function connect(test, API) {
+export function connect(test, API) {
     test('pre-run', async (t) => {
         try {
             await drop();
 
             const config = await Config.env();
+            config.pool = await Pool.connect(config.Postgres, {
+                parsing: { geometry: true }
+            });
 
             KnexConfig.connection = config.Postgres;
             const knex = Knex(KnexConfig);
@@ -122,7 +130,7 @@ function connect(test, API) {
 
     test('new model', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'POST',
                 json: true,
                 url: API + '/api/model',
@@ -190,7 +198,7 @@ function connect(test, API) {
 
     test('new model - storage: true', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'PATCH',
                 json: true,
                 url: API + '/api/model/1',
@@ -242,7 +250,7 @@ function connect(test, API) {
 
     test('Project 1', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'POST',
                 json: true,
                 url: API + '/api/project',
@@ -259,8 +267,8 @@ function connect(test, API) {
             t.equals(res.statusCode, 200, '200 status code');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'created', 'id', 'model_id', 'mosaic', 'name', 'uid'
-            ], 'expected props');
+                'created', 'id', 'model_id', 'mosaic', 'name', 'uid', 'model_name'
+            ].sort(), 'expected props');
 
             t.ok(res.body.created, 'created: <date>');
 
@@ -271,7 +279,8 @@ function connect(test, API) {
                 uid: 1,
                 name: 'Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest'
+                mosaic: 'naip.latest',
+                model_name: 'NAIP Supervised'
             }, 'expected body');
         } catch (err) {
             t.error(err, 'no error');
@@ -282,7 +291,7 @@ function connect(test, API) {
 
     test('Instance 1', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'POST',
                 json: true,
                 url: API + '/api/project/1/instance',
@@ -342,7 +351,7 @@ function connect(test, API) {
 function populate(test, API, state) {
     test('Checkpoints', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: API + `/api/project/${state.project}/checkpoint`,
@@ -363,7 +372,7 @@ function populate(test, API, state) {
 
     test('AOIs', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: API + `/api/project/${state.project}/aoi`,
@@ -386,7 +395,7 @@ function populate(test, API, state) {
 function running(test, API) {
     test('api running', async (t) => {
         try {
-            const res = await request({
+            const res = await prequest({
                 method: 'GET',
                 json: true,
                 url: `${API}/api`
@@ -415,8 +424,3 @@ function running(test, API) {
         t.end();
     });
 }
-
-module.exports = {
-    connect,
-    reconnect
-};

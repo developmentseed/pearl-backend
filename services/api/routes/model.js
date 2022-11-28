@@ -1,27 +1,16 @@
-'use strict';
-const Busboy = require('busboy');
+import Busboy from 'busboy';
+import Err from '@openaddresses/batch-error';
+import Model from '../lib/types/model.js';
+import OSMTag from '../lib/types/osmtag.js';
+import User from '../lib/types/user.js';
+import poly from '@turf/bbox-polygon';
 
-const { Err } = require('@openaddresses/batch-schema');
-const Model = require('../lib/model');
-const OSMTag = require('../lib/osmtag');
-const User = require('../lib/user');
-
-async function router(schema, config) {
-
-    /**
-     * @api {post} /api/model Create Model
-     * @apiVersion 1.0.0
-     * @apiName CreateModel
-     * @apiGroup Model
-     * @apiPermission admin
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateModel.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
-     *
-     * @apiDescription
-     *     Create a new model in the system
-     */
+export default async function router(schema, config) {
     await schema.post('/model', {
+        name: 'Create Model',
+        group: 'Model',
+        auth: 'admin',
+        description: 'Create a new model in the system',
         body: 'req.body.CreateModel.json',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
@@ -42,7 +31,13 @@ async function router(schema, config) {
                 req.body.osmtag_id = tagmap.id;
             }
 
-            const model = await Model.generate(config.pool, req.body);
+            if (!req.body.bounds) req.body.bounds = [-180, -90, 180, 90];
+            req.body.bounds = poly(req.body.bounds).geometry;
+
+            const model = await Model.generate(config.pool, {
+                storage: false,
+                ...req.body
+            });
 
             return res.json(model.serialize());
         } catch (err) {
@@ -51,20 +46,11 @@ async function router(schema, config) {
     });
 
 
-    /**
-     * @api {patch} /api/model/:modelid Update Model
-     * @apiVersion 1.0.0
-     * @apiName PatchModel
-     * @apiGroup Model
-     * @apiPermission admin
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchModel.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
-     *
-     * @apiDescription
-     *     Update a model
-     */
     await schema.patch('/model/:modelid', {
+        name: 'Update Model',
+        group: 'Model',
+        auth: 'admin',
+        description: 'Update a model',
         ':modelid': 'integer',
         body: 'req.body.PatchModel.json',
         res: 'res.Model.json'
@@ -75,9 +61,9 @@ async function router(schema, config) {
             const model = await Model.from(config.pool, req.params.modelid);
 
             if (req.body.tagmap && model.osmtag_id) {
-                const tagmap = await OSMTag.from(config.pool, model.osmtag_id);
-                tagmap.tagmap = req.body.tagmap;
-                await tagmap.commit(config.pool);
+                await OSMTag.commit(config.pool, model.osmtag_id, {
+                    tagmap: req.body.tagmap
+                });
                 delete req.body.tagmap;
             } else if (req.body.tagmap) {
                 const tagmap = await OSMTag.generate(config.pool, {
@@ -89,8 +75,8 @@ async function router(schema, config) {
                 model.osmtag_id = tagmap.id;
             }
 
-            model.patch(req.body);
-            await model.commit(config.pool);
+            if (Array.isArray(req.body.bounds)) req.body.bounds = poly(req.body.bounds).geometry;
+            await model.commit(req.body);
 
             res.json(model.serialize());
         } catch (err) {
@@ -98,19 +84,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/model/:modelid/upload UploadModel
-     * @apiVersion 1.0.0
-     * @apiName UploadModel
-     * @apiGroup Model
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Upload a new model asset to the API
-     *
-     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
-     */
     await schema.post('/model/:modelid/upload', {
+        name: 'Upload Model',
+        group: 'Model',
+        auth: 'admin',
+        description: 'Upload a new model asset',
         ':modelid': 'integer',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
@@ -147,20 +125,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/model List Models
-     * @apiVersion 1.0.0
-     * @apiName ListModel
-     * @apiGroup Model
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     List information about a set of models
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListModels.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListModels.json} apiSuccess
-     */
     await schema.get('/model', {
+        name: 'List Models',
+        group: 'Model',
+        auth: 'user',
+        description: 'List information about a set of models',
         query: 'req.query.ListModels.json',
         res: 'res.ListModels.json'
     }, config.requiresAuth, async (req, res) => {
@@ -183,20 +152,14 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {delete} /api/model/:modelid Delete Model
-     * @apiVersion 1.0.0
-     * @apiName DeleteModel
-     * @apiGroup Model
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Mark a model as inactive, and disallow subsequent instances of this model
-     *     Note: this will not affect currently running instances of the model
-     *
-     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-     */
     await schema.delete('/model/:modelid', {
+        name: 'Delete Model',
+        group: 'Model',
+        auth: 'admin',
+        description: `
+            Mark a model as inactive, and disallow subsequent instances of this model
+            Note: this will not affect currently running instances of the model
+        `,
         ':modelid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
@@ -215,24 +178,16 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/model/:modelid Get Model
-     * @apiVersion 1.0.0
-     * @apiName GetModel
-     * @apiGroup Model
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a all information for a single model
-     *
-     * @apiSchema {jsonschema=../schema/res.Model.json} apiSuccess
-     */
     await schema.get('/model/:modelid', {
+        name: 'Get Model',
+        group: 'Model',
+        auth: 'user',
+        description: 'Return all information about a single model',
         ':modelid': 'integer',
         res: 'res.Model.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const model = await Model.from(config.pool, req.params.modelid);
+            const model = (await Model.from(config.pool, req.params.modelid)).serialize();
 
             if (model.osmtag_id) {
                 model.osmtag = [];
@@ -246,25 +201,17 @@ async function router(schema, config) {
                 }
             }
 
-            return res.json(model.serialize());
+            return res.json(model);
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
-    /**
-     * @api {get} /api/model/:modelid/osmtag Get OSMTags
-     * @apiVersion 1.0.0
-     * @apiName GetOSMTags
-     * @apiGroup Model
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return OSMTags for a Model if they exist
-     *
-     * @apiSchema {jsonschema=../schema/res.OSMTag.json} apiSuccess
-     */
     await schema.get('/model/:modelid/osmtag', {
+        name: 'Get OSMTags',
+        group: 'Model',
+        auth: 'user',
+        description: 'Return OSMTags for a model if they exist',
         ':modelid': 'integer',
         res: 'res.OSMTag.json'
     }, config.requiresAuth, async (req, res) => {
@@ -273,25 +220,17 @@ async function router(schema, config) {
 
             if (!model.osmtag_id) throw new Err(404, null, 'Model does not have OSMTags');
 
-            const tags = await OSMTag.from(config.pool, model.osmtag_id);
-
-            return res.json(tags.serialize());
+            return res.json(await OSMTag.from(config.pool, model.osmtag_id));
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
-    /**
-     * @api {get} /api/model/:modelid/download Download Model
-     * @apiVersion 1.0.0
-     * @apiName DownloadModel
-     * @apiGroup Model
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return the model itself
-     */
     await schema.get('/model/:modelid/download', {
+        name: 'Download Model',
+        group: 'Model',
+        auth: 'user',
+        description: 'Return the model itself',
         ':modelid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -302,5 +241,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;
