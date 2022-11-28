@@ -1,10 +1,11 @@
 #! /usr/bin/env node
 
 import express from 'express';
-import WebSocket from 'ws';
+import { WebSocketServer }  from 'ws';
 import jwt from 'jsonwebtoken';
 import Pool from './lib/pool.js';
 import minimist from 'minimist';
+import http from 'http';
 
 const argv = minimist(process.argv, {
     boolean: ['prod', 'help', 'debug']
@@ -50,12 +51,12 @@ export async function server(argv, config, cb) {
 
     await config.api.deactivate();
 
-    const srv = require('http').createServer();
+    const srv = http.createServer();
     srv.timeout = 0;
     srv.keepAliveTimeout = 0;
     srv.on('request', app);
 
-    const wss = new WebSocket.Server({
+    const wss = new WebSocketServer({
         noServer: true,
         verifyClient: ({ req }, cb) => {
             const url = new URL(`http://localhost:${config.Port}` + req.url);
