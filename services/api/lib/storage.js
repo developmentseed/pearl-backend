@@ -1,15 +1,14 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const moment = require('moment');
-const {
+import Err from '@openaddresses/batch-error';
+import moment from 'moment';
+import {
     BlobSASPermissions,
     BlobServiceClient
-} = require('@azure/storage-blob');
+} from '@azure/storage-blob';
 
 /**
  * @class
  */
-class Storage {
+export default class Storage {
     constructor(config, type) {
         if (!config) throw new Error('config param required');
         if (!type) throw new Error('type param required');
@@ -124,5 +123,3 @@ class Storage {
         await blob.delete();
     }
 }
-
-module.exports = Storage;

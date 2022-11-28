@@ -1,8 +1,7 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
-const fs = require('fs');
-const { sql } = require('slonik');
+import test from 'tape';
+import Flight from './flight.js';
+import fs from 'fs';
+import { sql } from 'slonik';
 
 const flight = new Flight();
 
@@ -84,6 +83,12 @@ test('POST /api/project/1/aoi', async (t) => {
             ],
             bounds: {
                 type: 'Polygon',
+                bounds: [
+                    -79.37724530696869,
+                    38.83428180092151,
+                    -79.37677592039108,
+                    38.83455550411051
+                ],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],
@@ -120,6 +125,12 @@ test('GET /api/project/1/aoi/1', async (t) => {
             area: 1238,
             bounds: {
                 type: 'Polygon',
+                bounds: [
+                    -79.37724530696869,
+                    38.83428180092151,
+                    -79.37677592039108,
+                    38.83455550411051
+                ],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],
@@ -189,6 +200,12 @@ test('GET /api/project/1/aoi', async (t) => {
         t.deepEquals(res.body.aois[0].px_stats, {});
         t.deepEquals(res.body.aois[0].bounds, {
             type: 'Polygon',
+            bounds: [
+                -79.37724530696869,
+                38.83428180092151,
+                -79.37677592039108,
+                38.83455550411051
+            ],
             coordinates: [[
                 [-79.37724530696869, 38.83428180092151],
                 [-79.37677592039108, 38.83428180092151],
@@ -314,6 +331,12 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             name: 'RENAMED',
             bounds: {
                 type: 'Polygon',
+                bounds: [
+                    -79.37724530696869,
+                    38.83428180092151,
+                    -79.37677592039108,
+                    38.83455550411051
+                ],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],
@@ -403,6 +426,12 @@ test('POST /api/project/1/aoi', async (t) => {
             ],
             bounds: {
                 type: 'Polygon',
+                bounds: [
+                    -79.37724530696869,
+                    38.83428180092151,
+                    -79.37677592039108,
+                    38.83455550411051
+                ],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],

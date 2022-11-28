@@ -1,0 +1,40 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./users/id.json"
+        },
+        "auth0_id": {
+            "$ref": "./users/auth0_id.json"
+        },
+        "access": {
+            "$ref": "./users/access.json"
+        },
+        "username": {
+            "$ref": "./users/username.json"
+        },
+        "email": {
+            "$ref": "./users/email.json"
+        },
+        "created": {
+            "$ref": "./users/created.json"
+        },
+        "updated": {
+            "$ref": "./users/updated.json"
+        },
+        "flags": {
+            "$ref": "./users/flags.json"
+        }
+    },
+    "required": [
+        "id",
+        "auth0_id",
+        "access",
+        "username",
+        "email",
+        "created",
+        "updated",
+        "flags"
+    ]
+}

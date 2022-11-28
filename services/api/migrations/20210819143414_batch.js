@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE instances
             DROP COLUMN is_batch;
@@ -28,7 +28,7 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE instances
             ADD COLUMN is_batch BOOLEAN NOT NULL DEFAULT False;

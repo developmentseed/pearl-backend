@@ -4,7 +4,6 @@
         "id",
         "name",
         "bounds",
-        "area",
         "project_id",
         "bookmarked",
         "bookmarked_at",
@@ -13,6 +12,7 @@
         "storage",
         "patches",
         "px_stats",
+        "area",
         "classes"
     ],
     "additionalProperties": false,

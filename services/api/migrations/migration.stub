@@ -1,7 +1,12 @@
-exports.up = function(knex) {
+function up(knex) {
     return knex.schema.raw(``);
 }
 
-exports.down = function(knex) {
+function down(knex) {
     return knex.schema.raw(``);
+}
+
+export {
+    up,
+    down
 }

@@ -1,26 +1,16 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Batch = require('../lib/batch');
-const Project = require('../lib/project');
-const Instance = require('../lib/instance');
-const Checkpoint = require('../lib/checkpoint');
+import Err from '@openaddresses/batch-error';
+import Batch from '../lib/types/batch.js';
+import Project from '../lib/types/project.js';
+import Instance from '../lib/types/instance.js';
+import Checkpoint from '../lib/types/checkpoint.js';
+import { sql } from 'slonik';
 
-async function router(schema, config) {
-
-    /**
-     * @api {get} /api/project/:projectid/batch List Batch
-     * @apiVersion 1.0.0
-     * @apiName ListBatch
-     * @apiGroup Batch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a list of all batches for a given user
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListBatches.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListBatches.json} apiSuccess
-     */
+export default async function router(schema, config) {
     await schema.get('/project/:projectid/batch', {
+        name: 'List Batch',
+        group: 'Batch',
+        auth: 'user',
+        description: 'Return a list of all batches for a given user',
         ':projectid': 'integer',
         query: 'req.query.ListBatches.json',
         res: 'res.ListBatches.json'
@@ -36,20 +26,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {post} /api/project/:projectid/batch Create Batch
-     * @apiVersion 1.0.0
-     * @apiName CreateBatch
-     * @apiGroup Batch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Create a new batch
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateBatch.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Batch.json} apiSuccess
-     */
     await schema.post('/project/:projectid/batch', {
+        name: 'Create Batch',
+        group: 'Batch',
+        auth: 'user',
+        description: 'Create a new batch',
         ':projectid': 'integer',
         body: 'req.body.CreateBatch.json',
         res: 'res.Batch.json'
@@ -68,16 +49,20 @@ async function router(schema, config) {
 
             if (req.body.checkpoint_id) {
                 await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
+                delete req.body.checkpoint_id;
             }
 
             req.body.uid = req.auth.id;
             req.body.project_id = req.params.projectid;
+
+            const type = req.body.type;
+            delete req.body.type;
             const batch = await Batch.generate(config.pool, req.body);
 
             req.body.project_id = req.params.projectid;
             req.body.batch = batch.id;
 
-            req.body.type = req.params.type ? req.params.type : 'cpu';
+            req.body.type = req.params.type || type || 'cpu';
 
             req.body.uid = req.auth.id;
             const inst = await Instance.generate(config, req.body);
@@ -91,19 +76,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/project/:projectid/batch/:batchid Get Batch
-     * @apiVersion 1.0.0
-     * @apiName GetBatch
-     * @apiGroup Batch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a single batch
-     *
-     * @apiSchema {jsonschema=../schema/res.Batch.json} apiSuccess
-     */
     await schema.get('/project/:projectid/batch/:batchid', {
+        name: 'Get Batch',
+        group: 'Batch',
+        auth: 'user',
+        description: 'Return a single batch',
         ':projectid': 'integer',
         ':batchid': 'integer',
         res: 'res.Batch.json'
@@ -117,20 +94,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/project/:projectid/batch/:batchid Patch Batch
-     * @apiVersion 1.0.0
-     * @apiName PatchBatch
-     * @apiGroup Batch
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Update a project
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchBatch.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Batch.json} apiSuccess
-     */
     await schema.patch('/project/:projectid/batch/:batchid', {
+        name: 'Patch Batch',
+        group: 'Batch',
+        auth: 'user',
+        description: 'Update a batch',
         ':projectid': 'integer',
         ':batchid': 'integer',
         body: 'req.body.PatchBatch.json',
@@ -138,8 +106,10 @@ async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
-            batch.patch(req.body);
-            await batch.commit(config.pool);
+            await batch.commit({
+                ...req.body,
+                updated: sql`Now()`
+            });
 
             return res.json(batch.serialize());
         } catch (err) {
@@ -147,5 +117,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

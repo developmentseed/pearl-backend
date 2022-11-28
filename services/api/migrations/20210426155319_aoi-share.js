@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         CREATE TABLE aois_share (
             aoi_id      BIGINT NOT NULL,
@@ -23,7 +23,7 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         DROP TABLE aois_export;
     `);

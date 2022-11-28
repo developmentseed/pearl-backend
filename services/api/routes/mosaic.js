@@ -1,23 +1,13 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Mosaic = require('../lib/mosaic');
-const Proxy = require('../lib/proxy');
+import Err from '@openaddresses/batch-error';
+import Mosaic from '../lib/mosaic.js';
+import Proxy from '../lib/proxy.js';
 
-async function router(schema, config) {
-
-    /**
-     * @api {get} /api/mosaic List Mosaics
-     * @apiVersion 1.0.0
-     * @apiName ListMosaic
-     * @apiGroup Mosaic
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return a list of currently supported mosaic layers
-     *
-     * @apiSchema {jsonschema=../schema/res.Mosaic.json} apiSuccess
-     */
+export default async function router(schema, config) {
     await schema.get('/mosaic', {
+        name: 'List Mosaics',
+        group: 'Mosaic',
+        auth: 'public',
+        description: 'Return a list of currently supported mosaic layers',
         res: 'res.Mosaic.json'
     }, async (req, res) => {
         try {
@@ -27,19 +17,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/mosaic/:layer Get TileJson
-     * @apiVersion 1.0.0
-     * @apiName GetJson
-     * @apiGroup Mosaic
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     Return a TileJSON object for a given mosaic layer
-     *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
-     */
     await schema.get('/mosaic/:layer', {
+        name: 'Get TileJSON',
+        group: 'Mosaic',
+        auth: 'public',
+        description: 'Return a TileJSON object for a given mosaic layer',
         ':layer': 'string',
         res: 'res.TileJSON.json'
     }, async (req, res) => {
@@ -58,25 +40,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /mosaic/:layer/tiles/:z/:x/:y.:format Get Tile
-     * @apiVersion 1.0.0
-     * @apiName GetTile
-     * @apiGroup Mosaic
-     * @apiPermission public
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.tile.json} apiParam
-     *
-     * @apiParam {Integer} z Mercator Z coordinate
-     * @apiParam {Integer} x Mercator X coordinate
-     * @apiParam {Integer} y Mercator Y coordinate
-     * @apiParam {String} format Available values : png, npy, tif, jpg, jp2, webp, pngraw
-     *
-     * @apiDescription
-     *     Return an aerial imagery tile for a given set of mercator coordinates
-     *
-     */
     await schema.get('/mosaic/:layer/tiles/:z/:x/:y.:format', {
+        name: 'Get Tile',
+        group: 'Mosaic',
+        auth: 'public',
+        description: 'Return an aerial imagery tile for a given set of mercator coordinates',
         ':layer': 'string',
         ':format': 'string',
         ':z': 'integer',
@@ -99,5 +67,3 @@ async function router(schema, config) {
     });
 
 }
-
-module.exports = router;

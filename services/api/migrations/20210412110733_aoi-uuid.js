@@ -1,11 +1,11 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE aois
         ADD COLUMN uuid UUID NOT NULL DEFAULT uuid_generate_v4();
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE aois
         DROP COLUMN uuid;

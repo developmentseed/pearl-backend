@@ -1,0 +1,60 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./checkpoints/id.json"
+        },
+        "name": {
+            "$ref": "./checkpoints/name.json"
+        },
+        "classes": {
+            "$ref": "./checkpoints/classes.json"
+        },
+        "project_id": {
+            "$ref": "./checkpoints/project_id.json"
+        },
+        "created": {
+            "$ref": "./checkpoints/created.json"
+        },
+        "storage": {
+            "$ref": "./checkpoints/storage.json"
+        },
+        "bookmarked": {
+            "$ref": "./checkpoints/bookmarked.json"
+        },
+        "retrain_geoms": {
+            "$ref": "./checkpoints/retrain_geoms.json"
+        },
+        "analytics": {
+            "$ref": "./checkpoints/analytics.json"
+        },
+        "input_geoms": {
+            "$ref": "./checkpoints/input_geoms.json"
+        },
+        "parent": {
+            "$ref": "./checkpoints/parent.json"
+        },
+        "archived": {
+            "$ref": "./checkpoints/archived.json"
+        },
+        "osmtag_id": {
+            "$ref": "./checkpoints/osmtag_id.json"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "classes",
+        "project_id",
+        "created",
+        "storage",
+        "bookmarked",
+        "retrain_geoms",
+        "analytics",
+        "input_geoms",
+        "parent",
+        "archived",
+        "osmtag_id"
+    ]
+}

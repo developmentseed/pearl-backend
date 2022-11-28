@@ -14,7 +14,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
     vnet_subnet_id = azurerm_subnet.aks.id
     enable_auto_scaling   = true
     min_count             = 1
-    max_count             = 8
+    max_count             = 1
   }
 
   identity {

@@ -1,9 +1,6 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const test = require('tape');
-
-const Flight = require('./flight');
+import fs from 'fs';
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -69,7 +66,8 @@ test('POST /api/project', async (t) => {
             uid: 1,
             name: 'Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
 
     } catch (err) {
@@ -111,7 +109,7 @@ test('POST /api/project/1/checkpoint', async (t) => {
                 bearer: flight.token.ingalls
             },
             formData : {
-                file : fs.createReadStream(path.resolve(__dirname, './fixtures/asset'))
+                file : fs.createReadStream(new URL('./fixtures/asset', import.meta.url))
             }
         }, t);
     } catch (err) {

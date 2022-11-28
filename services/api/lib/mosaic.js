@@ -1,11 +1,9 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
+import Err from '@openaddresses/batch-error';
 
 /**
  * @class
  */
-class Mosaic {
-
+export default class Mosaic {
     static mosaics = {
         'naip.latest': {
             id: '87b72c66331e136e088004fba817e3e8',
@@ -50,5 +48,3 @@ class Mosaic {
         return this.mosaics[mosaic].default_params;
     }
 }
-
-module.exports = Mosaic;

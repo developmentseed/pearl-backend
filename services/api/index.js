@@ -1,44 +1,41 @@
 #! /usr/bin/env node
-'use strict';
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
-const { fetchJSON } = require('./lib/util');
-const jwt = require('express-jwt');
-const jwks = require('jwks-rsa');
-const cors = require('cors');
-const morgan = require('morgan');
-const minify = require('express-minify');
-const bodyparser = require('body-parser');
-const { ValidationError } = require('express-json-validator-middleware');
-const pkg = require('./package.json');
-const Kube = require('./lib/kube');
-const User = require('./lib/user');
-const Token = require('./lib/token');
+import fs from 'fs';
+import express from 'express';
+import jwt from 'express-jwt';
+import jwks from 'jwks-rsa';
+import cors from 'cors';
+import minify from 'express-minify';
+import { ValidationError } from 'express-json-validator-middleware';
+import minimist from 'minimist';
+import { Pool } from '@openaddresses/batch-generic';
 
-const { Schema, Err } = require('@openaddresses/batch-schema');
+import { fetchJSON } from './lib/util.js';
+import Kube from './lib/kube.js';
+import User from './lib/types/user.js';
+import Token from './lib/types/token.js';
+import Config from './lib/config.js';
+import Err from '@openaddresses/batch-error';
+import Schema from '@openaddresses/batch-schema';
 
-const argv = require('minimist')(process.argv, {
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
+
+const argv = minimist(process.argv, {
     boolean: ['prod', 'silent', 'test'],
     string: ['port']
 });
 
-const Config = require('./lib/config');
-
-if (require.main === module) {
-    configure(argv);
-}
-
-function configure(args = {}, cb) {
-    Config.env(args).then((config) => {
-        return server(args, config, cb);
-    }).catch((err) => {
+if (import.meta.url === `file://${process.argv[1]}`) {
+    try {
+        const config = Config.env(argv);
+        server(config);
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
 }
 
 /**
@@ -54,17 +51,22 @@ function configure(args = {}, cb) {
  *   This API endpoint does not require authentication
  */
 
-/**
- * @param {Object} args - Command Line Args
- * @param {Config} config
- * @param {function} cb
- */
-async function server(args, config, cb) {
+export default async function server(config) {
     const app = express();
 
-    const schema = new Schema(express.Router(), {
-        schemas: path.resolve(__dirname, 'schema')
+    config.pool = await Pool.connect(config.Postgres, {
+        schemas: {
+            dir: new URL('./schema/', import.meta.url)
+        },
+        parsing: {
+            geometry: true
+        }
     });
+
+    const schema = new Schema(express.Router(), {
+        schemas: new URL('./schema', import.meta.url)
+    });
+
     await schema.api();
 
     app.disable('x-powered-by');
@@ -159,11 +161,6 @@ async function server(args, config, cb) {
     });
 
     app.use('/api', schema.router);
-
-    schema.router.use(morgan('combined'));
-    schema.router.use(bodyparser.text());
-    schema.router.use(bodyparser.urlencoded({ extended: true }));
-    schema.router.use(bodyparser.json({ limit: '50mb' }));
 
     /*
      * Validate Auth0 JWT tokens
@@ -265,29 +262,27 @@ async function server(args, config, cb) {
     ];
 
 
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        const routepkg = require('./routes/' + r);
-        if (typeof routepkg === 'function') await routepkg(schema, config);
-    }
+    await schema.api();
+    await schema.load(
+        new URL('./routes/', import.meta.url),
+        config,
+        {
+            silent: !!config.silent
+        }
+    );
 
-    schema.router.all('*', (req, res) => {
-        return res.status(404).json({
-            status: 404,
-            message: 'API endpoint does not exist!'
+    schema.not_found();
+    schema.error();
+
+    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
+
+    return new Promise((resolve, reject) => {
+        const srv = app.listen(config.Port, (err) => {
+            if (err) return reject(err);
+
+            if (!config.silent) console.log(`ok - http://localhost:${config.Port}`);
+            return resolve(srv);
         });
     });
 
-    schema.error();
-
-    const srv = app.listen(config.Port, (err) => {
-        if (err) return err;
-
-        if (!config.silent) console.log(`ok - ${config.BaseUrl}`);
-        if (cb) return cb(srv, config);
-    });
-
 }
-
-module.exports = configure;

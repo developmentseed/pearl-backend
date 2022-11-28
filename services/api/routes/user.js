@@ -1,23 +1,13 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import User from '../lib/types/user.js';
+import { sql } from 'slonik';
 
-async function router(schema, config) {
-
-    /**
-     * @api {get} /api/user List Users
-     * @apiVersion 1.0.0
-     * @apiName ListUsers
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Return a list of users that have registered with the service
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListUsers.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListUsers.json} apiSuccess
-     */
+export default async function router(schema, config) {
     await schema.get('/user', {
+        name: 'List Users',
+        group: 'User',
+        auth: 'admin',
+        description: 'Return a list of users that have registered with the service',
         query: 'req.query.ListUsers.json',
         res: 'res.ListUsers.json'
     }, config.requiresAuth, async (req, res) => {
@@ -32,20 +22,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {patch} /api/user/:userid Patch User
-     * @apiVersion 1.0.0
-     * @apiName PatchUser
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Update information about a user
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchUser.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.User.json} apiSuccess
-     */
     await schema.patch('/user/:userid', {
+        name: 'Patch User',
+        group: 'User',
+        auth: 'admin',
+        description: 'Update information about a user',
         ':userid': 'integer',
         body: 'req.body.PatchUser.json',
         res: 'res.User.json'
@@ -54,8 +35,11 @@ async function router(schema, config) {
             await User.is_admin(req);
 
             const user = await User.from(config.pool, req.params.userid);
-            user.patch(req.body);
-            await user.commit(config.pool);
+
+            await user.commit({
+                ...req.body,
+                updated: sql`NOW()`
+            });
 
             return res.json(user.serialize());
         } catch (err) {
@@ -63,19 +47,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/user/me Get User Session Metadata
-     * @apiVersion 1.0.0
-     * @apiName self
-     * @apiGroup User
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return basic user information about the currently authenticated user
-     *
-     * @apiSchema {jsonschema=../schema/res.Me.json} apiSuccess
-     */
     await schema.get('/user/me', {
+        name: 'Session Metadata',
+        group: 'User',
+        auth: 'user',
+        description: 'Return basic user information about the currently authenticated user',
         res: 'res.Me.json'
     }, config.requiresAuth, async (req, res) => {
         return res.json({
@@ -89,19 +65,11 @@ async function router(schema, config) {
         });
     });
 
-    /**
-     * @api {get} /api/user/:userid Get User
-     * @apiVersion 1.0.0
-     * @apiName GetUser
-     * @apiGroup User
-     * @apiPermission admin
-     *
-     * @apiDescription
-     *     Return all information about a given user
-     *
-     * @apiSchema {jsonschema=../schema/res.User.json} apiSuccess
-     */
     await schema.get('/user/:userid', {
+        name: 'Get User',
+        group: 'User',
+        auth: 'admin',
+        description: 'Return all information about a given user',
         ':userid': 'integer',
         res: 'res.User.json'
     }, config.requiresAuth, async (req, res) => {
@@ -114,5 +82,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

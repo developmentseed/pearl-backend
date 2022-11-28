@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./aoi_patch/id.json"
+        },
+        "project_id": {
+            "$ref": "./aoi_patch/project_id.json"
+        },
+        "aoi_id": {
+            "$ref": "./aoi_patch/aoi_id.json"
+        },
+        "created": {
+            "$ref": "./aoi_patch/created.json"
+        },
+        "storage": {
+            "$ref": "./aoi_patch/storage.json"
+        }
+    },
+    "required": [
+        "id",
+        "project_id",
+        "aoi_id",
+        "created",
+        "storage"
+    ]
+}
