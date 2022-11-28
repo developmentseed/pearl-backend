@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+# v0.9.1
+- Switch to PC tiler [`#1`](https://github.com/developmentseed/pearl-backend/pull/1)
+
+
 # v0.9.0
 ## Fixes
 - turn off gpu placeholder for production [`#616`](https://github.com/developmentseed/lulc-infra/pull/616)

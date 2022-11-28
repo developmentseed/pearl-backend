@@ -1,3 +1,5 @@
+'use strict';
+
 const { Err } = require('@openaddresses/batch-schema');
 const Generic = require('@openaddresses/batch-generic');
 const AOI = require('./aoi');

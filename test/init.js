@@ -1,3 +1,4 @@
+'use strict';
 const { promisify } = require('util');
 const request = promisify(require('request'));
 const Knex = require('knex');
@@ -5,6 +6,8 @@ const Config = require('../services/api/lib/config');
 
 const drop = require('../services/api/test/drop');
 const KnexConfig = require('../services/api/knexfile');
+const Token = require('../services/api/lib/token');
+const User = new require('../services/api/lib/user');
 
 const state = {
     project: 1,
@@ -19,12 +22,13 @@ function reconnect(test, API) {
 
     test('pre-run', async (t) => {
         const config = await Config.env();
+
         try {
-            const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
-            state.token = (await authtoken.generate({
+            state.token = (await Token.generate(config.pool, {
+                name: 'Default Token',
                 type: 'auth0',
                 uid: 1
-            }, 'API Token')).token;
+            }, config.SigningSecret)).token;
         } catch (err) {
             t.error(err, 'no errors');
         }
@@ -89,22 +93,21 @@ function connect(test, API) {
             const knex = Knex(KnexConfig);
             await knex.migrate.latest();
 
-            const auth = new (require('../services/api/lib/auth').Auth)(config);
-            const authtoken = new (require('../services/api/lib/auth').AuthToken)(config);
-
-            await auth.create({
+            await User.generate(config.pool, {
                 access: 'admin',
                 username: 'example',
                 email: 'example@example.com',
-                auth0Id: 0
+                auth0Id: 0,
+                flags: {}
             });
 
-            const user = await auth.user(1);
+            const user = await User.from(config.pool, 1);
 
-            state.token = (await authtoken.generate({
+            state.token = (await Token.generate(config.pool, {
+                name: 'Default Token',
                 type: 'auth0',
-                uid: user.uid
-            }, 'API Token')).token;
+                uid: user.id
+            }, config.SigningSecret)).token;
 
             await knex.destroy();
             await config.pool.end();
@@ -321,7 +324,7 @@ function connect(test, API) {
                 checkpoint_id: null,
                 active: false,
                 pod: {},
-                type: 'gpu'
+                type: 'cpu'
             }, 'expected body');
 
         } catch (err) {
@@ -399,7 +402,9 @@ function running(test, API) {
                     max_inference: 200000000,
                     instance_window: 600,
                     total_gpus: 2,
-                    active_gpus: 0
+                    active_gpus: 0,
+                    total_cpus: 10,
+                    active_cpus: 0
                 }
             });
 

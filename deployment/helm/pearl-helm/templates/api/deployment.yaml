@@ -16,6 +16,8 @@ spec:
       run: {{ .Release.Name }}-api
   template:
     metadata:
+      annotations:
+        checksum/secret: {{ include (print .Template.BasePath "/api/secret.yaml") . | sha256sum }}
       labels:
         app: {{ template "lulc-helm.name" . }}
         release: {{ .Release.Name }}
@@ -55,31 +57,38 @@ spec:
               memory: {{ .Values.api.resources.limits.memory }}
           env:
             - name: SigningSecret
-              value: {{ .Values.api.env.SigningSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lulc-helm.fullname" . }}-api-secret
+                  key: SigningSecret
             - name: Postgres
-              value: {{ .Values.api.env.Postgres }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lulc-helm.fullname" . }}-api-secret
+                  key: Postgres
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "lulc-helm.fullname" . }}-api-secret
+                  key: AZURE_STORAGE_CONNECTION_STRING
             - name: GpuImageName
               value: {{ .Values.gpu.image.name }}
             - name: GpuImageTag
               value: {{ .Values.gpu.image.tag }}
             - name: GpuCount
-              value: {{ .Values.api.env.GpuCount | quote }}
+              value: {{ .Values.api.GpuCount | quote }}
             - name: CpuCount
-              value: {{ .Values.api.env.CpuCount | quote }}
-            - name: AZURE_STORAGE_CONNECTION_STRING
-              value: {{ .Values.api.env.AZURE_STORAGE_CONNECTION_STRING}}
+              value: {{ .Values.api.CpuCount | quote }}
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
               value: http://{{ template "lulc-helm.fullname" . }}-tiles
+            - name: PcTileUrl
+              value: {{ .Values.api.env.PcTileUrl }}
             - name: ApiUrl
               value: http://{{ template "lulc-helm.fullname" . }}-api
             - name: SocketUrl
               value: ws://{{ template "lulc-helm.fullname" . }}-socket
-            - name: nodeSelectorKey
-              value: {{ .Values.api.env.nodeSelectorKey }}
-            - name: nodeSelectorValue
-              value: {{ .Values.api.env.nodeSelectorValue }}
             - name: AUTH0_ISSUER_BASE_URL
-              value: {{ .Values.api.env.auth0BaseUrl }}
+              value: {{ .Values.api.auth0BaseUrl }}
 {{- end }}

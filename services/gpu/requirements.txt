@@ -31,3 +31,4 @@ opt-einsum==3.2.1
 plumbum==1.6.9
 scipy==1.7.1
 segmentation-models-pytorch==0.2.0
+protobuf==3.20.0

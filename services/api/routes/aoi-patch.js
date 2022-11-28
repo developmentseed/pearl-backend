@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Busboy = require('busboy');
 const AOI = require('../lib/aoi');

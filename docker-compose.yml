@@ -15,6 +15,7 @@ services:
         environment:
             - PORT=2000
             - TileUrl=http://tiler:8000
+            - PcTileUrl=https://planetarycomputer-staging.microsoft.com
             - Postgres=postgres://docker:docker@postgis:5432/gis
             - AZURE_STORAGE_CONNECTION_STRING
 
