@@ -20,7 +20,7 @@ export default class API {
         const res = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${this.token}`
-            },
+            }
         });
 
         console.error(`ok - RES ${url} ${res.status}`);
@@ -46,7 +46,7 @@ export default class API {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${this.token}`
-            },
+            }
         });
         console.error(`ok - RES ${url} ${res.status}`);
 

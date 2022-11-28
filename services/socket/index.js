@@ -15,10 +15,12 @@ import Config from './lib/config.js';
 
 const app = express();
 
-if (require.main === module) {
-    if (argv.help) return Config.help();
-
-    configure(argv);
+if (import.meta.url === `file://${process.argv[1]}`) {
+    if (argv.help) {
+        Config.help();
+    } else {
+        configure(argv);
+    }
 }
 
 export async function configure(argv = {}, cb) {
