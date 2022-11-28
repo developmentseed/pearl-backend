@@ -44,11 +44,11 @@ test('gpu connection', (t) => {
 
         if (msg.message === 'info#connected' && !sent) {
             t.ok('Sending: model#prediction (1)');
-            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
+            ws.send(fs.readFileSync(new URL('./fixtures/seneca-rocks/model#prediction.json', import.meta.url)));
             sent = true;
         } else if (msg.message === 'model#prediction#complete' && !sent_retrain) {
             t.ok('Sending: model#retrain (1)');
-            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#retrain.json')));
+            ws.send(fs.readFileSync(new URL('./fixtures/seneca-rocks/model#retrain.json', import.meta.url)));
             sent_retrain = true;
         }
 
