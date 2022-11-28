@@ -1,6 +1,6 @@
 FROM alpine:3.17
 
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash nodejs npm
 
 EXPOSE 2000
 
