@@ -1,12 +1,9 @@
-'use strict';
-const { promisify } = require('util');
-const request = promisify(require('request'));
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 /**
  * @class
  */
-class API {
+export default class API {
     constructor(base, SigningSecret) {
         this.base = base;
 
@@ -20,69 +17,58 @@ class API {
         const url = new URL(this.base + '/api');
 
         console.error(`ok - GET ${url}`);
-        const res = await request({
-            json: true,
-            method: 'GET',
+        const res = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${this.token}`
-            },
-            url: url
+            }
         });
-        console.error(`ok - RES ${url} ${res.statusCode}`);
 
-        return res;
+        console.error(`ok - RES ${url} ${res.status}`);
+
+        return await res.json();
     }
 
     async schemas() {
         const url = new URL(this.base + '/api/websocket');
 
         console.error(`ok - GET ${url}`);
-        const res = await request({
-            json: true,
-            method: 'GET',
-            url: url
-        });
-        console.error(`ok - RES ${url} ${res.statusCode}`);
+        const res = await fetch(url);
+        console.error(`ok - RES ${url} ${res.status}`);
 
-        return res;
+        return await res.json();
     }
 
     async deactivate() {
         const url = new URL(this.base + '/api/instance');
 
         console.error(`ok - DELETE ${url}`);
-        const res = await request({
-            json: true,
+        const res = await fetch(url, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${this.token}`
-            },
-            url: url
+            }
         });
-        console.error(`ok - RES ${url} ${res.statusCode}`);
+        console.error(`ok - RES ${url} ${res.status}`);
 
-        return res;
+        return await res.json();
     }
 
     async instance_state(projectid, instanceid, active) {
         const url = new URL(this.base + `/api/project/${projectid}/instance/${instanceid}`);
 
         console.error(`ok - PATCH ${url}`);
-        const res = await request({
-            json: true,
+        const res = await fetch(url, {
             method: 'PATCH',
-            url: url,
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${this.token}`
             },
-            body: {
+            body: JSON.stringify({
                 active: active
-            }
+            })
         });
-        console.error(`ok - RES ${url} ${res.statusCode}`);
+        console.error(`ok - RES ${url} ${res.status}`);
 
-        return res;
+        return await res.json();
     }
 }
-
-module.exports = API;

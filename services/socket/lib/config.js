@@ -1,11 +1,12 @@
-'use strict';
-const Ajv = require('ajv');
+import Ajv from 'ajv';
+import fs from 'fs';
+import API from './api.js';
+
 const ajv = new Ajv({
     allErrors: true
 });
 
-const pkg = require('../package.json');
-const API = require('./api');
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 /**
  * @class
@@ -14,7 +15,7 @@ const API = require('./api');
  * @prop {Number} Timeout How long a connection can be silent before it's resources are terminated
  * @prop {Number} [Alive=30000] How often the client must ping/pong to retain an active connection
  */
-class Config {
+export default class Config {
 
     /**
      * Combine cli arguments, environment variables and defaults into a single Config object
@@ -41,9 +42,8 @@ class Config {
                 await sleep(5000);
 
                 const meta = await this.api.meta();
-                if (meta.statusCode !== 200) throw new Error(meta.body);
 
-                this.Timeout = meta.body.limits.instance_window * 1000;
+                this.Timeout = meta.limits.instance_window * 1000;
                 console.error(`ok - Timeout: ${this.Timeout}`);
             } catch (err) {
                 console.error(err);
@@ -58,7 +58,7 @@ class Config {
             }
         } while (!this.Timeout);
 
-        this.schemas = (await this.api.schemas()).body;
+        this.schemas = await this.api.schemas();
         for (const key of Object.keys(this.schemas)) {
             this.schemas[key] = ajv.compile(this.schemas[key]);
         }
@@ -96,5 +96,3 @@ function sleep(ms) {
         setTimeout(resolve, ms);
     });
 }
-
-module.exports = Config;
