@@ -25,7 +25,7 @@ jobs:
       servicePrincipalKey: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_KEY }}
       storageAccessKey: ${{ secrets.TERRAFORM_STORAGE_KEY }}
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Login to Azure Container Registry
       uses: azure/docker-login@v1
       with:

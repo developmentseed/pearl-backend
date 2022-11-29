@@ -16,10 +16,14 @@ jobs:
     env:
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.LULCDATA_ASCS }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Docker Pull
         run: docker-compose pull
+
+     - uses: actions/setup-node@v3
+       with:
+         node-version: 18
 
       - name: Run Test
         run: ./scripts/test

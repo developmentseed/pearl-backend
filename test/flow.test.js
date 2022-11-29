@@ -52,7 +52,7 @@ async function gpu() {
     term.prompt.screen(['websockets', 'api']);
     term.on('promp#selection', async (sel) => {
         if (sel.value === 'websockets' || (sel.stats && sel.stats.isDirectory())) {
-            const dir = sel.stats ? sel.value : path.resolve(__dirname, './fixtures/');
+            const dir = sel.stats ? sel.value : new URL('./fixtures/', import.meta.url);
 
             term.prompt.screen(fs.readdirSync(dir).map((f) => {
                 const stats = fs.statSync(path.resolve(dir, f));

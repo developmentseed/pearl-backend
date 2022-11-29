@@ -16,7 +16,7 @@ jobs:
     env:
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.LULCCI_ASCS }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Docker Pull
         run: docker-compose pull
