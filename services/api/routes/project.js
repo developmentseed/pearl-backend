@@ -78,13 +78,17 @@ export default async function router(schema, config) {
         try {
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
+            const model = await Model.from(config.pool, req.body.model_id);
+
+            if (!model.storage) throw new error('Model has not been uploaded');'
+            if (!model.active) throw new error('Model has is not set as active');'
+
             const proj = await Project.generate(config.pool, {
                 ...req.body,
                 uid: req.auth.id
             });
 
             const json = proj.serialize();
-            const model = await Model.from(config.pool, json.model_id);
             json.model_name = model.name;
             return res.json(json);
         } catch (err) {
