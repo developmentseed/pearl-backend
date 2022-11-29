@@ -80,8 +80,8 @@ export default async function router(schema, config) {
 
             const model = await Model.from(config.pool, req.body.model_id);
 
-            if (!model.storage) throw new error('Model has not been uploaded');'
-            if (!model.active) throw new error('Model has is not set as active');'
+            if (!model.storage) throw new Err(400, null, 'Model has not been uploaded');
+            if (!model.active) throw new Err(400, null, 'Model has not been set as active');
 
             const proj = await Project.generate(config.pool, {
                 ...req.body,
