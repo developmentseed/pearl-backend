@@ -19,6 +19,11 @@
             "type": "boolean",
             "description": "Can the model be used for gpu instances"
         },
+        "storage": {
+            "type": "boolean",
+            "description": "Has the model been uploaded to azure - this is normally set by the server and not the client",
+            "default": false
+        },
         "model_type": {
             "type": "string",
             "description": "Underlying model type",
