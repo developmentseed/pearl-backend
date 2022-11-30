@@ -80,6 +80,27 @@ test('POST /api/project (Invalid Mosaic)', async (t) => {
     t.end();
 });
 
+test('PATCH /api/model/1 - storage: false, active: false', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: '/api/model/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                storage: false,
+                active: true
+            }
+        }, t);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('POST /api/project - Model not uploaded', async (t) => {
     try {
         const res = await flight.request({

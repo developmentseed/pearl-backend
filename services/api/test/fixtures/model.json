@@ -5,6 +5,7 @@
     "body": {
         "name": "NAIP Supervised",
         "active": true,
+        "storage": true,
         "model_type": "pytorch_example",
         "model_inputshape": [240,240,4],
         "model_zoom": 17,
