@@ -98,7 +98,7 @@ test('POST /api/project - Model not uploaded', async (t) => {
 
         t.deepEquals(res.body, {
             status: 400,
-            message:"Model has not been uploaded",
+            message:'Model has not been uploaded',
             messages:[]
         });
     } catch (err) {
@@ -110,7 +110,7 @@ test('POST /api/project - Model not uploaded', async (t) => {
 
 test('PATCH /api/model/1 - storage: true, active: false', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             json: true,
             url: '/api/model/1',
             method: 'PATCH',
@@ -147,7 +147,7 @@ test('POST /api/project - Model not active', async (t) => {
 
         t.deepEquals(res.body, {
             status: 400,
-            message:"Model has not been set as active",
+            message:'Model has not been set as active',
             messages:[]
         });
     } catch (err) {
@@ -159,7 +159,7 @@ test('POST /api/project - Model not active', async (t) => {
 
 test('PATCH /api/model/1 - storage: true, active: true', async (t) => {
     try {
-        const res = await flight.request({
+        await flight.request({
             json: true,
             url: '/api/model/1',
             method: 'PATCH',
