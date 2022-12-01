@@ -63,7 +63,7 @@ services:
     migration:
         platform: linux/amd64
         build: ./services/api
-        command: sh -c "sleep 20; npx knex migrate:latest"
+        command: sh -c "pgstac --dsn $Postgres pgready && npx knex migrate:latest && pgstac --dsn $Postgres migrate"
         links:
             - postgis
         ports:
