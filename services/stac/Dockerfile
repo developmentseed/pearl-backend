@@ -1,6 +1,6 @@
 FROM alpine:3.17
 
-EXPOSE 2001
+EXPOSE 2002
 
 ENV HOME=/home/lulc
 WORKDIR $HOME

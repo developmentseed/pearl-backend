@@ -22,14 +22,13 @@ services:
     stac:
         platform: linux/amd64
         build: ./services/stac/
-        command: sh -c "sleep 5; npm run dev"
         restart: always
         links:
             - postgis
         depends_on:
             - migration
         ports:
-            - "2001:2001"
+            - "2002:2002"
         environment:
             - POSTGRES_PASSWORD=docker
             - POSTGRES_USER=docker
