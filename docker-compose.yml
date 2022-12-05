@@ -19,6 +19,20 @@ services:
             - Postgres=postgres://docker:docker@postgis:5432/gis
             - AZURE_STORAGE_CONNECTION_STRING
 
+    stac:
+        platform: linux/amd64
+        build: ./services/stac/
+        command: sh -c "sleep 5; npm run dev"
+        restart: always
+        links:
+            - postgis
+        depends_on:
+            - migration
+        ports:
+            - "2001:2001"
+        environment:
+            - Postgres=postgres://docker:docker@postgis:5432/gis
+
     postgis:
         platform: linux/amd64
         image: kartoza/postgis:13.0
