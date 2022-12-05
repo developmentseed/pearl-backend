@@ -31,7 +31,11 @@ services:
         ports:
             - "2001:2001"
         environment:
-            - Postgres=postgres://docker:docker@postgis:5432/gis
+            - POSTGRES_PASSWORD=docker
+            - POSTGRES_USER=docker
+            - POSTGRES_DB=gis
+            - POSTGRES_HOST=postgis
+            - POSTGRES_PORT=5432
 
     postgis:
         platform: linux/amd64
