@@ -1,0 +1,19 @@
+[project]
+name = "pearl-backend-stac"
+description = "Pearl STAC Backend"
+requires-python = ">=3.7"
+dynamic = ["version"]
+dependencies = [
+    "stac-fastapi.api==2.4.3",
+    "stac-fastapi.extensions==2.4.3",
+    "stac-fastapi.pgstac==2.4.3",
+    "stac-fastapi.types==2.4.3",
+
+    "uvicorn",
+
+    "requests",
+    "itsdangerous",
+    "pypgstac==0.6.10",
+    "psycopg==3.0.14",
+    "psycopg_pool== 3.1.1",
+]

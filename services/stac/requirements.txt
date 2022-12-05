@@ -1,5 +1,0 @@
-stac-fastapi.api==2.4.3
-stac-fastapi.types==2.4.3
-stac-fastapi.extensions==2.4.3
-stac-fastapi.pgstac==2.4.3
-
