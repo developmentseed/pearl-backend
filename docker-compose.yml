@@ -82,7 +82,7 @@ services:
     migration:
         platform: linux/amd64
         build: ./services/api
-        command: sh -c "pgstac --dsn $Postgres pgready && npx knex migrate:latest && pgstac --dsn $Postgres migrate"
+        command: bash -c "echo $${Postgres} && pypgstac --dsn=$${Postgres} pgready && npx knex migrate:latest && pypgstac --dsn=$${Postgres} migrate"
         links:
             - postgis
         ports:
