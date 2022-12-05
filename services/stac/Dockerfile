@@ -1,5 +1,10 @@
 FROM alpine:3.17
 
+ENV POSTGRES_PASS=docker
+ENV POSTGRES_USER=docker
+ENV POSTGRES_DB=gis
+ENV POSTGRES_HOST=postgis
+
 EXPOSE 2002
 
 ENV HOME=/home/lulc

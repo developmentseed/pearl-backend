@@ -30,11 +30,13 @@ services:
         ports:
             - "2002:2002"
         environment:
-            - POSTGRES_PASSWORD=docker
+            - POSTGRES_PASS=docker
             - POSTGRES_USER=docker
-            - POSTGRES_DB=gis
+            - POSTGRES_DBNAME=gis
             - POSTGRES_HOST=postgis
             - POSTGRES_PORT=5432
+            - POSTGRES_HOST_READER=postgis
+            - POSTGRES_HOST_WRITER=postgis
 
     postgis:
         platform: linux/amd64

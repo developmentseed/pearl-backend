@@ -27,12 +27,7 @@ from stac_fastapi.pgstac.extensions import QueryExtension
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
 
-# Boiler Plate for Stac FastApi PGStac
-class Settings(STACSettings):
-    ...
-
-
-settings = Settings()
+settings = STACSettings()
 
 extensions = [
     TransactionExtension(
@@ -93,55 +88,17 @@ app.include_router(
 """
 
 
-def custom_openapi():
-    """
-    Read JSON files from folder with over-rides for summaries and descriptions for specific paths and
-    over-write the same in the OpenAPI schema.
-    """
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = app.openapi()
-    for f in TAGS_JSON_FILES:
-        with f.open() as tags:
-            endpoints = json.load(tags)
-        for endpoint in endpoints:
-            if (
-                endpoint["path"] not in openapi_schema["paths"]
-                or endpoint["method"] not in openapi_schema["paths"][endpoint["path"]]
-            ):
-                logger.warn(f"Endpoint not configured correctly for {endpoint['path']}")
-                continue
-            openapi_schema["paths"][endpoint["path"]][endpoint["method"]][
-                "summary"
-            ] = endpoint["summary"]
-            openapi_schema["paths"][endpoint["path"]][endpoint["method"]][
-                "description"
-            ] = endpoint["description"]
-    return openapi_schema
-
-
-app.openapi_schema = custom_openapi()
-
-
 @app.on_event("startup")
 @app.get(
     "/reload", dependencies=[Depends(authenticated)], tags=["Management"]
 )  # reload is useful to be able to refresh the table catalog from the database
 async def startup_event():
     """Application startup: register the db and create table list."""
-    # stac-fastapi, tifeatures, and timvt all have there own nearly identical connect_to_db functions we should sync them up so that we make sure to use a single connection pool across all three
-    await connect_to_db(app)
     await stac_connectdb(app)
-
-    # table catalog between tifeatures and timvt should be synced up and ideally we just use the same catalog for both
-    await register_table_catalog(app)
-    return {"Refreshed": True}
-
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Application shutdown: de-register the db."""
-    await close_db_connection(app)
     await stac_closedb(app)
 
 @app.get(
