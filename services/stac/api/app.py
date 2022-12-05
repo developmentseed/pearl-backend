@@ -77,15 +77,11 @@ stac = StacApi(
 )
 app.include_router(
     stac.router,
-    dependencies=[Depends(authenticated)],
     prefix="/stac",
     tags=["STAC"],
 )
 
 @app.on_event("startup")
-@app.get(
-    "/reload", dependencies=[Depends(authenticated)], tags=["Management"]
-)  # reload is useful to be able to refresh the table catalog from the database
 async def startup_event():
     """Application startup: register the db and create table list."""
     await stac_connectdb(app)
