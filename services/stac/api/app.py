@@ -27,11 +27,8 @@ from stac_fastapi.pgstac.extensions import QueryExtension
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
 
-from app.settings import Settings as AppSettings
-
-
 # Boiler Plate for Stac FastApi PGStac
-class Settings(STACSettings, AppSettings):
+class Settings(STACSettings):
     ...
 
 
@@ -70,7 +67,7 @@ app.add_middleware(StacRouteFixMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=['*'],
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
