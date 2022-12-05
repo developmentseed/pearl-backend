@@ -19,6 +19,7 @@ from stac_fastapi.extensions.core import (
     TokenPaginationExtension,
     TransactionExtension,
 )
+from fastapi.responses import ORJSONResponse
 from stac_fastapi.pgstac.config import Settings as STACSettings
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection as stac_closedb
@@ -52,13 +53,11 @@ logger.setLevel(logging.DEBUG)
 app = FastAPI(
     title="Pearl Backend STAC",
     version="0.0.1",
-    debug=settings.debug,
+    debug=True
 )
 app.state.settings = settings
 app.state.router_prefix = ""
 
-
-app.add_middleware(StacRouteFixMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -82,11 +81,6 @@ app.include_router(
     prefix="/stac",
     tags=["STAC"],
 )
-
-"""
-    Setup API doc over-rides for individual endpoints
-"""
-
 
 @app.on_event("startup")
 @app.get(
