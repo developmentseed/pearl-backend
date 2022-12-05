@@ -26,8 +26,6 @@ from stac_fastapi.pgstac.db import connect_to_db as stac_connectdb
 from stac_fastapi.pgstac.extensions import QueryExtension
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette_cramjam.middleware import CompressionMiddleware
 
 from app.settings import Settings as AppSettings
 
@@ -59,16 +57,6 @@ post_request_model = create_post_request_model(extensions, base_model=PgstacSear
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-class StacRouteFixMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        base_url = settings.ricr_base_url or request.base_url._url
-        url = urlparse(base_url)
-        request.scope["scheme"] = url.scheme
-        if request.url.path.startswith("/stac/"):
-            request.scope["root_path"] = "/stac"
-        response = await call_next(request)
-        return response
-
 app = FastAPI(
     title="Pearl Backend STAC",
     version="0.0.1",
@@ -87,8 +75,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
-
-app.add_middleware(CompressionMiddleware)
 
 stac = StacApi(
     settings=settings,
