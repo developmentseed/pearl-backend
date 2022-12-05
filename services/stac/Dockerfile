@@ -7,8 +7,6 @@ WORKDIR $HOME
 COPY ./ $HOME/stac
 WORKDIR $HOME/stac
 
-COPY ./api .
-
 RUN apk add --no-cache bash nodejs npm python3 py3-pip
 
 RUN pip install -U pip
