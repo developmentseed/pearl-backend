@@ -480,7 +480,7 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.patch('/project/:projectid/aoi/:aoiid/stac', {
+    await schema.post('/project/:projectid/aoi/:aoiid/stac', {
         name: 'Create STAC',
         group: 'AOI',
         auth: 'user',
@@ -492,6 +492,7 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             return res.json({
                 status: 200,

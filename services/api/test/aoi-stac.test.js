@@ -83,6 +83,30 @@ test('POST /api/project/1/aoi', async (t) => {
     t.end();
 });
 
+test('POST /api/project/1/aoi/1/stac - no storage', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1/stac',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {}
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'AOI has not been uploaded',
+            messages: []
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('[meta] Set aoi.storage: true', async (t) => {
     try {
         await flight.config.pool.query(sql`
@@ -91,6 +115,25 @@ test('[meta] Set aoi.storage: true', async (t) => {
             SET
                 storage = true
         `, []);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('POST /api/project/1/aoi/1/stac', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1/stac',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+            }
+        }, t);
     } catch (err) {
         t.error(err, 'no errors');
     }
