@@ -494,6 +494,12 @@ export default async function router(schema, config) {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
+            await config.pool.query(sql`
+                SELECT pgstac.create_item(${JSON.stringify({
+
+                })}::JSONB);
+            `);
+
             return res.json({
                 status: 200,
                 message: 'Create STAC Item'
