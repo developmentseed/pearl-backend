@@ -516,7 +516,14 @@ export default async function router(schema, config) {
                         datetime: (new Date(a.created)).toISOString(),
                     },
                     links: [],
-                    assets: {}
+                    assets: {
+                        visual: {
+                            href: 'URL HERE',
+                            type: 'image/tiff; application=geotiff; profile=cloud-optimized',
+                            title: `Project: ${a.project_id} - AOI: ${a.id}`,
+                            roles: [ 'visual' ]
+                        }
+                    }
                 })}::JSONB);
             `);
 
