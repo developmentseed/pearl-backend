@@ -17,7 +17,6 @@ from stac_fastapi.extensions.core import (
     FilterExtension,
     SortExtension,
     TokenPaginationExtension,
-    TransactionExtension,
 )
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.pgstac.config import Settings as STACSettings
@@ -25,17 +24,11 @@ from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection as stac_closedb
 from stac_fastapi.pgstac.db import connect_to_db as stac_connectdb
 from stac_fastapi.pgstac.extensions import QueryExtension
-from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
 
 settings = STACSettings()
 
 extensions = [
-    TransactionExtension(
-        client=TransactionsClient(),
-        settings=settings,
-        response_class=ORJSONResponse,
-    ),
     QueryExtension(),
     SortExtension(),
     FieldsExtension(),
