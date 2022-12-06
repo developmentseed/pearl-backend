@@ -480,6 +480,28 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.patch('/project/:projectid/aoi/:aoiid/stac', {
+        name: 'Create STAC',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Post the AOI to the public STAC Catalogue',
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        body: 'req.body.CreateStac.json',
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+
+            return res.json({
+                status: 200,
+                message: 'Create STAC Item'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     await schema.get('/share/:shareuuid', {
         name: 'Get Share',
         group: 'Share',
