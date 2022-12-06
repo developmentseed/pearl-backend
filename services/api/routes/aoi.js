@@ -495,8 +495,28 @@ export default async function router(schema, config) {
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             await config.pool.query(sql`
-                SELECT pgstac.create_item(${JSON.stringify({
+                SELECT pgstac.upsert_collection(${JSON.stringify({
+                    stac_version: "1.0.0",
+                    type: "Catalog",
+                    id: a.project_id,
+                    description: `Project ID: ${a.project_id}`,
+                    links: []
+                })}::JSONB);
+            `)
 
+            await config.pool.query(sql`
+                SELECT pgstac.upsert_item(${JSON.stringify({
+                    stac_version: "1.0.0",
+                    collection: a.project_id,
+                    type: "Feature",
+                    id: a.id,
+                    bbox: a.bounds.bounds,
+                    geometry: a.bounds,
+                    properties: {
+                        datetime: (new Date(a.created)).toISOString(),
+                    },
+                    links: [],
+                    assets: {}
                 })}::JSONB);
             `);
 
