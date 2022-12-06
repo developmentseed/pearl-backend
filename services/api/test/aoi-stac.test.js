@@ -141,4 +141,23 @@ test('POST /api/project/1/aoi/1/stac', async (t) => {
     t.end();
 });
 
+test('POST /api/project/1/aoi/1/stac - duplicate should pass', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1/stac',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+            }
+        }, t);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
