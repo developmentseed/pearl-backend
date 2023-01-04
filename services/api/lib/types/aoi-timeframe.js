@@ -1,4 +1,5 @@
 import Err from '@openaddresses/batch-error';
+import AOI from './aoi.js';
 import Generic, { Params } from '@openaddresses/batch-generic';
 import Project from './project.js';
 import Storage from '../storage.js';
@@ -7,7 +8,7 @@ import { sql } from 'slonik';
 /**
  * @class
  */
-export default class AOI extends Generic {
+export default class AOITimeframe extends Generic {
     static _table = 'aoi_timeframe';
 
     /**
@@ -24,7 +25,7 @@ export default class AOI extends Generic {
      * @param {String} [query.bookmarked] - Only return AOIs of this bookmarked state. Allowed true or false. By default returns all.
      * @param {String} [query.sort] - Sort AOI list by ascending or descending order of the created timestamp. Allowed asc or desc. Default desc.
      */
-    static async list(pool, projectid, query={}) {
+    static async list(pool, projectid, query = {}) {
         query.limit = Params.integer(query.limit, { default: 100 });
         query.page = Params.integer(query.page, { default: 0 });
 
@@ -44,13 +45,25 @@ export default class AOI extends Generic {
                     count(*) OVER() AS count,
                     a.id                                AS id,
                     a.name                              AS name,
+                    a.patches                           AS patches,
+                    a.px_stats                          AS px_stats,
+                    a.bookmarked                        AS bookmarked,
+                    a.bookmarked_at                     AS bookmarked_at,
                     a.bounds                            AS bounds,
                     Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.created                           AS created
+                    a.created                           AS created,
+                    a.storage                           AS storage,
+                    a.checkpoint_id                     AS checkpoint_id,
+                    a.classes                           AS classes,
+                    c.name                              AS checkpoint_name
                 FROM
-                    aois a
+                    aois a,
+                    checkpoints c
                 WHERE
-                    a.project_id = ${projectid}
+                    a.checkpoint_id = c.id
+                    AND a.project_id = ${projectid}
+                    AND (${query.checkpointid}::BIGINT IS NULL OR checkpoint_id = ${query.checkpointid})
+                    AND (${query.bookmarked}::BOOLEAN IS NULL OR a.bookmarked = ${query.bookmarked})
                     AND a.archived = false
                 ORDER BY
                     a.created ${query.sort}
@@ -67,12 +80,6 @@ export default class AOI extends Generic {
         list.project_id = projectid;
 
         return list;
-    }
-
-    serialize() {
-        const json = super.serialize();
-        json.area = this.area;
-        return json;
     }
 
     /**
@@ -92,6 +99,31 @@ export default class AOI extends Generic {
         }
 
         return aoi;
+    }
+
+    /**
+     * Download an AOI geotiff fabric
+     *
+     * @param {Config} config
+     */
+    async exists(config) {
+        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        return await storage.exists(`aoi-${this.id}.tiff`);
+    }
+
+    /**
+     * Download an AOI geotiff fabric
+     *
+     * @param {Config} config
+     * @param {Stream} res Stream to pipe geotiff to (usually express response object)
+     */
+    async download(config, res) {
+        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+        const storage = new Storage(config, 'aois');
+        return await storage.download(`aoi-${this.id}.tiff`, res);
     }
 
     /**
@@ -124,31 +156,6 @@ export default class AOI extends Generic {
     }
 
     /**
-     * Download an AOI geotiff fabric
-     *
-     * @param {Config} config
-     */
-    async exists(config) {
-        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
-
-        const storage = new Storage(config, 'aois');
-        return await storage.exists(`aoi-${this.id}.tiff`);
-    }
-
-    /**
-     * Download an AOI geotiff fabric
-     *
-     * @param {Config} config
-     * @param {Stream} res Stream to pipe geotiff to (usually express response object)
-     */
-    async download(config, res) {
-        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
-
-        const storage = new Storage(config, 'aois');
-        return await storage.download(`aoi-${this.id}.tiff`, res);
-    }
-
-    /**
      * Return a single aoi
      *
      * @param {Pool} pool - Instantiated Postgres Pool
@@ -159,19 +166,8 @@ export default class AOI extends Generic {
         try {
             pgres = await pool.query(sql`
                SELECT
-                    a.id                                AS id,
-                    a.name                              AS name,
-                    a.bounds                            AS bounds,
-                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.project_id                        AS project_id,
-                    a.bookmarked                        AS bookmarked,
-                    a.bookmarked_at                     AS bookmarked_at,
-                    a.checkpoint_id                     AS checkpoint_id,
-                    a.created                           AS created,
-                    a.storage                           AS storage,
-                    a.patches                           AS patches,
-                    a.px_stats                          AS px_stats,
-                    a.classes                           AS classes
+                    a.*
+                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area
                 FROM
                     aois a
                 WHERE
