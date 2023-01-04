@@ -8,7 +8,7 @@ import { sql } from 'slonik';
  * @class
  */
 export default class AOI extends Generic {
-    static _table = 'aois';
+    static _table = 'aoi_timeframe';
 
     /**
      * Return a list of aois

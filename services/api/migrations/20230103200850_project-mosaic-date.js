@@ -70,6 +70,11 @@ function up(knex) {
         ALTER TABLE projects
             DROP COLUMN mosaic;
 
+        ALTER TABLE projects
+            ALTER COLUMN archived SET NOT NULL;
+
+        ALTER TABLE aois
+            ALTER COLUMN bounds SET NOT NULL;
     `);
 }
 
