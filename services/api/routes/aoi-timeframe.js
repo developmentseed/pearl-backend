@@ -2,6 +2,7 @@ import Err from '@openaddresses/batch-error';
 import Busboy from 'busboy';
 import Project from '../lib/types/project.js';
 import AOI from '../lib/types/aoi.js';
+import TimeFrame from '../lib/types/aoi-timeframe.js';
 import Checkpoint from '../lib/types/checkpoint.js';
 import AOIPatch from '../lib/types/aoi-patch.js';
 import AOIShare from '../lib/types/aoi-share.js';
@@ -10,13 +11,13 @@ import User from '../lib/types/user.js';
 import { sql } from 'slonik';
 
 export default async function router(schema, config) {
-    const getAoiTileJSON = async (aoi, req) => {
+    const getAoiTileJSON = async (timeframe, req) => {
         let tiffurl;
-        if (aoi.uuid) {
-            const a = await AOIShare.from(config.pool, aoi.uuid);
+        if (timeframe.uuid) {
+            const a = await AOIShare.from(config.pool, timeframe.uuid);
             tiffurl = await a.url(config);
         } else {
-            const a = await AOI.from(config.pool, aoi.id);
+            const a = await AOI.from(config.pool, timeframe.id);
             tiffurl = await a.url(config);
         }
 
@@ -27,7 +28,7 @@ export default async function router(schema, config) {
 
 
         let tj, tiles;
-        if (aoi.uuid) {
+        if (timeframe.uuid) {
             const response = await Proxy.request(req, false, config.TileUrl);
 
             if (response.statusCode !== 200) throw new Err(500, new Error(response.body), 'Could not access upstream tiff');
@@ -36,12 +37,12 @@ export default async function router(schema, config) {
 
             // this is a share
             tiles = [
-                `/api/share/${aoi.uuid}/tiles/{z}/{x}/{y}`
+                `/api/share/${timeframe.uuid}/tiles/{z}/{x}/{y}`
             ];
         } else {
             const cmap = {};
-            for (let i = 0; i < aoi.classes.length; i++) {
-                cmap[i] = aoi.classes[i].color;
+            for (let i = 0; i < timeframe.classes.length; i++) {
+                cmap[i] = timeframe.classes[i].color;
             }
 
             req.query.colormap = JSON.stringify(cmap);
@@ -57,7 +58,7 @@ export default async function router(schema, config) {
             ];
         }
 
-        const aoiTileName = aoi.aoi_id ? `aoi-${aoi.aoi_id}` : `aoi-${aoi.id}`;
+        const aoiTileName = timeframe.aoi_id ? `aoi-${timeframe.aoi_id}` : `aoi-${timeframe.id}`;
 
         return {
             tilejson: tj.tilejson,
@@ -73,19 +74,20 @@ export default async function router(schema, config) {
     };
 
 
-    await schema.get('/project/:projectid/aoi/:aoiid', {
-        name: 'Get AOI',
-        group: 'AOI',
+    await schema.get('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid', {
+        name: 'Get Timeframe',
+        group: 'TimeFrame',
         auth: 'user',
-        description: 'Return all information about a given AOI',
+        description: 'Return all information about a given AOI Timeframe',
         ':projectid': 'integer',
         ':aoiid': 'integer',
-        res: 'res.AOI.json'
+        ':timeframeid': 'integer',
+        res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            const shares = await AOIShare.list(config.pool, req.params.projectid, {
+            const shares = await TimeFrameShare.list(config.pool, req.params.projectid, {
                 aoi_id: a.id
             });
 
@@ -98,11 +100,11 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.get('/project/:projectid/aoi/:aoiid/tiles', {
-        name: 'TileJSON AOI',
-        group: 'AOI',
+    await schema.get('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles', {
+        name: 'TileJSON',
+        group: 'TimeFrame',
         auth: 'user',
-        description: 'Return a TileJSON for a given AOI',
+        description: 'Return a TileJSON for a given AOI TimeFrame',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         res: 'res.TileJSON.json'
@@ -110,7 +112,7 @@ export default async function router(schema, config) {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             res.json(await getAoiTileJSON(a, req));
@@ -119,19 +121,20 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.get('/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y', {
-        name: 'Tile AOI',
-        group: 'AOI',
+    await schema.get('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles/:z/:x/:y', {
+        name: 'Tiles',
+        group: 'TimeFrame',
         auth: 'user',
-        description: 'Return a Tile for a given AOI',
+        description: 'Return a Tile for a given AOI TimeFrame',
         ':projectid': 'integer',
         ':aoiid': 'integer',
+        ':timeframeid': 'integer',
         ':z': 'integer',
         ':x': 'integer',
         ':y': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             const tiffurl = await a.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
@@ -144,14 +147,15 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.post('/project/:projectid/aoi/:aoiid/upload', {
-        name: 'Upload AOI',
-        group: 'AOI',
+    await schema.post('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/upload', {
+        name: 'Upload TimeFrame',
+        group: 'TimeFrame',
         auth: 'admin',
         description: 'Upload a new GeoTIFF to the API',
         ':projectid': 'integer',
         ':aoiid': 'integer',
-        res: 'res.AOI.json'
+        ':timeframeid': 'integer',
+        res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await User.is_admin(req);
@@ -163,7 +167,7 @@ export default async function router(schema, config) {
                 }
             });
 
-            const a = await AOI.from(config.pool, req.params.aoiid);
+            const a = await TimeFrame.from(config.pool, req.params.aoiid);
 
             const files = [];
 
@@ -182,7 +186,7 @@ export default async function router(schema, config) {
                         histo[i] = i + 1;
                     }
 
-                    if (!(await a.exists(config))) throw new Err(500, null, 'AOI is not on Azure?!');
+                    if (!(await a.exists(config))) throw new Err(500, null, 'TimeFrame is not on Azure?!');
 
                     const pres = await Proxy.request({
                         url: '/cog/statistics',
@@ -222,16 +226,17 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.get('/project/:projectid/aoi/:aoiid/download/raw', {
-        name: 'Download Raw AOI',
-        group: 'AOI',
+    await schema.get('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/raw', {
+        name: 'Download Raw TimeFrame',
+        group: 'TimeFrame',
         auth: 'admin',
-        description: 'Return the AOI Fabric as a GeoTIFF',
+        description: 'Return the TimeFrame Fabric as a GeoTIFF',
         ':projectid': 'integer',
-        ':aoiid': 'integer'
+        ':aoiid': 'integer',
+        ':timeframeid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             await a.download(config, res);
         } catch (err) {
@@ -239,16 +244,17 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.get('/project/:projectid/aoi/:aoiid/download/color', {
-        name: 'Download Color AOI',
-        group: 'AOI',
+    await schema.get('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/color', {
+        name: 'Download Color TimeFrame',
+        group: 'TimeFrame',
         auth: 'user',
         description: 'Return the colourized aoi fabric geotiff - but doesn\'t save it to share page',
         ':projectid': 'integer',
-        ':aoiid': 'integer'
+        ':aoiid': 'integer',
+        ':timeframeid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             const tiffurl = await a.url(config);
 
@@ -278,14 +284,15 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.get('/project/:projectid/aoi', {
-        name: 'List AOIs',
-        group: 'AOI',
+    await schema.get('/project/:projectid/aoi/:aoiid/timeframe', {
+        name: 'List TimeFrames',
+        group: 'TimeFrame',
         auth: 'user',
-        description: 'Return all AOIs for a given instance',
+        description: 'Return all TimeFrames for a given instance',
         ':projectid': 'integer',
+        ':aoiid': 'integer',
         query: 'req.query.aoi.json',
-        res: 'res.ListAOIs.json'
+        res: 'res.ListTimeFrames.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
@@ -306,9 +313,9 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.post('/project/:projectid/aoi', {
-        name: 'Create AOI',
-        group: 'AOI',
+    await schema.post('/project/:projectid/aoi/:aoiid/timeframe', {
+        name: 'Create TimeFrame',
+        group: 'TimeFrame',
         auth: 'admin',
         description: `
             Create a new AOI during an instance
@@ -334,13 +341,14 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.post('/project/:projectid/aoi/:aoiid/share', {
+    await schema.post('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share', {
         name: 'Create Share',
         group: 'Share',
         auth: 'user',
         description: 'Export an AOI & it\'s patches to share',
         ':projectid': 'integer',
         ':aoiid': 'integer',
+        ':timeframeid': 'integer',
         res: 'res.Share.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -382,13 +390,14 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.delete('/project/:projectid/aoi/:aoiid/share/:shareuuid', {
+    await schema.delete('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share/:shareuuid', {
         name: 'Delete Share',
         group: 'Share',
         auth: 'user',
         description: 'Delete a shared AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
+        ':timeframeid': 'integer',
         ':shareuuid': 'string',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
@@ -425,13 +434,14 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.delete('/project/:projectid/aoi/:aoiid', {
+    await schema.delete('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid', {
         name: 'Delete AOI',
-        group: 'AOI',
+        group: 'TimeFrame',
         auth: 'user',
         description: 'Delete an existing AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
+        ':timeframeid': 'integer',
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -450,13 +460,14 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.patch('/project/:projectid/aoi/:aoiid', {
+    await schema.patch('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid', {
         name: 'Patch AOI',
-        group: 'AOI',
+        group: 'TimeFrame',
         auth: 'user',
         description: 'Update an AOI',
         ':projectid': 'integer',
         ':aoiid': 'integer',
+        ':timeframeid': 'integer',
         body: 'req.body.PatchAOI.json',
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
