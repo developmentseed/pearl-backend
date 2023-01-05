@@ -3,6 +3,7 @@
     "required": [
         "uuid",
         "aoi_id",
+        "timeframe_id",
         "project_id",
         "bounds",
         "created",
@@ -15,6 +16,9 @@
             "type": "string"
         },
         "aoi_id": {
+            "type": "integer"
+        },
+        "timeframe_id": {
             "type": "integer"
         },
         "project_id": {

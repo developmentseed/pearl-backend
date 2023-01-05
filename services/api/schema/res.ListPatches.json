@@ -3,7 +3,7 @@
     "required": [
         "total",
         "project_id",
-        "aoi_id",
+        "timeframe_id",
         "patches"
     ],
     "additionalProperties": false,
@@ -15,7 +15,7 @@
         "project_id": {
             "type": "integer"
         },
-        "aoi_id": {
+        "timeframe_id": {
             "type": "integer"
         },
         "patches": {
