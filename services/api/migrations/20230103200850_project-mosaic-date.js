@@ -76,8 +76,19 @@ function up(knex) {
         ALTER TABLE aois
             ALTER COLUMN bounds SET NOT NULL;
 
-        ALTER TABLE aois_shares
+        ALTER TABLE aois_share
             RENAME TO aoi_timeframe_share;
+        ALTER TABLE aoi_timeframe_share
+            ADD COLUMN timeframe_id BIGINT REFERENCES aoi_timeframe(id);
+        UPDATE aoi_timeframe_share
+            SET
+                timeframe_id = aoi_timeframe.id
+            FROM
+                aoi_timeframe
+            WHERE
+                aoi_timeframe.aoi_id = aoi_timeframe_share.aoi_id;
+        ALTER TABLE aoi_timeframe_share
+            ALTER COLUMN timeframe_id SET NOT NULL;
 
         ALTER TABLE aoi_patch
             RENAME TO aoi_timeframe_patch;
