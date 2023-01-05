@@ -7,7 +7,7 @@ import { sql } from 'slonik';
  * @class
  */
 export default class AOIShare extends Generic {
-    static _table = 'aois_share';
+    static _table = 'aoi_timeframe_share';
 
     /**
      * Return a list of AOI Shares

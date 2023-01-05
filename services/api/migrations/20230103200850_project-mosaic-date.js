@@ -75,6 +75,12 @@ function up(knex) {
 
         ALTER TABLE aois
             ALTER COLUMN bounds SET NOT NULL;
+
+        ALTER TABLE aois_shares
+            RENAME TO aoi_timeframe_share;
+
+        ALTER TABLE aoi_patch
+            RENAME TO aoi_timeframe_patch;
     `);
 }
 

@@ -8,7 +8,7 @@ import { sql } from 'slonik';
  * @class
  */
 export default class AOIPatch extends Generic {
-    static _table = 'aoi_patch';
+    static _table = 'aoi_timeframe_patch';
 
     /**
      * Return a list of AOI Patches
