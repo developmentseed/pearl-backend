@@ -92,6 +92,19 @@ function up(knex) {
 
         ALTER TABLE aoi_patch
             RENAME TO aoi_timeframe_patch;
+        ALTER TABLE aoi_timeframe_patch
+            ADD COLUMN timeframe_id BIGINT REFERENCES aoi_timeframe(id);
+        UPDATE aoi_timeframe_patch
+            SET
+                timeframe_id = aoi_timeframe.id
+            FROM
+                aoi_timeframe
+            WHERE
+                aoi_timeframe.aoi_id = aoi_timeframe_patch.aoi_id;
+        ALTER TABLE aoi_timeframe_patch
+            ALTER COLUMN timeframe_id SET NOT NULL;
+        ALTER TABLE aoi_timeframe_patch
+            DROP COLUMN aoi_id;
     `);
 }
 
