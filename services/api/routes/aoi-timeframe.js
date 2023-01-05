@@ -323,6 +323,7 @@ export default async function router(schema, config) {
             Note: this is an internal API that is called by the websocket GPU
         `,
         ':projectid': 'integer',
+        ':aoiid': 'integer',
         body: 'req.body.CreateAOI.json',
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {

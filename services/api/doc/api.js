@@ -197,36 +197,38 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid Get AOI
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid Get Timeframe
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid
-* @apiGroup AOI
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid
+* @apiGroup TimeFrame
 * @apiPermission user
 *
 * @apidescription
-*   Return all information about a given AOI
+*   Return all information about a given AOI Timeframe
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 *
-* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
+* @apiSchema {jsonschema=../schema/res.TimeFrame.json} apiSuccess
 */
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/tiles TileJSON AOI
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles TileJSON
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/tiles
-* @apiGroup AOI
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles
+* @apiGroup TimeFrame
 * @apiPermission user
 *
 * @apidescription
-*   Return a TileJSON for a given AOI
+*   Return a TileJSON for a given AOI TimeFrame
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 *
@@ -235,17 +237,18 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y Tile AOI
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles/:z/:x/:y Tiles
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/tiles/:z/:x/:y
-* @apiGroup AOI
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles/:z/:x/:y
+* @apiGroup TimeFrame
 * @apiPermission user
 *
 * @apidescription
-*   Return a Tile for a given AOI
+*   Return a Tile for a given AOI TimeFrame
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {integer} z param
 * @apiParam {integer} x param
 * @apiParam {integer} y param
@@ -257,10 +260,10 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/upload Upload AOI
+* @api {post} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/upload Upload TimeFrame
 * @apiVersion 1.0.0
-* @apiName POST-/project/:projectid/aoi/:aoiid/upload
-* @apiGroup AOI
+* @apiName POST-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/upload
+* @apiGroup TimeFrame
 * @apiPermission admin
 *
 * @apidescription
@@ -268,25 +271,27 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 *
-* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
+* @apiSchema {jsonschema=../schema/res.TimeFrame.json} apiSuccess
 */
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/download/raw Download Raw AOI
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/raw Download Raw TimeFrame
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/download/raw
-* @apiGroup AOI
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/raw
+* @apiGroup TimeFrame
 * @apiPermission admin
 *
 * @apidescription
-*   Return the AOI Fabric as a GeoTIFF
+*   Return the TimeFrame Fabric as a GeoTIFF
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 *
@@ -295,10 +300,10 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/download/color Download Color AOI
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/color Download Color TimeFrame
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/download/color
-* @apiGroup AOI
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/color
+* @apiGroup TimeFrame
 * @apiPermission user
 *
 * @apidescription
@@ -306,6 +311,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 *
@@ -314,28 +320,29 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi List AOIs
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe List TimeFrames
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi
-* @apiGroup AOI
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe
+* @apiGroup TimeFrame
 * @apiPermission user
 *
 * @apidescription
-*   Return all AOIs for a given instance
+*   Return all TimeFrames for a given instance
 *
 * @apiParam {integer} projectid param
+* @apiParam {integer} aoiid param
 *
 * @apiSchema (Query) {jsonschema=../schema/req.query.aoi.json} apiParam
 *
-* @apiSchema {jsonschema=../schema/res.ListAOIs.json} apiSuccess
+* @apiSchema {jsonschema=../schema/res.ListTimeFrames.json} apiSuccess
 */
 
 
 /**
-* @api {post} /project/:projectid/aoi Create AOI
+* @api {post} /project/:projectid/aoi/:aoiid/timeframe Create TimeFrame
 * @apiVersion 1.0.0
-* @apiName POST-/project/:projectid/aoi
-* @apiGroup AOI
+* @apiName POST-/project/:projectid/aoi/:aoiid/timeframe
+* @apiGroup TimeFrame
 * @apiPermission admin
 *
 * @apidescription
@@ -345,6 +352,7 @@ Note: this is an internal API that is called by the websocket GPU
 
 *
 * @apiParam {integer} projectid param
+* @apiParam {integer} aoiid param
 *
 *
 * @apiSchema (Body) {jsonschema=../schema/req.body.CreateAOI.json} apiParam
@@ -353,9 +361,9 @@ Note: this is an internal API that is called by the websocket GPU
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/share Create Share
+* @api {post} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share Create Share
 * @apiVersion 1.0.0
-* @apiName POST-/project/:projectid/aoi/:aoiid/share
+* @apiName POST-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share
 * @apiGroup Share
 * @apiPermission user
 *
@@ -364,6 +372,7 @@ Note: this is an internal API that is called by the websocket GPU
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 *
@@ -372,9 +381,9 @@ Note: this is an internal API that is called by the websocket GPU
 
 
 /**
-* @api {delete} /project/:projectid/aoi/:aoiid/share/:shareuuid Delete Share
+* @api {delete} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share/:shareuuid Delete Share
 * @apiVersion 1.0.0
-* @apiName DELETE-/project/:projectid/aoi/:aoiid/share/:shareuuid
+* @apiName DELETE-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share/:shareuuid
 * @apiGroup Share
 * @apiPermission user
 *
@@ -383,6 +392,7 @@ Note: this is an internal API that is called by the websocket GPU
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {string} shareuuid param
 *
 *
@@ -410,10 +420,10 @@ Note: this is an internal API that is called by the websocket GPU
 
 
 /**
-* @api {delete} /project/:projectid/aoi/:aoiid Delete AOI
+* @api {delete} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid Delete AOI
 * @apiVersion 1.0.0
-* @apiName DELETE-/project/:projectid/aoi/:aoiid
-* @apiGroup AOI
+* @apiName DELETE-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid
+* @apiGroup TimeFrame
 * @apiPermission user
 *
 * @apidescription
@@ -421,6 +431,7 @@ Note: this is an internal API that is called by the websocket GPU
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 *
@@ -429,10 +440,10 @@ Note: this is an internal API that is called by the websocket GPU
 
 
 /**
-* @api {patch} /project/:projectid/aoi/:aoiid Patch AOI
+* @api {patch} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid Patch AOI
 * @apiVersion 1.0.0
-* @apiName PATCH-/project/:projectid/aoi/:aoiid
-* @apiGroup AOI
+* @apiName PATCH-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid
+* @apiGroup TimeFrame
 * @apiPermission user
 *
 * @apidescription
@@ -440,6 +451,7 @@ Note: this is an internal API that is called by the websocket GPU
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 * @apiSchema (Body) {jsonschema=../schema/req.body.PatchAOI.json} apiParam
@@ -537,6 +549,83 @@ Note: this is an internal API that is called by the websocket GPU
 *
 *
 *
+*/
+
+
+/**
+* @api {get} /project/:projectid/aoi/:aoiid Get AOI
+* @apiVersion 1.0.0
+* @apiName GET-/project/:projectid/aoi/:aoiid
+* @apiGroup AOI
+* @apiPermission user
+*
+* @apidescription
+*   Return all information about a given AOI
+*
+* @apiParam {integer} projectid param
+* @apiParam {integer} aoiid param
+*
+*
+*
+* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
+*/
+
+
+/**
+* @api {get} /project/:projectid/aoi List AOIs
+* @apiVersion 1.0.0
+* @apiName GET-/project/:projectid/aoi
+* @apiGroup AOI
+* @apiPermission user
+*
+* @apidescription
+*   Return all AOIs for a given instance
+*
+* @apiParam {integer} projectid param
+*
+* @apiSchema (Query) {jsonschema=../schema/req.query.aoi.json} apiParam
+*
+* @apiSchema {jsonschema=../schema/res.ListAOIs.json} apiSuccess
+*/
+
+
+/**
+* @api {post} /project/:projectid/aoi Create AOI
+* @apiVersion 1.0.0
+* @apiName POST-/project/:projectid/aoi
+* @apiGroup AOI
+* @apiPermission admin
+*
+* @apidescription
+*
+Create a new AOI during an instance
+Note: this is an internal API that is called by the websocket GPU
+
+*
+* @apiParam {integer} projectid param
+*
+*
+* @apiSchema (Body) {jsonschema=../schema/req.body.CreateAOI.json} apiParam
+* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
+*/
+
+
+/**
+* @api {patch} /project/:projectid/aoi/:aoiid Patch AOI
+* @apiVersion 1.0.0
+* @apiName PATCH-/project/:projectid/aoi/:aoiid
+* @apiGroup AOI
+* @apiPermission user
+*
+* @apidescription
+*   Update an AOI
+*
+* @apiParam {integer} projectid param
+* @apiParam {integer} aoiid param
+*
+*
+* @apiSchema (Body) {jsonschema=../schema/req.body.PatchAOI.json} apiParam
+* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
 */
 
 
@@ -1222,24 +1311,6 @@ Note: this will not affect currently running instances of the model
 *
 *
 * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
-*/
-
-
-/**
-* @api {post} /user POST /user
-* @apiVersion 1.0.0
-* @apiName POST-/user
-* @apiGroup Default
-* @apiPermission Unknown
-*
-* @apidescription
-*   No Description
-*
-
-*
-*
-*
-*
 */
 
 
