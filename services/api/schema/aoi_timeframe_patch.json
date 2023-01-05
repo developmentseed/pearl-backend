@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./aoi_timeframe_patch/id.json"
+        },
+        "project_id": {
+            "$ref": "./aoi_timeframe_patch/project_id.json"
+        },
+        "created": {
+            "$ref": "./aoi_timeframe_patch/created.json"
+        },
+        "storage": {
+            "$ref": "./aoi_timeframe_patch/storage.json"
+        },
+        "timeframe_id": {
+            "$ref": "./aoi_timeframe_patch/timeframe_id.json"
+        }
+    },
+    "required": [
+        "id",
+        "project_id",
+        "created",
+        "storage",
+        "timeframe_id"
+    ]
+}

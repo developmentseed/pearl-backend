@@ -5,7 +5,7 @@ dotenv.config();
 
 import fs from 'fs';
 import express from 'express';
-import jwt from 'express-jwt';
+import { expressjwt as jwt } from 'express-jwt';
 import jwks from 'jwks-rsa';
 import cors from 'cors';
 import minify from 'express-minify';

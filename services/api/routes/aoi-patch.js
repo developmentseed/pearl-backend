@@ -1,7 +1,7 @@
 import Err from '@openaddresses/batch-error';
 import Busboy from 'busboy';
 import AOI from '../lib/types/aoi.js';
-import AOIPatch from '../lib/types/aoi-patch.js';
+import AOIPatch from '../lib/types/aoi-timeframe-patch.js';
 import Proxy from '../lib/proxy.js';
 import User from '../lib/types/user.js';
 

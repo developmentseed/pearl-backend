@@ -4,8 +4,8 @@ import Project from '../lib/types/project.js';
 import AOI from '../lib/types/aoi.js';
 import TimeFrame from '../lib/types/aoi-timeframe.js';
 import Checkpoint from '../lib/types/checkpoint.js';
-import AOIPatch from '../lib/types/aoi-patch.js';
-import AOIShare from '../lib/types/aoi-share.js';
+import TimeFramePatch from '../lib/types/aoi-timeframe-patch.js';
+import TimeFrameShare from '../lib/types/aoi-timeframe-share.js';
 import Proxy from '../lib/proxy.js';
 import User from '../lib/types/user.js';
 import { sql } from 'slonik';
@@ -14,7 +14,7 @@ export default async function router(schema, config) {
     const getAoiTileJSON = async (timeframe, req) => {
         let tiffurl;
         if (timeframe.uuid) {
-            const a = await AOIShare.from(config.pool, timeframe.uuid);
+            const a = await TimeFrameShare.from(config.pool, timeframe.uuid);
             tiffurl = await a.url(config);
         } else {
             const a = await AOI.from(config.pool, timeframe.id);
@@ -107,6 +107,7 @@ export default async function router(schema, config) {
         description: 'Return a TileJSON for a given AOI TimeFrame',
         ':projectid': 'integer',
         ':aoiid': 'integer',
+        ':timeframeid': 'integer',
         res: 'res.TileJSON.json'
     }, config.requiresAuth, async (req, res) => {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
@@ -265,7 +266,7 @@ export default async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                const patch = await TimeFramePatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
                 patchurls.push(await patch.url(config));
             }
 
@@ -300,7 +301,7 @@ export default async function router(schema, config) {
             const aois = await AOI.list(config.pool, req.params.projectid, req.query);
 
             for (const a of aois.aois) {
-                const shares = await AOIShare.list(config.pool, req.params.projectid, {
+                const shares = await TimeFrameShare.list(config.pool, req.params.projectid, {
                     aoi: a.id
                 });
 
@@ -362,11 +363,11 @@ export default async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                const patch = await AOIPatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                const patch = await TimeFramePatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
                 patchurls.push(await patch.url(config));
             }
 
-            const share = await AOIShare.generate(config.pool, a);
+            const share = await TimeFrameShare.generate(config.pool, a);
 
             if (config.TileUrl) {
                 const tiffurl = await a.url(config);
@@ -404,7 +405,7 @@ export default async function router(schema, config) {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
             await share.delete(config);
 
             return res.json({
@@ -428,7 +429,7 @@ export default async function router(schema, config) {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            return res.json(await AOIShare.list(config.pool, req.params.projectid, req.query));
+            return res.json(await TimeFrameShare.list(config.pool, req.params.projectid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -500,7 +501,7 @@ export default async function router(schema, config) {
         res: 'res.Share.json'
     }, async (req, res) => {
         try {
-            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
 
             const json = share.serialize();
             json.checkpoint_id = share.checkpoint_id;
@@ -523,7 +524,7 @@ export default async function router(schema, config) {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            const a = await AOIShare.from(config.pool, req.params.shareuuid);
+            const a = await TimeFrameShare.from(config.pool, req.params.shareuuid);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             res.json(await getAoiTileJSON(a, req));
@@ -543,7 +544,7 @@ export default async function router(schema, config) {
         ':y': 'integer'
     }, async (req, res) => {
         try {
-            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
             const tiffurl = await share.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
             req.query.url = tiffurl.origin + tiffurl.pathname;
@@ -563,7 +564,7 @@ export default async function router(schema, config) {
         ':shareuuid': 'string'
     }, async (req, res) => {
         try {
-            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
             if (!share.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             const aoi = await AOI.from(config.pool, share.aoi_id);
@@ -581,7 +582,7 @@ export default async function router(schema, config) {
         ':shareuuid': 'string'
     }, async (req, res) => {
         try {
-            const share = await AOIShare.from(config.pool, req.params.shareuuid);
+            const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
             if (!share.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             const aoi = await AOI.from(config.pool, share.aoi_id);
@@ -594,7 +595,7 @@ export default async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of aoi.patches) {
-                const patch = await AOIPatch.from(config.pool, patchid);
+                const patch = await TimeFramePatch.from(config.pool, patchid);
                 patchurls.push(await patch.url(config));
             }
 
