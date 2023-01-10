@@ -297,7 +297,7 @@ export default async function router(schema, config) {
         res: 'res.ListTimeFrames.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
 
             const list = await TimeFrame.list(config.pool, req.params.aoiid, req.query);
 
@@ -361,7 +361,7 @@ export default async function router(schema, config) {
         res: 'res.Share.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             const cmap = {};
@@ -454,7 +454,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
 
             await a.commit({
                 archived: true
@@ -477,11 +477,11 @@ export default async function router(schema, config) {
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':timeframeid': 'integer',
-        body: 'req.body.PatchAOI.json',
+        body: 'req.body.PatchTimeFrame.json',
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
 
             if (req.body.classes && req.body.classes.length !== a.classes.length) {
                 throw new Err(400, null, 'Cannot change number of classes on an existing AOI');

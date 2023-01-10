@@ -355,8 +355,8 @@ Note: this is an internal API that is called by the websocket GPU
 * @apiParam {integer} aoiid param
 *
 *
-* @apiSchema (Body) {jsonschema=../schema/req.body.CreateAOI.json} apiParam
-* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
+* @apiSchema (Body) {jsonschema=../schema/req.body.CreateTimeFrame.json} apiParam
+* @apiSchema {jsonschema=../schema/res.TimeFrame.json} apiSuccess
 */
 
 
