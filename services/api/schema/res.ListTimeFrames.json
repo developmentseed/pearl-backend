@@ -3,7 +3,8 @@
     "required": [
         "total",
         "project_id",
-        "aois"
+        "aoi_id",
+        "timeframes"
     ],
     "additionalProperties": false,
     "properties": {
@@ -15,15 +16,17 @@
             "type": "integer",
             "description": "Id of the associated project"
         },
-        "aois": {
+        "aoi_id": {
+            "type": "integer",
+            "description": "Id of the associated AOI"
+        },
+        "timeframes": {
             "type": "array",
             "items": {
                 "type": "object",
                 "required": [
                     "id",
                     "name",
-                    "bounds",
-                    "area",
                     "bookmarked",
                     "bookmarked_at",
                     "checkpoint_id",
@@ -43,12 +46,6 @@
                     },
                     "checkpoint_name": {
                         "type": "string"
-                    },
-                    "bounds": {
-                        "type": "object"
-                    },
-                    "area": {
-                        "type": "integer"
                     },
                     "bookmarked": {
                         "type": ["boolean", "null"]

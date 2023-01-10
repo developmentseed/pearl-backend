@@ -297,19 +297,23 @@ export default async function router(schema, config) {
         res: 'res.ListTimeFrames.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            const aois = await AOI.list(config.pool, req.params.projectid, req.query);
+            const list = await TimeFrame.list(config.pool, req.params.aoiid, req.query);
 
-            for (const a of aois.aois) {
+            // TODO this should be a join
+            for (const tf of list.timeframes) {
                 const shares = await TimeFrameShare.list(config.pool, req.params.projectid, {
                     aoi: a.id
                 });
 
-                a.shares = shares.shares;
+                tf.shares = shares.shares;
             }
 
-            return res.json(aois);
+            list.project_id = req.params.projectid;
+            list.aoi_id = req.params.aoiid;
+
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -13,18 +13,15 @@ export default class AOIShare extends Generic {
      * Return a list of AOI Shares
      *
      * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Number} projectid - AOI Shares related to a specific project
+     * @param {Number} aoiid - AOI Shares related to a specific project
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
-     * @param {Number} query.aoi_id - Specfic AOI to filter for
      */
-    static async list(pool, projectid, query) {
+    static async list(pool, aoiid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-
-        if (query.aoi === undefined) query.aoi = null;
 
         let pgres;
         try {
@@ -36,10 +33,9 @@ export default class AOIShare extends Generic {
                     created,
                     storage
                 FROM
-                    aois_share
+                    aoi_timeframe_share
                 WHERE
-                    project_id = ${projectid}
-                    AND (${query.aoi}::BIGINT IS NULL OR aoi_id = ${query.aoi})
+                    aoi_id = ${aoiid}
                 ORDER BY
                     created DESC
                 LIMIT
@@ -51,9 +47,7 @@ export default class AOIShare extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOI Shares');
         }
 
-        const list = this.deserialize_list(pgres, 'shares');
-        list.project_id = projectid;
-        return list;
+        return this.deserialize_list(pgres, 'shares');
     }
 
     /**
@@ -109,7 +103,7 @@ export default class AOIShare extends Generic {
             pgres = await this._pool.query(sql`
                 DELETE
                     FROM
-                        aois_share
+                        aoi_timeframe_share
                     WHERE
                         aoi_id = ${this.aoi_id}
                         AND uuid = ${this.uuid}
@@ -150,7 +144,7 @@ export default class AOIShare extends Generic {
                     a.checkpoint_id AS checkpoint_id,
                     c.classes AS classes
                 FROM
-                    aois_share s,
+                    aoi_timeframe_share s,
                     aois a,
                     checkpoints c
                 WHERE
@@ -180,7 +174,7 @@ export default class AOIShare extends Generic {
         let pgres;
         try {
             pgres = await pool.query(sql`
-                INSERT INTO aois_share (
+                INSERT INTO aoi_timeframe_share (
                     project_id,
                     aoi_id,
                     bounds,

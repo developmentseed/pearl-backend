@@ -50,7 +50,7 @@ export default class AOITimeframe extends Generic {
                     checkpoints c
                 WHERE
                     a.checkpoint_id = c.id
-                    AND a.project_id = ${projectid}
+                    AND a.aoi_id = ${aoiid}
                     AND (${query.checkpointid}::BIGINT IS NULL OR checkpoint_id = ${query.checkpointid})
                     AND (${query.bookmarked}::BOOLEAN IS NULL OR a.bookmarked = ${query.bookmarked})
                     AND a.archived = false
@@ -65,8 +65,7 @@ export default class AOITimeframe extends Generic {
             throw new Err(500, err, 'Failed to list AOI TimeFrames');
         }
 
-        const list = this.deserialize_list(pgres);
-        list.project_id = projectid;
+        const list = this.deserialize_list(pgres, 'timeframes');
 
         return list;
     }

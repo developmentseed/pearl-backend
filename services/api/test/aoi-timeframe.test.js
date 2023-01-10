@@ -28,7 +28,8 @@ test('GET /api/project/1/aoi/1/timeframe (empty)', async (t) => {
         t.deepEquals(res.body, {
             total: 0,
             project_id: 1,
-            aois: []
+            aoi_id: 1,
+            timeframes: []
         });
     } catch (err) {
         t.error(err, 'no errors');
