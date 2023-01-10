@@ -50,36 +50,6 @@ test('GET /api/project/1 (empty)', async (t) => {
 
 flight.fixture(test, 'model.json', 'ingalls');
 
-test('POST /api/project (Invalid Mosaic)', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/project',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Test Project',
-                model_id: 1,
-                mosaic: 'naip.fake'
-            }
-        }, false);
-
-        t.equals(res.statusCode, 400, 'status: 400');
-
-        t.deepEquals(res.body, {
-            status: 400,
-            message: 'Invalid Mosaic',
-            messages: []
-        });
-    } catch (err) {
-        t.error(err, 'no errors');
-    }
-
-    t.end();
-});
-
 test('PATCH /api/model/1 - storage: false, active: false', async (t) => {
     try {
         await flight.request({
@@ -113,7 +83,6 @@ test('POST /api/project - Model not uploaded', async (t) => {
             body: {
                 name: 'Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest'
             }
         }, false);
 
@@ -162,7 +131,6 @@ test('POST /api/project - Model not active', async (t) => {
             body: {
                 name: 'Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest'
             }
         }, false);
 
@@ -211,7 +179,6 @@ test('POST /api/project', async (t) => {
             body: {
                 name: 'Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest'
             }
         }, t);
 
@@ -223,7 +190,6 @@ test('POST /api/project', async (t) => {
             uid: 1,
             name: 'Test Project',
             model_id: 1,
-            mosaic: 'naip.latest',
             model_name: 'NAIP Supervised'
         });
 
@@ -388,7 +354,6 @@ test('POST /api/project (sort)', async (t) => {
             body: {
                 name: 'LULC Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest'
             }
         }, t);
 
@@ -400,7 +365,6 @@ test('POST /api/project (sort)', async (t) => {
             uid: 1,
             name: 'LULC Test Project',
             model_id: 1,
-            mosaic: 'naip.latest',
             model_name: 'NAIP Supervised'
         });
     } catch (err) {
@@ -521,7 +485,6 @@ test('GET /api/project/1', async (t) => {
             name: 'Test Project',
             model_id: 1,
             model_name: 'NAIP Supervised',
-            mosaic: 'naip.latest',
             checkpoints: []
         });
     } catch (err) {
@@ -553,7 +516,6 @@ test('PATCH /api/project/1', async (t) => {
             uid: 1,
             name: 'Renamed Test Project',
             model_id: 1,
-            mosaic: 'naip.latest',
             model_name: 'NAIP Supervised'
         });
 
@@ -584,7 +546,6 @@ test('GET /api/project/1', async (t) => {
             name: 'Renamed Test Project',
             model_id: 1,
             model_name: 'NAIP Supervised',
-            mosaic: 'naip.latest',
             checkpoints: []
         });
 
