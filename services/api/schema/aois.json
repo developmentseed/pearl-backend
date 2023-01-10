@@ -22,6 +22,12 @@
         },
         "archived": {
             "$ref": "./aois/archived.json"
+        },
+        "bookmarked": {
+            "$ref": "./aois/bookmarked.json"
+        },
+        "bookmarked_at": {
+            "$ref": "./aois/bookmarked_at.json"
         }
     },
     "required": [
@@ -31,6 +37,8 @@
         "created",
         "updated",
         "bounds",
-        "archived"
+        "archived",
+        "bookmarked",
+        "bookmarked_at"
     ]
 }

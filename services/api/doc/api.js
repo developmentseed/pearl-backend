@@ -454,7 +454,7 @@ Note: this is an internal API that is called by the websocket GPU
 * @apiParam {integer} timeframeid param
 *
 *
-* @apiSchema (Body) {jsonschema=../schema/req.body.PatchAOI.json} apiParam
+* @apiSchema (Body) {jsonschema=../schema/req.body.PatchTimeFrame.json} apiParam
 * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
 */
 

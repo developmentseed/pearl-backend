@@ -105,6 +105,12 @@ function up(knex) {
             ALTER COLUMN timeframe_id SET NOT NULL;
         ALTER TABLE aoi_timeframe_patch
             DROP COLUMN aoi_id;
+
+        ALTER TABLE aois
+            ADD COLUMN bookmarked BOOLEAN NOT NULL Default False;
+
+        ALTER TABLE aois
+            ADD COLUMN bookmarked_at TIMESTAMP;
     `);
 }
 

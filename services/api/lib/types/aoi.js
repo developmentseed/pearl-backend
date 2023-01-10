@@ -31,6 +31,8 @@ export default class AOI extends Generic {
             query.sort = sql`asc`;
         }
 
+        if (query.bookmarked === undefined) query.bookmarked = null;
+
         let pgres;
         try {
             pgres = await pool.query(sql`
@@ -47,6 +49,7 @@ export default class AOI extends Generic {
                 WHERE
                     a.project_id = ${projectid}
                     AND a.archived = false
+                    AND (${query.bookmarked}::BOOLEAN IS NULL OR a.bookmarked = ${query.bookmarked})
                 ORDER BY
                     a.created ${query.sort}
                 LIMIT

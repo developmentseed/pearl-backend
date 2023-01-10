@@ -213,7 +213,6 @@ test('POST /api/project/1/aoi', async (t) => {
             },
             body: {
                 name: 'Test AOI',
-                checkpoint_id: 1,
                 bounds: {
                     type: 'Polygon',
                     coordinates: [[
@@ -229,24 +228,16 @@ test('POST /api/project/1/aoi', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
+        t.ok(res.body.updated, '.updated: <date>');
+        delete res.body.updated;
 
         t.deepEquals(res.body, {
             id: 1,
             area: 1238,
-            storage: false,
             project_id: 1,
-            patches: [],
-            checkpoint_id: 1,
             name: 'Test AOI',
             bookmarked: false,
             bookmarked_at: null,
-            px_stats: {},
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],

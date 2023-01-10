@@ -7,7 +7,9 @@
         "project_id",
         "created",
         "updated",
-        "area"
+        "area",
+        "bookmarked",
+        "bookmarked_at"
     ],
     "additionalProperties": false,
     "properties": {
@@ -32,8 +34,11 @@
         "updated": {
             "type": "integer"
         },
-        "storage": {
-            "type": "boolean"
+        "bookmarked": {
+            "type": ["boolean", "null"]
+        },
+        "bookmarked_at": {
+            "type": ["integer", "null"]
         }
     }
 }
