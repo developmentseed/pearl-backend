@@ -329,8 +329,8 @@ export default async function router(schema, config) {
         `,
         ':projectid': 'integer',
         ':aoiid': 'integer',
-        body: 'req.body.CreateAOI.json',
-        res: 'res.AOI.json'
+        body: 'req.body.CreateTimeFrame.json',
+        res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);

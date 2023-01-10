@@ -38,6 +38,44 @@ test('GET /api/project/1/aoi/1/timeframe (empty)', async (t) => {
     t.end();
 });
 
+test('POST /api/project/1/aoi/1/timeframe - invalid mosaic', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1/timeframe',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test AOI',
+                checkpoint_id: 1,
+                mosaic: 'fake.naip',
+                bounds: {
+                    type: 'Polygon',
+                    coordinates: [[
+                        [-79.37724530696869, 38.83428180092151],
+                        [-79.37677592039108, 38.83428180092151],
+                        [-79.37677592039108, 38.83455550411051],
+                        [-79.37724530696869, 38.83455550411051],
+                        [-79.37724530696869, 38.83428180092151]
+                    ]]
+                }
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'Invalid Mosaic',
+            messages: []
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('POST /api/project/1/aoi/1/timeframe', async (t) => {
     try {
         const res = await flight.request({
