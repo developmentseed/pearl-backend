@@ -12,12 +12,13 @@ flight.user(test, 'ingalls', true);
 flight.fixture(test, 'model.json', 'ingalls');
 flight.fixture(test, 'project.json', 'ingalls');
 flight.fixture(test, 'checkpoint.json', 'ingalls');
+flight.fixture(test, 'aoi.json', 'ingalls');
 
-test('GET /api/project/1/aoi (empty)', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe (empty)', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi',
+            url: '/api/project/1/aoi/1/timeframe',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -36,11 +37,11 @@ test('GET /api/project/1/aoi (empty)', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/aoi', async (t) => {
+test('POST /api/project/1/aoi/1/timeframe', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi',
+            url: '/api/project/1/aoi/1/timeframe',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -106,11 +107,11 @@ test('POST /api/project/1/aoi', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi/1', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1/timeframe/1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -174,11 +175,11 @@ test('[meta] Set aoi.storage: true', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi',
+            url: '/api/project/1/aoi/1/timeframe',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -225,11 +226,11 @@ test('GET /api/project/1/aoi', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi?bookmarked=false', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe?bookmarked=false', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi?bookmarked=false',
+            url: '/api/project/1/aoi/1/timeframe?bookmarked=false',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -292,11 +293,11 @@ test.skip('GET /api/project/1/aoi/1/tiles/9/143/195', async (t) => {
     t.end();
 });
 
-test('PATCH /api/project/1/aoi/1', async (t) => {
+test('PATCH /api/project/1/aoi/1/timeframe/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1/timeframe/1',
             method: 'PATCH',
             body: {
                 bookmarked: true,
@@ -359,11 +360,11 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi?bookmarked=true', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe?bookmarked=true', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi?bookmarked=true',
+            url: '/api/project/1/aoi/1/timeframe?bookmarked=true',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -379,11 +380,11 @@ test('GET /api/project/1/aoi?bookmarked=true', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/aoi', async (t) => {
+test('POST /api/project/1/aoi/1/timeframe', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi',
+            url: '/api/project/1/aoi/1/timeframe',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -448,11 +449,11 @@ test('POST /api/project/1/aoi', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi?sort=asc', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe?sort=asc', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi?sort=asc',
+            url: '/api/project/1/aoi/1/timeframe?sort=asc',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -469,11 +470,11 @@ test('GET /api/project/1/aoi?sort=asc', async (t) => {
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1', async (t) => {
+test('DELETE /api/project/1/aoi/1/timeframe/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1/timeframe/1',
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -492,11 +493,11 @@ test('DELETE /api/project/1/aoi/1', async (t) => {
 });
 
 // after delete there should only be 1 aoi
-test('GET /api/project/1/aoi?sort=asc', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe?sort=asc', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi?sort=asc',
+            url: '/api/project/1/aoi/1/timeframe?sort=asc',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

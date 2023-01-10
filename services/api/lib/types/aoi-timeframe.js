@@ -16,7 +16,7 @@ export default class AOITimeframe extends Generic {
      *
      * @param {Pool} pool - Instantiated Postgres Pool
      *
-     * @param {Number} projectid - AOIS related to a specific project
+     * @param {Number} aoiid - TimeFrames related to a specific project/aoi
      *
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
@@ -25,7 +25,7 @@ export default class AOITimeframe extends Generic {
      * @param {String} [query.bookmarked] - Only return AOIs of this bookmarked state. Allowed true or false. By default returns all.
      * @param {String} [query.sort] - Sort AOI list by ascending or descending order of the created timestamp. Allowed asc or desc. Default desc.
      */
-    static async list(pool, projectid, query = {}) {
+    static async list(pool, aoiid, query = {}) {
         query.limit = Params.integer(query.limit, { default: 100 });
         query.page = Params.integer(query.page, { default: 0 });
 
@@ -43,21 +43,10 @@ export default class AOITimeframe extends Generic {
             pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
-                    a.id                                AS id,
-                    a.name                              AS name,
-                    a.patches                           AS patches,
-                    a.px_stats                          AS px_stats,
-                    a.bookmarked                        AS bookmarked,
-                    a.bookmarked_at                     AS bookmarked_at,
-                    a.bounds                            AS bounds,
-                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.created                           AS created,
-                    a.storage                           AS storage,
-                    a.checkpoint_id                     AS checkpoint_id,
-                    a.classes                           AS classes,
+                    a.*,
                     c.name                              AS checkpoint_name
                 FROM
-                    aois a,
+                    aoi_timeframe a,
                     checkpoints c
                 WHERE
                     a.checkpoint_id = c.id
@@ -73,7 +62,7 @@ export default class AOITimeframe extends Generic {
                     ${query.page * query.limit}
             `);
         } catch (err) {
-            throw new Err(500, err, 'Failed to list AOIs');
+            throw new Err(500, err, 'Failed to list AOI TimeFrames');
         }
 
         const list = this.deserialize_list(pgres);
@@ -108,7 +97,7 @@ export default class AOITimeframe extends Generic {
      * @param {Config} config
      */
     async exists(config) {
-        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+        if (!this.storage) throw new Err(404, null, 'AOI TimeFrame has not been uploaded');
 
         const storage = new Storage(config, 'aois');
         return await storage.exists(`aoi-${this.id}.tiff`);
@@ -121,7 +110,7 @@ export default class AOITimeframe extends Generic {
      * @param {Stream} res Stream to pipe geotiff to (usually express response object)
      */
     async download(config, res) {
-        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+        if (!this.storage) throw new Err(404, null, 'AOI TimeFrame has not been uploaded');
 
         const storage = new Storage(config, 'aois');
         return await storage.download(`aoi-${this.id}.tiff`, res);
@@ -133,7 +122,7 @@ export default class AOITimeframe extends Generic {
      * @param {Config} config
      */
     async url(config) {
-        if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
+        if (!this.storage) throw new Err(404, null, 'AOI TimeFrame has not been uploaded');
 
         const storage = new Storage(config, 'aois');
         return await storage.url(`aoi-${this.id}.tiff`);
@@ -146,7 +135,7 @@ export default class AOITimeframe extends Generic {
      * @param {Object} file File Stream to upload
      */
     async upload(config, file) {
-        if (this.storage) throw new Err(404, null, 'AOI has already been uploaded');
+        if (this.storage) throw new Err(404, null, 'AOI TimeFrame has already been uploaded');
 
         const storage = new Storage(config, 'aois');
         await storage.upload(file, `aoi-${this.id}.tiff`);
@@ -168,19 +157,18 @@ export default class AOITimeframe extends Generic {
             pgres = await pool.query(sql`
                SELECT
                     a.*
-                    Round(ST_Area(a.bounds::GEOGRAPHY)) AS area
                 FROM
-                    aois a
+                    aoi_timeframe a
                 WHERE
                     a.id = ${id}
                 AND
                     a.archived = false
             `);
         } catch (err) {
-            throw new Err(500, err, 'Failed to get AOI');
+            throw new Err(500, err, 'Failed to get AOI TimeFrame');
         }
 
-        if (!pgres.rows.length) throw new Err(404, null, 'aoi not found');
+        if (!pgres.rows.length) throw new Err(404, null, 'AOI TimeFrame not found');
 
         return this.deserialize(pool, pgres);
     }
