@@ -1,7 +1,5 @@
 import test from 'tape';
 import Flight from './flight.js';
-import fs from 'fs';
-import { sql } from 'slonik';
 
 const flight = new Flight();
 
@@ -191,7 +189,7 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             url: '/api/project/1/aoi/1',
             method: 'PATCH',
             body: {
-                name: 'RENAMED',
+                name: 'RENAMED'
             },
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

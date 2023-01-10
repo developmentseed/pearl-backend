@@ -86,20 +86,17 @@ export default class AOITimeframe extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} aoiid AOI the user is attemping to access
-     * @param {Number} timeframeid TimeFrame the user is attemping to access
+     * @param {Object} req req Express Request object
      */
-    static async has_auth(pool, auth, projectid, aoiid, timeframeid) {
-        const proj = await Project.has_auth(pool, auth, projectid);
-        const aoi = await AOI.from(pool, aoiid);
-        const timeframe = await TimeFrame.from(pool, timeframe);
+    static async has_auth(pool, req) {
+        const proj = await Project.has_auth(pool, req.auth, req.params.projectid);
+        const aoi = await AOI.from(pool, req.params.aoiid);
+        const timeframe = await this.from(pool, req.params.timeframeid);
 
         if (aoi.project_id !== proj.id) {
-            throw new Err(400, null, `AOI #${aoiid} is not associated with project #${projectid}`);
+            throw new Err(400, null, `AOI #${req.params.aoiid} is not associated with project #${req.params.projectid}`);
         } else if (timeframe.aoi_id !== aoi.id) {
-            throw new Err(400, null, `TiumeFrame #${timeframeid} is not associated with AOI #${aoiid}`);
+            throw new Err(400, null, `TiumeFrame #${req.params.timeframeid} is not associated with AOI #${req.params.aoiid}`);
         }
 
         return timeframe;

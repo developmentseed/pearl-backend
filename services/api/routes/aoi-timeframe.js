@@ -238,7 +238,7 @@ export default async function router(schema, config) {
         ':timeframeid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
 
             await a.download(config, res);
         } catch (err) {
@@ -256,7 +256,7 @@ export default async function router(schema, config) {
         ':timeframeid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
 
             const tiffurl = await a.url(config);
 
