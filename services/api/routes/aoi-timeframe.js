@@ -9,6 +9,7 @@ import TimeFrameShare from '../lib/types/aoi-timeframe-share.js';
 import Proxy from '../lib/proxy.js';
 import User from '../lib/types/user.js';
 import { sql } from 'slonik';
+import Mosaic from '../lib/mosaic.js';
 
 export default async function router(schema, config) {
     const getAoiTileJSON = async (timeframe, req) => {
@@ -85,7 +86,7 @@ export default async function router(schema, config) {
         res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
 
             const shares = await TimeFrameShare.list(config.pool, req.params.projectid, {
                 aoi_id: a.id
@@ -113,7 +114,7 @@ export default async function router(schema, config) {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
             if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             res.json(await getAoiTileJSON(a, req));
@@ -135,7 +136,7 @@ export default async function router(schema, config) {
         ':y': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await TimeFrame.has_auth(config.pool, req);
 
             const tiffurl = await a.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
@@ -329,6 +330,8 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
+
+            if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
             req.body.project_id = req.params.projectid;
 

@@ -1,5 +1,4 @@
 import Err from '@openaddresses/batch-error';
-import Mosaic from '../lib/mosaic.js';
 import Project from '../lib/types/project.js';
 import AOI from '../lib/types/aoi.js';
 import Model from '../lib/types/model.js';
@@ -76,8 +75,6 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
-
             const model = await Model.from(config.pool, req.body.model_id);
 
             if (!model.storage) throw new Err(400, null, 'Model has not been uploaded');
