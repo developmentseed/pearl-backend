@@ -5,24 +5,6 @@
         "name": {
             "type": "string",
             "description": "The human readable name of the AOI"
-        },
-        "classes": {
-            "$ref": "./util/classes.json"
-        },
-        "bookmarked": {
-            "type": "boolean",
-            "description": "Has the checkpoint been bookmarked in the frontend"
-        },
-        "px_stats": {
-            "type": "object",
-            "description": "Coverage % stats by class element id"
-        },
-        "patches": {
-            "type": "array",
-            "description": "List of patch ids to apply on export",
-            "items": {
-                "type": "integer"
-            }
         }
     }
 }

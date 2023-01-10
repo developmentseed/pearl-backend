@@ -1,6 +1,7 @@
 import Err from '@openaddresses/batch-error';
 import Project from '../lib/types/project.js';
 import AOI from '../lib/types/aoi.js';
+import { sql } from 'slonik';
 
 export default async function router(schema, config) {
     await schema.get('/project/:projectid/aoi/:aoiid', {
@@ -52,7 +53,10 @@ export default async function router(schema, config) {
         try {
             await Project.has_auth(config.pool, req.auth, req.params.projectid);
 
-            return res.json(await AOI.from(config.pool, (await AOI.generate(config.pool, req.body)).id));
+            return res.json(await AOI.from(config.pool, (await AOI.generate(config.pool, {
+                project_id: req.params.projectid,
+                ...req.body
+            })).id));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -71,9 +75,61 @@ export default async function router(schema, config) {
         try {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
-            return res.json(await a.commit(req.body));
+            return res.json(await a.commit({
+                updated: sql`Now()`,
+                ...req.body
+            }));
         } catch (err) {
             return Err.respond(err, res);
         }
     });
+
+    await schema.patch('/project/:projectid/aoi/:aoiid', {
+        name: 'Patch AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Update an AOI',
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        body: 'req.body.PatchAOI.json',
+        res: 'res.AOI.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+
+            return res.json(await a.commit({
+                updated: sql`Now()`,
+                ...req.body
+            }));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    await schema.delete('/project/:projectid/aoi/:aoiid', {
+        name: 'Delete AOI',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Delete an existing AOI',
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+
+            await a.commit({
+                archived: true
+            });
+
+            return res.json({
+                status: 200,
+                message: 'AOI Deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+
 }

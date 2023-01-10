@@ -154,6 +154,11 @@
         "query": false,
         "res": true
     },
+    "DELETE /project/:projectid/aoi/:aoiid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /project/:projectid/batch": {
         "body": false,
         "query": true,

@@ -630,6 +630,44 @@ Note: this is an internal API that is called by the websocket GPU
 
 
 /**
+* @api {patch} /project/:projectid/aoi/:aoiid Patch AOI
+* @apiVersion 1.0.0
+* @apiName PATCH-/project/:projectid/aoi/:aoiid
+* @apiGroup AOI
+* @apiPermission user
+*
+* @apidescription
+*   Update an AOI
+*
+* @apiParam {integer} projectid param
+* @apiParam {integer} aoiid param
+*
+*
+* @apiSchema (Body) {jsonschema=../schema/req.body.PatchAOI.json} apiParam
+* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
+*/
+
+
+/**
+* @api {delete} /project/:projectid/aoi/:aoiid Delete AOI
+* @apiVersion 1.0.0
+* @apiName DELETE-/project/:projectid/aoi/:aoiid
+* @apiGroup AOI
+* @apiPermission user
+*
+* @apidescription
+*   Delete an existing AOI
+*
+* @apiParam {integer} projectid param
+* @apiParam {integer} aoiid param
+*
+*
+*
+* @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+*/
+
+
+/**
 * @api {get} /project/:projectid/batch List Batch
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/batch

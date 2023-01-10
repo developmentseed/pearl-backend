@@ -19,8 +19,6 @@ export default class AOI extends Generic {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
-     * @param {Number} [query.checkpointid] - Only return AOIs related to a given Checkpoint
-     * @param {String} [query.bookmarked] - Only return AOIs of this bookmarked state. Allowed true or false. By default returns all.
      * @param {String} [query.sort] - Sort AOI list by ascending or descending order of the created timestamp. Allowed asc or desc. Default desc.
      */
     static async list(pool, projectid, query = {}) {
@@ -33,9 +31,6 @@ export default class AOI extends Generic {
             query.sort = sql`asc`;
         }
 
-        if (query.checkpointid === undefined) query.checkpointid = null;
-        if (query.bookmarked === undefined) query.bookmarked = null;
-
         let pgres;
         try {
             pgres = await pool.query(sql`
@@ -45,7 +40,8 @@ export default class AOI extends Generic {
                     a.name                              AS name,
                     a.bounds                            AS bounds,
                     Round(ST_Area(a.bounds::GEOGRAPHY)) AS area,
-                    a.created                           AS created
+                    a.created                           AS created,
+                    a.updated                           AS updated
                 FROM
                     aois a
                 WHERE
@@ -104,7 +100,7 @@ export default class AOI extends Generic {
         try {
             pgres = await pool.query(sql`
                SELECT
-                    a.*
+                    a.*,
                     Round(ST_Area(a.bounds::GEOGRAPHY)) AS area
                 FROM
                     aois a
