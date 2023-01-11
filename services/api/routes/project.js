@@ -49,7 +49,7 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            const proj = await Project.has_auth(config.pool, req);
 
             const json = proj.serialize();
 
@@ -103,7 +103,7 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            const proj = await Project.has_auth(config.pool, req);
             await proj.commit(req.body);
 
             const json = proj.serialize();
@@ -124,7 +124,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            const proj = await Project.has_auth(config.pool, req);
 
             const insts = await Instance.list(config.pool, req.params.projectid);
             for (const inst of insts.instances) {

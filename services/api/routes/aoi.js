@@ -14,7 +14,7 @@ export default async function router(schema, config) {
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            return res.json(await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid));
+            return res.json(await AOI.has_auth(config.pool, req));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -30,7 +30,7 @@ export default async function router(schema, config) {
         res: 'res.ListAOIs.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             return res.json(await AOI.list(config.pool, req.params.projectid, req.query));
         } catch (err) {
@@ -51,7 +51,7 @@ export default async function router(schema, config) {
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             return res.json(await AOI.from(config.pool, (await AOI.generate(config.pool, {
                 project_id: req.params.projectid,
@@ -73,7 +73,7 @@ export default async function router(schema, config) {
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req);
 
             if (req.body.bookmarked && !a.bookmarked_at) {
                 req.body.bookmarked_at = sql`NOW()`;
@@ -101,7 +101,7 @@ export default async function router(schema, config) {
         res: 'res.AOI.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req);
 
             return res.json(await a.commit({
                 updated: sql`Now()`,
@@ -122,7 +122,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req);
 
             await a.commit({
                 archived: true

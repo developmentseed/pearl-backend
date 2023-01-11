@@ -19,7 +19,7 @@ export default async function router(schema, config) {
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             req.body.project_id = req.params.projectid;
             req.body.uid = req.auth.id;
@@ -107,7 +107,7 @@ export default async function router(schema, config) {
         res: 'res.ListInstances.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             return res.json(await Instance.list(config.pool, req.params.projectid, req.query));
         } catch (err) {

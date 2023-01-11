@@ -7,7 +7,7 @@ import { sql } from 'slonik';
 /**
  * @class
  */
-export default class AOIPatch extends Generic {
+export default class Patch extends Generic {
     static _table = 'aoi_timeframe_patch';
 
     /**
@@ -57,17 +57,14 @@ export default class AOIPatch extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} aoiid AOI the user is attemping to access
-     * @param {Number} patchid AOI the user is attemping to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(pool, auth, projectid, aoiid, patchid) {
-        const a = await AOI.has_auth(pool, auth, projectid, aoiid);
-        const patch = await AOIPatch.from(pool, patchid);
+    static async has_auth(pool, req) {
+        const tf = await TimeFrame.has_auth(pool, req);
+        const patch = await Patch.from(pool, req.params.patchid);
 
-        if (patch.aoi_id !== a.id) {
-            throw new Err(400, null, `AOI Patch #${patchid} is not associated with aoi #${aoiid}`);
+        if (patch.timeframe_id !== tf.id) {
+            throw new Err(400, null, `TimeFrame Patch #${req.params.patchid} is not associated with TimeFrame #${req.params.timeframeid}`);
         }
 
         return patch;

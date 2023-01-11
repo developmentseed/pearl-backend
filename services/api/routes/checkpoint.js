@@ -152,7 +152,7 @@ export default async function router(schema, config) {
         ':checkpointid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             const checkpoint = await Checkpoint.from(config.pool, req.params.checkpointid);
             await checkpoint.download(config, res);
@@ -171,7 +171,7 @@ export default async function router(schema, config) {
         res: 'res.ListCheckpoints.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             return res.json(await Checkpoint.list(config.pool, req.params.projectid, req.query));
         } catch (err) {
@@ -192,7 +192,7 @@ export default async function router(schema, config) {
         res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             if (req.body.retrain_geoms && req.body.retrain_geoms.length !== req.body.classes.length) {
                 throw new Err(400, null, 'retrain_geoms array must be parallel with classes array');

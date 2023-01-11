@@ -86,16 +86,16 @@ export default async function router(schema, config) {
         res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
+            const tf = await TimeFrame.has_auth(config.pool, req);
 
             const shares = await TimeFrameShare.list(config.pool, req.params.projectid, {
-                aoi_id: a.id
+                aoi_id: tf.id
             });
 
-            const a_json = a.serialize();
-            a_json.shares = shares.shares;
+            const tf_json = tf.serialize();
+            tf_json.shares = shares.shares;
 
-            return res.json(a_json);
+            return res.json(tf_json);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -114,10 +114,10 @@ export default async function router(schema, config) {
         if (!config.TileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            const tf = await TimeFrame.has_auth(config.pool, req);
+            if (!tf.storage) throw new Err(404, null, 'AOI TimeFrame has not been uploaded');
 
-            res.json(await getAoiTileJSON(a, req));
+            res.json(await getAoiTileJSON(tf, req));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -136,9 +136,9 @@ export default async function router(schema, config) {
         ':y': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
+            const tf = await TimeFrame.has_auth(config.pool, req);
 
-            const tiffurl = await a.url(config);
+            const tiffurl = await tf.url(config);
             req.url = `/cog/tiles/WebMercatorQuad/${req.params.z}/${req.params.x}/${req.params.y}@1x`;
             req.query.url = tiffurl.origin + tiffurl.pathname;
             req.query.url_params = Buffer.from(tiffurl.search).toString('base64');
@@ -169,26 +169,26 @@ export default async function router(schema, config) {
                 }
             });
 
-            const a = await TimeFrame.from(config.pool, req.params.aoiid);
+            const tf = await TimeFrame.from(config.pool, req.params.aoiid);
 
             const files = [];
 
             busboy.on('file', (fieldname, file) => {
-                files.push(a.upload(config, file));
+                files.push(tf.upload(config, file));
             });
 
             busboy.on('finish', async () => {
                 try {
                     await Promise.all(files);
 
-                    const tiffurl = await a.url(config);
+                    const tiffurl = await tf.url(config);
 
                     const histo = [];
-                    for (let i = 0; i <= a.classes.length; i++) {
+                    for (let i = 0; i <= tf.classes.length; i++) {
                         histo[i] = i + 1;
                     }
 
-                    if (!(await a.exists(config))) throw new Err(500, null, 'TimeFrame is not on Azure?!');
+                    if (!(await tf.exists(config))) throw new Err(500, null, 'TimeFrame is not on Azure?!');
 
                     const pres = await Proxy.request({
                         url: '/cog/statistics',
@@ -205,18 +205,16 @@ export default async function router(schema, config) {
 
                     if (pres && pres.body && pres.body.length && pres.body[0].valid_pixels) {
                         const totalpx = pres.body[0].valid_pixels;
-                        for (let i = 0; i < a.classes.length; i++) {
+                        for (let i = 0; i < tf.classes.length; i++) {
                             px_stats[i] = (pres.body[0].categories[i] || 0) / totalpx;
                         }
                     } else {
                         console.log('PX_Stats Error:', JSON.stringify(pres.body));
                     }
 
-                    await a.commit({
-                        px_stats
-                    });
+                    await tf.commit({ px_stats });
 
-                    return res.json(a.serialize());
+                    return res.json(tf);
                 } catch (err) {
                     Err.respond(err, res);
                 }
@@ -238,9 +236,8 @@ export default async function router(schema, config) {
         ':timeframeid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
-
-            await a.download(config, res);
+            const tf = await TimeFrame.has_auth(config.pool, req);
+            await tf.download(config, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -256,17 +253,17 @@ export default async function router(schema, config) {
         ':timeframeid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
+            const tf = await TimeFrame.has_auth(config.pool, req);
 
-            const tiffurl = await a.url(config);
+            const tiffurl = await tf.url(config);
 
             const cmap = {};
-            for (let i = 0; i < a.classes.length; i++) {
-                cmap[i] = a.classes[i].color;
+            for (let i = 0; i < tf.classes.length; i++) {
+                cmap[i] = tf.classes[i].color;
             }
 
             const patchurls = [];
-            for (const patchid of a.patches) {
+            for (const patchid of tf.patches) {
                 const patch = await TimeFramePatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
                 patchurls.push(await patch.url(config));
             }
@@ -293,11 +290,11 @@ export default async function router(schema, config) {
         description: 'Return all TimeFrames for a given instance',
         ':projectid': 'integer',
         ':aoiid': 'integer',
-        query: 'req.query.aoi.json',
+        query: 'req.query.timeframe.json',
         res: 'res.ListTimeFrames.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            const a = await AOI.has_auth(config.pool, req);
 
             const list = await TimeFrame.list(config.pool, req.params.aoiid, req.query);
 
@@ -333,7 +330,7 @@ export default async function router(schema, config) {
         res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            await AOI.has_auth(config.pool, req);
 
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
@@ -409,7 +406,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await TimeFrame.has_auth(config.pool, req);
 
             const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
             await share.delete(config);
@@ -433,7 +430,7 @@ export default async function router(schema, config) {
         res: 'res.ListShare.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             return res.json(await TimeFrameShare.list(config.pool, req.params.projectid, req.query));
         } catch (err) {

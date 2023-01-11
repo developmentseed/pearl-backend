@@ -82,7 +82,7 @@ test('POST /api/project - Model not uploaded', async (t) => {
             },
             body: {
                 name: 'Test Project',
-                model_id: 1,
+                model_id: 1
             }
         }, false);
 
@@ -130,7 +130,7 @@ test('POST /api/project - Model not active', async (t) => {
             },
             body: {
                 name: 'Test Project',
-                model_id: 1,
+                model_id: 1
             }
         }, false);
 
@@ -178,7 +178,7 @@ test('POST /api/project', async (t) => {
             },
             body: {
                 name: 'Test Project',
-                model_id: 1,
+                model_id: 1
             }
         }, t);
 
@@ -288,7 +288,7 @@ test('GET /api/project', async (t) => {
                     name: 'NAIP Supervised',
                     model_type: 'pytorch_example',
                     osmtag_id: null,
-                    model_inputshape: [ 240, 240, 4 ],
+                    model_inputshape: [240, 240, 4],
                     model_zoom: 17,
                     storage: true,
                     classes: [
@@ -298,7 +298,7 @@ test('GET /api/project', async (t) => {
                         { 'name': 'Built', 'color': '#806060' }
                     ],
                     meta: {},
-                    bounds: [ -180, -90, 180, 90 ]
+                    bounds: [-180, -90, 180, 90]
                 }
             }]
         });
@@ -384,7 +384,7 @@ test('GET /api/project', async (t) => {
                 aois: [{
                     id: 1,
                     area: 1238,
-                    name: "Test AOI",
+                    name: 'Test AOI',
                     bounds: {
                         type: 'Polygon',
                         bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -405,7 +405,7 @@ test('GET /api/project', async (t) => {
                     name: 'NAIP Supervised',
                     model_type: 'pytorch_example',
                     osmtag_id: null,
-                    model_inputshape: [ 240, 240, 4 ],
+                    model_inputshape: [240, 240, 4],
                     model_zoom: 17,
                     storage: true,
                     classes: [
@@ -415,7 +415,7 @@ test('GET /api/project', async (t) => {
                         { 'name': 'Built', 'color': '#806060' }
                     ],
                     meta: {},
-                    bounds: [ -180, -90, 180, 90 ]
+                    bounds: [-180, -90, 180, 90]
                 }
             }]
         });
@@ -438,7 +438,7 @@ test('POST /api/project (sort)', async (t) => {
             },
             body: {
                 name: 'LULC Test Project',
-                model_id: 1,
+                model_id: 1
             }
         }, t);
 

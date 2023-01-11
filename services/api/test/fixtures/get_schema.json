@@ -4,42 +4,42 @@
         "query": true,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/patch": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch": {
         "body": false,
         "query": true,
         "res": true
     },
-    "POST /project/:projectid/aoi/:aoiid/patch": {
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch": {
         "body": true,
         "query": false,
         "res": true
     },
-    "DELETE /project/:projectid/aoi/:aoiid/patch/:patchid": {
+    "DELETE /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid": {
         "body": false,
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid": {
         "body": false,
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles": {
         "body": false,
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
     },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/download": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/download": {
         "body": false,
         "query": false,
         "res": false
     },
-    "POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/upload": {
         "body": false,
         "query": false,
         "res": true

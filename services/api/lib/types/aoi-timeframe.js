@@ -77,13 +77,10 @@ export default class AOITimeframe extends Generic {
      * @param {Object} req req Express Request object
      */
     static async has_auth(pool, req) {
-        const proj = await Project.has_auth(pool, req.auth, req.params.projectid);
-        const aoi = await AOI.from(pool, req.params.aoiid);
+        const aoi = await AOI.has_auth(pool, req);
         const timeframe = await this.from(pool, req.params.timeframeid);
 
-        if (aoi.project_id !== proj.id) {
-            throw new Err(400, null, `AOI #${req.params.aoiid} is not associated with project #${req.params.projectid}`);
-        } else if (timeframe.aoi_id !== aoi.id) {
+        if (timeframe.aoi_id !== aoi.id) {
             throw new Err(400, null, `TiumeFrame #${req.params.timeframeid} is not associated with AOI #${req.params.aoiid}`);
         }
 

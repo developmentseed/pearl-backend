@@ -77,16 +77,14 @@ export default class AOI extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} aoiid AOI the user is attemping to access
+     * @param {Object} req Express req object
      */
-    static async has_auth(pool, auth, projectid, aoiid) {
-        const proj = await Project.has_auth(pool, auth, projectid);
-        const aoi = await AOI.from(pool, aoiid);
+    static async has_auth(pool, req) {
+        const proj = await Project.has_auth(pool, req);
+        const aoi = await AOI.from(pool, req.params.aoiid);
 
         if (aoi.project_id !== proj.id) {
-            throw new Err(400, null, `AOI #${aoiid} is not associated with project #${projectid}`);
+            throw new Err(400, null, `AOI #${req.params.aoiid} is not associated with project #${req.params.projectid}`);
         }
 
         return aoi;

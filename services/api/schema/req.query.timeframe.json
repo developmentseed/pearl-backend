@@ -8,6 +8,10 @@
         "page": {
             "$ref": "./util/page.json"
         },
+        "checkpointid": {
+            "type": "integer",
+            "description": "Only return AOIs for a specific checkpoint"
+        },
         "bookmarked": {
             "type": "boolean",
             "description": "Filter AOIs based on bookmarked. Allowed 'true' or 'false'. By default returns all."

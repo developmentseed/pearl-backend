@@ -36,17 +36,18 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch List Patches
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch List Patches
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/patch
-* @apiGroup AOIPatch
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch
+* @apiGroup TimeFramePatch
 * @apiPermission user
 *
 * @apidescription
-*   Return all patches for a given API
+*   Return all patches for a given AOI TimeFrame
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 * @apiSchema (Query) {jsonschema=../schema/req.query.ListPatches.json} apiParam
 *
@@ -55,10 +56,10 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/patch Create Patch
+* @api {post} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch Create Patch
 * @apiVersion 1.0.0
-* @apiName POST-/project/:projectid/aoi/:aoiid/patch
-* @apiGroup AOIPatch
+* @apiName POST-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch
+* @apiGroup TimeFramePatch
 * @apiPermission user
 *
 * @apidescription
@@ -66,6 +67,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 *
 *
 * @apiSchema (Body) {jsonschema=../schema/req.body.CreatePatch.json} apiParam
@@ -74,10 +76,10 @@
 
 
 /**
-* @api {delete} /project/:projectid/aoi/:aoiid/patch/:patchid Delete Patch
+* @api {delete} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid Delete Patch
 * @apiVersion 1.0.0
-* @apiName DELETE-/project/:projectid/aoi/:aoiid/patch/:patchid
-* @apiGroup AOIPatch
+* @apiName DELETE-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid
+* @apiGroup TimeFramePatch
 * @apiPermission user
 *
 * @apidescription
@@ -85,6 +87,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {integer} patchid param
 *
 *
@@ -94,10 +97,10 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid Get Patch
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid Get Patch
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid
-* @apiGroup AOIPatch
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid
+* @apiGroup TimeFramePatch
 * @apiPermission user
 *
 * @apidescription
@@ -105,6 +108,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {integer} patchid param
 *
 *
@@ -114,10 +118,10 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/tiles TileJSON Patch
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles TileJSON Patch
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid/tiles
-* @apiGroup AOIPatch
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles
+* @apiGroup TimeFramePatch
 * @apiPermission user
 *
 * @apidescription
@@ -125,6 +129,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {integer} patchid param
 *
 *
@@ -134,10 +139,10 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y Tile Patch
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles/:z/:x/:y Tile Patch
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y
-* @apiGroup AOIPatch
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles/:z/:x/:y
+* @apiGroup TimeFramePatch
 * @apiPermission user
 *
 * @apidescription
@@ -145,6 +150,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {integer} patchid param
 * @apiParam {integer} z param
 * @apiParam {integer} x param
@@ -157,10 +163,10 @@
 
 
 /**
-* @api {get} /project/:projectid/aoi/:aoiid/patch/:patchid/download Download Patch
+* @api {get} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/download Download Patch
 * @apiVersion 1.0.0
-* @apiName GET-/project/:projectid/aoi/:aoiid/patch/:patchid/download
-* @apiGroup AOIPatch
+* @apiName GET-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/download
+* @apiGroup TimeFramePatch
 * @apiPermission user
 *
 * @apidescription
@@ -168,6 +174,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {integer} patchid param
 *
 *
@@ -177,10 +184,10 @@
 
 
 /**
-* @api {post} /project/:projectid/aoi/:aoiid/patch/:patchid/upload Upload Patch
+* @api {post} /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/upload Upload Patch
 * @apiVersion 1.0.0
-* @apiName POST-/project/:projectid/aoi/:aoiid/patch/:patchid/upload
-* @apiGroup AOIPatch
+* @apiName POST-/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/upload
+* @apiGroup TimeFramePatch
 * @apiPermission admin
 *
 * @apidescription
@@ -188,6 +195,7 @@
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
+* @apiParam {integer} timeframeid param
 * @apiParam {integer} patchid param
 *
 *
@@ -332,7 +340,7 @@
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
 *
-* @apiSchema (Query) {jsonschema=../schema/req.query.aoi.json} apiParam
+* @apiSchema (Query) {jsonschema=../schema/req.query.timeframe.json} apiParam
 *
 * @apiSchema {jsonschema=../schema/res.ListTimeFrames.json} apiSuccess
 */

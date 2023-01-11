@@ -87,7 +87,7 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
             },
             body: {
                 mosaic: 'naip.latest',
-                checkpoint_id: 1,
+                checkpoint_id: 1
             }
         }, t);
 
@@ -357,7 +357,7 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
             },
             body: {
                 mosaic: 'naip.latest',
-                checkpoint_id: 1,
+                checkpoint_id: 1
             }
         }, t);
 

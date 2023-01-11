@@ -16,7 +16,7 @@ export default async function router(schema, config) {
         res: 'res.ListBatches.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             req.query.uid = req.auth.id;
             req.query.projectid = req.params.projectid;
@@ -36,7 +36,7 @@ export default async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             const existing_batch = await Instance.list(config.pool, req.params.projectid, {
                 batch: true,
