@@ -34,7 +34,7 @@ export default class Patch extends Generic {
                     created,
                     storage
                 FROM
-                    aoi_patch
+                    aoi_timeframe_patch
                 WHERE
                     project_id = ${projectid}
                     AND aoi_id = ${aoiid}
@@ -123,7 +123,7 @@ export default class Patch extends Generic {
             pgres = await this._pool.query(sql`
                 DELETE
                     FROM
-                        aoi_patch
+                        aoi_timeframe_patch
                     WHERE
                         id = ${this.id}
                     RETURNING *

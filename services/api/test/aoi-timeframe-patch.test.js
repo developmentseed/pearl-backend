@@ -38,11 +38,11 @@ test('POST /api/project/1/aoi/1/timeframe/1/patch - no project', async (t) => {
 flight.fixture(test, 'project.json', 'ingalls');
 flight.fixture(test, 'checkpoint.json', 'ingalls');
 
-test('POST /api/project/1/aoi/1/patch - no aoi', async (t) => {
+test('POST /api/project/1/aoi/1/timeframe/1/patch - no aoi', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch',
             method: 'POST',
             auth: {
                 bearer: flight.token.ingalls
@@ -62,11 +62,36 @@ test('POST /api/project/1/aoi/1/patch - no aoi', async (t) => {
 
 flight.fixture(test, 'aoi.json', 'ingalls');
 
-test('GET /api/project/1/aoi/1/patch', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1/patch - no timeframe', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch',
+            method: 'GET',
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 404,
+            message: 'AOI TimeFrame not found',
+            messages: []
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+flight.fixture(test, 'timeframe.json', 'ingalls');
+
+test('GET /api/project/1/aoi/1/timeframe/1/patch', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
