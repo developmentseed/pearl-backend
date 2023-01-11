@@ -275,55 +275,149 @@ test('GET /api/project', async (t) => {
         delete res.body.projects[0].model.created;
 
         t.deepEquals(res.body, {
-            'total': 1,
-            'projects': [
-                {
-                    'id': 1,
-                    'name': 'Test Project',
-                    'aois': [],
-                    'checkpoints': [],
-                    'model': {
-                        'id': 1,
-                        'active': true,
-                        'uid': 1,
-                        'name': 'NAIP Supervised',
-                        'model_type': 'pytorch_example',
-                        osmtag_id: null,
-                        'model_inputshape': [
-                            240,
-                            240,
-                            4
-                        ],
-                        'model_zoom': 17,
-                        'storage': true,
-                        'classes': [
-                            {
-                                'name': 'Water',
-                                'color': '#0000FF'
-                            },
-                            {
-                                'name': 'Tree Canopy',
-                                'color': '#008000'
-                            },
-                            {
-                                'name': 'Field',
-                                'color': '#80FF80'
-                            },
-                            {
-                                'name': 'Built',
-                                'color': '#806060'
-                            }
-                        ],
-                        'meta': {},
-                        'bounds': [
-                            -180,
-                            -90,
-                            180,
-                            90
-                        ]
-                    }
+            total: 1,
+            projects: [{
+                id: 1,
+                name: 'Test Project',
+                aois: [],
+                checkpoints: [],
+                model: {
+                    id: 1,
+                    active: true,
+                    uid: 1,
+                    name: 'NAIP Supervised',
+                    model_type: 'pytorch_example',
+                    osmtag_id: null,
+                    model_inputshape: [ 240, 240, 4 ],
+                    model_zoom: 17,
+                    storage: true,
+                    classes: [
+                        { 'name': 'Water', 'color': '#0000FF' },
+                        { 'name': 'Tree Canopy', 'color': '#008000' },
+                        { 'name': 'Field', 'color': '#80FF80' },
+                        { 'name': 'Built', 'color': '#806060' }
+                    ],
+                    meta: {},
+                    bounds: [ -180, -90, 180, 90 ]
                 }
-            ]
+            }]
+        });
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/project/1/aoi/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                bookmarked: true
+            }
+        }, t);
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+        t.ok(res.body.updated, '.updated: <date>');
+        delete res.body.updated;
+        t.ok(res.body.bookmarked_at, '.bookmarked_at: <date>');
+        delete res.body.bookmarked_at;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            area: 1238,
+            project_id: 1,
+            name: 'Test AOI',
+            bookmarked: true,
+            bounds: {
+                type: 'Polygon',
+                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
+                coordinates: [[
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
+                ]]
+            }
+        });
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/project', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+
+        t.ok(res.body.projects[0].created, '.created: <date>');
+        delete res.body.projects[0].created;
+        delete res.body.projects[0].model.created;
+
+        delete res.body.projects[0].aois[0].created;
+        delete res.body.projects[0].aois[0].updated;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            projects: [{
+                id: 1,
+                name: 'Test Project',
+                aois: [{
+                    id: 1,
+                    area: 1238,
+                    name: "Test AOI",
+                    bounds: {
+                        type: 'Polygon',
+                        bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
+                        coordinates: [[
+                            [-79.37724530696869, 38.83428180092151],
+                            [-79.37677592039108, 38.83428180092151],
+                            [-79.37677592039108, 38.83455550411051],
+                            [-79.37724530696869, 38.83455550411051],
+                            [-79.37724530696869, 38.83428180092151]
+                        ]]
+                    }
+                }],
+                checkpoints: [],
+                model: {
+                    id: 1,
+                    active: true,
+                    uid: 1,
+                    name: 'NAIP Supervised',
+                    model_type: 'pytorch_example',
+                    osmtag_id: null,
+                    model_inputshape: [ 240, 240, 4 ],
+                    model_zoom: 17,
+                    storage: true,
+                    classes: [
+                        { 'name': 'Water', 'color': '#0000FF' },
+                        { 'name': 'Tree Canopy', 'color': '#008000' },
+                        { 'name': 'Field', 'color': '#80FF80' },
+                        { 'name': 'Built', 'color': '#806060' }
+                    ],
+                    meta: {},
+                    bounds: [ -180, -90, 180, 90 ]
+                }
+            }]
         });
 
     } catch (err) {

@@ -75,6 +75,12 @@ export default async function router(schema, config) {
         try {
             const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
+            if (req.body.bookmarked && !a.bookmarked_at) {
+                req.body.bookmarked_at = sql`NOW()`;
+            } else if (req.body.bookmarked === false) {
+                req.body.bookmarked_at = sql`NULL`;
+            }
+
             return res.json(await a.commit({
                 updated: sql`Now()`,
                 ...req.body
