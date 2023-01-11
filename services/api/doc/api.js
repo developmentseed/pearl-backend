@@ -447,7 +447,7 @@ Note: this is an internal API that is called by the websocket GPU
 * @apiPermission user
 *
 * @apidescription
-*   Update an AOI
+*   Update an TimeFrame
 *
 * @apiParam {integer} projectid param
 * @apiParam {integer} aoiid param
@@ -455,7 +455,7 @@ Note: this is an internal API that is called by the websocket GPU
 *
 *
 * @apiSchema (Body) {jsonschema=../schema/req.body.PatchTimeFrame.json} apiParam
-* @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
+* @apiSchema {jsonschema=../schema/res.TimeFrame.json} apiSuccess
 */
 
 

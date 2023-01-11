@@ -19,9 +19,6 @@
         "id": {
             "$ref": "./util/id.json"
         },
-        "name": {
-            "type": "string"
-        },
         "aoi_id": {
             "type": "integer"
         },
@@ -56,7 +53,7 @@
             "type": "string"
         },
         "mosaic_ts": {
-            "type": "string"
+            "type": ["null", "integer"]
         },
         "shares": {
             "type": "array",

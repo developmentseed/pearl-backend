@@ -297,7 +297,7 @@ export default async function router(schema, config) {
         res: 'res.ListTimeFrames.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             const list = await TimeFrame.list(config.pool, req.params.aoiid, req.query);
 
@@ -333,18 +333,16 @@ export default async function router(schema, config) {
         res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
 
             if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
 
-            req.body.project_id = req.params.projectid;
+            req.body.aoi_id = req.params.aoiid;
 
             const chkpt = await Checkpoint.from(config.pool, req.body.checkpoint_id);
             req.body.classes = chkpt.classes;
 
-            const a = await AOI.from(config.pool, (await AOI.generate(config.pool, req.body)).id);
-
-            return res.json(a.serialize());
+            return res.json(await TimeFrame.generate(config.pool, req.body));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -473,12 +471,12 @@ export default async function router(schema, config) {
         name: 'Patch AOI',
         group: 'TimeFrame',
         auth: 'user',
-        description: 'Update an AOI',
+        description: 'Update an TimeFrame',
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':timeframeid': 'integer',
         body: 'req.body.PatchTimeFrame.json',
-        res: 'res.AOI.json'
+        res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
             const a = await TimeFrame.has_auth(config.pool, req);

@@ -86,57 +86,32 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             },
             body: {
-                name: 'Test AOI',
+                mosaic: 'naip.latest',
                 checkpoint_id: 1,
-                bounds: {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [-79.37724530696869, 38.83428180092151],
-                        [-79.37677592039108, 38.83428180092151],
-                        [-79.37677592039108, 38.83455550411051],
-                        [-79.37724530696869, 38.83455550411051],
-                        [-79.37724530696869, 38.83428180092151]
-                    ]]
-                }
             }
         }, t);
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
+        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
+        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
-            area: 1238,
             storage: false,
-            project_id: 1,
+            aoi_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
             bookmarked_at: null,
+            mosaic: 'naip.latest',
             patches: [],
-            name: 'Test AOI',
             px_stats: {},
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ],
-            bounds: {
-                type: 'Polygon',
-                bounds: [
-                    -79.37724530696869,
-                    38.83428180092151,
-                    -79.37677592039108,
-                    38.83455550411051
-                ],
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            }
+            ]
         });
 
     } catch (err) {
@@ -159,34 +134,19 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
+        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
+        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
-            area: 1238,
-            bounds: {
-                type: 'Polygon',
-                bounds: [
-                    -79.37724530696869,
-                    38.83428180092151,
-                    -79.37677592039108,
-                    38.83455550411051
-                ],
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            },
             storage: false,
-            project_id: 1,
+            aoi_id: 1,
             checkpoint_id: 1,
+            mosaic: 'naip.latest',
             bookmarked: false,
             bookmarked_at: null,
             patches: [],
             shares:  [],
-            name: 'Test AOI',
             px_stats: {},
             classes: [
                 { name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }
@@ -199,11 +159,11 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
     t.end();
 });
 
-test('[meta] Set aoi.storage: true', async (t) => {
+test('[meta] Set aoi_timeframe.storage: true', async (t) => {
     try {
         await flight.config.pool.query(sql`
             UPDATE
-                aois
+                aoi_timeframe
             SET
                 storage = true
         `, []);
@@ -225,39 +185,22 @@ test('GET /api/project/1/aoi/1/timeframe', async (t) => {
             }
         }, t);
 
-        t.ok(res.body.aois[0].created, '.aois[0].created: <date>');
+        t.ok(res.body.timeframes[0].created, '.timeframes[0].created: <date>');
 
-        delete res.body.aois[0].created;
+        delete res.body.timeframes[0].created;
 
         t.equals(res.body.total, 1);
         t.equals(res.body.project_id, 1);
-        t.equals(res.body.aois.length, 1);
-        t.equals(res.body.aois[0].id, 1);
-        t.equals(res.body.aois[0].name, 'Test AOI');
-        t.deepEquals(res.body.aois[0].shares, []);
-        t.equals(res.body.aois[0].storage, true);
-        t.equals(res.body.aois[0].bookmarked, false);
-        t.deepEquals(res.body.aois[0].px_stats, {});
-        t.deepEquals(res.body.aois[0].bounds, {
-            type: 'Polygon',
-            bounds: [
-                -79.37724530696869,
-                38.83428180092151,
-                -79.37677592039108,
-                38.83455550411051
-            ],
-            coordinates: [[
-                [-79.37724530696869, 38.83428180092151],
-                [-79.37677592039108, 38.83428180092151],
-                [-79.37677592039108, 38.83455550411051],
-                [-79.37724530696869, 38.83455550411051],
-                [-79.37724530696869, 38.83428180092151]
-            ]]
-        });
-
-        t.equals(res.body.aois[0].checkpoint_id, 1);
-        t.equals(res.body.aois[0].checkpoint_name, 'Test Checkpoint');
-        t.deepEquals(res.body.aois[0].classes, [{ name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }]);
+        t.equals(res.body.timeframes.length, 1);
+        t.equals(res.body.timeframes[0].id, 1);
+        t.deepEquals(res.body.timeframes[0].shares, []);
+        t.equals(res.body.timeframes[0].storage, true);
+        t.equals(res.body.timeframes[0].bookmarked, false);
+        t.deepEquals(res.body.timeframes[0].px_stats, {});
+        t.equals(res.body.timeframes[0].checkpoint_id, 1);
+        t.equals(res.body.timeframes[0].checkpoint_name, 'Test Checkpoint');
+        t.equals(res.body.timeframes[0].mosaic, 'naip.latest');
+        t.deepEquals(res.body.timeframes[0].classes, [{ name: 'Water', color: '#0000FF' }, { name: 'Tree Canopy', color: '#008000' }, { name: 'Field', color: '#80FF80' }, { name: 'Built', color: '#806060' }]);
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -340,7 +283,6 @@ test('PATCH /api/project/1/aoi/1/timeframe/1', async (t) => {
             method: 'PATCH',
             body: {
                 bookmarked: true,
-                name: 'RENAMED',
                 px_stats: {
                     0: 100,
                     1: 0
@@ -353,38 +295,23 @@ test('PATCH /api/project/1/aoi/1/timeframe/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.bookmarked_at, '.bookmarked_at: <date>');
+        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
         delete res.body.created;
         delete res.body.bookmarked_at;
+        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
-            area: 1238,
             storage: true,
-            project_id: 1,
+            aoi_id: 1,
             patches: [],
             px_stats: {
                 0: 100,
                 1: 0
             },
+            mosaic: 'naip.latest',
             checkpoint_id: 1,
             bookmarked: true,
-            name: 'RENAMED',
-            bounds: {
-                type: 'Polygon',
-                bounds: [
-                    -79.37724530696869,
-                    38.83428180092151,
-                    -79.37677592039108,
-                    38.83455550411051
-                ],
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            },
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -429,57 +356,32 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             },
             body: {
-                name: 'Test AOI 2',
+                mosaic: 'naip.latest',
                 checkpoint_id: 1,
-                bounds: {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [-79.37724530696869, 38.83428180092151],
-                        [-79.37677592039108, 38.83428180092151],
-                        [-79.37677592039108, 38.83455550411051],
-                        [-79.37724530696869, 38.83455550411051],
-                        [-79.37724530696869, 38.83428180092151]
-                    ]]
-                }
             }
         }, t);
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
+        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
+        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 2,
-            area: 1238,
             storage: false,
-            project_id: 1,
+            aoi_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
             bookmarked_at: null,
+            mosaic: 'naip.latest',
             patches: [],
-            name: 'Test AOI 2',
             px_stats: {},
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
-            ],
-            bounds: {
-                type: 'Polygon',
-                bounds: [
-                    -79.37724530696869,
-                    38.83428180092151,
-                    -79.37677592039108,
-                    38.83455550411051
-                ],
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            }
+            ]
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -501,7 +403,7 @@ test('GET /api/project/1/aoi/1/timeframe?sort=asc', async (t) => {
 
         t.equals(res.statusCode, 200, 'status: 200');
 
-        t.true(new Date(res.body.aois[1].created) > new Date(res.body.aois[0].created));
+        t.true(new Date(res.body.timeframes[1].created) > new Date(res.body.timeframes[0].created));
     } catch (err) {
         t.error(err, 'no errors');
     }

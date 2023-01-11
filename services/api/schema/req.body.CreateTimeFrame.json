@@ -1,22 +1,17 @@
 {
     "type": "object",
     "required": [
-        "mosaic",
-        "mosaic_ts"
+        "mosaic"
     ],
     "additionalProperties": false,
     "properties": {
         "mosaic": {
-            "type": "integer",
+            "type": "string",
             "description": "The mosaic name for the TimeFrame"
         },
         "checkpoint_id": {
             "type": "integer",
             "description": "The checkpoint ID that created this AOI"
-        },
-        "mosaic_ts": {
-            "type": "integer",
-            "description": "The timestamp for the mosaic"
         }
     }
 }

@@ -26,7 +26,8 @@
                 "type": "object",
                 "required": [
                     "id",
-                    "name",
+                    "mosaic",
+                    "mosaic_ts",
                     "bookmarked",
                     "bookmarked_at",
                     "checkpoint_id",
@@ -40,9 +41,6 @@
                 "properties": {
                     "id": {
                         "$ref": "./util/id.json"
-                    },
-                    "name": {
-                        "type": "string"
                     },
                     "checkpoint_name": {
                         "type": "string"
@@ -70,6 +68,12 @@
                     },
                     "px_stats": {
                         "type": "object"
+                    },
+                    "mosaic": {
+                        "type": "string"
+                    },
+                    "mosaic_ts": {
+                        "type": ["integer", "null"]
                     },
                     "classes": {
                         "$ref": "./util/classes.json"
