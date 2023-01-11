@@ -5,6 +5,10 @@
         "name": {
             "type": "string",
             "description": "The human readable name of the AOI"
+        },
+        "bookmarked": {
+            "type": "boolean",
+            "description": "Is the AOI Bookmarked"
         }
     }
 }

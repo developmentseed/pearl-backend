@@ -67,6 +67,8 @@ test('POST /api/project/1/aoi', async (t) => {
             area: 1238,
             project_id: 1,
             name: 'Test AOI',
+            bookmarked: false,
+            bookmarked_at: null,
             bounds: {
                 type: 'Polygon',
                 bounds: [
@@ -111,6 +113,8 @@ test('GET /api/project/1/aoi/1', async (t) => {
         t.deepEquals(res.body, {
             id: 1,
             area: 1238,
+            bookmarked: false,
+            bookmarked_at: null,
             bounds: {
                 type: 'Polygon',
                 bounds: [
@@ -206,6 +210,8 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             area: 1238,
             project_id: 1,
             name: 'RENAMED',
+            bookmarked: false,
+            bookmarked_at: null,
             bounds: {
                 type: 'Polygon',
                 bounds: [
@@ -264,6 +270,8 @@ test('POST /api/project/1/aoi', async (t) => {
             area: 1238,
             project_id: 1,
             name: 'Test AOI 2',
+            bookmarked: false,
+            bookmarked_at: null,
             bounds: {
                 type: 'Polygon',
                 bounds: [
