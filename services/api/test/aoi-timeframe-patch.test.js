@@ -102,6 +102,7 @@ test('GET /api/project/1/aoi/1/timeframe/1/patch', async (t) => {
             total: 0,
             project_id: 1,
             aoi_id: 1,
+            timeframe_id: 1,
             patches: []
         });
     } catch (err) {
@@ -129,7 +130,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/patch', async (t) => {
             id: 1,
             storage: false,
             project_id: 1,
-            aoi_id: 1
+            timeframe_id: 1
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -156,6 +157,7 @@ test('GET /api/project/1/aoi/1/timeframe/1/patch', async (t) => {
             total: 1,
             project_id: 1,
             aoi_id: 1,
+            timeframe_id: 1,
             patches: [{
                 id: 1,
                 storage: false

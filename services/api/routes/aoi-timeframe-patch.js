@@ -20,7 +20,12 @@ export default async function router(schema, config) {
         try {
             await TimeFrame.has_auth(config.pool, req);
 
-            return res.json(await Patch.list(config.pool, req.params.projectid, req.params.aoiid, req.query));
+            const list = await Patch.list(config.pool, req.params.timeframeid, req.query);
+            list.project_id = req.params.projectid;
+            list.aoi_id = req.params.aoiid;
+            list.timeframe_id = req.params.timeframeid;
+
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }
