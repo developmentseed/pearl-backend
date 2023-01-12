@@ -14,13 +14,12 @@ export default class Patch extends Generic {
      * Return a list of AOI Patches
      *
      * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Number} projectid - AOI Patches related to a specific project
-     * @param {Number} aoiid - AOI Patches related to a specific AOI
+     * @param {Number} timeframeid - AOI Patches related to a specific project
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    static async list(pool, projectid, aoiid, query) {
+    static async list(pool, timeframeid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -36,8 +35,7 @@ export default class Patch extends Generic {
                 FROM
                     aoi_timeframe_patch
                 WHERE
-                    project_id = ${projectid}
-                    AND aoi_id = ${aoiid}
+                    timeframe_id = ${timeframeid}
                 LIMIT
                     ${query.limit}
                 OFFSET
@@ -47,10 +45,7 @@ export default class Patch extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOI Patches');
         }
 
-        const list = this.deserialize_list(pgres, 'patches');
-        list.project_id = projectid;
-        list.aoi_id = aoiid;
-        return list;
+        return this.deserialize_list(pgres, 'patches');
     }
 
     /**
@@ -79,7 +74,7 @@ export default class Patch extends Generic {
         if (!this.storage) throw new Err(404, null, 'AOI Patch has not been uploaded');
 
         const storage = new Storage(config, 'aois');
-        return await storage.url(`aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+        return await storage.url(`aoi-${this.timeframe_id}-patch-${this.id}.tiff`);
     }
 
     /**
@@ -92,7 +87,7 @@ export default class Patch extends Generic {
         if (this.storage) throw new Err(404, null, 'AOI Patch has already been uploaded');
 
         const storage = new Storage(config, 'aois');
-        await storage.upload(file, `aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+        await storage.upload(file, `aoi-${this.timeframe_id}-patch-${this.id}.tiff`);
 
         return await this.commit({
             storage: true
@@ -109,7 +104,7 @@ export default class Patch extends Generic {
         if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
         const storage = new Storage(config, 'aois');
-        await storage.download(`aoi-${this.aoi_id}-patch-${this.id}.tiff`, res);
+        await storage.download(`aoi-${this.timeframe_id}-patch-${this.id}.tiff`, res);
     }
 
     /**
@@ -136,7 +131,7 @@ export default class Patch extends Generic {
 
         if (pgres.rows[0].storage && config.AzureStorage) {
             const storage = new Storage(config, 'aois');
-            await storage.delete(`aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+            await storage.delete(`aoi-${this.timeframe_id}-patch-${this.id}.tiff`);
         }
 
         return true;
