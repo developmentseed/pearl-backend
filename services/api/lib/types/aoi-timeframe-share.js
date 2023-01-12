@@ -30,6 +30,7 @@ export default class AOIShare extends Generic {
                     count(*) OVER() AS count,
                     uuid,
                     aoi_id,
+                    timeframe_id,
                     created,
                     storage
                 FROM
@@ -134,61 +135,30 @@ export default class AOIShare extends Generic {
         try {
             pgres = await pool.query(sql`
                SELECT
-                    s.uuid AS uuid,
-                    s.aoi_id AS aoi_id,
-                    s.project_id AS project_id,
-                    s.bounds AS bounds,
-                    s.created AS created,
-                    s.patches AS patches,
-                    s.storage AS storage,
-                    a.checkpoint_id AS checkpoint_id,
-                    c.classes AS classes
+                    s.uuid,
+                    s.aoi_id,
+                    s.project_id,
+                    s.timeframe_id,
+                    s.bounds,
+                    s.created,
+                    s.patches,
+                    s.storage,
+                    tf.checkpoint_id,
+                    c.classes
                 FROM
-                    aoi_timeframe_share s,
-                    aois a,
-                    checkpoints c
+                    aoi_timeframe_share s
+                        LEFT JOIN aoi_timeframe tf
+                            ON s.timeframe_id = tf.id
+                        LEFT JOIN checkpoints c
+                            ON tf.checkpoint_id = c.id
                 WHERE
                     s.uuid = ${shareuuid}
-                AND
-                    a.id = s.aoi_id
-                AND
-                    c.id = a.checkpoint_id
             `);
         } catch (err) {
             throw new Err(500, new Error(err), 'Failed to get AOI Share');
         }
 
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
-
-        return this.deserialize(pool, pgres);
-    }
-
-
-    /**
-     * Create a new AOI Share
-     *
-     * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Object} share - AOI Share
-     */
-    static async generate(pool, share) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                INSERT INTO aoi_timeframe_share (
-                    project_id,
-                    aoi_id,
-                    bounds,
-                    patches
-                ) VALUES (
-                    ${share.project_id},
-                    ${share.id},
-                    ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(share.bounds)}), 4326),
-                    ${sql.array(share.patches,  sql`BIGINT[]`)}
-                ) RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to create AOI Share');
-        }
 
         return this.deserialize(pool, pgres);
     }

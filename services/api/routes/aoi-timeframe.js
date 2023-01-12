@@ -356,24 +356,31 @@ export default async function router(schema, config) {
         res: 'res.Share.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
-            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            const tf = await TimeFrame.has_auth(config.pool, req);
+            if (!tf.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
             const cmap = {};
-            for (let i = 0; i < a.classes.length; i++) {
-                cmap[i] = a.classes[i].color;
+            for (let i = 0; i < tf.classes.length; i++) {
+                cmap[i] = tf.classes[i].color;
             }
 
             const patchurls = [];
-            for (const patchid of a.patches) {
+            for (const patchid of tf.patches) {
                 const patch = await TimeFramePatch.has_auth(config.pool, req);
                 patchurls.push(await patch.url(config));
             }
 
-            const share = await TimeFrameShare.generate(config.pool, a);
+            const a = await AOI.from(config.pool, req.params.aoiid);
+            const share = await TimeFrameShare.generate(config.pool, {
+                project_id: req.params.projectid,
+                aoi_id: req.params.aoiid,
+                timeframe_id: req.params.timeframeid,
+                bounds: a.bounds,
+                patches: tf.patches
+            });
 
             if (config.TileUrl) {
-                const tiffurl = await a.url(config);
+                const tiffurl = await tf.url(config);
                 req.method = 'POST';
                 req.url = '/cog/cogify';
 
