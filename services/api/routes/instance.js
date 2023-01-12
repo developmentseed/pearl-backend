@@ -125,7 +125,7 @@ export default async function router(schema, config) {
         res: 'res.Instance.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const inst = await Instance.has_auth(config, req.auth, req.params.projectid, req.params.instanceid);
+            const inst = await Instance.has_auth(config, req);
 
             const json = inst.serialize();
             json.token = inst.token;

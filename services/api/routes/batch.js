@@ -48,7 +48,7 @@ export default async function router(schema, config) {
             }
 
             if (req.body.checkpoint_id) {
-                await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
+                await Checkpoint.has_auth(config.pool, req);
                 delete req.body.checkpoint_id;
             }
 
@@ -86,7 +86,7 @@ export default async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req);
 
             return res.json(batch.serialize());
         } catch (err) {
@@ -105,7 +105,7 @@ export default async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req);
             await batch.commit({
                 ...req.body,
                 updated: sql`Now()`

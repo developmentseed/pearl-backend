@@ -264,7 +264,7 @@ export default async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of tf.patches) {
-                const patch = await TimeFramePatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                const patch = await TimeFramePatch.has_auth(config.pool, req);
                 patchurls.push(await patch.url(config));
             }
 
@@ -366,7 +366,7 @@ export default async function router(schema, config) {
 
             const patchurls = [];
             for (const patchid of a.patches) {
-                const patch = await TimeFramePatch.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid, patchid);
+                const patch = await TimeFramePatch.has_auth(config.pool, req);
                 patchurls.push(await patch.url(config));
             }
 

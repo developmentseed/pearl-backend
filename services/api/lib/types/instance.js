@@ -15,16 +15,14 @@ export default class Instance extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Config} config
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} instanceid Instance the user is attemping to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(config, auth, projectid, instanceid) {
-        const proj = await Project.has_auth(config.pool, auth, projectid);
-        const instance = await Instance.from(config, auth, instanceid);
+    static async has_auth(config, req) {
+        const proj = await Project.has_auth(config.pool, req);
+        const instance = await Instance.from(config, req.auth, req.params.instanceid);
 
         if (instance.project_id !== proj.id) {
-            throw new Err(400, null, `Instance #${instanceid} is not associated with project #${projectid}`);
+            throw new Err(400, null, `Instance #${req.params.instanceid} is not associated with project #${req.params.projectid}`);
         }
 
         return instance;
