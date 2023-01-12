@@ -193,7 +193,7 @@ test('POST: /api/project/1/aoi/1/timeframe/1/patch/1/upload', async (t) => {
         t.deepEquals(res.body, {
             id: 1,
             project_id: 1,
-            aoi_id: 1,
+            timeframe_id: 1,
             storage: true
         });
     } catch (err) {
@@ -220,7 +220,7 @@ test('GET /api/project/1/aoi/1/timeframe/1/patch/1', async (t) => {
             id: 1,
             storage: true,
             project_id: 1,
-            aoi_id: 1
+            timeframe_id: 1
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -290,30 +290,20 @@ test('PATCH /api/project/1/aoi/1/timeframe/1/', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.bookmarked_at);
+        t.ok(res.body.mosaic_ts);
         delete res.body.created;
         delete res.body.bookmarked_at;
+        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
-            area: 1238,
             storage: false,
-            project_id: 1,
+            aoi_id: 1,
             checkpoint_id: 1,
             bookmarked: true,
             px_stats: {},
             patches: [1],
-            name: 'Test AOI',
-            bounds: {
-                type: 'Polygon',
-                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            },
+            mosaic: 'naip.latest',
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -328,7 +318,7 @@ test('PATCH /api/project/1/aoi/1/timeframe/1/', async (t) => {
     t.end();
 });
 
-test('PATCH /api/project/1/aoi/1/timeframe/1 - update the name and check if the bookmarked value is not reset', async (t) => {
+test('PATCH /api/project/1/aoi/1/timeframe/1 - update the timeframe and check if the bookmarked value is not reset', async (t) => {
     try {
         const res = await flight.request({
             json: true,
@@ -337,14 +327,11 @@ test('PATCH /api/project/1/aoi/1/timeframe/1 - update the name and check if the 
             auth: {
                 bearer: flight.token.ingalls
             },
-            body: {
-                name: 'New test AOI'
-            }
+            body: { }
         }, t);
 
         t.ok(res.body.bookmarked_at);
         t.equals(res.body.bookmarked, true);
-        t.equals(res.body.name, 'New test AOI');
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -422,30 +409,19 @@ test('GET /api/project/1/aoi/1/timeframe/1 - should return the classes field upd
         }, t);
 
         delete res.body.created;
+        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
-            area: 1238,
             storage: false,
-            project_id: 1,
+            aoi_id: 1,
             checkpoint_id: 1,
             bookmarked: false,
             bookmarked_at: null,
             patches: [1],
             shares: [],
-            name: 'New test AOI',
             px_stats: {},
-            bounds: {
-                type: 'Polygon',
-                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            },
+            mosaic: 'naip.latest',
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008100' },
@@ -475,7 +451,7 @@ test('GET /api/project/1/aoi/1/timeframe/1/patch/1', async (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'aoi_patch not found',
+            message: 'aoi_timeframe_patch not found',
             messages: []
         });
     } catch (err) {
