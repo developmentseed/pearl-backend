@@ -111,11 +111,11 @@ test('GET /api/project/1/aoi/1/timeframe/1/patch', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/aoi/1/patch', async (t) => {
+test('POST /api/project/1/aoi/1/timeframe/1/patch', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch',
             method: 'POST',
             auth: {
                 bearer: flight.token.ingalls
@@ -138,11 +138,11 @@ test('POST /api/project/1/aoi/1/patch', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi/1/patch', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1/patch', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/patch',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -168,11 +168,11 @@ test('GET /api/project/1/aoi/1/patch', async (t) => {
     t.end();
 });
 
-test('POST: /api/project/1/aoi/1/patch/1/upload', async (t) => {
+test('POST: /api/project/1/aoi/1/timeframe/1/patch/1/upload', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1/patch/1/upload',
+            url: '/api/project/1/aoi/1/timeframe/1/patch/1/upload',
             method: 'POST',
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -201,11 +201,11 @@ test('POST: /api/project/1/aoi/1/patch/1/upload', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi/1/patch/1', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1/patch/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch/1',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -227,11 +227,11 @@ test('GET /api/project/1/aoi/1/patch/1', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi/1/patch/1/download', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1/patch/1/download', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1/patch/1/download',
+            url: '/api/project/1/aoi/1/timeframe/1/patch/1/download',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -249,11 +249,11 @@ test('GET /api/project/1/aoi/1/patch/1/download', async (t) => {
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/patch/1', async (t) => {
+test('DELETE /api/project/1/aoi/1/timeframe/1/patch/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch/1',
             method: 'DELETE',
             auth: {
                 bearer: flight.token.ingalls
@@ -271,11 +271,11 @@ test('DELETE /api/project/1/aoi/1/patch/1', async (t) => {
     t.end();
 });
 
-test('PATCH /api/project/1/aoi/1', async (t) => {
+test('PATCH /api/project/1/aoi/1/timeframe/1/', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1',
             method: 'PATCH',
             auth: {
                 bearer: flight.token.ingalls
@@ -326,11 +326,11 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
     t.end();
 });
 
-test('PATCH /api/project/1/aoi/1 - update the name and check if the bookmarked value is not reset', async (t) => {
+test('PATCH /api/project/1/aoi/1/timeframe/1 - update the name and check if the bookmarked value is not reset', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1',
             method: 'PATCH',
             auth: {
                 bearer: flight.token.ingalls
@@ -350,11 +350,11 @@ test('PATCH /api/project/1/aoi/1 - update the name and check if the bookmarked v
     t.end();
 });
 
-test('PATCH /api/project/1/aoi/1 - unbookmarking', async (t) => {
+test('PATCH /api/project/1/aoi/1/timeframe/1 - unbookmarking', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1',
             method: 'PATCH',
             auth: {
                 bearer: flight.token.ingalls
@@ -373,11 +373,11 @@ test('PATCH /api/project/1/aoi/1 - unbookmarking', async (t) => {
     t.end();
 });
 
-test('PATCH /api/project/1/aoi/1 - update classes', async (t) => {
+test('PATCH /api/project/1/aoi/1/timeframe/1 - update classes', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1',
             method: 'PATCH',
             auth: {
                 bearer: flight.token.ingalls
@@ -408,11 +408,11 @@ test('PATCH /api/project/1/aoi/1 - update classes', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi/1 - should return the classes field updated', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1 - should return the classes field updated', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls
@@ -458,11 +458,11 @@ test('GET /api/project/1/aoi/1 - should return the classes field updated', async
     t.end();
 });
 
-test('GET /api/project/1/aoi/1/patch/1', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1/patch/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: 'http://localhost:2000/api/project/1/aoi/1/patch/1',
+            url: 'http://localhost:2000/api/project/1/aoi/1/timeframe/1/patch/1',
             method: 'GET',
             auth: {
                 bearer: flight.token.ingalls

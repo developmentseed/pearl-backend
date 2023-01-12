@@ -2,7 +2,7 @@ import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import Storage from '../storage.js';
 import { sql } from 'slonik';
-import TimeFrame from '../lib/types/aoi-timeframe.js';
+import TimeFrame from './aoi-timeframe.js';
 
 /**
  * @class
