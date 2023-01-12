@@ -48,6 +48,7 @@ export default async function router(schema, config) {
             }
 
             if (req.body.checkpoint_id) {
+                req.params.checkpointid = req.body.checkpoint_id;
                 await Checkpoint.has_auth(config.pool, req);
                 delete req.body.checkpoint_id;
             }
