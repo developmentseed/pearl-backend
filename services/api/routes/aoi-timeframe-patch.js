@@ -1,6 +1,5 @@
 import Err from '@openaddresses/batch-error';
 import Busboy from 'busboy';
-import AOI from '../lib/types/aoi.js';
 import TimeFrame from '../lib/types/aoi-timeframe.js';
 import Patch from '../lib/types/aoi-timeframe-patch.js';
 import Proxy from '../lib/proxy.js';

@@ -1,7 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import AOI from './aoi.js';
 import Generic, { Params } from '@openaddresses/batch-generic';
-import Project from './project.js';
 import Storage from '../storage.js';
 import { sql } from 'slonik';
 
