@@ -13,12 +13,12 @@ export default class AOIShare extends Generic {
      * Return a list of AOI Shares
      *
      * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Number} aoiid - AOI Shares related to a specific project
+     * @param {Number} projectid - AOI Shares related to a specific project
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    static async list(pool, aoiid, query) {
+    static async list(pool, projectid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -35,7 +35,7 @@ export default class AOIShare extends Generic {
                 FROM
                     aoi_timeframe_share
                 WHERE
-                    aoi_id = ${aoiid}
+                    project_id = ${projectid}
                 ORDER BY
                     created DESC
                 LIMIT

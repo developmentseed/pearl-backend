@@ -432,7 +432,9 @@ export default async function router(schema, config) {
         try {
             await Project.has_auth(config.pool, req);
 
-            return res.json(await TimeFrameShare.list(config.pool, req.params.projectid, req.query));
+            const list = await TimeFrameShare.list(config.pool, req.params.projectid, req.query);
+            list.project_id = req.params.projectid;
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }
