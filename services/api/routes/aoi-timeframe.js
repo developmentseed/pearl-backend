@@ -334,8 +334,11 @@ export default async function router(schema, config) {
             await AOI.has_auth(config.pool, req);
 
             try {
-                await Mosaic.from(config.pool, req.body.mosaic);
+                await Mosaic.from(config.pool, req.body.mosaic, {
+                    column: 'name'
+                });
             } catch (err) {
+            console.error(err)
                 throw new Err(400, null, 'Invalid Mosaic');
             }
 

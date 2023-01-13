@@ -33,7 +33,9 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        const mosaic = await Mosaic.from(config.pool, req.params.mosaic);
+        const mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+            column: 'name'
+        });
         req.url = `/api/data/v1/mosaic/${mosaic.id}/tilejson.json`;
         req.query = {
             ...mosaic.params,
@@ -60,7 +62,9 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        const mosaic = await Mosaic.from(config.pool, req.params.mosaic);
+        const mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+            column: 'name'
+        });
         req.url = req.url.replace(`/mosaic/${req.params.layer}/tiles/`, `/api/data/v1/mosaic/tiles/${mosaic.id}/`);
         req.query = {
             ...mosaic.params,
