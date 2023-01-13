@@ -17,25 +17,26 @@ export default async function router(schema, config) {
                 return mosaic.name;
             });
 
-            return list;
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
-    await schema.get('/mosaic/:layer', {
+    await schema.get('/mosaic/:mosaic', {
         name: 'Get TileJSON',
         group: 'Mosaic',
         auth: 'public',
         description: 'Return a TileJSON object for a given mosaic layer',
-        ':layer': 'string',
+        ':mosaic': 'string',
         res: 'res.TileJSON.json'
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        req.url = `/api/data/v1/mosaic/${Mosaic.get_id(req.params.layer)}/tilejson.json`;
+        const mosaic = await Mosaic.from(config.pool, req.params.mosaic);
+        req.url = `/api/data/v1/mosaic/${mosaic.id}/tilejson.json`;
         req.query = {
-            ...Mosaic.get_query(req.params.layer),
+            ...mosaic.params,
             ...req.query
         };
 
@@ -59,9 +60,10 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        req.url = req.url.replace(`/mosaic/${req.params.layer}/tiles/`, `/api/data/v1/mosaic/tiles/${Mosaic.get_id(req.params.layer)}/`);
+        const mosaic = await Mosaic.from(config.pool, req.params.mosaic);
+        req.url = req.url.replace(`/mosaic/${req.params.layer}/tiles/`, `/api/data/v1/mosaic/tiles/${mosaic.id}/`);
         req.query = {
-            ...Mosaic.get_query(req.params.layer),
+            ...mosaic.params,
             ...req.query
         };
 
