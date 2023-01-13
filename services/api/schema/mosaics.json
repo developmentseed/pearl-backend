@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./mosaics/id.json"
+        },
+        "name": {
+            "$ref": "./mosaics/name.json"
+        },
+        "params": {
+            "$ref": "./mosaics/params.json"
+        },
+        "mosaic_ts": {
+            "$ref": "./mosaics/mosaic_ts.json"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "params",
+        "mosaic_ts"
+    ]
+}
