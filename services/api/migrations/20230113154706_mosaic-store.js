@@ -1,9 +1,10 @@
 function up(knex) {
     return knex.schema.raw(`
         CREATE TABLE mosaics (
-            id      TEXT PRIMARY KEY,
-            name    TEXT NOT NULL,
-            params  JSONB NOT NULL DEFAULT '{}'
+            id          TEXT PRIMARY KEY,
+            name        TEXT NOT NULL,
+            params      JSONB NOT NULL DEFAULT '{}',
+            mosaic_ts   TIMESTAMP
         );
 
         INSERT INTO mosaics (
