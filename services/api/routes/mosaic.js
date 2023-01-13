@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Mosaic from '../lib/mosaic.js';
+import Mosaic from '../lib/types/mosaic.js';
 import Proxy from '../lib/proxy.js';
 
 export default async function router(schema, config) {
@@ -11,7 +11,13 @@ export default async function router(schema, config) {
         res: 'res.Mosaic.json'
     }, async (req, res) => {
         try {
-            return res.json(Mosaic.list());
+            const list = await Mosaic.list(config.pool);
+
+            list.mosaics = list.mosaics.map((mosaic) => {
+                return mosaic.name;
+            });
+
+            return list;
         } catch (err) {
             return Err.respond(err, res);
         }

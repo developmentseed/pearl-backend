@@ -16,17 +16,6 @@ export default class Mosaic {
     };
 
     /**
-     * Return a list of Mosaics
-     *
-     * @returns {Object}
-     */
-    static list() {
-        return {
-            mosaics: Object.keys(this.mosaics)
-        };
-    }
-
-    /**
      * Return mosaic SearchID
      *
      * @param {String} mosaic - Mosaic Name
