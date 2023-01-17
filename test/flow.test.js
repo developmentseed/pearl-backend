@@ -172,14 +172,14 @@ async function gpu() {
             } else if (msg.message === 'model#checkpoint#complete') {
                 term.log(`ok - model#checkpoint#complete - ${msg.data.checkpoint}`);
                 term.prog.update();
-            } else if (msg.message === 'model#aoi#progress') {
-                term.log(`ok - model#aoi#progress - ${msg.data.aoi}`);
-                term.prog.update('model#aoi', 0);
-            } else if (msg.message === 'model#aoi#complete') {
-                term.log(`ok - model#aoi#complete - ${msg.data.aoi}`);
+            } else if (msg.message === 'model#timeframe#progress') {
+                term.log(`ok - model#timeframe#progress - ${msg.data.aoi}`);
+                term.prog.update('model#timeframe', 0);
+            } else if (msg.message === 'model#timeframe#complete') {
+                term.log(`ok - model#timeframe#complete - ${msg.data.aoi}`);
                 term.prog.update();
-            } else if (msg.message === 'model#aoi') {
-                term.log(`ok - model#aoi - ${msg.data.name} - chkpt: ${msg.data.checkpoint_id}`);
+            } else if (msg.message === 'model#timeframe') {
+                term.log(`ok - model#timeframe - ${msg.data.name} - chkpt: ${msg.data.checkpoint_id}`);
                 state.aois.push(msg.data);
                 term.prog.update('model#prediction', 0);
             } else if (msg.message === 'model#patch') {

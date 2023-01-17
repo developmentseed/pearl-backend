@@ -13,7 +13,7 @@ from shapely.geometry import box, shape
 LOGGER = logging.getLogger("server")
 
 
-class AOI:
+class TimeFrame:
     def __init__(self, api, poly, name, checkpointid, is_patch=False):
         self.api = api
         self.poly = shape(poly)
@@ -27,42 +27,44 @@ class AOI:
         self.live = False
 
     def create(api, poly, name, checkpointid, is_patch=False):
-        aoi = AOI(api, poly, name, checkpointid, is_patch)
-        aoi.tiles = AOI.gen_tiles(aoi.bounds, aoi.zoom)
-        aoi.total = len(aoi.tiles)
+        tf = TimeFrame(api, poly, name, checkpointid, is_patch)
+        tf.tiles = TimeFrame.gen_tiles(tf.bounds, tf.zoom)
+        tf.total = len(tf.tiles)
 
-        LOGGER.info("ok - " + str(aoi.total) + " tiles queued")
+        LOGGER.info("ok - " + str(tf.total) + " tiles queued")
 
-        aoi.bounds = AOI.gen_bounds(aoi.tiles)
-        LOGGER.info("ok - [" + ",".join(str(x) for x in aoi.bounds) + "] aoi bounds")
+        tf.bounds = TimeFrame.gen_bounds(tf.tiles)
+        LOGGER.info("ok - [" + ",".join(str(x) for x in tf.bounds) + "] timeframe bounds")
 
         # TODO Check Max size too
-        aoi.live = AOI.area(aoi.bounds) < aoi.api.server["limits"]["live_inference"]
+        tf.live = TimeFrame.area(tf.bounds) < tf.api.server["limits"]["live_inference"]
 
-        if aoi.is_patch is not False:
-            aoi.id = aoi.api.create_patch(is_patch)["id"]
+        if tf.is_patch is not False:
+            tf.id = tf.api.create_patch(is_patch)["id"]
         else:
-            aoi.id = aoi.api.create_aoi(aoi)["id"]
-            aoi.api.instance_patch(aoi_id=aoi.id)
+            tf.id = tf.api.create_timeframe(tf)["id"]
+            tf.api.instance_patch(tiemframe_id=tf.id)
 
-        aoi.extrema, aoi.raw_fabric, aoi.fabric = AOI.gen_fabric(aoi.bounds, aoi.zoom)
+        tf.extrema, tf.raw_fabric, tf.fabric = TimeFrame.gen_fabric(tf.bounds, tf.zoom)
 
-        return aoi
+        return tf
 
-    def load(api, aoiid):
-        aoijson = api.aoi_meta(aoiid)
+    def load(api, timeframeid):
+        tfjson = api.timeframe_meta(aoiid, timeframeid)
+        aoijson = api.aoi_meta(tfjson["aoi_id"])
 
-        aoi = AOI(
+        tf = TimeFrame(
             api,
             shape(aoijson.get("bounds")),
             aoijson.get("name"),
-            aoijson.get("checkpoint_id"),
+            tfjson.get("checkpoint_id"),
         )
-        aoi.id = aoijson.get("id")
+        tf.id = tfjson.get("id")
+        tf.aoi_id = tfjson.get("aoi_id")
 
-        aoi.api.instance_patch(aoi_id=aoi.id)
+        tf.api.instance_patch(timeframe_id=tf.id)
 
-        return aoi
+        return tf
 
     def add_to_fabric(self, fragment):
         data = np.moveaxis(fragment.data, -1, 0)

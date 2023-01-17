@@ -261,13 +261,15 @@ class API:
 
         return ch_dir
 
-    def create_patch(self, aoi_id):
+    def create_patch(self, aoi_id, timeframe_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoi_id)
+            + "/timeframe/"
+            + str(timeframe_id)
             + "/patch"
         )
 
@@ -285,13 +287,15 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_patch(self, aoiid, patchid, geotiff):
+    def upload_patch(self, aoiid, timeframeid, patchid, geotiff):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoiid)
+            + "/timeframe/"
+            + str(timeframeid)
             + "/patch/"
             + str(patchid)
             + "/upload"
@@ -299,7 +303,7 @@ class API:
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = self.tmp_dir + "/aoi-{}-patch-{}.tiff".format(aoiid, patchid)
+        geo_path = self.tmp_dir + "/aoi-{}-patch-{}.tiff".format(timeframeid, patchid)
         with open(geo_path, "wb") as filehandle:
             filehandle.write(geotiff.read())
 
@@ -332,8 +336,19 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def create_aoi(self, aoi):
-        url = self.url + "/api/project/" + str(self.project_id) + "/aoi"
+    def timeframe_meta(self, aoiid, timeframeid):
+        url = self.url + "/api/project/" + str(self.project_id) + "/aoi/" + str(aoiid) + "/timeframe" + str(timeframeid)
+
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def create_timeframe(self, aoiid, timeframe):
+        url = self.url + "/api/project/" + str(self.project_id) + "/aoi/" + str(aoiid) + "/timeframe"
 
         LOGGER.info("ok - POST " + url)
         r = self.requests.post(
@@ -344,9 +359,7 @@ class API:
             },
             data=json.dumps(
                 {
-                    "name": aoi.name,
-                    "checkpoint_id": aoi.checkpointid,
-                    "bounds": mapping(aoi.poly),
+                    "checkpoint_id": timeframe.checkpointid
                 }
             ),
         )
@@ -356,13 +369,15 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_aoi(self, aoiid, geotiff):
+    def upload_timeframe(self, aoiid, timeframeid, geotiff):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoiid)
+            + "/timeframe/"
+            + str(timeframeid)
             + "/upload"
         )
 
@@ -455,7 +470,7 @@ class API:
 
             return r.content
 
-    def instance_patch(self, aoi_id=None, checkpoint_id=None):
+    def instance_patch(self, timeframe_id=None, checkpoint_id=None):
         url = (
             self.url
             + "/api/project/"
@@ -465,8 +480,8 @@ class API:
         )
 
         data = {}
-        if aoi_id is not None:
-            data["aoi_id"] = aoi_id
+        if timeframe_id is not None:
+            data["timeframe_id"] = timeframe_id
         if checkpoint_id is not None:
             data["checkpoint_id"] = checkpoint_id
 

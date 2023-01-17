@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from shapely.geometry import mapping
 
-from .AOI import AOI
+from .TimeFrame import TimeFrame
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
 from .osm import OSM
@@ -294,7 +294,7 @@ class ModelSrv:
             websocket.send(
                 json.dumps(
                     {
-                        "message": "model#aoi#progress",
+                        "message": "model#timeframe#progress",
                         "data": {"aoi": body["id"], "processed": 0, "total": 1},
                     }
                 )
@@ -305,7 +305,7 @@ class ModelSrv:
 
             websocket.send(
                 json.dumps(
-                    {"message": "model#aoi#complete", "data": {"aoi": self.aoi.id}}
+                    {"message": "model#timeframe#complete", "data": {"aoi": self.aoi.id}}
                 )
             )
 
@@ -384,7 +384,7 @@ class ModelSrv:
                 websocket.send(
                     json.dumps(
                         {
-                            "message": "model#aoi",
+                            "message": "model#timeframe",
                             "data": {
                                 "id": self.aoi.id,
                                 "live": self.aoi.live,
