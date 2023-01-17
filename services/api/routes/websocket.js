@@ -98,5 +98,5 @@ export default async function router(schema) {
  * @apiGroup Websockets
  * @apiPermission user
  *
- * @apiSchema (Body) {jsonschema=../schema/websocket/model#aoi.json} apiParam
+ * @apiSchema (Body) {jsonschema=../schema/websocket/model#timeframe.json} apiParam
  */
