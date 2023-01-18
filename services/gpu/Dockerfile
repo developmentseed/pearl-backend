@@ -6,7 +6,7 @@ ENV HOME=/home/lulc
 WORKDIR $HOME
 
 ADD requirements.txt .
-RUN apt install gdal-config
+
 RUN pip install -r requirements.txt
 
 COPY ./ $HOME/gpu
