@@ -23,7 +23,6 @@
         "@openaddresses/batch-generic": "^13.1.0",
         "ajv": "^8.6.2",
         "charm": "^1.0.2",
-        "i": "^0.3.6",
         "inquirer": "^9.1.0",
         "knex": "^2.0.0",
         "minimist": "^1.2.5",
