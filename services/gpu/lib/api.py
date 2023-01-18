@@ -96,11 +96,9 @@ class API:
         self.project = self.project_meta()
 
         self.model_id = self.project["model_id"]
-        self.mosaic_id = self.project["mosaic"]
 
         self.model = self.model_meta()
         self.model_dir = self.model_download()
-        self.mosaic = self.get_tilejson()
 
     def server_meta(self):
         url = self.url + "/api"
