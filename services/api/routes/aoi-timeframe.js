@@ -338,7 +338,7 @@ export default async function router(schema, config) {
                     column: 'name'
                 });
             } catch (err) {
-            console.error(err)
+                console.error(err);
                 throw new Err(400, null, 'Invalid Mosaic');
             }
 
