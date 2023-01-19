@@ -257,7 +257,6 @@ export function connect(test, API) {
                 body: {
                     name: 'Test Project',
                     model_id: 1,
-                    mosaic: 'naip.latest'
                 },
                 headers: {
                     Authorization: `Bearer ${state.token}`
@@ -267,7 +266,7 @@ export function connect(test, API) {
             t.equals(res.statusCode, 200, '200 status code');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'created', 'id', 'model_id', 'mosaic', 'name', 'uid', 'model_name'
+                'created', 'id', 'model_id', 'name', 'uid', 'model_name'
             ].sort(), 'expected props');
 
             t.ok(res.body.created, 'created: <date>');
@@ -279,7 +278,6 @@ export function connect(test, API) {
                 uid: 1,
                 name: 'Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest',
                 model_name: 'NAIP Supervised'
             }, 'expected body');
         } catch (err) {
