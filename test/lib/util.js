@@ -5,12 +5,12 @@ import path from 'path';
 
 const prequest = promisify(request);
 
-export function local_schema() {
+function local_schema() {
     const local = JSON.parse(fs.readFileSync(new URL('./schema.json', import.meta.url)));
     return local;
 }
 
-export default async function schema(url) {
+async function schema(url) {
     const res = await prequest({
         json: true,
         method: 'GET',
@@ -25,4 +25,9 @@ export default async function schema(url) {
     fs.writeFileSync(new URL('./schema.json', import.meta.url), JSON.stringify(local, null, 4));
 
     return local;
+}
+
+export default {
+    schema,
+    local_schema
 }
