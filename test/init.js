@@ -287,6 +287,132 @@ export function connect(test, API) {
         t.end();
     });
 
+    test('AOI 1 - Seneca Rocks (small)', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project/1/aoi',
+                body: {
+                    name: 'Seneca Rocks, WV',
+                    bounds: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [ -79.38355922698973, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.830046580030306 ]
+                        ]]
+                    }
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'area', 'bookmarked', 'bookmarked_at', 'bounds', 'created', 'id', 'name', 'project_id', 'updated'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+            delete res.body.created;
+
+            t.ok(res.body.updated, 'updated: <date>');
+            delete res.body.updated;
+
+            t.deepEquals(res.body, {
+                id: 1,
+                name: 'Seneca Rocks, WV',
+                project_id: 1,
+                bookmarked: false,
+                bookmarked_at: null,
+                area: 722859,
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [ -79.38355922698973, 38.830046580030306, -79.37222957611084, 38.83666569946354 ],
+                    coordinates: [[
+                        [ -79.38355922698973, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.830046580030306 ]
+                    ]]
+                }
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('AOI 2 - Riverton (large)', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project/1/aoi',
+                body: {
+                    name: 'Riverton, WV',
+                    bounds: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [-79.4466018676758,38.72850983470067],
+                            [-79.40935134887695,38.72850983470067],
+                            [-79.40935134887695,38.756225137839074],
+                            [-79.4466018676758,38.756225137839074],
+                            [-79.4466018676758,38.72850983470067]
+                        ]]
+                    }
+
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'area', 'bookmarked', 'bookmarked_at', 'bounds', 'created', 'id', 'name', 'project_id', 'updated'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+            delete res.body.created;
+
+            t.ok(res.body.updated, 'updated: <date>');
+            delete res.body.updated;
+
+            t.deepEquals(res.body, {
+                id: 2,
+                project_id: 1,
+                bookmarked: false,
+                bookmarked_at: null,
+                area: 9964013,
+                name: 'Riverton, WV',
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [ -79.4466018676758, 38.72850983470067, -79.40935134887695, 38.756225137839074 ],
+                    coordinates: [[
+                        [-79.4466018676758,38.72850983470067],
+                        [-79.40935134887695,38.72850983470067],
+                        [-79.40935134887695,38.756225137839074],
+                        [-79.4466018676758,38.756225137839074],
+                        [-79.4466018676758,38.72850983470067]
+                    ]]
+                }
+
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
     test('Instance 1', async (t) => {
         try {
             const res = await prequest({
@@ -303,7 +429,7 @@ export function connect(test, API) {
 
             t.deepEquals(Object.keys(res.body).sort(), [
                 'active',
-                'aoi_id',
+                'timeframe_id',
                 'checkpoint_id',
                 'created',
                 'id',
@@ -327,7 +453,7 @@ export function connect(test, API) {
             t.deepEquals(res.body, {
                 project_id: 1,
                 batch: null,
-                aoi_id: null,
+                timeframe_id: null,
                 checkpoint_id: null,
                 active: false,
                 pod: {},
