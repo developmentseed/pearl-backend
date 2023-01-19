@@ -359,10 +359,12 @@ class ModelSrv:
 
             self.processing = True
 
+            aoi = self.api.aoi_meta(body["aoi_id"])
+
             if self.chk is None:
                 self.meta_save_checkpoint(
                     {
-                        "name": body["name"],
+                        "name": aoi["name"],
                         "geoms": [None] * len(self.model.classes),
                         "analytics": [
                             {
@@ -377,7 +379,7 @@ class ModelSrv:
                 )
 
             self.timeframe = TimeFrame.create(
-                self.api, body.get("polygon"), body.get("name"), self.chk["id"]
+                self.api, aoi.get("bounds"), aoi.get("name"), self.chk["id"]
             )
 
             if websocket is not False:
