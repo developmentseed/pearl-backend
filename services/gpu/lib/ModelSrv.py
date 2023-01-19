@@ -35,7 +35,7 @@ class ModelSrv:
             self.meta_load_checkpoint(self.api.instance.get("checkpoint_id"))
 
         if api.instance.get("aoi_id") is not None:
-            self.aoi = AOI.load(self.api, self.api.instance.get("aoi_id"))
+            self.aoi = TimeFrame.load(self.api, self.api.instance.get("aoi_id"))
 
         if api.batch is not False:
             self.prediction(
@@ -73,7 +73,7 @@ class ModelSrv:
             self.processing = True
 
             if self.aoi is None:
-                websocket.error("Cannot Patch as no AOI is loaded")
+                websocket.error("Cannot Patch as no TimeFrame is loaded")
                 done_processing(self)
                 return
             elif self.chk is None:
@@ -82,7 +82,7 @@ class ModelSrv:
                 return
 
             if body.get("type") == "class":
-                patch = AOI.create(
+                patch = TimeFrame.create(
                     self.api,
                     body.get("polygon"),
                     body.get("name", ""),
@@ -167,7 +167,7 @@ class ModelSrv:
                 current_checkpoint = self.chk["id"]
                 self.meta_load_checkpoint(body["checkpoint_id"])
 
-                patch = AOI.create(
+                patch = TimeFrame.create(
                     self.api,
                     body.get("polygon"),
                     body.get("name", ""),
@@ -281,7 +281,7 @@ class ModelSrv:
             done_processing(self)
         except Exception as e:
             done_processing(self)
-            websocket.error("AOI Patch Error", e)
+            websocket.error("TimeFrame Patch Error", e)
             raise e
 
     def load_aoi(self, body, websocket):
@@ -300,7 +300,7 @@ class ModelSrv:
                 )
             )
 
-            self.aoi = AOI.load(self.api, body["id"])
+            self.aoi = TimeFrame.load(self.api, body["id"])
             self.meta_load_checkpoint(self.aoi.checkpointid)
 
             websocket.send(
@@ -313,7 +313,7 @@ class ModelSrv:
 
         except Exception as e:
             done_processing(self)
-            websocket.error("AOI Load Error", e)
+            websocket.error("TimeFrame Load Error", e)
             raise e
 
     def load_checkpoint(self, body, websocket):
@@ -376,7 +376,7 @@ class ModelSrv:
                     websocket,
                 )
 
-            self.aoi = AOI.create(
+            self.aoi = TimeFrame.create(
                 self.api, body.get("polygon"), body.get("name"), self.chk["id"]
             )
 
