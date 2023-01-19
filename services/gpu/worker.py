@@ -105,7 +105,7 @@ def connection(uri, model, api):
         router.on_act("model#osm", model.osm)
         router.on_act("model#retrain", model.retrain)
         router.on_act("model#checkpoint", model.load_checkpoint)
-        router.on_act("model#aoi", model.load_aoi)
+        router.on_act("model#timeframe", model.load_timeframe)
 
     router.on_act("model#status", model.status)
 
