@@ -13,17 +13,15 @@
         "data": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "name",
-                "polygon"
-            ],
+            "required": [ "aoi_id", "mosaic" ],
             "properties": {
-                "name": {
-                    "type": "string",
-                    "description": "Human readable name of the AOI"
+                "aoi_id": {
+                    "type": "integer",
+                    "description": "AOI to process with"
                 },
-                "polygon": {
-                    "$ref": "../util/polygon.json"
+                "mosaic": {
+                    "type": "string",
+                    "description": "Mosaic to process the AOI with"
                 }
             }
         }

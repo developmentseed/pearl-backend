@@ -15,13 +15,20 @@ LOGGER = logging.getLogger("server")
 
 class TimeFrame:
     def __init__(self, api, poly, name, checkpointid, is_patch=False):
+        self.id = None
+        self.aoi_id = None
+
         self.api = api
+        self.zoom = self.api.model["model_zoom"]
+
+        # AOI Properties
         self.poly = shape(poly)
         self.bounds = self.poly.bounds
         self.name = name
+
+        # TimeFrame Properties
         self.checkpointid = checkpointid
         self.is_patch = is_patch
-        self.zoom = self.api.model["model_zoom"]
         self.tiles = []
         self.total = 0
         self.live = False

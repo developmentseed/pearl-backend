@@ -345,8 +345,8 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def create_timeframe(self, aoiid, timeframe):
-        url = self.url + "/api/project/" + str(self.project_id) + "/aoi/" + str(aoiid) + "/timeframe"
+    def create_timeframe(self, timeframe):
+        url = self.url + "/api/project/" + str(self.project_id) + "/aoi/" + str(timeframe.aoi_id) + "/timeframe"
 
         LOGGER.info("ok - POST " + url)
         r = self.requests.post(
