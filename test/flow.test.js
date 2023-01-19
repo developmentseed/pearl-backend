@@ -55,7 +55,7 @@ async function gpu() {
             const dir = sel.stats ? sel.value : new URL('./fixtures/', import.meta.url);
 
             term.prompt.screen(fs.readdirSync(dir).map((f) => {
-                const stats = fs.statSync(path.resolve(dir, f));
+                const stats = fs.statSync(dir + f);
 
                 return {
                     name: (stats.isDirectory() ? '*' : '') + path.parse(f).name,
