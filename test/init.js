@@ -256,7 +256,7 @@ export function connect(test, API) {
                 url: API + '/api/project',
                 body: {
                     name: 'Test Project',
-                    model_id: 1,
+                    model_id: 1
                 },
                 headers: {
                     Authorization: `Bearer ${state.token}`

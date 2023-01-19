@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import test from 'tape';
 import path from 'path';
 import fs from 'fs';
+import fsp from 'fs/promises';
 import LULC from './lib.js';
 import minimist from 'minimist';
 
@@ -52,20 +53,22 @@ async function gpu() {
     term.prompt.screen(['websockets', 'api']);
     term.on('promp#selection', async (sel) => {
         if (sel.value === 'websockets' || (sel.stats && sel.stats.isDirectory())) {
-            const dir = sel.stats ? sel.value : new URL('./fixtures/', import.meta.url);
+            const dir = sel.stats ? sel.value : (new URL('./fixtures/', import.meta.url)).pathname;
 
-            term.prompt.screen(fs.readdirSync(dir).map((f) => {
-                const stats = fs.statSync(dir + f);
+            const screen = (await fsp.readdir(dir)).map((f) => {
+                const stats = fs.statSync(path.resolve(dir, f));
 
                 return {
                     name: (stats.isDirectory() ? '*' : '') + path.parse(f).name,
                     stats: stats,
                     value: path.resolve(dir, f)
                 };
-            }));
+            });
+
+            term.prompt.screen(screen);
             return;
         } else if (sel.stats && sel.stats.isFile()) {
-            ws.send(String(fs.readFileSync(sel.value)));
+            ws.send(String(await fsp.readFile(sel.value)));
             term.log(`SENT: ${sel.value}`);
         } else if (sel.value === 'api') {
             term.prompt.screen(Object.keys(lulc.schema.cli).map((k) => {
@@ -95,7 +98,7 @@ async function gpu() {
                 if (!res || res.toLowerCase() === 'y') {
                     const f = await term.prompt.ask('File Path');
 
-                    Object.assign(inp, JSON.parse(fs.readFileSync(path.resolve(f))));
+                    Object.assign(inp, JSON.parse(await fsp.readFile(path.resolve(f))));
 
                 } else {
                     if (data.body && data.body.type === 'object') {
@@ -121,9 +124,9 @@ async function gpu() {
 
             try {
                 const outp = path.resolve('/tmp/', 'api-output');
-                const out = fs.createWriteStream(outp).on('close', () => {
+                const out = fs.createWriteStream(outp).on('close', async () => {
                     try {
-                        term.log(JSON.stringify(JSON.parse(fs.readFileSync(outp)), null, 4));
+                        term.log(JSON.stringify(JSON.parse(await fsp.readFile(outp)), null, 4));
                     } catch (err) {
                         term.log(`Downloaded: ${outp}`);
                     }
