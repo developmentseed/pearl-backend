@@ -83,10 +83,7 @@ class ModelSrv:
 
             if body.get("type") == "class":
                 patch = TimeFrame.create(
-                    self.api,
-                    body,
-                    self.chk["id"],
-                    is_patch=self.timeframe.id,
+                    self.api, body, self.chk["id"], is_patch=self.timeframe.id
                 )
 
                 websocket.send(
@@ -167,11 +164,7 @@ class ModelSrv:
                 self.meta_load_checkpoint(body["checkpoint_id"])
 
                 patch = TimeFrame.create(
-                    self.api,
-                    body.get("polygon"),
-                    body.get("name", ""),
-                    self.chk["id"],
-                    is_patch=self.timeframe.id,
+                    self.api, body, self.chk["id"], is_patch=self.timeframe.id
                 )
                 websocket.send(
                     json.dumps(
@@ -378,7 +371,7 @@ class ModelSrv:
                 )
 
             self.timeframe = TimeFrame.create(
-                self.api, aoi, self.chk["id"]
+                self.api, aoi, body["mosaic"], self.chk["id"]
             )
 
             if websocket is not False:

@@ -363,6 +363,7 @@ class API:
             ),
         )
 
+        print(r.text);
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
@@ -404,8 +405,8 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tilejson(self):
-        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
+    def get_tilejson(self, mosaic):
+        _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
         params = _mosaic.get("default_params", {})
         url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/{searchid}/tilejson.json"
@@ -418,8 +419,8 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tile(self, z, x, y, iformat="npy", buffer=32, cache=True):
-        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
+    def get_tile(self, mosaic, z, x, y, iformat="npy", buffer=32, cache=True):
+        _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
         params = _mosaic.get("default_params", {})
         params.update(

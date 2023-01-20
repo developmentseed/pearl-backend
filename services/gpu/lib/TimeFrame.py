@@ -14,11 +14,12 @@ LOGGER = logging.getLogger("server")
 
 
 class TimeFrame:
-    def __init__(self, api, aoi, checkpointid, is_patch=False):
+    def __init__(self, api, aoi, mosaic, checkpointid, is_patch=False):
         self.id = None
 
         self.api = api
         self.zoom = self.api.model["model_zoom"]
+        self.mosaic = mosaic
 
         # AOI Properties
         self.aoi_id = aoi["id"]
@@ -50,7 +51,7 @@ class TimeFrame:
             tf.id = tf.api.create_patch(is_patch)["id"]
         else:
             tf.id = tf.api.create_timeframe(tf)["id"]
-            tf.api.instance_patch(tiemframe_id=tf.id)
+            tf.api.instance_patch(timeframe_id=tf.id)
 
         tf.extrema, tf.raw_fabric, tf.fabric = TimeFrame.gen_fabric(tf.bounds, tf.zoom)
 
