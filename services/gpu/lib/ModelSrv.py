@@ -83,7 +83,10 @@ class ModelSrv:
 
             if body.get("type") == "class":
                 patch = TimeFrame.create(
-                    self.api, body, self.chk["id"], is_patch=self.timeframe.id
+                    self.api, body, {
+                        "checkpoint_id": self.chk["id"],
+                        "mosaic": self.timeframe.mosaic
+                    }, is_patch=self.timeframe.id
                 )
 
                 websocket.send(
@@ -164,7 +167,10 @@ class ModelSrv:
                 self.meta_load_checkpoint(body["checkpoint_id"])
 
                 patch = TimeFrame.create(
-                    self.api, body, self.chk["id"], is_patch=self.timeframe.id
+                    self.api, body, {
+                        "checkpoint_id": self.chk["id"],
+                        "mosaic": self.timeframe.mosaic
+                    }, is_patch=self.timeframe.id
                 )
                 websocket.send(
                     json.dumps(
@@ -371,7 +377,10 @@ class ModelSrv:
                 )
 
             self.timeframe = TimeFrame.create(
-                self.api, aoi, body["mosaic"], self.chk["id"]
+                self.api, aoi, {
+                    "mosaic": body["mosaic"],
+                    "checkpoint_id": self.chk["id"]
+                }
             )
 
             if websocket is not False:
@@ -639,10 +648,10 @@ class ModelSrv:
             done_processing(self)
 
             if self.timeframe is not None:
-                self.prediction(
-                    {"name": body["name"], "polygon": mapping(self.timeframe.poly)},
-                    websocket,
-                )
+                self.prediction({
+                    "checkpoint_id": self.chk,
+                    "mosaic": self.timeframe.mosaic
+                }, websocket)
 
         except Exception as e:
             done_processing(self)

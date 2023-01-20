@@ -363,7 +363,6 @@ class API:
             ),
         )
 
-        print(r.text);
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)

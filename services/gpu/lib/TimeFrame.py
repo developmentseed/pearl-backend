@@ -14,12 +14,11 @@ LOGGER = logging.getLogger("server")
 
 
 class TimeFrame:
-    def __init__(self, api, aoi, mosaic, checkpointid, is_patch=False):
+    def __init__(self, api, aoi, tf, is_patch=False):
         self.id = None
 
         self.api = api
         self.zoom = self.api.model["model_zoom"]
-        self.mosaic = mosaic
 
         # AOI Properties
         self.aoi_id = aoi["id"]
@@ -28,14 +27,16 @@ class TimeFrame:
         self.name = aoi["name"]
 
         # TimeFrame Properties
-        self.checkpointid = checkpointid
+        self.checkpointid = tf["checkpoint_id"]
+        self.moasic = tf["mosaic"]
         self.is_patch = is_patch
         self.tiles = []
         self.total = 0
         self.live = False
 
-    def create(api, aoi, checkpointid, is_patch=False):
-        tf = TimeFrame(api, aoi, checkpointid, is_patch)
+    def create(api, aoi, tf, is_patch=False):
+        print(api, tf);
+        tf = TimeFrame(api, aoi, tf, is_patch)
         tf.tiles = TimeFrame.gen_tiles(tf.bounds, tf.zoom)
         tf.total = len(tf.tiles)
 
@@ -61,11 +62,7 @@ class TimeFrame:
         tfjson = api.timeframe_meta(timeframeid)
         aoi = api.aoi_meta(tfjson["aoi_id"])
 
-        tf = TimeFrame(
-            api,
-            aoi,
-            tfjson.get("checkpoint_id"),
-        )
+        tf = TimeFrame(api, aoi, tfjson)
         tf.id = tfjson.get("id")
 
         tf.api.instance_patch(timeframe_id=tf.id)
