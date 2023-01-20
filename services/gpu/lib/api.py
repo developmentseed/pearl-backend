@@ -357,7 +357,8 @@ class API:
             },
             data=json.dumps(
                 {
-                    "checkpoint_id": timeframe.checkpointid
+                    "checkpoint_id": timeframe.checkpointid,
+                    "mosaic": timeframe.mosaic
                 }
             ),
         )
