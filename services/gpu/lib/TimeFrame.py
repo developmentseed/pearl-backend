@@ -14,17 +14,17 @@ LOGGER = logging.getLogger("server")
 
 
 class TimeFrame:
-    def __init__(self, api, poly, name, checkpointid, is_patch=False):
+    def __init__(self, api, aoi, checkpointid, is_patch=False):
         self.id = None
-        self.aoi_id = None
 
         self.api = api
         self.zoom = self.api.model["model_zoom"]
 
         # AOI Properties
-        self.poly = shape(poly)
+        self.aoi_id = aoi["id"]
+        self.poly = shape(aoi["bounds"])
         self.bounds = self.poly.bounds
-        self.name = name
+        self.name = aoi["name"]
 
         # TimeFrame Properties
         self.checkpointid = checkpointid
@@ -33,8 +33,8 @@ class TimeFrame:
         self.total = 0
         self.live = False
 
-    def create(api, poly, name, checkpointid, is_patch=False):
-        tf = TimeFrame(api, poly, name, checkpointid, is_patch)
+    def create(api, aoi, checkpointid, is_patch=False):
+        tf = TimeFrame(api, aoi, checkpointid, is_patch)
         tf.tiles = TimeFrame.gen_tiles(tf.bounds, tf.zoom)
         tf.total = len(tf.tiles)
 
@@ -58,16 +58,14 @@ class TimeFrame:
 
     def load(api, timeframeid):
         tfjson = api.timeframe_meta(aoiid, timeframeid)
-        aoijson = api.aoi_meta(tfjson["aoi_id"])
+        aoi = api.aoi_meta(tfjson["aoi_id"])
 
         tf = TimeFrame(
             api,
-            shape(aoijson.get("bounds")),
-            aoijson.get("name"),
+            aoi,
             tfjson.get("checkpoint_id"),
         )
         tf.id = tfjson.get("id")
-        tf.aoi_id = tfjson.get("aoi_id")
 
         tf.api.instance_patch(timeframe_id=tf.id)
 

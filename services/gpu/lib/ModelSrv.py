@@ -84,8 +84,7 @@ class ModelSrv:
             if body.get("type") == "class":
                 patch = TimeFrame.create(
                     self.api,
-                    body.get("polygon"),
-                    body.get("name", ""),
+                    body,
                     self.chk["id"],
                     is_patch=self.timeframe.id,
                 )
@@ -379,7 +378,7 @@ class ModelSrv:
                 )
 
             self.timeframe = TimeFrame.create(
-                self.api, aoi.get("bounds"), aoi.get("name"), self.chk["id"]
+                self.api, aoi, self.chk["id"]
             )
 
             if websocket is not False:
