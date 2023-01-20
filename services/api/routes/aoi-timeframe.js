@@ -635,4 +635,20 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.get('/timeframe/:timeframeid', {
+        name: 'Machine Timeframe',
+        group: 'TimeFrame',
+        auth: 'user',
+        description: 'Get a TimeFrame without any top level ids - Only an admin can access this endpoint',
+        ':timeframeid': 'integer',
+        res: 'res.TimeFrame.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            await User.is_admin(req);
+
+            return res.json(await TimeFrame.from(config.pool, req.params.timeframeid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }

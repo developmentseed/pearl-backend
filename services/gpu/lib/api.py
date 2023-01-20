@@ -334,8 +334,8 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def timeframe_meta(self, aoiid, timeframeid):
-        url = self.url + "/api/project/" + str(self.project_id) + "/aoi/" + str(aoiid) + "/timeframe" + str(timeframeid)
+    def timeframe_meta(self, timeframeid):
+        url = self.url + "/api/timeframe/" + str(timeframeid)
 
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})

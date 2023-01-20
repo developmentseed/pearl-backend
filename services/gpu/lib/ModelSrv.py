@@ -183,7 +183,7 @@ class ModelSrv:
 
                 color_list = [item["color"] for item in self.model.classes]
 
-                dataset = InferenceDataSet(self.api, self.timeframe.tiles)
+                dataset = InferenceDataSet(self.api, self.timeframe)
                 if torch.cuda.is_available():
                     batch_size = 8
                 else:
@@ -393,7 +393,7 @@ class ModelSrv:
 
             color_list = [item["color"] for item in self.model.classes]
 
-            dataset = InferenceDataSet(self.api, self.timeframe.tiles)
+            dataset = InferenceDataSet(self.api, self.timeframe)
             if torch.cuda.is_available():
                 batch_size = 8
             else:

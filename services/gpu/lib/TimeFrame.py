@@ -58,7 +58,7 @@ class TimeFrame:
         return tf
 
     def load(api, timeframeid):
-        tfjson = api.timeframe_meta(aoiid, timeframeid)
+        tfjson = api.timeframe_meta(timeframeid)
         aoi = api.aoi_meta(tfjson["aoi_id"])
 
         tf = TimeFrame(
