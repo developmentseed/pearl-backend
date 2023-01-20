@@ -7,7 +7,7 @@
     "repository": "git@github.com:developmentseed/lulc-infra",
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
-        "doc": "apidoc -i ./ -f ./routes/ -f index.js -e node_modules --private",
+        "doc": "apidoc -i ./doc",
         "lint": "eslint index.js lib/*.js lib/types/*.js routes/**.js test/**.js",
         "prod": "node --trace-warnings ./index.js --prod",
         "dev": "nodemon -i schema/ -i doc/ ./index.js",
