@@ -1,11 +1,9 @@
+import EventEmitter from 'events';
+import Charm from 'charm';
+import readline from 'readline';
+import fs from 'fs';
 
-
-const EventEmitter = require('events');
-const Charm = require('charm');
-const readline = require('readline');
-const fs = require('fs');
-
-class Progress {
+export class Progress {
     constructor(y, term) {
         this.y = y;
         this.term = term;
@@ -33,7 +31,7 @@ class Progress {
 }
 
 
-class Prompt {
+export class Prompt {
     constructor(y, max_prompt, term) {
         this.max_prompt = max_prompt;
         this.y = y;
@@ -138,7 +136,7 @@ class Prompt {
 }
 
 
-class Term extends EventEmitter {
+export class Term extends EventEmitter {
     constructor(debug = false) {
         readline.emitKeypressEvents(process.stdin);
         process.stdin.setRawMode(true);
@@ -193,7 +191,3 @@ class Term extends EventEmitter {
         }
     }
 }
-
-module.exports = {
-    Term
-};

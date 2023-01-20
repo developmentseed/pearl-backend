@@ -1,26 +1,30 @@
 #! /usr/bin/env node
-'use strict';
 
-const express = require('express');
-const WebSocket = require('ws');
-const jwt = require('jsonwebtoken');
-const Pool = require('./lib/pool');
-const argv = require('minimist')(process.argv, {
+import express from 'express';
+import { WebSocketServer }  from 'ws';
+import jwt from 'jsonwebtoken';
+import Pool from './lib/pool.js';
+import minimist from 'minimist';
+import http from 'http';
+
+const argv = minimist(process.argv, {
     boolean: ['prod', 'help', 'debug']
 });
 
-const Timeout = require('./lib/timeout');
+import Timeout from './lib/timeout.js';
+import Config from './lib/config.js';
 
-const Config = require('./lib/config');
 const app = express();
 
-if (require.main === module) {
-    if (argv.help) return Config.help();
-
-    configure(argv);
+if (import.meta.url === `file://${process.argv[1]}`) {
+    if (argv.help) {
+        Config.help();
+    } else {
+        configure(argv);
+    }
 }
 
-async function configure(argv = {}, cb) {
+export async function configure(argv = {}, cb) {
     try {
         const config = await Config.env(argv);
         return server(argv, config, cb);
@@ -35,7 +39,7 @@ async function configure(argv = {}, cb) {
  * @param {Config} config
  * @param {function} cb
  */
-async function server(argv, config, cb) {
+export async function server(argv, config, cb) {
     const pool = new Pool(config, argv);
 
     app.get('/health', (req, res) => {
@@ -47,12 +51,12 @@ async function server(argv, config, cb) {
 
     await config.api.deactivate();
 
-    const srv = require('http').createServer();
+    const srv = http.createServer();
     srv.timeout = 0;
     srv.keepAliveTimeout = 0;
     srv.on('request', app);
 
-    const wss = new WebSocket.Server({
+    const wss = new WebSocketServer({
         noServer: true,
         verifyClient: ({ req }, cb) => {
             const url = new URL(`http://localhost:${config.Port}` + req.url);
@@ -107,9 +111,3 @@ async function server(argv, config, cb) {
     });
 
 }
-
-module.exports = {
-    Config,
-    configure,
-    server
-};

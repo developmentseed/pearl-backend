@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE instances
             ADD COLUMN last_update TIMESTAMP NOT NULL DEFAULT NOW();
@@ -21,7 +21,7 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE instances
             DROP COLUMN last_update;

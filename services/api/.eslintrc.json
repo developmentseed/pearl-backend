@@ -9,7 +9,8 @@
         "Promise": true
     },
     "parserOptions": {
-        "ecmaVersion": 13
+        "ecmaVersion": 13,
+        "sourceType": "module"
     },
     "plugins": [ "node" ],
     "rules": {

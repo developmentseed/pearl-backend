@@ -1,32 +1,24 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Proxy = require('../lib/proxy');
-const Tiles = require('../lib/tiles');
-const VectorTile = require('@mapbox/vector-tile').VectorTile;
-const Protobuf = require('pbf');
-const zlib = require('zlib');
-const { promisify } = require('util');
-const request = require('request');
+import Err from '@openaddresses/batch-error';
+import Proxy from '../lib/proxy.js';
+import Tiles from '../lib/tiles.js';
+import { VectorTile } from '@mapbox/vector-tile';
+import Protobuf from 'pbf';
+import zlib from 'zlib';
+import { promisify } from 'util';
+import request from 'request';
+import geojsonvt from 'geojson-vt';
+import vtpbf from 'vt-pbf';
+
+const arequest = promisify(request);
 const gunzip = promisify(zlib.gunzip);
 const gzip = promisify(zlib.gzip);
-const arequest = promisify(request);
-const geojsonvt = require('geojson-vt');
-const vtpbf = require('vt-pbf');
 
-async function router(schema, config) {
-    /**
-     * @api {get} /api/tiles
-     * @apiVersion 1.0.0
-     * @apiName ListTiles
-     * @apiGroup Tiles
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a list of all supported Vector Tile Layers
-     *
-     * @apiSchema {jsonschema=../schema/res.Tiles.json} apiSuccess
-     */
+export default async function router(schema, config) {
     await schema.get('/tiles', {
+        name: 'List Tiles',
+        group: 'Tiles',
+        auth: 'user',
+        description: 'Return a list of all supported Vector Tile Layers',
         res: 'res.Tiles.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -36,19 +28,11 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/tiles/:layer TileJSON
-     * @apiVersion 1.0.0
-     * @apiName TileJSONTiles
-     * @apiGroup Tiles
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return a TileJSON for the given layer
-     *
-     * @apiSchema {jsonschema=../schema/res.TileJSON.json} apiSuccess
-     */
     await schema.get('/tiles/:layer', {
+        name: 'TileJSON',
+        group: 'Tiles',
+        auth: 'user',
+        description: 'Return a TileJSON for the given layer',
         ':layer': 'string',
         res: 'res.TileJSON.json'
     }, async (req, res) => {
@@ -70,21 +54,15 @@ async function router(schema, config) {
         }
     });
 
-    /**
-     * @api {get} /api/tiles/:layer/:z/:x/:y.mvt Get MVT
-     * @apiVersion 1.0.0
-     * @apiName GetMVT
-     * @apiGroup Tiles
-     * @apiPermission user
-     *
-     * @apiDescription
-     *     Return an MVT for the given layer
-     *     This endpoint will request the upstream vector tile and parse it in place
-     *     Adding a `feature.properties.@ftype = '<GeoJSON Geometry Type>'` property
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.GetMVT.json} apiParam
-     */
     await schema.get('/tiles/:layer/:z/:x/:y.mvt', {
+        name: 'Get MVT',
+        group: 'Tiles',
+        auth: 'user',
+        description: `
+            Return an MVT for the given layer
+            This endpoint will request the upstream vector tile and parse it in place
+            Adding a \`feature.properties.@ftype = '<GeoJSON Geometry Type>'\` property
+        `,
         query: 'req.query.GetMVT.json',
         ':layer': 'string',
         ':z': 'integer',
@@ -146,5 +124,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

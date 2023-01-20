@@ -1,15 +1,13 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const Ajv = require('ajv');
-const ajv = new Ajv({
-    allErrors: true
-});
+import fs from 'fs';
+import path from 'path';
+import Ajv from 'ajv';
+
+const ajv = new Ajv({ allErrors: true });
 
 /**
  * @class
  */
-class Output {
+export default class Output {
     /**
      * @constructor
      * @param {Object} t Instantiated tape test runner
@@ -17,7 +15,7 @@ class Output {
      */
     constructor(t, input) {
         this.t = t;
-        this.schema = JSON.parse(fs.readFileSync(path.resolve(__dirname, input)));
+        this.schema = JSON.parse(fs.readFileSync(new URL(input, import.meta.url)));
 
         this.fixtures = [];
 
@@ -26,7 +24,7 @@ class Output {
         for (const d of this.schema.data) {
             if (!d.items) d.items = 1;
 
-            if (d.data['$ref']) d.data = JSON.parse(fs.readFileSync(path.resolve(__dirname, './outputs', d.data['$ref'])));
+            if (d.data['$ref']) d.data = JSON.parse(fs.readFileSync((new URL('./outputs/', import.meta.url)).pathname + d.data['$ref']));
 
             for (let i = 0; i < d.items; i++) {
                 this.fixtures.push(d);
@@ -72,5 +70,3 @@ class Output {
         this.log.close();
     }
 }
-
-module.exports = Output;

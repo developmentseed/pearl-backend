@@ -1,6 +1,7 @@
-'use strict';
-const pkg = require('../package.json');
-const test = require('tape');
+import fs from 'fs';
+import test from 'tape';
+
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
 test('Package Locked Deps', (t) => {
 
@@ -8,9 +9,6 @@ test('Package Locked Deps', (t) => {
     // An HTTP header that's mandatory for this request is not specified
     // MissingRequiredHeader - x-ms-blob-type
     t.equals(pkg.dependencies['@azure/storage-blob'], '12.7.0', '@azure/storage-blob === 12.7.0');
-
-    // Node Fetch 3.0 only supports resolution as an ES6 module via import
-    t.equals(pkg.dependencies['node-fetch'], '^2.6.5', 'node-fetch === ^2.6.1');
 
     t.end();
 });

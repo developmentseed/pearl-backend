@@ -1,6 +1,3 @@
-'use strict';
-const fetch = require('node-fetch');
-
 /**
  * Performs a request to the given url returning the response in json format
  * or throwing an error.
@@ -8,7 +5,7 @@ const fetch = require('node-fetch');
  * @param {string} url Url to query
  * @param {object} options Options for fetch
  */
-async function fetchJSON(url, options) {
+export async function fetchJSON(url, options) {
     let response;
     try {
         response = await fetch(url, options);
@@ -27,10 +24,3 @@ async function fetchJSON(url, options) {
         throw error;
     }
 }
-
-
-
-module.exports = {
-    fetchJSON
-};
-

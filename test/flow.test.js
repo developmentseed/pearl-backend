@@ -1,16 +1,17 @@
-'use strict';
-const { Term } = require('./lib/term');
-const WebSocket = require('ws');
-const test = require('tape');
+import { Term } from './lib/term.js';
+import WebSocket from 'ws';
+import test from 'tape';
+import path from 'path';
+import fs from 'fs';
+import LULC from './lib.js';
+import minimist from 'minimist';
+
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'ws://localhost:1999';
-const path = require('path');
-const fs = require('fs');
-const LULC = require('./lib');
 
-const { connect, reconnect } = require('./init');
+import { connect, reconnect } from './init.js';
 
-const argv = require('minimist')(process.argv, {
+const argv = minimist(process.argv, {
     string: ['postgres'],
     boolean: ['interactive', 'debug', 'reconnect'],
     alias: {
@@ -51,7 +52,7 @@ async function gpu() {
     term.prompt.screen(['websockets', 'api']);
     term.on('promp#selection', async (sel) => {
         if (sel.value === 'websockets' || (sel.stats && sel.stats.isDirectory())) {
-            const dir = sel.stats ? sel.value : path.resolve(__dirname, './fixtures/');
+            const dir = sel.stats ? sel.value : new URL('./fixtures/', import.meta.url);
 
             term.prompt.screen(fs.readdirSync(dir).map((f) => {
                 const stats = fs.statSync(path.resolve(dir, f));

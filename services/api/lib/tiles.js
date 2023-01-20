@@ -1,8 +1,7 @@
-'use strict';
 /**
  * @class
  */
-class Tiles {
+export default class Tiles {
     static list() {
         return {
             tiles: [
@@ -11,5 +10,3 @@ class Tiles {
         };
     }
 }
-
-module.exports = Tiles;

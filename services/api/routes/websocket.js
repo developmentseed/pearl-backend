@@ -1,31 +1,23 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const { Err } = require('@openaddresses/batch-schema');
-const $RefParser = require('json-schema-ref-parser');
+import fs from 'fs';
+import path from 'path';
+import Err from '@openaddresses/batch-error';
+import $RefParser from 'json-schema-ref-parser';
 
-async function router(schema) {
+export default async function router(schema) {
     const map = {};
 
-    fs.readdirSync(path.resolve(__dirname, '../schema/websocket')).forEach(async (s) => {
+    fs.readdirSync(new URL('../schema/websocket/', import.meta.url)).forEach(async (s) => {
+        const url = new URL('../schema/websocket/' + s, import.meta.url);
         map[path.parse(s).name] = await $RefParser.dereference(
-            path.resolve(__dirname, '../schema/websocket', s)
+            url.pathname + url.hash
         );
     });
 
-    /**
-     * @api {get} /websocket Schemas
-     * @apiVersion 1.0.0
-     * @apiName Schemas
-     * @apiGroup Websockets
-     * @apiPermission public
-     *
-     * @apiDescription
-     *   Return an object containing all the schemas used by the websocket router
-     *
-     * @apiSchema (Body) {jsonschema=../schema/websocket/model#osm.json} apiParam
-     */
     await schema.get('/websocket', {
+        name: 'Schemas',
+        group: 'Websockets',
+        auth: 'public',
+        description: 'Return an object containing all the schemas used by the websocket router',
         res: 'res.Websocket.json'
     }, async (req, res) => {
         try {
@@ -108,5 +100,3 @@ async function router(schema) {
  *
  * @apiSchema (Body) {jsonschema=../schema/websocket/model#aoi.json} apiParam
  */
-
-module.exports = router;

@@ -1,8 +1,6 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
-const fs = require('fs');
-const path = require('path');
+import test from 'tape';
+import Flight from './flight.js';
+import fs from 'fs';
 
 const flight = new Flight();
 
@@ -27,7 +25,7 @@ test('POST /api/project/1/aoi/1/patch - no project', async (t) => {
         t.equals(res.statusCode, 404, 'status: 404');
         t.deepEquals(res.body, {
             status: 404,
-            message: 'No project found',
+            message: 'projects not found',
             messages: []
         });
 
@@ -104,6 +102,7 @@ test('POST /api/project/1/aoi', async (t) => {
             px_stats: {},
             bounds: {
                 type: 'Polygon',
+                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],
@@ -220,7 +219,7 @@ test('POST: /api/project/1/aoi/1/patch/1/upload', async (t) => {
                 bearer: flight.token.ingalls
             },
             formData : {
-                file : fs.createReadStream(path.resolve(__dirname, './fixtures/asset'))
+                file : fs.createReadStream(new URL('./fixtures/asset', import.meta.url))
             }
         }, t);
 
@@ -342,6 +341,7 @@ test('PATCH /api/project/1/aoi/1', async (t) => {
             name: 'Test AOI',
             bounds: {
                 type: 'Polygon',
+                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],
@@ -473,6 +473,7 @@ test('GET /api/project/1/aoi/1 - should return the classes field updated', async
             px_stats: {},
             bounds: {
                 type: 'Polygon',
+                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],

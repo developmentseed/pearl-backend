@@ -1,6 +1,5 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -81,6 +80,125 @@ test('POST /api/project (Invalid Mosaic)', async (t) => {
     t.end();
 });
 
+test('PATCH /api/model/1 - storage: false, active: false', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: '/api/model/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                storage: false,
+                active: true
+            }
+        }, t);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('POST /api/project - Model not uploaded', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test Project',
+                model_id: 1,
+                mosaic: 'naip.latest'
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message:'Model has not been uploaded',
+            messages:[]
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/model/1 - storage: true, active: false', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: '/api/model/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                storage: true,
+                active: false
+            }
+        }, t);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('POST /api/project - Model not active', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project',
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                name: 'Test Project',
+                model_id: 1,
+                mosaic: 'naip.latest'
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message:'Model has not been set as active',
+            messages:[]
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/model/1 - storage: true, active: true', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: '/api/model/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                storage: true,
+                active: true
+            }
+        }, t);
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('POST /api/project', async (t) => {
     try {
         const res = await flight.request({
@@ -105,7 +223,8 @@ test('POST /api/project', async (t) => {
             uid: 1,
             name: 'Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
 
     } catch (err) {
@@ -164,6 +283,7 @@ test('POST /api/project/1/aoi', async (t) => {
             ],
             bounds: {
                 type: 'Polygon',
+                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
                 coordinates: [[
                     [-79.37724530696869, 38.83428180092151],
                     [-79.37677592039108, 38.83428180092151],
@@ -218,7 +338,7 @@ test('GET /api/project', async (t) => {
                             4
                         ],
                         'model_zoom': 17,
-                        'storage': false,
+                        'storage': true,
                         'classes': [
                             {
                                 'name': 'Water',
@@ -280,7 +400,8 @@ test('POST /api/project (sort)', async (t) => {
             uid: 1,
             name: 'LULC Test Project',
             model_id: 1,
-            mosaic: 'naip.latest'
+            mosaic: 'naip.latest',
+            model_name: 'NAIP Supervised'
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -343,7 +464,7 @@ test('GET /api/project?name=lulc', async (t) => {
                             4
                         ],
                         'model_zoom': 17,
-                        'storage': false,
+                        'storage': true,
                         'classes': [
                             {
                                 'name': 'Water',

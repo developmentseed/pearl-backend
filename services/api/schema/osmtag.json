@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./osmtag/id.json"
+        },
+        "tagmap": {
+            "$ref": "./osmtag/tagmap.json"
+        },
+        "created": {
+            "$ref": "./osmtag/created.json"
+        },
+        "updated": {
+            "$ref": "./osmtag/updated.json"
+        },
+        "project_id": {
+            "$ref": "./osmtag/project_id.json"
+        }
+    },
+    "required": [
+        "id",
+        "tagmap",
+        "created",
+        "updated",
+        "project_id"
+    ]
+}

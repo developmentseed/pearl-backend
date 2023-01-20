@@ -1,5 +1,4 @@
-'use strict';
-const CP = require('child_process');
+import CP from 'child_process';
 
 /**
  * Spin up a CPU based GPU worker for tests
@@ -14,7 +13,7 @@ const CP = require('child_process');
  * @param {String} [opts.tiler='http://tiler:8000'] TiTiler to connect to
  * @param {String} [opts.pctiler='https://planetarycomputer-staging.microsoft.com'] PlanetaryComputer tiler to connect to
  */
-class Worker {
+export default class Worker {
     constructor(test, opts = {}) {
         if (!opts.instance) opts.instance = 1;
         if (!opts.socket) opts.socket = 'ws://socket:1999';
@@ -88,5 +87,3 @@ class Worker {
             .forEach((e) => CP.execSync(`docker kill ${e}`));
     }
 }
-
-module.exports = Worker;

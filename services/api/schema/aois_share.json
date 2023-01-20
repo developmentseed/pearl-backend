@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "aoi_id": {
+            "$ref": "./aois_share/aoi_id.json"
+        },
+        "project_id": {
+            "$ref": "./aois_share/project_id.json"
+        },
+        "bounds": {
+            "$ref": "./aois_share/bounds.json"
+        },
+        "created": {
+            "$ref": "./aois_share/created.json"
+        },
+        "storage": {
+            "$ref": "./aois_share/storage.json"
+        },
+        "uuid": {
+            "$ref": "./aois_share/uuid.json"
+        },
+        "patches": {
+            "$ref": "./aois_share/patches.json"
+        }
+    },
+    "required": [
+        "aoi_id",
+        "project_id",
+        "bounds",
+        "created",
+        "storage",
+        "uuid",
+        "patches"
+    ]
+}

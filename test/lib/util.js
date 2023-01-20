@@ -1,15 +1,17 @@
-const { promisify } = require('util');
-const request = promisify(require('request'));
-const fs = require('fs');
-const path = require('path');
+import { promisify } from 'util';
+import request from 'request';
+import fs from 'fs';
+import path from 'path';
 
-function local_schema() {
-    const local = JSON.parse(fs.readFileSync(path.resolve(__dirname, './schema.json')));
+const prequest = promisify(request);
+
+export function local_schema() {
+    const local = JSON.parse(fs.readFileSync(new URL('./schema.json', import.meta.url)));
     return local;
 }
 
-async function schema(url) {
-    const res = await request({
+export default async function schema(url) {
+    const res = await prequest({
         json: true,
         method: 'GET',
         url: new URL(`/api/schema`, url)
@@ -20,13 +22,7 @@ async function schema(url) {
     const local = local_schema();
     local.schema = res.body;
 
-    fs.writeFileSync(path.resolve(__dirname, './schema.json'), JSON.stringify(local, null, 4));
+    fs.writeFileSync(new URL('./schema.json', import.meta.url), JSON.stringify(local, null, 4));
 
     return local;
 }
-
-module.exports = {
-    schema,
-    local_schema
-};
-

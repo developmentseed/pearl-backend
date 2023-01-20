@@ -1,8 +1,7 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const WebSocket = require('ws');
-const test = require('tape');
+import fs from 'fs';
+import path from 'path';
+import WebSocket from 'ws';
+import test from 'tape';
 
 const API = process.env.API || 'http://localhost:2000';
 const SOCKET = process.env.SOCKET || 'ws://localhost:1999';
@@ -10,9 +9,9 @@ const SOCKET = process.env.SOCKET || 'ws://localhost:1999';
 // Top level tests are only designed to run with docker-compose
 process.env.Postgres = process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis';
 
-const { connect } = require('./init');
-const Worker = require('./worker');
-const Output = require('./output');
+import { connect } from './init.js';
+import Worker from './worker.js';
+import Output from './output.js';
 
 Worker.dalek();
 
@@ -45,11 +44,11 @@ test('gpu connection', (t) => {
 
         if (msg.message === 'info#connected' && !sent) {
             t.ok('Sending: model#prediction (1)');
-            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#prediction.json')));
+            ws.send(fs.readFileSync((new URL('./fixtures/seneca-rocks/', import.meta.url)).pathname + 'model#prediction.json'));
             sent = true;
         } else if (msg.message === 'model#prediction#complete' && !sent_retrain) {
             t.ok('Sending: model#retrain (1)');
-            ws.send(fs.readFileSync(path.resolve(__dirname, './fixtures/seneca-rocks/model#retrain.json')));
+            ws.send(fs.readFileSync((new URL('./fixtures/seneca-rocks/', import.meta.url)).pathname + 'model#retrain.json'));
             sent_retrain = true;
         }
 

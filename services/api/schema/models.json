@@ -1,0 +1,60 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./models/id.json"
+        },
+        "created": {
+            "$ref": "./models/created.json"
+        },
+        "active": {
+            "$ref": "./models/active.json"
+        },
+        "uid": {
+            "$ref": "./models/uid.json"
+        },
+        "name": {
+            "$ref": "./models/name.json"
+        },
+        "model_type": {
+            "$ref": "./models/model_type.json"
+        },
+        "model_zoom": {
+            "$ref": "./models/model_zoom.json"
+        },
+        "model_inputshape": {
+            "$ref": "./models/model_inputshape.json"
+        },
+        "storage": {
+            "$ref": "./models/storage.json"
+        },
+        "classes": {
+            "$ref": "./models/classes.json"
+        },
+        "meta": {
+            "$ref": "./models/meta.json"
+        },
+        "bounds": {
+            "$ref": "./models/bounds.json"
+        },
+        "osmtag_id": {
+            "$ref": "./models/osmtag_id.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "active",
+        "uid",
+        "name",
+        "model_type",
+        "model_zoom",
+        "model_inputshape",
+        "storage",
+        "classes",
+        "meta",
+        "bounds",
+        "osmtag_id"
+    ]
+}
