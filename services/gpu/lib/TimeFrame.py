@@ -28,15 +28,15 @@ class TimeFrame:
 
         # TimeFrame Properties
         self.checkpointid = tf["checkpoint_id"]
-        self.moasic = tf["mosaic"]
+        self.mosaic = tf["mosaic"]
         self.is_patch = is_patch
         self.tiles = []
         self.total = 0
         self.live = False
 
     def create(api, aoi, tf, is_patch=False):
-        print(api, tf);
         tf = TimeFrame(api, aoi, tf, is_patch)
+        print(tf.mosaic);
         tf.tiles = TimeFrame.gen_tiles(tf.bounds, tf.zoom)
         tf.total = len(tf.tiles)
 

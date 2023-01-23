@@ -376,6 +376,7 @@ class ModelSrv:
                     websocket,
                 )
 
+            print(body)
             self.timeframe = TimeFrame.create(
                 self.api, aoi, {
                     "mosaic": body["mosaic"],
