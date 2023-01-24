@@ -204,6 +204,11 @@ async function gpu() {
             } else if (msg.message === 'model#aborted') {
                 term.log('ok - model#aborted');
                 term.prog.update();
+            } else if (msg.message === 'model#retrain#progress') {
+                term.prog.update('model#retrain', msg.data.processed / msg.data.total);
+            } else if (msg.message === 'model#retrain#complete') {
+                term.prog.update('model#retrain#complete');
+                term.prog.update();
             } else if (msg.message === 'model#status') {
                 term.log(JSON.stringify(msg.data, null, 4));
             } else {

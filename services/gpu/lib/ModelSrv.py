@@ -77,13 +77,17 @@ class ModelSrv:
                 done_processing(self)
                 return
 
-            # TODO Create AOI
+            aoi = {
+                "bounds": body["polygon"]
+            }
 
+            # TODO Create AOI
+            print('TIMEFRAME', self.timeframe);
             if body.get("type") == "class":
                 patch = TimeFrame.create(
                     self.api,
-                    body,
-                    {"aoi_id": self.timeframe.aoi_id, "mosaic": self.timeframe.mosaic},
+                    aoi,
+                    {"id": self.timeframe.id, "checkpoint_id": self.timeframe.checkpoint_id, "mosaic": self.timeframe.mosaic},
                     is_patch=self.timeframe.id,
                 )
 
@@ -164,15 +168,11 @@ class ModelSrv:
                 current_checkpoint = self.chk["id"]
                 self.meta_load_checkpoint(body["checkpoint_id"])
 
-                aoi = self.api.create_aoi({
-                    "name": "Manual Checkpoint Patch",
-                    "bounds": body["polygon"]
-                })
-
                 patch = TimeFrame.create(
                     self.api,
                     aoi,
                     {
+                        "id": self.timeframe.id,
                         "checkpoint_id": body["checkpoint_id"],
                         "mosaic": self.timeframe.mosaic,
                     },

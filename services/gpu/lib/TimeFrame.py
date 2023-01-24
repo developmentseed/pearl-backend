@@ -15,16 +15,16 @@ LOGGER = logging.getLogger("server")
 
 class TimeFrame:
     def __init__(self, api, aoi, tf, is_patch=False):
-        self.id = None
+        self.id = tf.get("id")
 
         self.api = api
         self.zoom = self.api.model["model_zoom"]
 
         # AOI Properties
-        self.aoi_id = aoi["id"]
+        self.aoi_id = aoi.get("id")
         self.poly = shape(aoi["bounds"])
         self.bounds = self.poly.bounds
-        self.name = aoi["name"]
+        self.name = aoi.get("name", "Default Name")
 
         # TimeFrame Properties
         self.checkpointid = tf["checkpoint_id"]
