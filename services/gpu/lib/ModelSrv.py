@@ -11,13 +11,7 @@ from .TimeFrame import TimeFrame
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
 from .osm import OSM
-from .utils import (
-    generate_random_points,
-    geom2px,
-    geom2coords,
-    pred2png,
-    pxs2geojson
-)
+from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson
 
 LOGGER = logging.getLogger("server")
 
@@ -35,7 +29,9 @@ class ModelSrv:
             self.meta_load_checkpoint(self.api.instance.get("checkpoint_id"))
 
         if api.instance.get("timeframe_id") is not None:
-            self.timeframe = TimeFrame.load(self.api, self.api.instance.get("timeframe_id"))
+            self.timeframe = TimeFrame.load(
+                self.api, self.api.instance.get("timeframe_id")
+            )
 
         if api.batch is not False:
             self.prediction(
@@ -83,10 +79,10 @@ class ModelSrv:
 
             if body.get("type") == "class":
                 patch = TimeFrame.create(
-                    self.api, body, {
-                        "checkpoint_id": self.chk["id"],
-                        "mosaic": self.timeframe.mosaic
-                    }, is_patch=self.timeframe.id
+                    self.api,
+                    body,
+                    {"checkpoint_id": self.chk["id"], "mosaic": self.timeframe.mosaic},
+                    is_patch=self.timeframe.id,
                 )
 
                 websocket.send(
@@ -166,11 +162,16 @@ class ModelSrv:
                 current_checkpoint = self.chk["id"]
                 self.meta_load_checkpoint(body["checkpoint_id"])
 
+                body["id"] = self.timeframe.aoi_id
+                body["bounds"] = body["polygon"]
                 patch = TimeFrame.create(
-                    self.api, body, {
-                        "checkpoint_id": self.chk["id"],
-                        "mosaic": self.timeframe.mosaic
-                    }, is_patch=self.timeframe.id
+                    self.api,
+                    body,
+                    {
+                        "checkpoint_id": body["checkpoint_id"],
+                        "mosaic": self.timeframe.mosaic,
+                    },
+                    is_patch=self.timeframe.id,
                 )
                 websocket.send(
                     json.dumps(
@@ -303,7 +304,10 @@ class ModelSrv:
 
             websocket.send(
                 json.dumps(
-                    {"message": "model#timeframe#complete", "data": {"timeframe": self.timeframe.id}}
+                    {
+                        "message": "model#timeframe#complete",
+                        "data": {"timeframe": self.timeframe.id},
+                    }
                 )
             )
 
@@ -378,10 +382,9 @@ class ModelSrv:
 
             print(body)
             self.timeframe = TimeFrame.create(
-                self.api, aoi, {
-                    "mosaic": body["mosaic"],
-                    "checkpoint_id": self.chk["id"]
-                }
+                self.api,
+                aoi,
+                {"mosaic": body["mosaic"], "checkpoint_id": self.chk["id"]},
             )
 
             if websocket is not False:
@@ -469,7 +472,9 @@ class ModelSrv:
                             )
                         )
                     else:
-                        new_prog = int(float(current) / float(self.timeframe.total) * 100)
+                        new_prog = int(
+                            float(current) / float(self.timeframe.total) * 100
+                        )
 
                         if progress != new_prog:
                             res = self.api.batch_patch({"progress": new_prog})
@@ -477,7 +482,9 @@ class ModelSrv:
                             progress = new_prog
 
                             if res.get("abort") is True:
-                                res = self.api.batch_patch({"progress": 0, "completed": False})
+                                res = self.api.batch_patch(
+                                    {"progress": 0, "completed": False}
+                                )
                                 done_processing(self)
                                 LOGGER.info("ok - prediction aborted")
                                 sys.exit()
@@ -544,11 +551,14 @@ class ModelSrv:
 
             done_processing(self)
 
-            self.retrain({
-                "name": body.get("name"),
-                "classes": body.get("classes"),
-                "bounds": body.get("bounds")
-            }, websocket)
+            self.retrain(
+                {
+                    "name": body.get("name"),
+                    "classes": body.get("classes"),
+                    "bounds": body.get("bounds"),
+                },
+                websocket,
+            )
 
         except Exception as e:
             done_processing(self)
@@ -607,7 +617,12 @@ class ModelSrv:
             curr = 0
             for cls in body["classes"]:
                 cls["retrain_geometry"] = geom2px(
-                    cls["retrain_geometry"], self, websocket, total, curr, body.get('bounds')
+                    cls["retrain_geometry"],
+                    self,
+                    websocket,
+                    total,
+                    curr,
+                    body.get("bounds"),
                 )
 
                 curr += len(cls["retrain_geometry"])
@@ -649,10 +664,10 @@ class ModelSrv:
             done_processing(self)
 
             if self.timeframe is not None:
-                self.prediction({
-                    "checkpoint_id": self.chk,
-                    "mosaic": self.timeframe.mosaic
-                }, websocket)
+                self.prediction(
+                    {"checkpoint_id": self.chk, "mosaic": self.timeframe.mosaic},
+                    websocket,
+                )
 
         except Exception as e:
             done_processing(self)

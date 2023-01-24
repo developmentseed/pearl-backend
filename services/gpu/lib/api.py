@@ -26,13 +26,13 @@ tiler = tileschemes.WebMercator()
 
 
 AVAILABLE_MOSAICS = {
-    'naip.latest': {
-        'id': '87b72c66331e136e088004fba817e3e8',
-        'default_params': {
-            'assets': 'image',
-            'asset_bidx': 'image|1,2,3,4',
-            'collection': 'naip',
-        }
+    "naip.latest": {
+        "id": "87b72c66331e136e088004fba817e3e8",
+        "default_params": {
+            "assets": "image",
+            "asset_bidx": "image|1,2,3,4",
+            "collection": "naip",
+        },
     }
 }
 
@@ -346,7 +346,14 @@ class API:
         return r.json()
 
     def create_timeframe(self, timeframe):
-        url = self.url + "/api/project/" + str(self.project_id) + "/aoi/" + str(timeframe.aoi_id) + "/timeframe"
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/aoi/"
+            + str(timeframe.aoi_id)
+            + "/timeframe"
+        )
 
         LOGGER.info("ok - POST " + url)
         r = self.requests.post(
@@ -356,10 +363,7 @@ class API:
                 "content-type": "application/json",
             },
             data=json.dumps(
-                {
-                    "checkpoint_id": timeframe.checkpointid,
-                    "mosaic": timeframe.mosaic
-                }
+                {"checkpoint_id": timeframe.checkpointid, "mosaic": timeframe.mosaic}
             ),
         )
 
@@ -424,12 +428,15 @@ class API:
         params = _mosaic.get("default_params", {})
         params.update(
             {
-                'return_mask': False,
-                'buffer': buffer,
+                "return_mask": False,
+                "buffer": buffer,
             }
         )
 
-        url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
+        url = (
+            os.environ["PcTileUrl"]
+            + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
+        )
 
         if iformat == "npy":
             tmpfs = "{}/tiles/{}-{}-{}.{}".format(self.tmp_dir, x, y, z, iformat)

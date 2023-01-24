@@ -16,7 +16,8 @@ const state = {
     token: false,
     instance: false,
     checkpoints: [],
-    aois: []
+    aois: [],
+    timeframes: []
 };
 
 export function reconnect(test, API) {

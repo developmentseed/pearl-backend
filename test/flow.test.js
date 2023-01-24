@@ -176,14 +176,14 @@ async function gpu() {
                 term.log(`ok - model#checkpoint#complete - ${msg.data.checkpoint}`);
                 term.prog.update();
             } else if (msg.message === 'model#timeframe#progress') {
-                term.log(`ok - model#timeframe#progress - ${msg.data.aoi}`);
+                term.log(`ok - model#timeframe#progress - ${msg.data.timeframe}`);
                 term.prog.update('model#timeframe', 0);
             } else if (msg.message === 'model#timeframe#complete') {
-                term.log(`ok - model#timeframe#complete - ${msg.data.aoi}`);
+                term.log(`ok - model#timeframe#complete - ${msg.data.timeframe}`);
                 term.prog.update();
             } else if (msg.message === 'model#timeframe') {
                 term.log(`ok - model#timeframe - ${msg.data.name} - chkpt: ${msg.data.checkpoint_id}`);
-                state.aois.push(msg.data);
+                state.timeframes.push(msg.data);
                 term.prog.update('model#prediction', 0);
             } else if (msg.message === 'model#patch') {
                 term.log(`ok - model#patch - ${msg.data.id}`);

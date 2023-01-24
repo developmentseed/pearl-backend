@@ -36,14 +36,16 @@ class TimeFrame:
 
     def create(api, aoi, tf, is_patch=False):
         tf = TimeFrame(api, aoi, tf, is_patch)
-        print(tf.mosaic);
+        print(tf.mosaic)
         tf.tiles = TimeFrame.gen_tiles(tf.bounds, tf.zoom)
         tf.total = len(tf.tiles)
 
         LOGGER.info("ok - " + str(tf.total) + " tiles queued")
 
         tf.bounds = TimeFrame.gen_bounds(tf.tiles)
-        LOGGER.info("ok - [" + ",".join(str(x) for x in tf.bounds) + "] timeframe bounds")
+        LOGGER.info(
+            "ok - [" + ",".join(str(x) for x in tf.bounds) + "] timeframe bounds"
+        )
 
         # TODO Check Max size too
         tf.live = TimeFrame.area(tf.bounds) < tf.api.server["limits"]["live_inference"]
@@ -85,7 +87,7 @@ class TimeFrame:
                 if self.is_patch is not False:
                     self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
                 else:
-                    self.api.upload_aoi(self.id, self.raw_fabric)
+                    self.api.upload_timeframe(self.aoi_id, self.id, self.raw_fabric)
             except Exception as e:
                 LOGGER.error("Error: {0}".format(e))
                 traceback.print_exc()
