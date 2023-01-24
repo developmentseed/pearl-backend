@@ -199,7 +199,7 @@ async function gpu() {
             } else if (msg.message === 'model#prediction') {
                 term.prog.update('model#prediction', msg.data.processed / msg.data.total);
             } else if (msg.message === 'model#prediction#complete') {
-                term.log(`ok - model#prediction#complete - ${msg.data.aoi}`);
+                term.log(`ok - model#prediction#complete - ${msg.data.timeframe}`);
                 term.prog.update();
             } else if (msg.message === 'model#aborted') {
                 term.log('ok - model#aborted');
