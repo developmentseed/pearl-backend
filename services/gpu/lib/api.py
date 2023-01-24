@@ -345,6 +345,31 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
+    def create_aoi(self, aoi):
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/aoi"
+        )
+
+        LOGGER.info("ok - POST " + url)
+        r = self.requests.post(
+            url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json",
+            },
+            data=json.dumps(
+                {"name": aoi["name"], "bounds": aoi["bounds"]}
+            ),
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_timeframe(self, timeframe):
         url = (
             self.url

@@ -96,7 +96,7 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1, bounds=None):
             pixels = rowcol(transform, *xy)
 
             in_memraster = modelsrv.api.get_tile(
-                modelsrv.tiemframe.mosaic, xyz.z, xyz.x, xyz.y, iformat="npy"
+                modelsrv.timeframe.mosaic, xyz.z, xyz.x, xyz.y, iformat="npy"
             )
 
             retrain = modelsrv.model.run(in_memraster.data)

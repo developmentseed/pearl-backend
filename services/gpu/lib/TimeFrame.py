@@ -36,7 +36,6 @@ class TimeFrame:
 
     def create(api, aoi, tf, is_patch=False):
         tf = TimeFrame(api, aoi, tf, is_patch)
-        print(tf.mosaic)
         tf.tiles = TimeFrame.gen_tiles(tf.bounds, tf.zoom)
         tf.total = len(tf.tiles)
 
@@ -51,7 +50,7 @@ class TimeFrame:
         tf.live = TimeFrame.area(tf.bounds) < tf.api.server["limits"]["live_inference"]
 
         if tf.is_patch is not False:
-            tf.id = tf.api.create_patch(is_patch)["id"]
+            tf.id = tf.api.create_patch(is_patch, tf.id)["id"]
         else:
             tf.id = tf.api.create_timeframe(tf)["id"]
             tf.api.instance_patch(timeframe_id=tf.id)

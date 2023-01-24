@@ -77,11 +77,13 @@ class ModelSrv:
                 done_processing(self)
                 return
 
+            # TODO Create AOI
+
             if body.get("type") == "class":
                 patch = TimeFrame.create(
                     self.api,
                     body,
-                    {"checkpoint_id": self.chk["id"], "mosaic": self.timeframe.mosaic},
+                    {"aoi_id": self.timeframe.aoi_id, "mosaic": self.timeframe.mosaic},
                     is_patch=self.timeframe.id,
                 )
 
@@ -162,11 +164,14 @@ class ModelSrv:
                 current_checkpoint = self.chk["id"]
                 self.meta_load_checkpoint(body["checkpoint_id"])
 
-                body["id"] = self.timeframe.aoi_id
-                body["bounds"] = body["polygon"]
+                aoi = self.api.create_aoi({
+                    "name": "Manual Checkpoint Patch",
+                    "bounds": body["polygon"]
+                })
+
                 patch = TimeFrame.create(
                     self.api,
-                    body,
+                    aoi,
                     {
                         "checkpoint_id": body["checkpoint_id"],
                         "mosaic": self.timeframe.mosaic,
@@ -571,6 +576,11 @@ class ModelSrv:
                 return is_processing(websocket)
             self.processing = True
 
+            if self.timeframe is None:
+                websocket.error("Cannot Retrain as no TimeFrame is loaded")
+                done_processing(self)
+                return
+
             LOGGER.info("ok - starting retrain")
 
             total = 0
@@ -665,7 +675,7 @@ class ModelSrv:
 
             if self.timeframe is not None:
                 self.prediction(
-                    {"checkpoint_id": self.chk, "mosaic": self.timeframe.mosaic},
+                    {"aoi_id": self.timeframe.aoi_id, "mosaic": self.timeframe.mosaic},
                     websocket,
                 )
 
