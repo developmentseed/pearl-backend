@@ -196,9 +196,7 @@ export default async function server(config) {
      */
     config.requiresAuth = [
         (req, res, next) => {
-            console.log('req', req.headers.authorization);
             if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-                console.log('TOKEN bearer')
                 const token = req.headers.authorization.split(' ')[1];
 
                 // Self-signed tokens are prefixed with 'api.'
@@ -214,8 +212,6 @@ export default async function server(config) {
                     };
                 }
 
-                console.log('req.jwt', req.jwt);
-                console.log('validateAuth0Token', validateAuth0Token(req, res, next));
                 req.jwt.type === 'auth0' ? validateAuth0Token(req, res, next) : validateApiToken(req, res, next);
             } else {
                 return Err.respond(new Err(401, null, 'Authentication Required'), res);
@@ -236,15 +232,12 @@ export default async function server(config) {
         },
         async (req, res, next) => {
             if (req.jwt.type === 'auth0') {
-                console.log('CHECKING auth0')
                 try {
                     // Load user from database, if exists
                     const user = await User.from(config.pool, req.user.sub, 'auth0_id');
-                    console.log('user', user)
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
-                    console.log('create user')
                     const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
                         method: 'GET',
                         headers: {
