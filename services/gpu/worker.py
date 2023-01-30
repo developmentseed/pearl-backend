@@ -75,7 +75,9 @@ def main():
     )
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], "dev-secret")
     os.environ["TileUrl"] = arg([os.environ.get("TileUrl")], "http://localhost:8000")
-    os.environ["PcTileUrl"] = arg([os.environ.get("PcTileUrl")], "https://planetarycomputer-staging.microsoft.com")
+    os.environ["PcTileUrl"] = arg(
+        [os.environ.get("PcTileUrl")], "https://planetarycomputer-staging.microsoft.com"
+    )
 
     api = API(os.environ["API"], os.environ["INSTANCE_ID"])
 
@@ -105,7 +107,7 @@ def connection(uri, model, api):
         router.on_act("model#osm", model.osm)
         router.on_act("model#retrain", model.retrain)
         router.on_act("model#checkpoint", model.load_checkpoint)
-        router.on_act("model#aoi", model.load_aoi)
+        router.on_act("model#timeframe", model.load_timeframe)
 
     router.on_act("model#status", model.status)
 

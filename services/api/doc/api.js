@@ -1231,16 +1231,16 @@ Note: this will not affect currently running instances of the model
 
 
 /**
-* @api {get} /mosaic/:layer Get TileJSON
+* @api {get} /mosaic/:mosaic Get TileJSON
 * @apiVersion 1.0.0
-* @apiName GET-/mosaic/:layer
+* @apiName GET-/mosaic/:mosaic
 * @apiGroup Mosaic
 * @apiPermission public
 *
 * @apidescription
 *   Return a TileJSON object for a given mosaic layer
 *
-* @apiParam {string} layer param
+* @apiParam {string} mosaic param
 *
 *
 *

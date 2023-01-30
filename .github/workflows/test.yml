@@ -21,8 +21,8 @@ jobs:
       - name: Docker Pull
         run: docker-compose pull
 
-     - uses: actions/setup-node@v3
-       with:
+      - uses: actions/setup-node@v3
+        with:
          node-version: 18
 
       - name: Run Test

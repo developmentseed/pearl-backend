@@ -1,20 +1,19 @@
 import { promisify } from 'util';
 import request from 'request';
 import fs from 'fs';
-import path from 'path';
 
 const prequest = promisify(request);
 
-export function local_schema() {
+function local_schema() {
     const local = JSON.parse(fs.readFileSync(new URL('./schema.json', import.meta.url)));
     return local;
 }
 
-export default async function schema(url) {
+async function schema(url) {
     const res = await prequest({
         json: true,
         method: 'GET',
-        url: new URL(`/api/schema`, url)
+        url: new URL('/api/schema', url)
     });
 
     if (res.statusCode !== 200) throw new Error(res.body.message ? res.body.message : res.body);
@@ -26,3 +25,8 @@ export default async function schema(url) {
 
     return local;
 }
+
+export default {
+    schema,
+    local_schema
+};

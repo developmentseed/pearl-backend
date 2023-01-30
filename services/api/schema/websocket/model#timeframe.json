@@ -9,7 +9,7 @@
         "action": {
             "type": "string",
             "enum": [
-                "model#aoi"
+                "model#timeframe"
             ]
         },
         "data": {
@@ -21,7 +21,7 @@
             "properties": {
                 "id": {
                     "type": "integer",
-                    "description": "AOI ID to load"
+                    "description": "TimeFrame ID to load"
                 }
             }
         }
