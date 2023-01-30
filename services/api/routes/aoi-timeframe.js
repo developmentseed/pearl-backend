@@ -9,7 +9,7 @@ import TimeFrameShare from '../lib/types/aoi-timeframe-share.js';
 import Proxy from '../lib/proxy.js';
 import User from '../lib/types/user.js';
 import { sql } from 'slonik';
-import Mosaic from '../lib/mosaic.js';
+import Mosaic from '../lib/types/mosaic.js';
 
 export default async function router(schema, config) {
     const getAoiTileJSON = async (timeframe, req) => {
@@ -333,7 +333,14 @@ export default async function router(schema, config) {
         try {
             await AOI.has_auth(config.pool, req);
 
-            if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
+            try {
+                await Mosaic.from(config.pool, req.body.mosaic, {
+                    column: 'name'
+                });
+            } catch (err) {
+                console.error(err);
+                throw new Err(400, null, 'Invalid Mosaic');
+            }
 
             req.body.aoi_id = req.params.aoiid;
 
@@ -628,4 +635,20 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.get('/timeframe/:timeframeid', {
+        name: 'Machine Timeframe',
+        group: 'TimeFrame',
+        auth: 'user',
+        description: 'Get a TimeFrame without any top level ids - Only an admin can access this endpoint',
+        ':timeframeid': 'integer',
+        res: 'res.TimeFrame.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            await User.is_admin(req);
+
+            return res.json(await TimeFrame.from(config.pool, req.params.timeframeid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }

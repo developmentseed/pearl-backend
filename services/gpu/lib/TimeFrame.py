@@ -13,56 +13,62 @@ from shapely.geometry import box, shape
 LOGGER = logging.getLogger("server")
 
 
-class AOI:
-    def __init__(self, api, poly, name, checkpointid, is_patch=False):
+class TimeFrame:
+    def __init__(self, api, aoi, tf, is_patch=False):
+        self.id = tf.get("id")
+
         self.api = api
-        self.poly = shape(poly)
-        self.bounds = self.poly.bounds
-        self.name = name
-        self.checkpointid = checkpointid
-        self.is_patch = is_patch
         self.zoom = self.api.model["model_zoom"]
+
+        # AOI Properties
+        self.aoi_id = aoi.get("id")
+        self.poly = shape(aoi["bounds"])
+        self.bounds = self.poly.bounds
+        self.name = aoi.get("name", "Default Name")
+
+        # TimeFrame Properties
+        self.checkpointid = tf["checkpoint_id"]
+        self.mosaic = tf["mosaic"]
+        self.is_patch = is_patch
         self.tiles = []
         self.total = 0
         self.live = False
 
-    def create(api, poly, name, checkpointid, is_patch=False):
-        aoi = AOI(api, poly, name, checkpointid, is_patch)
-        aoi.tiles = AOI.gen_tiles(aoi.bounds, aoi.zoom)
-        aoi.total = len(aoi.tiles)
+    def create(api, aoi, tf, is_patch=False):
+        tf = TimeFrame(api, aoi, tf, is_patch)
+        tf.tiles = TimeFrame.gen_tiles(tf.bounds, tf.zoom)
+        tf.total = len(tf.tiles)
 
-        LOGGER.info("ok - " + str(aoi.total) + " tiles queued")
+        LOGGER.info("ok - " + str(tf.total) + " tiles queued")
 
-        aoi.bounds = AOI.gen_bounds(aoi.tiles)
-        LOGGER.info("ok - [" + ",".join(str(x) for x in aoi.bounds) + "] aoi bounds")
+        tf.bounds = TimeFrame.gen_bounds(tf.tiles)
+        LOGGER.info(
+            "ok - [" + ",".join(str(x) for x in tf.bounds) + "] timeframe bounds"
+        )
 
         # TODO Check Max size too
-        aoi.live = AOI.area(aoi.bounds) < aoi.api.server["limits"]["live_inference"]
+        tf.live = TimeFrame.area(tf.bounds) < tf.api.server["limits"]["live_inference"]
 
-        if aoi.is_patch is not False:
-            aoi.id = aoi.api.create_patch(is_patch)["id"]
+        if tf.is_patch is not False:
+            tf.id = tf.api.create_patch(is_patch, tf.id)["id"]
         else:
-            aoi.id = aoi.api.create_aoi(aoi)["id"]
-            aoi.api.instance_patch(aoi_id=aoi.id)
+            tf.id = tf.api.create_timeframe(tf)["id"]
+            tf.api.instance_patch(timeframe_id=tf.id)
 
-        aoi.extrema, aoi.raw_fabric, aoi.fabric = AOI.gen_fabric(aoi.bounds, aoi.zoom)
+        tf.extrema, tf.raw_fabric, tf.fabric = TimeFrame.gen_fabric(tf.bounds, tf.zoom)
 
-        return aoi
+        return tf
 
-    def load(api, aoiid):
-        aoijson = api.aoi_meta(aoiid)
+    def load(api, timeframeid):
+        tfjson = api.timeframe_meta(timeframeid)
+        aoi = api.aoi_meta(tfjson["aoi_id"])
 
-        aoi = AOI(
-            api,
-            shape(aoijson.get("bounds")),
-            aoijson.get("name"),
-            aoijson.get("checkpoint_id"),
-        )
-        aoi.id = aoijson.get("id")
+        tf = TimeFrame(api, aoi, tfjson)
+        tf.id = tfjson.get("id")
 
-        aoi.api.instance_patch(aoi_id=aoi.id)
+        tf.api.instance_patch(timeframe_id=tf.id)
 
-        return aoi
+        return tf
 
     def add_to_fabric(self, fragment):
         data = np.moveaxis(fragment.data, -1, 0)
@@ -80,7 +86,7 @@ class AOI:
                 if self.is_patch is not False:
                     self.api.upload_patch(self.is_patch, self.id, self.raw_fabric)
                 else:
-                    self.api.upload_aoi(self.id, self.raw_fabric)
+                    self.api.upload_timeframe(self.aoi_id, self.id, self.raw_fabric)
             except Exception as e:
                 LOGGER.error("Error: {0}".format(e))
                 traceback.print_exc()

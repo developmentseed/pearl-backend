@@ -25,27 +25,23 @@ export default async function run(api, schema, method, url, payload, stream = fa
 
     if (schema.body) req.body = payload;
 
-    try {
-        if (stream) {
-            return request(req).pipe(stream);
-        } else {
-            const res = await arequest(req);
+    if (stream) {
+        return request(req).pipe(stream);
+    } else {
+        const res = await arequest(req);
 
-            if (res.statusCode !== 200) {
-                if (typeof res.body === 'object') {
-                    if (res.body.message) {
-                        throw new Error(res.statusCode, ': ' + res.body.message);
-                    } else {
-                        throw new Error(res.statusCode, ': ' + 'No .message');
-                    }
+        if (res.statusCode !== 200) {
+            if (typeof res.body === 'object') {
+                if (res.body.message) {
+                    throw new Error(res.statusCode, ': ' + res.body.message);
+                } else {
+                    throw new Error(res.statusCode, ': ' + 'No .message');
                 }
-
-                throw new Error(res.body)
             }
 
-            return res.body;
+            throw new Error(res.body);
         }
-    } catch (err) {
-        throw err;
+
+        return res.body;
     }
 }

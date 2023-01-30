@@ -7,17 +7,11 @@ import numpy as np
 import torch
 from shapely.geometry import mapping
 
-from .AOI import AOI
+from .TimeFrame import TimeFrame
 from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
 from .osm import OSM
-from .utils import (
-    generate_random_points,
-    geom2px,
-    geom2coords,
-    pred2png,
-    pxs2geojson
-)
+from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson
 
 LOGGER = logging.getLogger("server")
 
@@ -25,7 +19,7 @@ LOGGER = logging.getLogger("server")
 class ModelSrv:
     def __init__(self, model, api):
 
-        self.aoi = None
+        self.timeframe = None
         self.chk = None
         self.processing = False
         self.api = api
@@ -34,8 +28,10 @@ class ModelSrv:
         if api.instance.get("checkpoint_id") is not None:
             self.meta_load_checkpoint(self.api.instance.get("checkpoint_id"))
 
-        if api.instance.get("aoi_id") is not None:
-            self.aoi = AOI.load(self.api, self.api.instance.get("aoi_id"))
+        if api.instance.get("timeframe_id") is not None:
+            self.timeframe = TimeFrame.load(
+                self.api, self.api.instance.get("timeframe_id")
+            )
 
         if api.batch is not False:
             self.prediction(
@@ -49,12 +45,12 @@ class ModelSrv:
         try:
             payload = {
                 "processing": self.processing,
-                "aoi": False,
+                "timeframe": False,
                 "checkpoint": False,
             }
 
-            if self.aoi is not None:
-                payload["aoi"] = self.aoi.id
+            if self.timeframe is not None:
+                payload["timeframe"] = self.timeframe.id
 
             if self.chk is not None:
                 payload["checkpoint"] = self.chk["id"]
@@ -72,8 +68,8 @@ class ModelSrv:
 
             self.processing = True
 
-            if self.aoi is None:
-                websocket.error("Cannot Patch as no AOI is loaded")
+            if self.timeframe is None:
+                websocket.error("Cannot Patch as no TimeFrame is loaded")
                 done_processing(self)
                 return
             elif self.chk is None:
@@ -81,13 +77,18 @@ class ModelSrv:
                 done_processing(self)
                 return
 
+            aoi = {
+                "bounds": body["polygon"]
+            }
+
+            # TODO Create AOI
+            print('TIMEFRAME', self.timeframe);
             if body.get("type") == "class":
-                patch = AOI.create(
+                patch = TimeFrame.create(
                     self.api,
-                    body.get("polygon"),
-                    body.get("name", ""),
-                    self.chk["id"],
-                    is_patch=self.aoi.id,
+                    aoi,
+                    {"id": self.timeframe.id, "checkpoint_id": self.timeframe.checkpoint_id, "mosaic": self.timeframe.mosaic},
+                    is_patch=self.timeframe.id,
                 )
 
                 websocket.send(
@@ -167,12 +168,15 @@ class ModelSrv:
                 current_checkpoint = self.chk["id"]
                 self.meta_load_checkpoint(body["checkpoint_id"])
 
-                patch = AOI.create(
+                patch = TimeFrame.create(
                     self.api,
-                    body.get("polygon"),
-                    body.get("name", ""),
-                    self.chk["id"],
-                    is_patch=self.aoi.id,
+                    aoi,
+                    {
+                        "id": self.timeframe.id,
+                        "checkpoint_id": body["checkpoint_id"],
+                        "mosaic": self.timeframe.mosaic,
+                    },
+                    is_patch=self.timeframe.id,
                 )
                 websocket.send(
                     json.dumps(
@@ -191,7 +195,7 @@ class ModelSrv:
 
                 color_list = [item["color"] for item in self.model.classes]
 
-                dataset = InferenceDataSet(self.api, self.aoi.tiles)
+                dataset = InferenceDataSet(self.api, self.timeframe)
                 if torch.cuda.is_available():
                     batch_size = 8
                 else:
@@ -281,10 +285,10 @@ class ModelSrv:
             done_processing(self)
         except Exception as e:
             done_processing(self)
-            websocket.error("AOI Patch Error", e)
+            websocket.error("TimeFrame Patch Error", e)
             raise e
 
-    def load_aoi(self, body, websocket):
+    def load_timeframe(self, body, websocket):
         try:
             if self.processing is True:
                 return is_processing(websocket)
@@ -294,18 +298,21 @@ class ModelSrv:
             websocket.send(
                 json.dumps(
                     {
-                        "message": "model#aoi#progress",
-                        "data": {"aoi": body["id"], "processed": 0, "total": 1},
+                        "message": "model#timeframe#progress",
+                        "data": {"timeframe": body["id"], "processed": 0, "total": 1},
                     }
                 )
             )
 
-            self.aoi = AOI.load(self.api, body["id"])
-            self.meta_load_checkpoint(self.aoi.checkpointid)
+            self.timeframe = TimeFrame.load(self.api, body["id"])
+            self.meta_load_checkpoint(self.timeframe.checkpointid)
 
             websocket.send(
                 json.dumps(
-                    {"message": "model#aoi#complete", "data": {"aoi": self.aoi.id}}
+                    {
+                        "message": "model#timeframe#complete",
+                        "data": {"timeframe": self.timeframe.id},
+                    }
                 )
             )
 
@@ -313,7 +320,7 @@ class ModelSrv:
 
         except Exception as e:
             done_processing(self)
-            websocket.error("AOI Load Error", e)
+            websocket.error("TimeFrame Load Error", e)
             raise e
 
     def load_checkpoint(self, body, websocket):
@@ -359,10 +366,12 @@ class ModelSrv:
 
             self.processing = True
 
+            aoi = self.api.aoi_meta(body["aoi_id"])
+
             if self.chk is None:
                 self.meta_save_checkpoint(
                     {
-                        "name": body["name"],
+                        "name": aoi["name"],
                         "geoms": [None] * len(self.model.classes),
                         "analytics": [
                             {
@@ -376,22 +385,25 @@ class ModelSrv:
                     websocket,
                 )
 
-            self.aoi = AOI.create(
-                self.api, body.get("polygon"), body.get("name"), self.chk["id"]
+            print(body)
+            self.timeframe = TimeFrame.create(
+                self.api,
+                aoi,
+                {"mosaic": body["mosaic"], "checkpoint_id": self.chk["id"]},
             )
 
             if websocket is not False:
                 websocket.send(
                     json.dumps(
                         {
-                            "message": "model#aoi",
+                            "message": "model#timeframe",
                             "data": {
-                                "id": self.aoi.id,
-                                "live": self.aoi.live,
-                                "name": self.aoi.name,
+                                "id": self.timeframe.id,
+                                "live": self.timeframe.live,
+                                "name": self.timeframe.name,
                                 "checkpoint_id": self.chk["id"],
-                                "bounds": self.aoi.bounds,
-                                "total": self.aoi.total,
+                                "bounds": self.timeframe.bounds,
+                                "total": self.timeframe.total,
                             },
                         }
                     )
@@ -399,7 +411,7 @@ class ModelSrv:
 
             color_list = [item["color"] for item in self.model.classes]
 
-            dataset = InferenceDataSet(self.api, self.aoi.tiles)
+            dataset = InferenceDataSet(self.api, self.timeframe)
             if torch.cuda.is_available():
                 batch_size = 8
             else:
@@ -425,10 +437,10 @@ class ModelSrv:
                     output = output.remove_buffer()
 
                     # clip output
-                    output.clip(self.aoi.poly)
+                    output.clip(self.timeframe.poly)
                     LOGGER.info("ok - generated inference")
 
-                    if self.aoi.live and websocket is not False:
+                    if self.timeframe.live and websocket is not False:
                         # Create color versions of predictions
                         png = pred2png(output.data, color_list)
 
@@ -439,13 +451,13 @@ class ModelSrv:
                                 {
                                     "message": "model#prediction",
                                     "data": {
-                                        "aoi": self.aoi.id,
+                                        "timeframe": self.timeframe.id,
                                         "bounds": output.bounds,
                                         "x": output.x.item(),
                                         "y": output.y.item(),
                                         "z": output.z.item(),  # Convert from int64 to int
                                         "image": png,
-                                        "total": self.aoi.total,
+                                        "total": self.timeframe.total,
                                         "processed": current,
                                     },
                                 }
@@ -457,15 +469,17 @@ class ModelSrv:
                                 {
                                     "message": "model#prediction",
                                     "data": {
-                                        "aoi": self.aoi.id,
-                                        "total": self.aoi.total,
+                                        "timeframe": self.timeframe.id,
+                                        "total": self.timeframe.total,
                                         "processed": current,
                                     },
                                 }
                             )
                         )
                     else:
-                        new_prog = int(float(current) / float(self.aoi.total) * 100)
+                        new_prog = int(
+                            float(current) / float(self.timeframe.total) * 100
+                        )
 
                         if progress != new_prog:
                             res = self.api.batch_patch({"progress": new_prog})
@@ -473,7 +487,9 @@ class ModelSrv:
                             progress = new_prog
 
                             if res.get("abort") is True:
-                                res = self.api.batch_patch({"progress": 0, "completed": False})
+                                res = self.api.batch_patch(
+                                    {"progress": 0, "completed": False}
+                                )
                                 done_processing(self)
                                 LOGGER.info("ok - prediction aborted")
                                 sys.exit()
@@ -487,9 +503,9 @@ class ModelSrv:
                         output.tile,
                         output.buffered,
                     )
-                    self.aoi.add_to_fabric(output)
+                    self.timeframe.add_to_fabric(output)
 
-            self.aoi.upload_fabric()
+            self.timeframe.upload_fabric()
 
             LOGGER.info("ok - done prediction")
 
@@ -499,14 +515,14 @@ class ModelSrv:
                         {
                             "message": "model#prediction#complete",
                             "data": {
-                                "aoi": self.aoi.id,
+                                "timeframe": self.timeframe.id,
                             },
                         }
                     )
                 )
             else:
                 self.api.batch_patch(
-                    {"progress": 100, "completed": True, "aoi": self.aoi.id}
+                    {"progress": 100, "completed": True, "timeframe": self.timeframe.id}
                 )
 
                 sys.exit()
@@ -540,11 +556,14 @@ class ModelSrv:
 
             done_processing(self)
 
-            self.retrain({
-                "name": body.get("name"),
-                "classes": body.get("classes"),
-                "bounds": body.get("bounds")
-            }, websocket)
+            self.retrain(
+                {
+                    "name": body.get("name"),
+                    "classes": body.get("classes"),
+                    "bounds": body.get("bounds"),
+                },
+                websocket,
+            )
 
         except Exception as e:
             done_processing(self)
@@ -556,6 +575,11 @@ class ModelSrv:
             if self.processing is True:
                 return is_processing(websocket)
             self.processing = True
+
+            if self.timeframe is None:
+                websocket.error("Cannot Retrain as no TimeFrame is loaded")
+                done_processing(self)
+                return
 
             LOGGER.info("ok - starting retrain")
 
@@ -603,7 +627,12 @@ class ModelSrv:
             curr = 0
             for cls in body["classes"]:
                 cls["retrain_geometry"] = geom2px(
-                    cls["retrain_geometry"], self, websocket, total, curr, body.get('bounds')
+                    cls["retrain_geometry"],
+                    self,
+                    websocket,
+                    total,
+                    curr,
+                    body.get("bounds"),
                 )
 
                 curr += len(cls["retrain_geometry"])
@@ -644,9 +673,9 @@ class ModelSrv:
 
             done_processing(self)
 
-            if self.aoi is not None:
+            if self.timeframe is not None:
                 self.prediction(
-                    {"name": body["name"], "polygon": mapping(self.aoi.poly)},
+                    {"aoi_id": self.timeframe.aoi_id, "mosaic": self.timeframe.mosaic},
                     websocket,
                 )
 
@@ -661,7 +690,7 @@ class ModelSrv:
         self.model.load_state_from(self.chk, chk_fs)
         self.api.instance_patch(checkpoint_id=self.chk["id"])
 
-    def meta_load_aoi(self, load_id):
+    def meta_load_timeframe(self, load_id):
         self.chk = self.api.get_checkpoint(load_id)
         chk_fs = self.api.download_checkpoint(self.chk["id"])
         self.model.load_state_from(self.chk, chk_fs)
