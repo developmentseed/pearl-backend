@@ -224,6 +224,7 @@ export default async function server(config) {
             } else if (err instanceof ValidationError) {
                 return Err.respond(new Err(400, null, 'validation error'), res, err.validationErrors.body);
             } else if (err) {
+                console.log('error', err);
                 return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
             } else {
                 next();
