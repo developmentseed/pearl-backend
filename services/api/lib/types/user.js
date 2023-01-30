@@ -104,6 +104,7 @@ export default class User extends Generic {
 
         if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
 
+        console.log('user', user)
         try {
             const pgres = await pool.query(sql`
                 INSERT INTO users (
