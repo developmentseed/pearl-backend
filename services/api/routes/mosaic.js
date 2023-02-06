@@ -23,10 +23,11 @@ export default async function router(schema, config) {
         group: 'Mosaic',
         auth: 'public',
         description: 'Return a list of currently supported mosaic layers',
+        query: 'req.query.Mosaic.json',
         res: 'res.Mosaic.json'
     }, async (req, res) => {
         try {
-            const list = await Mosaic.list(config.pool);
+            const list = await Mosaic.list(config.pool, req.query);
 
             list.mosaics = list.mosaics.map((mosaic) => {
                 return mosaic.name;

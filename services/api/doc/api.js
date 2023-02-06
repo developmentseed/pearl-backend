@@ -561,6 +561,24 @@ Note: this is an internal API that is called by the websocket GPU
 
 
 /**
+* @api {get} /timeframe/:timeframeid Machine Timeframe
+* @apiVersion 1.0.0
+* @apiName GET-/timeframe/:timeframeid
+* @apiGroup TimeFrame
+* @apiPermission user
+*
+* @apidescription
+*   Get a TimeFrame without any top level ids - Only an admin can access this endpoint
+*
+* @apiParam {integer} timeframeid param
+*
+*
+*
+* @apiSchema {jsonschema=../schema/res.TimeFrame.json} apiSuccess
+*/
+
+
+/**
 * @api {get} /project/:projectid/aoi/:aoiid Get AOI
 * @apiVersion 1.0.0
 * @apiName GET-/project/:projectid/aoi/:aoiid
@@ -1213,6 +1231,24 @@ Note: this will not affect currently running instances of the model
 
 
 /**
+* @api {get} /mosaicgroup List Groups
+* @apiVersion 1.0.0
+* @apiName GET-/mosaicgroup
+* @apiGroup Mosaic
+* @apiPermission public
+*
+* @apidescription
+*   Return a list of mosaic groups
+*
+
+*
+*
+*
+* @apiSchema {jsonschema=../schema/res.ListMosaicGroups.json} apiSuccess
+*/
+
+
+/**
 * @api {get} /mosaic List Mosaics
 * @apiVersion 1.0.0
 * @apiName GET-/mosaic
@@ -1224,7 +1260,7 @@ Note: this will not affect currently running instances of the model
 *
 
 *
-*
+* @apiSchema (Query) {jsonschema=../schema/req.query.Mosaic.json} apiParam
 *
 * @apiSchema {jsonschema=../schema/res.Mosaic.json} apiSuccess
 */

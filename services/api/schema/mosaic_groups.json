@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./mosaic_groups/id.json"
+        },
+        "created": {
+            "$ref": "./mosaic_groups/created.json"
+        },
+        "updated": {
+            "$ref": "./mosaic_groups/updated.json"
+        },
+        "name": {
+            "$ref": "./mosaic_groups/name.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "name"
+    ]
+}

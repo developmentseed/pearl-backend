@@ -21,6 +21,11 @@ function up(knex) {
 
         ALTER TABLE mosaics
             ALTER COLUMN group_id SET NOT NULL;
+
+        ALTER TABLE mosaics
+            ADD COLUMN created TIMESTAMP NOT NULL DEFAULT Now();
+        ALTER TABLE mosaics
+            ADD COLUMN updated TIMESTAMP NOT NULL DEFAULT Now();
     `);
 }
 

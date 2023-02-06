@@ -260,7 +260,7 @@ export default async function server(config) {
                         // Set auth type
                         req.auth.type = 'auth0';
                     } catch (error) {
-                        console.log('Failed to create user', error)
+                        console.log('Failed to create user', error);
                         return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
                     }
                 }

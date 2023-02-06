@@ -134,6 +134,11 @@
         "query": false,
         "res": false
     },
+    "GET /timeframe/:timeframeid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /project/:projectid/aoi/:aoiid": {
         "body": false,
         "query": false,
@@ -299,9 +304,14 @@
         "query": false,
         "res": false
     },
-    "GET /mosaic": {
+    "GET /mosaicgroup": {
         "body": false,
         "query": false,
+        "res": true
+    },
+    "GET /mosaic": {
+        "body": false,
+        "query": true,
         "res": true
     },
     "GET /mosaic/:mosaic": {
