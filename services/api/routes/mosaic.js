@@ -1,8 +1,23 @@
 import Err from '@openaddresses/batch-error';
 import Mosaic from '../lib/types/mosaic.js';
+import MosaicGroup from '../lib/types/mosaic-group.js';
 import Proxy from '../lib/proxy.js';
 
 export default async function router(schema, config) {
+    await schema.get('/mosaicgroup', {
+        name: 'List Groups',
+        group: 'Mosaic',
+        auth: 'public',
+        description: 'Return a list of mosaic groups',
+        res: 'res.ListMosaicGroups.json'
+    }, async (req, res) => {
+        try {
+            res.json(await MosaicGroup.list(config.pool));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     await schema.get('/mosaic', {
         name: 'List Mosaics',
         group: 'Mosaic',

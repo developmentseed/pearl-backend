@@ -2,6 +2,8 @@ function up(knex) {
     return knex.schema.raw(`
         CREATE TABLE mosaic_groups (
             id          BIGSERIAL PRIMARY KEY,
+            created     TIMESTAMP NOT NULL DEFAULT Now(),
+            updated     TIMESTAMP NOT NULL DEFAULT Now(),
             name        TEXT NOT NULL
         );
 
