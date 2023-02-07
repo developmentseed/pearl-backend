@@ -11,6 +11,7 @@ from lib.models.ModelSessionPyTorchExample import TorchFineTuning
 from lib.models.ModelSessionUnet import LoadUnet
 from lib.models.ModelSessionDeepLabv3 import LoadDeepLabv3Plus
 from lib.models.ModelSessionUnet2 import LoadUnet2
+from lib.models.ModelSessionUnet3 import LoadUnet3
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
 from lib.utils import setup_logging
@@ -126,6 +127,8 @@ def load(gpu_id, api):
         model = LoadUnet(gpu_id, api.model_dir, api.model["classes"])
     elif model_type == "unet2":
         model = LoadUnet2(gpu_id, api.model_dir, api.model["classes"])
+    elif model_type == "unet3":
+        model = LoadUnet3(gpu_id, api.model_dir, api.model["classes"])
     elif model_type == "deeplabv3plus":
         model = LoadDeepLabv3Plus(gpu_id, api.model_dir, api.model["classes"])
     else:
