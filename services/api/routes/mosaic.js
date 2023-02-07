@@ -1,18 +1,18 @@
 import Err from '@openaddresses/batch-error';
 import Mosaic from '../lib/types/mosaic.js';
-import MosaicGroup from '../lib/types/mosaic-group.js';
+import ImagerySource from '../lib/types/imagery-source.js';
 import Proxy from '../lib/proxy.js';
 
 export default async function router(schema, config) {
-    await schema.get('/mosaicgroup', {
-        name: 'List Groups',
+    await schema.get('/imagery', {
+        name: 'List Imagery Sources',
         group: 'Mosaic',
         auth: 'public',
-        description: 'Return a list of mosaic groups',
-        res: 'res.ListMosaicGroups.json'
+        description: 'Return a list of imagery sources',
+        res: 'res.ListImagerySources.json'
     }, async (req, res) => {
         try {
-            res.json(await MosaicGroup.list(config.pool));
+            res.json(await ImagerySource.list(config.pool));
         } catch (err) {
             return Err.respond(err, res);
         }

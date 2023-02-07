@@ -14,8 +14,8 @@
         "mosaic_ts": {
             "$ref": "./mosaics/mosaic_ts.json"
         },
-        "group_id": {
-            "$ref": "./mosaics/group_id.json"
+        "source_id": {
+            "$ref": "./mosaics/source_id.json"
         },
         "created": {
             "$ref": "./mosaics/created.json"
@@ -29,7 +29,7 @@
         "name",
         "params",
         "mosaic_ts",
-        "group_id",
+        "source_id",
         "created",
         "updated"
     ]

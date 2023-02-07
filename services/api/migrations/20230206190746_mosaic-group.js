@@ -1,6 +1,6 @@
 function up(knex) {
     return knex.schema.raw(`
-        CREATE TABLE mosaic_groups (
+        CREATE TABLE imagery_sources (
             id          BIGSERIAL PRIMARY KEY,
             created     TIMESTAMP NOT NULL DEFAULT Now(),
             updated     TIMESTAMP NOT NULL DEFAULT Now(),
@@ -8,19 +8,19 @@ function up(knex) {
         );
 
         ALTER TABLE mosaics
-            ADD COLUMN group_id BIGINT REFERENCES mosaic_groups(id);
+            ADD COLUMN source_id BIGINT REFERENCES imagery_sources(id);
 
-        INSERT INTO mosaic_groups (
+        INSERT INTO imagery_sources (
             name
         ) VALUES (
             'NAIP'
         );
 
         UPDATE mosaics
-            SET group_id = 1;
+            SET source_id = 1;
 
         ALTER TABLE mosaics
-            ALTER COLUMN group_id SET NOT NULL;
+            ALTER COLUMN source_id SET NOT NULL;
 
         ALTER TABLE mosaics
             ADD COLUMN created TIMESTAMP NOT NULL DEFAULT Now();

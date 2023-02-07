@@ -12,7 +12,7 @@ export default class Mosaic extends Generic {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
-        if (!query.groupid) query.groupid = null;
+        if (!query.sourceid) query.sourceid = null;
         if (!query.sort) query.sort = 'created';
         if (!query.order || query.order === 'asc') {
             query.order = sql`asc`;
@@ -28,7 +28,7 @@ export default class Mosaic extends Generic {
                 FROM
                     mosaics
                 WHERE
-                    (${query.groupid}::TEXT IS NULL OR group_id = ${query.groupid})
+                    (${query.sourceid}::TEXT IS NULL OR source_id = ${query.sourceid})
                 ORDER BY
                     ${sql.identifier(['mosaics', query.sort])} ${query.order}
                 LIMIT

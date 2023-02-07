@@ -30,22 +30,22 @@ test('GET /api/mosaic', async(t) => {
     t.end();
 });
 
-test('GET /api/mosaicgroup', async(t) => {
+test('GET /api/imagery', async(t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/mosaicgroup',
+            url: '/api/imagery',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             }
         }, t);
 
-        delete res.body.mosaic_groups[0].created;
-        delete res.body.mosaic_groups[0].updated;
+        delete res.body.imagery_sources[0].created;
+        delete res.body.imagery_sources[0].updated;
         t.deepEquals(res.body, {
             total: 1,
-            mosaic_groups: [{
+            imagery_sources: [{
                 id: 1,
                 name: 'NAIP'
             }]
@@ -57,11 +57,11 @@ test('GET /api/mosaicgroup', async(t) => {
     t.end();
 });
 
-test('GET /api/mosaic?groupid=1', async(t) => {
+test('GET /api/mosaic?sourceid=1', async(t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/mosaic?groupid=1',
+            url: '/api/mosaic?sourceid=1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -80,11 +80,11 @@ test('GET /api/mosaic?groupid=1', async(t) => {
     t.end();
 });
 
-test('GET /api/mosaic?groupid=2', async(t) => {
+test('GET /api/mosaic?sourceid=2', async(t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/mosaic?groupid=2',
+            url: '/api/mosaic?sourceid=2',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

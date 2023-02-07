@@ -1231,20 +1231,20 @@ Note: this will not affect currently running instances of the model
 
 
 /**
-* @api {get} /mosaicgroup List Groups
+* @api {get} /imagery List Imagery Sources
 * @apiVersion 1.0.0
-* @apiName GET-/mosaicgroup
+* @apiName GET-/imagery
 * @apiGroup Mosaic
 * @apiPermission public
 *
 * @apidescription
-*   Return a list of mosaic groups
+*   Return a list of imagery sources
 *
 
 *
 *
 *
-* @apiSchema {jsonschema=../schema/res.ListMosaicGroups.json} apiSuccess
+* @apiSchema {jsonschema=../schema/res.ListImagerySources.json} apiSuccess
 */
 
 

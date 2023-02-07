@@ -304,7 +304,7 @@
         "query": false,
         "res": false
     },
-    "GET /mosaicgroup": {
+    "GET /imagery": {
         "body": false,
         "query": false,
         "res": true
