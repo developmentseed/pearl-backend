@@ -19,6 +19,8 @@ export NODEV='18.12.1' \
 docker-compose up --build -d
 docker build -t gpu $(pwd)/services/gpu
 
+sleep 20
+
 npm install --include=dev
 npm --prefix ./services/api/ install --include=dev
 npm test
