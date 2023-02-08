@@ -11,7 +11,7 @@ test('GET /api/mosaic', async(t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/mosaic',
+            url: '/api/mosaic?limit=1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -105,7 +105,7 @@ test('GET /api/mosaic?sourceid=2', async(t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/mosaic?sourceid=2',
+            url: '/api/mosaic?sourceid=100',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
