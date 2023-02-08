@@ -9,8 +9,30 @@
             "type": "array",
             "description": "List of supported mosaics",
             "items": {
-                "type": "string",
-                "description": "Name of mosaic"
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "params": {
+                        "type": "object"
+                    },
+                    "mosaic_ts": {
+                        "type": ["integer", "null"]
+                    },
+                    "source_id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "updated": {
+                        "type": "integer"
+                    }
+                }
             }
         }
     }

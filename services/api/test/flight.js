@@ -14,6 +14,7 @@ import Config from '../lib/config.js';
 
 const prequest = promisify(request);
 const ajv = new Ajv({
+    strict: false,
     allErrors: true
 });
 

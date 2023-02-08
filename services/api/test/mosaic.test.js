@@ -18,10 +18,16 @@ test('GET /api/mosaic', async(t) => {
             }
         }, t);
 
+        delete res.body.mosaics[0].created;
+        delete res.body.mosaics[0].updated;
         t.deepEquals(res.body, {
-            mosaics: [
-                'naip.latest'
-            ]
+            mosaics: [{
+                id: '87b72c66331e136e088004fba817e3e8',
+                name: 'naip.latest',
+                params: { assets: 'image', asset_bidx: 'image|1,2,3', collection: 'naip' },
+                mosaic_ts: null,
+                source_id: 1
+            }]
         });
     } catch (err) {
         t.error(err, 'no errors');
@@ -68,10 +74,16 @@ test('GET /api/mosaic?sourceid=1', async(t) => {
             }
         }, t);
 
+        delete res.body.mosaics[0].created;
+        delete res.body.mosaics[0].updated;
         t.deepEquals(res.body, {
-            mosaics: [
-                'naip.latest'
-            ]
+            mosaics: [{
+                id: '87b72c66331e136e088004fba817e3e8',
+                name: 'naip.latest',
+                params: { assets: 'image', asset_bidx: 'image|1,2,3', collection: 'naip' },
+                mosaic_ts: null,
+                source_id: 1
+            }]
         });
     } catch (err) {
         t.error(err, 'no errors');

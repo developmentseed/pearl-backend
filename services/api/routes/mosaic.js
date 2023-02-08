@@ -29,10 +29,6 @@ export default async function router(schema, config) {
         try {
             const list = await Mosaic.list(config.pool, req.query);
 
-            list.mosaics = list.mosaics.map((mosaic) => {
-                return mosaic.name;
-            });
-
             return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
