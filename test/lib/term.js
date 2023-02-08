@@ -85,7 +85,7 @@ export class Prompt {
     }
 
     ask(question) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.resolve = resolve;
             this.current.shown = question;
             this.current.inp = '';

@@ -1,6 +1,6 @@
 {
     "action": "model#checkpoint",
     "data": {
-        "id": "$id"
+        "id": 1
     }
 }

@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./imagery_sources/id.json"
+        },
+        "created": {
+            "$ref": "./imagery_sources/created.json"
+        },
+        "updated": {
+            "$ref": "./imagery_sources/updated.json"
+        },
+        "name": {
+            "$ref": "./imagery_sources/name.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "name"
+    ]
+}

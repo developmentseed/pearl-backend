@@ -15,16 +15,14 @@ export default class Instance extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Config} config
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} instanceid Instance the user is attemping to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(config, auth, projectid, instanceid) {
-        const proj = await Project.has_auth(config.pool, auth, projectid);
-        const instance = await Instance.from(config, auth, instanceid);
+    static async has_auth(config, req) {
+        const proj = await Project.has_auth(config.pool, req);
+        const instance = await Instance.from(config, req.auth, req.params.instanceid);
 
         if (instance.project_id !== proj.id) {
-            throw new Err(400, null, `Instance #${instanceid} is not associated with project #${projectid}`);
+            throw new Err(400, null, `Instance #${req.params.instanceid} is not associated with project #${req.params.projectid}`);
         }
 
         return instance;
@@ -133,7 +131,7 @@ export default class Instance extends Generic {
      *
      * @param {Object} instance - Instance Object
      * @param {Number} instance.uid The UID creating the instance
-     * @param {Number} instance.aoi_id The current AOI loaded on the instance
+     * @param {Number} instance.tiemframe_id The current TimeFrame loaded on the instance
      * @param {Number} instance.checkpoint_id The current checkpoint loaded on the instance
      * @param {Number} instance.batch If the instance is a batch job, specify batch ID
      */
@@ -149,13 +147,13 @@ export default class Instance extends Generic {
             const pgres = await config.pool.query(sql`
                 INSERT INTO instances (
                     project_id,
-                    aoi_id,
+                    timeframe_id,
                     checkpoint_id,
                     batch,
                     type
                 ) VALUES (
                     ${instance.project_id},
-                    ${instance.aoi_id || null},
+                    ${instance.timeframe_id || null},
                     ${instance.checkpoint_id || null},
                     ${instance.batch || null},
                     ${instance.type}

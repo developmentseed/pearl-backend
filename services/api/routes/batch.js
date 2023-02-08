@@ -16,7 +16,7 @@ export default async function router(schema, config) {
         res: 'res.ListBatches.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             req.query.uid = req.auth.id;
             req.query.projectid = req.params.projectid;
@@ -36,7 +36,7 @@ export default async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             const existing_batch = await Instance.list(config.pool, req.params.projectid, {
                 batch: true,
@@ -48,7 +48,8 @@ export default async function router(schema, config) {
             }
 
             if (req.body.checkpoint_id) {
-                await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.body.checkpoint_id);
+                req.params.checkpointid = req.body.checkpoint_id;
+                await Checkpoint.has_auth(config.pool, req);
                 delete req.body.checkpoint_id;
             }
 
@@ -86,7 +87,7 @@ export default async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req);
 
             return res.json(batch.serialize());
         } catch (err) {
@@ -105,7 +106,7 @@ export default async function router(schema, config) {
         res: 'res.Batch.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const batch = await Batch.has_auth(config.pool, req.auth, req.params.projectid, req.params.batchid);
+            const batch = await Batch.has_auth(config.pool, req);
             await batch.commit({
                 ...req.body,
                 updated: sql`Now()`

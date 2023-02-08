@@ -26,13 +26,13 @@ tiler = tileschemes.WebMercator()
 
 
 AVAILABLE_MOSAICS = {
-    'naip.latest': {
-        'id': '87b72c66331e136e088004fba817e3e8',
-        'default_params': {
-            'assets': 'image',
-            'asset_bidx': 'image|1,2,3,4',
-            'collection': 'naip',
-        }
+    "naip.latest": {
+        "id": "87b72c66331e136e088004fba817e3e8",
+        "default_params": {
+            "assets": "image",
+            "asset_bidx": "image|1,2,3,4",
+            "collection": "naip",
+        },
     }
 }
 
@@ -96,11 +96,9 @@ class API:
         self.project = self.project_meta()
 
         self.model_id = self.project["model_id"]
-        self.mosaic_id = self.project["mosaic"]
 
         self.model = self.model_meta()
         self.model_dir = self.model_download()
-        self.mosaic = self.get_tilejson()
 
     def server_meta(self):
         url = self.url + "/api"
@@ -261,13 +259,15 @@ class API:
 
         return ch_dir
 
-    def create_patch(self, aoi_id):
+    def create_patch(self, aoi_id, timeframe_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoi_id)
+            + "/timeframe/"
+            + str(timeframe_id)
             + "/patch"
         )
 
@@ -285,13 +285,15 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_patch(self, aoiid, patchid, geotiff):
+    def upload_patch(self, aoiid, timeframeid, patchid, geotiff):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoiid)
+            + "/timeframe/"
+            + str(timeframeid)
             + "/patch/"
             + str(patchid)
             + "/upload"
@@ -299,7 +301,7 @@ class API:
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = self.tmp_dir + "/aoi-{}-patch-{}.tiff".format(aoiid, patchid)
+        geo_path = self.tmp_dir + "/aoi-{}-patch-{}.tiff".format(timeframeid, patchid)
         with open(geo_path, "wb") as filehandle:
             filehandle.write(geotiff.read())
 
@@ -332,8 +334,24 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
+    def timeframe_meta(self, timeframeid):
+        url = self.url + "/api/timeframe/" + str(timeframeid)
+
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_aoi(self, aoi):
-        url = self.url + "/api/project/" + str(self.project_id) + "/aoi"
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/aoi"
+        )
 
         LOGGER.info("ok - POST " + url)
         r = self.requests.post(
@@ -343,11 +361,7 @@ class API:
                 "content-type": "application/json",
             },
             data=json.dumps(
-                {
-                    "name": aoi.name,
-                    "checkpoint_id": aoi.checkpointid,
-                    "bounds": mapping(aoi.poly),
-                }
+                {"name": aoi["name"], "bounds": aoi["bounds"]}
             ),
         )
 
@@ -356,13 +370,42 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_aoi(self, aoiid, geotiff):
+    def create_timeframe(self, timeframe):
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/aoi/"
+            + str(timeframe.aoi_id)
+            + "/timeframe"
+        )
+
+        LOGGER.info("ok - POST " + url)
+        r = self.requests.post(
+            url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json",
+            },
+            data=json.dumps(
+                {"checkpoint_id": timeframe.checkpointid, "mosaic": timeframe.mosaic}
+            ),
+        )
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def upload_timeframe(self, aoiid, timeframeid, geotiff):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoiid)
+            + "/timeframe/"
+            + str(timeframeid)
             + "/upload"
         )
 
@@ -390,8 +433,8 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tilejson(self):
-        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
+    def get_tilejson(self, mosaic):
+        _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
         params = _mosaic.get("default_params", {})
         url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/{searchid}/tilejson.json"
@@ -404,18 +447,21 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tile(self, z, x, y, iformat="npy", buffer=32, cache=True):
-        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
+    def get_tile(self, mosaic, z, x, y, iformat="npy", buffer=32, cache=True):
+        _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
         params = _mosaic.get("default_params", {})
         params.update(
             {
-                'return_mask': False,
-                'buffer': buffer,
+                "return_mask": False,
+                "buffer": buffer,
             }
         )
 
-        url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
+        url = (
+            os.environ["PcTileUrl"]
+            + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
+        )
 
         if iformat == "npy":
             tmpfs = "{}/tiles/{}-{}-{}.{}".format(self.tmp_dir, x, y, z, iformat)
@@ -455,7 +501,7 @@ class API:
 
             return r.content
 
-    def instance_patch(self, aoi_id=None, checkpoint_id=None):
+    def instance_patch(self, timeframe_id=None, checkpoint_id=None):
         url = (
             self.url
             + "/api/project/"
@@ -465,8 +511,8 @@ class API:
         )
 
         data = {}
-        if aoi_id is not None:
-            data["aoi_id"] = aoi_id
+        if timeframe_id is not None:
+            data["timeframe_id"] = timeframe_id
         if checkpoint_id is not None:
             data["checkpoint_id"] = checkpoint_id
 

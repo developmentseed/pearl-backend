@@ -13,17 +13,15 @@ export default class Batch extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} batchid Checkpoint the user is attemping to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(pool, auth, projectid, batchid) {
+    static async has_auth(pool, req) {
 
-        const proj = await Project.has_auth(pool, auth, projectid);
-        const batch = await this.from(pool, batchid);
+        const proj = await Project.has_auth(pool, req);
+        const batch = await this.from(pool, req.params.batchid);
 
         if (batch.project_id !== proj.id) {
-            throw new Err(400, null, `Batch #${batchid} is not associated with project #${projectid}`);
+            throw new Err(400, null, `Batch #${req.params.batchid} is not associated with project #${req.params.projectid}`);
         }
 
         return batch;

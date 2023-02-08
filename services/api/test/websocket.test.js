@@ -15,7 +15,7 @@ test('GET /api/websocket', async(t) => {
         }, t);
 
         t.deepEquals(Object.keys(res.body).sort(), [
-            'model#aoi',
+            'model#timeframe',
             'model#checkpoint',
             'model#osm',
             'model#patch',

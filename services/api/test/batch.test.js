@@ -131,7 +131,7 @@ test('GET /api/project/1/instance/1', async (t) => {
             id: 1,
             batch: 1,
             project_id: 1,
-            aoi_id: null,
+            timeframe_id: null,
             checkpoint_id: null,
             active: false,
             type: 'cpu',

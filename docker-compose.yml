@@ -9,6 +9,7 @@ services:
         links:
             - postgis
         depends_on:
+            - postgis
             - migration
         ports:
             - "2000:2000"

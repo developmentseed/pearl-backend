@@ -17,7 +17,7 @@ export default async function router(schema, config) {
         res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+            const checkpoint = await Checkpoint.has_auth(config.pool, req);
 
             return res.json(checkpoint.serialize());
         } catch (err) {
@@ -35,7 +35,7 @@ export default async function router(schema, config) {
         res: 'res.OSMTag.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+            const checkpoint = await Checkpoint.has_auth(config.pool, req);
 
             if (!checkpoint.osmtag_id) throw new Err(404, null, 'Checkpoint does not have OSMTags');
 
@@ -57,7 +57,7 @@ export default async function router(schema, config) {
         res: 'res.TileJSON.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const c = (await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid)).serialize();
+            const c = (await Checkpoint.has_auth(config.pool, req)).serialize();
             if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
             if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
@@ -89,7 +89,7 @@ export default async function router(schema, config) {
         ':y': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const c = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+            const c = await Checkpoint.has_auth(config.pool, req);
             if (!c.storage) throw new Err(404, null, 'Checkpoint has not been uploaded');
             if (!c.center || !c.bounds) throw new Err(404, null, 'Checkpoint has no geometries to serve');
 
@@ -152,7 +152,7 @@ export default async function router(schema, config) {
         ':checkpointid': 'integer'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             const checkpoint = await Checkpoint.from(config.pool, req.params.checkpointid);
             await checkpoint.download(config, res);
@@ -171,7 +171,7 @@ export default async function router(schema, config) {
         res: 'res.ListCheckpoints.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             return res.json(await Checkpoint.list(config.pool, req.params.projectid, req.query));
         } catch (err) {
@@ -192,7 +192,7 @@ export default async function router(schema, config) {
         res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            await Project.has_auth(config.pool, req);
 
             if (req.body.retrain_geoms && req.body.retrain_geoms.length !== req.body.classes.length) {
                 throw new Err(400, null, 'retrain_geoms array must be parallel with classes array');
@@ -263,7 +263,7 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+            const checkpoint = await Checkpoint.has_auth(config.pool, req);
 
             const aois = await AOI.list(config.pool, req.params.projectid, {
                 checkpointid: req.params.checkpointid
@@ -300,7 +300,7 @@ export default async function router(schema, config) {
         res: 'res.Checkpoint.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const checkpoint = await Checkpoint.has_auth(config.pool, req.auth, req.params.projectid, req.params.checkpointid);
+            const checkpoint = await Checkpoint.has_auth(config.pool, req);
 
             if (req.body.classes && checkpoint.classes.length !== req.body.classes.length) {
                 throw new Err(400, null, 'Cannot change the number of classes once a checkpoint is created');

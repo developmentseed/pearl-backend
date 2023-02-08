@@ -1,26 +1,25 @@
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
-import AOI from './aoi.js';
 import Storage from '../storage.js';
 import { sql } from 'slonik';
+import TimeFrame from './aoi-timeframe.js';
 
 /**
  * @class
  */
-export default class AOIPatch extends Generic {
-    static _table = 'aoi_patch';
+export default class Patch extends Generic {
+    static _table = 'aoi_timeframe_patch';
 
     /**
      * Return a list of AOI Patches
      *
      * @param {Pool} pool - Instantiated Postgres Pool
-     * @param {Number} projectid - AOI Patches related to a specific project
-     * @param {Number} aoiid - AOI Patches related to a specific AOI
+     * @param {Number} timeframeid - AOI Patches related to a specific project
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page to return
      */
-    static async list(pool, projectid, aoiid, query) {
+    static async list(pool, timeframeid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -34,10 +33,9 @@ export default class AOIPatch extends Generic {
                     created,
                     storage
                 FROM
-                    aoi_patch
+                    aoi_timeframe_patch
                 WHERE
-                    project_id = ${projectid}
-                    AND aoi_id = ${aoiid}
+                    timeframe_id = ${timeframeid}
                 LIMIT
                     ${query.limit}
                 OFFSET
@@ -47,27 +45,21 @@ export default class AOIPatch extends Generic {
             throw new Err(500, new Error(err), 'Failed to list AOI Patches');
         }
 
-        const list = this.deserialize_list(pgres, 'patches');
-        list.project_id = projectid;
-        list.aoi_id = aoiid;
-        return list;
+        return this.deserialize_list(pgres, 'patches');
     }
 
     /**
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} aoiid AOI the user is attemping to access
-     * @param {Number} patchid AOI the user is attemping to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(pool, auth, projectid, aoiid, patchid) {
-        const a = await AOI.has_auth(pool, auth, projectid, aoiid);
-        const patch = await AOIPatch.from(pool, patchid);
+    static async has_auth(pool, req) {
+        const tf = await TimeFrame.has_auth(pool, req);
+        const patch = await Patch.from(pool, req.params.patchid);
 
-        if (patch.aoi_id !== a.id) {
-            throw new Err(400, null, `AOI Patch #${patchid} is not associated with aoi #${aoiid}`);
+        if (patch.timeframe_id !== tf.id) {
+            throw new Err(400, null, `TimeFrame Patch #${req.params.patchid} is not associated with TimeFrame #${req.params.timeframeid}`);
         }
 
         return patch;
@@ -82,7 +74,7 @@ export default class AOIPatch extends Generic {
         if (!this.storage) throw new Err(404, null, 'AOI Patch has not been uploaded');
 
         const storage = new Storage(config, 'aois');
-        return await storage.url(`aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+        return await storage.url(`aoi-${this.timeframe_id}-patch-${this.id}.tiff`);
     }
 
     /**
@@ -95,7 +87,7 @@ export default class AOIPatch extends Generic {
         if (this.storage) throw new Err(404, null, 'AOI Patch has already been uploaded');
 
         const storage = new Storage(config, 'aois');
-        await storage.upload(file, `aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+        await storage.upload(file, `aoi-${this.timeframe_id}-patch-${this.id}.tiff`);
 
         return await this.commit({
             storage: true
@@ -112,7 +104,7 @@ export default class AOIPatch extends Generic {
         if (!this.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
         const storage = new Storage(config, 'aois');
-        await storage.download(`aoi-${this.aoi_id}-patch-${this.id}.tiff`, res);
+        await storage.download(`aoi-${this.timeframe_id}-patch-${this.id}.tiff`, res);
     }
 
     /**
@@ -126,7 +118,7 @@ export default class AOIPatch extends Generic {
             pgres = await this._pool.query(sql`
                 DELETE
                     FROM
-                        aoi_patch
+                        aoi_timeframe_patch
                     WHERE
                         id = ${this.id}
                     RETURNING *
@@ -139,7 +131,7 @@ export default class AOIPatch extends Generic {
 
         if (pgres.rows[0].storage && config.AzureStorage) {
             const storage = new Storage(config, 'aois');
-            await storage.delete(`aoi-${this.aoi_id}-patch-${this.id}.tiff`);
+            await storage.delete(`aoi-${this.timeframe_id}-patch-${this.id}.tiff`);
         }
 
         return true;

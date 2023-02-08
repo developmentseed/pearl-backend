@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import test from 'tape';
 import path from 'path';
 import fs from 'fs';
+import fsp from 'fs/promises';
 import LULC from './lib.js';
 import minimist from 'minimist';
 
@@ -52,9 +53,9 @@ async function gpu() {
     term.prompt.screen(['websockets', 'api']);
     term.on('promp#selection', async (sel) => {
         if (sel.value === 'websockets' || (sel.stats && sel.stats.isDirectory())) {
-            const dir = sel.stats ? sel.value : new URL('./fixtures/', import.meta.url);
+            const dir = sel.stats ? sel.value : (new URL('./fixtures/', import.meta.url)).pathname;
 
-            term.prompt.screen(fs.readdirSync(dir).map((f) => {
+            const screen = (await fsp.readdir(dir)).map((f) => {
                 const stats = fs.statSync(path.resolve(dir, f));
 
                 return {
@@ -62,10 +63,12 @@ async function gpu() {
                     stats: stats,
                     value: path.resolve(dir, f)
                 };
-            }));
+            });
+
+            term.prompt.screen(screen);
             return;
         } else if (sel.stats && sel.stats.isFile()) {
-            ws.send(String(fs.readFileSync(sel.value)));
+            ws.send(String(await fsp.readFile(sel.value)));
             term.log(`SENT: ${sel.value}`);
         } else if (sel.value === 'api') {
             term.prompt.screen(Object.keys(lulc.schema.cli).map((k) => {
@@ -95,7 +98,7 @@ async function gpu() {
                 if (!res || res.toLowerCase() === 'y') {
                     const f = await term.prompt.ask('File Path');
 
-                    Object.assign(inp, JSON.parse(fs.readFileSync(path.resolve(f))));
+                    Object.assign(inp, JSON.parse(await fsp.readFile(path.resolve(f))));
 
                 } else {
                     if (data.body && data.body.type === 'object') {
@@ -121,9 +124,9 @@ async function gpu() {
 
             try {
                 const outp = path.resolve('/tmp/', 'api-output');
-                const out = fs.createWriteStream(outp).on('close', () => {
+                const out = fs.createWriteStream(outp).on('close', async () => {
                     try {
-                        term.log(JSON.stringify(JSON.parse(fs.readFileSync(outp)), null, 4));
+                        term.log(JSON.stringify(JSON.parse(await fsp.readFile(outp)), null, 4));
                     } catch (err) {
                         term.log(`Downloaded: ${outp}`);
                     }
@@ -172,15 +175,15 @@ async function gpu() {
             } else if (msg.message === 'model#checkpoint#complete') {
                 term.log(`ok - model#checkpoint#complete - ${msg.data.checkpoint}`);
                 term.prog.update();
-            } else if (msg.message === 'model#aoi#progress') {
-                term.log(`ok - model#aoi#progress - ${msg.data.aoi}`);
-                term.prog.update('model#aoi', 0);
-            } else if (msg.message === 'model#aoi#complete') {
-                term.log(`ok - model#aoi#complete - ${msg.data.aoi}`);
+            } else if (msg.message === 'model#timeframe#progress') {
+                term.log(`ok - model#timeframe#progress - ${msg.data.timeframe}`);
+                term.prog.update('model#timeframe', 0);
+            } else if (msg.message === 'model#timeframe#complete') {
+                term.log(`ok - model#timeframe#complete - ${msg.data.timeframe}`);
                 term.prog.update();
-            } else if (msg.message === 'model#aoi') {
-                term.log(`ok - model#aoi - ${msg.data.name} - chkpt: ${msg.data.checkpoint_id}`);
-                state.aois.push(msg.data);
+            } else if (msg.message === 'model#timeframe') {
+                term.log(`ok - model#timeframe - ${msg.data.name} - chkpt: ${msg.data.checkpoint_id}`);
+                state.timeframes.push(msg.data);
                 term.prog.update('model#prediction', 0);
             } else if (msg.message === 'model#patch') {
                 term.log(`ok - model#patch - ${msg.data.id}`);
@@ -196,10 +199,15 @@ async function gpu() {
             } else if (msg.message === 'model#prediction') {
                 term.prog.update('model#prediction', msg.data.processed / msg.data.total);
             } else if (msg.message === 'model#prediction#complete') {
-                term.log(`ok - model#prediction#complete - ${msg.data.aoi}`);
+                term.log(`ok - model#prediction#complete - ${msg.data.timeframe}`);
                 term.prog.update();
             } else if (msg.message === 'model#aborted') {
                 term.log('ok - model#aborted');
+                term.prog.update();
+            } else if (msg.message === 'model#retrain#progress') {
+                term.prog.update('model#retrain', msg.data.processed / msg.data.total);
+            } else if (msg.message === 'model#retrain#complete') {
+                term.prog.update('model#retrain#complete');
                 term.prog.update();
             } else if (msg.message === 'model#status') {
                 term.log(JSON.stringify(msg.data, null, 4));

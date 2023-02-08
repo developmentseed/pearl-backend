@@ -11,70 +11,8 @@ flight.user(test, 'ingalls', true);
 flight.fixture(test, 'model.json', 'ingalls');
 flight.fixture(test, 'project.json', 'ingalls');
 flight.fixture(test, 'checkpoint.json', 'ingalls');
-
-test('POST /api/project/1/aoi', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/project/1/aoi',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Test AOI',
-                checkpoint_id: 1,
-                bounds: {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [-79.37724530696869, 38.83428180092151],
-                        [-79.37677592039108, 38.83428180092151],
-                        [-79.37677592039108, 38.83455550411051],
-                        [-79.37724530696869, 38.83455550411051],
-                        [-79.37724530696869, 38.83428180092151]
-                    ]]
-                }
-            }
-        }, t);
-
-        t.ok(res.body.created, '.created: <date>');
-        delete res.body.created;
-
-        t.deepEquals(res.body, {
-            id: 1,
-            area: 1238,
-            storage: false,
-            project_id: 1,
-            checkpoint_id: 1,
-            bookmarked: false,
-            bookmarked_at: null,
-            patches: [],
-            name: 'Test AOI',
-            px_stats: {},
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
-            bounds: {
-                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
-                type: 'Polygon',
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            }
-        });
-    } catch (err) {
-        t.error(err, 'no errors');
-    }
-
-    t.end();
-});
+flight.fixture(test, 'aoi.json', 'ingalls');
+flight.fixture(test, 'timeframe.json', 'ingalls');
 
 test('GET /api/project/1/share', async (t) => {
     try {
@@ -100,11 +38,11 @@ test('GET /api/project/1/share', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/aoi/1/share', async (t) => {
+test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1/share',
+            url: '/api/project/1/aoi/1/timeframe/1/share',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -126,11 +64,11 @@ test('POST /api/project/1/aoi/1/share', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/aoi/2/share', async (t) => {
+test('POST /api/project/1/aoi/2/timeframe/2/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/2/share',
+            url: '/api/project/1/aoi/2/timeframe/2/share',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -156,7 +94,7 @@ test('[meta] Set aoi.storage: true', async (t) => {
     try {
         await flight.config.pool.query(sql`
             UPDATE
-                aois
+                aoi_timeframe
             SET
                 storage = true
         `);
@@ -167,11 +105,11 @@ test('[meta] Set aoi.storage: true', async (t) => {
     t.end();
 });
 
-test('POST /api/project/1/aoi/1/share', async (t) => {
+test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1/share',
+            url: '/api/project/1/aoi/1/timeframe/1/share',
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -187,6 +125,7 @@ test('POST /api/project/1/aoi/1/share', async (t) => {
         t.deepEquals(res.body, {
             aoi_id: 1,
             project_id: 1,
+            timeframe_id: 1,
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -232,6 +171,7 @@ test('GET /api/project/1/share', async (t) => {
             project_id: 1,
             shares: [{
                 aoi_id: 1,
+                timeframe_id: 1,
                 storage: false
             }]
         });
@@ -274,6 +214,7 @@ test('GET /api/share/uuid', async (t) => {
         t.deepEqual(res.body, {
             aoi_id: 1,
             project_id: 1,
+            timeframe_id: 1,
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -302,11 +243,11 @@ test('GET /api/share/uuid', async (t) => {
     t.end();
 });
 
-test('GET /api/project/1/aoi/1', async (t) => {
+test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1',
+            url: '/api/project/1/aoi/1/timeframe/1',
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -315,6 +256,8 @@ test('GET /api/project/1/aoi/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
+        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
+        delete res.body.mosaic_ts;
 
         t.ok(res.body.shares[0].created, '.shares[0].created: <date>');
         delete res.body.shares[0].created;
@@ -323,12 +266,11 @@ test('GET /api/project/1/aoi/1', async (t) => {
 
         t.deepEquals(res.body, {
             id: 1,
-            area: 1238,
-            name: 'Test AOI',
             storage: true,
             bookmarked: false,
             bookmarked_at: null,
-            project_id: 1,
+            aoi_id: 1,
+            mosaic: 'naip.latest',
             checkpoint_id: 1,
             patches: [],
             px_stats: {},
@@ -338,19 +280,9 @@ test('GET /api/project/1/aoi/1', async (t) => {
                 { name: 'Field', color: '#80FF80' },
                 { name: 'Built', color: '#806060' }
             ],
-            bounds: {
-                type: 'Polygon',
-                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
-                coordinates: [[
-                    [-79.37724530696869, 38.83428180092151],
-                    [-79.37677592039108, 38.83428180092151],
-                    [-79.37677592039108, 38.83455550411051],
-                    [-79.37724530696869, 38.83455550411051],
-                    [-79.37724530696869, 38.83428180092151]
-                ]]
-            },
             shares: [{
                 aoi_id: 1,
+                timeframe_id: 1,
                 storage: false
             }]
         });
@@ -361,11 +293,11 @@ test('GET /api/project/1/aoi/1', async (t) => {
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', async (t) => {
+test('DELETE /api/project/1/aoi/1/timeframe/1/share/<uuid> - doesn\'t exist', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
+            url: '/api/project/1/aoi/1/timeframe/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -387,11 +319,11 @@ test('DELETE /api/project/1/aoi/1/share/<uuid> - doesn\'t exist', async (t) => {
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/<uuid> - exists', async (t) => {
+test('DELETE /api/project/1/aoi/1/timeframe/1/<uuid> - exists', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: `/api/project/1/aoi/1/share/${uuid}`,
+            url: `/api/project/1/aoi/1/timeframe/1/share/${uuid}`,
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

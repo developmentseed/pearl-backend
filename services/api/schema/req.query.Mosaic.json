@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "sourceid": {
+            "type": "integer"
+        }
+    }
+}

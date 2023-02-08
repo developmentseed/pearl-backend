@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./mosaics/id.json"
+        },
+        "name": {
+            "$ref": "./mosaics/name.json"
+        },
+        "params": {
+            "$ref": "./mosaics/params.json"
+        },
+        "mosaic_ts": {
+            "$ref": "./mosaics/mosaic_ts.json"
+        },
+        "source_id": {
+            "$ref": "./mosaics/source_id.json"
+        },
+        "created": {
+            "$ref": "./mosaics/created.json"
+        },
+        "updated": {
+            "$ref": "./mosaics/updated.json"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "params",
+        "mosaic_ts",
+        "source_id",
+        "created",
+        "updated"
+    ]
+}

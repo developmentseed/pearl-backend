@@ -5,7 +5,7 @@ dotenv.config();
 
 import fs from 'fs';
 import express from 'express';
-import jwt from 'express-jwt';
+import { expressjwt as jwt } from 'express-jwt';
 import jwks from 'jwks-rsa';
 import cors from 'cors';
 import minify from 'express-minify';
@@ -224,6 +224,7 @@ export default async function server(config) {
             } else if (err instanceof ValidationError) {
                 return Err.respond(new Err(400, null, 'validation error'), res, err.validationErrors.body);
             } else if (err) {
+                console.log('error', err);
                 return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
             } else {
                 next();
@@ -233,28 +234,35 @@ export default async function server(config) {
             if (req.jwt.type === 'auth0') {
                 try {
                     // Load user from database, if exists
-                    const user = await User.from(config.pool, req.user.sub, 'auth0_id');
+                    const user = await User.from(config.pool, req.auth.sub, 'auth0_id');
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
-                    const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${req.jwt.token}`
-                        }
-                    });
+                    console.log('Failed to fetch user from DB', err);
+                    try {
+                        const auth0Data = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${req.jwt.token}`
+                            }
+                        });
+                        const auth0User = auth0Data.body;
 
-                    // Create user, add to request
-                    req.auth = await User.generate(config.pool, {
-                        access: 'user',
-                        auth0Id: auth0User.sub,
-                        username: auth0User.name,
-                        email: auth0User.email
-                    });
+                        // Create user, add to request
+                        req.auth = await User.generate(config.pool, {
+                            access: 'user',
+                            auth0Id: auth0User.sub,
+                            username: auth0User.name,
+                            email: auth0User.email
+                        });
 
-                    // Set auth type
-                    req.auth.type = 'auth0';
+                        // Set auth type
+                        req.auth.type = 'auth0';
+                    } catch (error) {
+                        console.log('Failed to create user', error);
+                        return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
+                    }
                 }
             }
             next();

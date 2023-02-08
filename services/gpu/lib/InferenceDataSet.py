@@ -9,9 +9,10 @@ EJE_MEAN = np.asarray([19.27930406, 16.32866561, 11.00430714, 51.38230159, 255.0
 EJE_STD = np.asarray([15.44816624, 12.1612895, 11.40836373, 16.50995133, 0.0])
 
 class InferenceDataSet(Dataset):
-    def __init__(self, api, tiles, tfm=None):
+    def __init__(self, api, timeframe):
         self.api = api
-        self.tiles = tiles
+        self.mosaic = timeframe.mosaic
+        self.tiles = timeframe.tiles
         self.tfm = A.Compose([
                 A.Normalize(mean=EJE_MEAN[:3], std=EJE_STD[:3], max_pixel_value=1.0),
                 ToTensorV2()
@@ -23,7 +24,7 @@ class InferenceDataSet(Dataset):
         in_memraster = False
         while in_memraster is False:
             try:
-                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+                in_memraster = self.api.get_tile(self.mosaic, zxy.z, zxy.x, zxy.y)
             except:
                 print("InferenceDataSet ERROR", sys.exc_info()[0])
         tile = in_memraster.data

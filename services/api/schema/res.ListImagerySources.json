@@ -1,0 +1,42 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "imagery_sources"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "imagery_sources": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "created",
+                    "updated",
+                    "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "$ref": "./util/id.json"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "updated": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Human-readable name of the Group"
+                    }
+                }
+            }
+        }
+    }
+}
