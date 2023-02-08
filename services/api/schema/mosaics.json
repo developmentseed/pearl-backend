@@ -11,9 +11,6 @@
         "params": {
             "$ref": "./mosaics/params.json"
         },
-        "mosaic_ts": {
-            "$ref": "./mosaics/mosaic_ts.json"
-        },
         "source_id": {
             "$ref": "./mosaics/source_id.json"
         },
@@ -22,15 +19,22 @@
         },
         "updated": {
             "$ref": "./mosaics/updated.json"
+        },
+        "mosaic_ts_start": {
+            "$ref": "./mosaics/mosaic_ts_start.json"
+        },
+        "mosaic_ts_end": {
+            "$ref": "./mosaics/mosaic_ts_end.json"
         }
     },
     "required": [
         "id",
         "name",
         "params",
-        "mosaic_ts",
         "source_id",
         "created",
-        "updated"
+        "updated",
+        "mosaic_ts_start",
+        "mosaic_ts_end"
     ]
 }

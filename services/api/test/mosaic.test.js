@@ -25,7 +25,8 @@ test('GET /api/mosaic', async(t) => {
                 id: '87b72c66331e136e088004fba817e3e8',
                 name: 'naip.latest',
                 params: { assets: 'image', asset_bidx: 'image|1,2,3', collection: 'naip' },
-                mosaic_ts: null,
+                mosaic_ts_start: null,
+                mosaic_ts_end: null,
                 source_id: 1
             }]
         });
@@ -47,13 +48,20 @@ test('GET /api/imagery', async(t) => {
             }
         }, t);
 
-        delete res.body.imagery_sources[0].created;
-        delete res.body.imagery_sources[0].updated;
+        for (const s of res.body.imagery_sources) {
+            delete s.created;
+            delete s.updated;
+        }
+
+
         t.deepEquals(res.body, {
-            total: 1,
+            total: 2,
             imagery_sources: [{
                 id: 1,
                 name: 'NAIP'
+            },{
+                id: 2,
+                name: 'Sentinel-2'
             }]
         });
     } catch (err) {
@@ -81,7 +89,8 @@ test('GET /api/mosaic?sourceid=1', async(t) => {
                 id: '87b72c66331e136e088004fba817e3e8',
                 name: 'naip.latest',
                 params: { assets: 'image', asset_bidx: 'image|1,2,3', collection: 'naip' },
-                mosaic_ts: null,
+                mosaic_ts_start: null,
+                mosaic_ts_end: null,
                 source_id: 1
             }]
         });

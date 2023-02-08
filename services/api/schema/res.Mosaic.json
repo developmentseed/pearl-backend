@@ -20,7 +20,10 @@
                     "params": {
                         "type": "object"
                     },
-                    "mosaic_ts": {
+                    "mosaic_ts_start": {
+                        "type": ["integer", "null"]
+                    },
+                    "mosaic_ts_end": {
                         "type": ["integer", "null"]
                     },
                     "source_id": {

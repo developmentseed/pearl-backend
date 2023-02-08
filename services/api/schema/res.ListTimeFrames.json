@@ -27,7 +27,8 @@
                 "required": [
                     "id",
                     "mosaic",
-                    "mosaic_ts",
+                    "mosaic_ts_start",
+                    "mosaic_ts_end",
                     "bookmarked",
                     "bookmarked_at",
                     "checkpoint_id",
@@ -72,7 +73,10 @@
                     "mosaic": {
                         "type": "string"
                     },
-                    "mosaic_ts": {
+                    "mosaic_ts_start": {
+                        "type": ["integer", "null"]
+                    },
+                    "mosaic_ts_end": {
                         "type": ["integer", "null"]
                     },
                     "classes": {

@@ -12,7 +12,8 @@
         "px_stats",
         "classes",
         "mosaic",
-        "mosaic_ts"
+        "mosaic_ts_start",
+        "mosaic_ts_end"
     ],
     "additionalProperties": false,
     "properties": {
@@ -52,7 +53,10 @@
         "mosaic": {
             "type": "string"
         },
-        "mosaic_ts": {
+        "mosaic_ts_start": {
+            "type": ["null", "integer"]
+        },
+        "mosaic_ts_end": {
             "type": ["null", "integer"]
         },
         "shares": {
