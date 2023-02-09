@@ -13,12 +13,16 @@
         },
         "name": {
             "$ref": "./imagery_sources/name.json"
+        },
+        "bounds": {
+            "$ref": "./imagery_sources/bounds.json"
         }
     },
     "required": [
         "id",
         "created",
         "updated",
-        "name"
+        "name",
+        "bounds"
     ]
 }

@@ -53,15 +53,38 @@ test('GET /api/imagery', async(t) => {
             delete s.updated;
         }
 
+        console.error(JSON.stringify(res.body));
 
         t.deepEquals(res.body, {
             total: 2,
             imagery_sources: [{
                 id: 1,
-                name: 'NAIP'
+                name: 'NAIP',
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [-180,-85.0511287798066,180,85.0511287798066],
+                    coordinates: [[
+                        [-180,-85.0511287798066],
+                        [-180,85.0511287798066],
+                        [180,85.0511287798066],
+                        [180,-85.0511287798066],
+                        [-180,-85.0511287798066]
+                    ]],
+                }
             },{
                 id: 2,
-                name: 'Sentinel-2'
+                name: 'Sentinel-2',
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [-180,-85.0511287798066,180,85.0511287798066],
+                    coordinates: [[
+                        [-180,-85.0511287798066],
+                        [-180,85.0511287798066],
+                        [180,85.0511287798066],
+                        [180,-85.0511287798066],
+                        [-180,-85.0511287798066]
+                    ]],
+                }
             }]
         });
     } catch (err) {
