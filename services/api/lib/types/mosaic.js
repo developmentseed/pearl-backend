@@ -28,7 +28,7 @@ export default class Mosaic extends Generic {
                 FROM
                     mosaics
                 WHERE
-                    (${query.sourceid}::TEXT IS NULL OR source_id = ${query.sourceid})
+                    (${query.sourceid}::TEXT IS NULL OR imagery_source_id = ${query.sourceid})
                 ORDER BY
                     ${sql.identifier(['mosaics', query.sort])} ${query.order}
                 LIMIT

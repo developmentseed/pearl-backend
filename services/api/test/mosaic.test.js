@@ -27,7 +27,7 @@ test('GET /api/mosaic', async(t) => {
                 params: { assets: 'image', asset_bidx: 'image|1,2,3', collection: 'naip' },
                 mosaic_ts_start: null,
                 mosaic_ts_end: null,
-                source_id: 1
+                imagery_source_id: 1
             }]
         });
     } catch (err) {
@@ -91,7 +91,7 @@ test('GET /api/mosaic?sourceid=1', async(t) => {
                 params: { assets: 'image', asset_bidx: 'image|1,2,3', collection: 'naip' },
                 mosaic_ts_start: null,
                 mosaic_ts_end: null,
-                source_id: 1
+                imagery_source_id: 1
             }]
         });
     } catch (err) {

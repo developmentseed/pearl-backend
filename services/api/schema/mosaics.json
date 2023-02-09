@@ -11,8 +11,8 @@
         "params": {
             "$ref": "./mosaics/params.json"
         },
-        "source_id": {
-            "$ref": "./mosaics/source_id.json"
+        "imagery_source_id": {
+            "$ref": "./mosaics/imagery_source_id.json"
         },
         "created": {
             "$ref": "./mosaics/created.json"
@@ -31,7 +31,7 @@
         "id",
         "name",
         "params",
-        "source_id",
+        "imagery_source_id",
         "created",
         "updated",
         "mosaic_ts_start",
