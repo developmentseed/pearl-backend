@@ -24,6 +24,9 @@
             "description": "Has the model been uploaded to azure - this is normally set by the server and not the client",
             "default": false
         },
+        "imagery_source_id": {
+            "type": "integer"
+        },
         "model_type": {
             "type": "string",
             "description": "Underlying model type",

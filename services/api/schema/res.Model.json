@@ -6,6 +6,7 @@
         "active",
         "uid",
         "name",
+        "imagery_source_id",
         "model_type",
         "model_inputshape",
         "model_zoom",
@@ -33,6 +34,9 @@
         "active": {
             "type": "boolean",
             "description": "Can the model be used for gpu instances"
+        },
+        "imagery_source_id": {
+            "type": "integer"
         },
         "model_type": {
             "type": "string",

@@ -23,7 +23,8 @@
                     "meta",
                     "classes",
                     "bounds",
-                    "storage"
+                    "storage",
+                    "imagery_source_id"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -59,6 +60,9 @@
                     },
                     "storage": {
                         "type": "boolean"
+                    },
+                    "imagery_source_id": {
+                        "type": "integer"
                     }
                 }
             }
