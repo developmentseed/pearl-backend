@@ -256,8 +256,6 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
-        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
-        delete res.body.mosaic_ts;
 
         t.ok(res.body.shares[0].created, '.shares[0].created: <date>');
         delete res.body.shares[0].created;

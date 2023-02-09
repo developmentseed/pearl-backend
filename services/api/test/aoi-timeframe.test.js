@@ -93,8 +93,6 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
-        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
-        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -134,8 +132,6 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
-        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
-        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -295,10 +291,8 @@ test('PATCH /api/project/1/aoi/1/timeframe/1', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         t.ok(res.body.bookmarked_at, '.bookmarked_at: <date>');
-        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
         delete res.body.created;
         delete res.body.bookmarked_at;
-        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -363,8 +357,6 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
-        t.ok(res.body.mosaic_ts, '.mosaic_ts: <date>');
-        delete res.body.mosaic_ts;
 
         t.deepEquals(res.body, {
             id: 2,
