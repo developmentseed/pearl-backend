@@ -287,6 +287,7 @@ test('GET /api/project', async (t) => {
                     uid: 1,
                     name: 'NAIP Supervised',
                     model_type: 'pytorch_example',
+                    imagery_source_id: 1,
                     osmtag_id: null,
                     model_inputshape: [240, 240, 4],
                     model_zoom: 17,
@@ -405,6 +406,7 @@ test('GET /api/project', async (t) => {
                     name: 'NAIP Supervised',
                     model_type: 'pytorch_example',
                     osmtag_id: null,
+                    imagery_source_id: 1,
                     model_inputshape: [240, 240, 4],
                     model_zoom: 17,
                     storage: true,
@@ -501,44 +503,24 @@ test('GET /api/project?name=lulc', async (t) => {
                     'aois': [],
                     'checkpoints': [],
                     'model': {
-                        'id': 1,
-                        'active': true,
-                        'uid': 1,
-                        'name': 'NAIP Supervised',
-                        'model_type': 'pytorch_example',
+                        id: 1,
+                        active: true,
+                        uid: 1,
+                        name: 'NAIP Supervised',
+                        model_type: 'pytorch_example',
+                        imagery_source_id: 1,
                         osmtag_id: null,
-                        'model_inputshape': [
-                            240,
-                            240,
-                            4
+                        model_inputshape: [ 240, 240, 4 ],
+                        model_zoom: 17,
+                        storage: true,
+                        classes: [
+                            { name: 'Water',          color: '#0000FF' },
+                            { name: 'Tree Canopy',    color: '#008000' },
+                            { name: 'Field',          color: '#80FF80' },
+                            { name: 'Built',          color: '#806060' }
                         ],
-                        'model_zoom': 17,
-                        'storage': true,
-                        'classes': [
-                            {
-                                'name': 'Water',
-                                'color': '#0000FF'
-                            },
-                            {
-                                'name': 'Tree Canopy',
-                                'color': '#008000'
-                            },
-                            {
-                                'name': 'Field',
-                                'color': '#80FF80'
-                            },
-                            {
-                                'name': 'Built',
-                                'color': '#806060'
-                            }
-                        ],
-                        'meta': {},
-                        'bounds': [
-                            -180,
-                            -90,
-                            180,
-                            90
-                        ]
+                        meta: {},
+                        bounds: [ -180, -90, 180, 90 ]
                     }
                 }
             ]
