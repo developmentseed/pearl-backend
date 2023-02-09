@@ -54,6 +54,7 @@ export default class Model extends Generic {
                     id,
                     created,
                     active,
+                    imagery_source_id,
                     uid,
                     name,
                     meta,
