@@ -243,7 +243,7 @@ export default async function router(schema, config) {
 
             return res.json(checkpoint.serialize());
         } catch (err) {
-            if (String(err.err).match(/ForeignKeyIntegrityConstraintViolationError/)) {
+            if (err.message.match(/ForeignKeyIntegrityConstraintViolationError/)) {
                 return Err.respond(new Err(400, null, 'Parent does not exist'), res);
             }
             return Err.respond(err, res);
