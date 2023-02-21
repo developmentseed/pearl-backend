@@ -36,6 +36,32 @@ export default async function router(schema, config) {
     });
 
     await schema.get('/mosaic/:mosaic', {
+        name: 'Get Mosaic',
+        group: 'Mosaic',
+        auth: 'public',
+        description: 'Return a single Mosaic Config',
+        ':mosaic': 'string',
+        res: 'mosaics.json'
+    }, async (req, res) => {
+        try {
+            let mosaic;
+            try {
+                mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                    column: 'name'
+                });
+            } catch (err) {
+                mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                    column: 'id'
+                });
+            }
+
+            return res.json(mosaic);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    await schema.get('/mosaic/:mosaic/tiles', {
         name: 'Get TileJSON',
         group: 'Mosaic',
         auth: 'public',
@@ -68,6 +94,7 @@ export default async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
 
     await schema.get('/mosaic/:layer/tiles/:z/:x/:y.:format', {
         name: 'Get Tile',

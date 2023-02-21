@@ -19,16 +19,8 @@ LOGGER = logging.getLogger("server")
 
 tiler = tileschemes.WebMercator()
 
-AVAILABLE_MOSAICS = {
-    "naip.latest": {
-        "id": "87b72c66331e136e088004fba817e3e8",
-        "default_params": {
-            "assets": "image",
-            "asset_bidx": "image|1,2,3,4",
-            "collection": "naip",
-        },
-    }
-}
+# Cached Mosaics
+AVAILABLE_MOSAICS = {}
 
 class API:
     def __init__(self, url, instance_id):
@@ -446,6 +438,9 @@ class API:
         return r.json()
 
     def get_tilejson(self, mosaic):
+        if AVAILABLE_MOSAICS.get(mosaic) is None:
+            AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
+
         _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
         params = _mosaic.get("default_params", {})
@@ -460,6 +455,9 @@ class API:
         return r.json()
 
     def get_tile(self, mosaic, z, x, y, iformat="npy", buffer=32, cache=True):
+        if AVAILABLE_MOSAICS.get(mosaic) is None:
+            AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
+
         _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
         params = _mosaic.get("default_params", {})
