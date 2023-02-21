@@ -418,7 +418,7 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_mosaic(mosaic):
+    def get_mosaic(self, mosaic):
         url = (
             self.url
             + "/api/mosaic/"
@@ -459,6 +459,7 @@ class API:
             AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
 
         _mosaic = AVAILABLE_MOSAICS[mosaic]
+
         searchid = _mosaic["id"]
         params = _mosaic.get("default_params", {})
         params.update(
