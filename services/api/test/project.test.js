@@ -510,7 +510,7 @@ test('GET /api/project?name=lulc', async (t) => {
                         model_type: 'pytorch_example',
                         imagery_source_id: 1,
                         osmtag_id: null,
-                        model_inputshape: [ 240, 240, 4 ],
+                        model_inputshape: [240, 240, 4],
                         model_zoom: 17,
                         storage: true,
                         classes: [
@@ -520,7 +520,7 @@ test('GET /api/project?name=lulc', async (t) => {
                             { name: 'Built',          color: '#806060' }
                         ],
                         meta: {},
-                        bounds: [ -180, -90, 180, 90 ]
+                        bounds: [-180, -90, 180, 90]
                     }
                 }
             ]
