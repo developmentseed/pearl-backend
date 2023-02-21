@@ -1267,9 +1267,27 @@ Note: this will not affect currently running instances of the model
 
 
 /**
-* @api {get} /mosaic/:mosaic Get TileJSON
+* @api {get} /mosaic/:mosaic Get Mosaic
 * @apiVersion 1.0.0
 * @apiName GET-/mosaic/:mosaic
+* @apiGroup Mosaic
+* @apiPermission public
+*
+* @apidescription
+*   Return a single Mosaic Config
+*
+* @apiParam {string} mosaic param
+*
+*
+*
+* @apiSchema {jsonschema=../schema/mosaics.json} apiSuccess
+*/
+
+
+/**
+* @api {get} /mosaic/:mosaic/tiles Get TileJSON
+* @apiVersion 1.0.0
+* @apiName GET-/mosaic/:mosaic/tiles
 * @apiGroup Mosaic
 * @apiPermission public
 *

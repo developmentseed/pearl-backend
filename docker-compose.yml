@@ -36,6 +36,8 @@ services:
     socket:
         platform: linux/amd64
         build: ./services/socket/
+        depends_on:
+            - api
         ports:
             - "1999:1999"
         environment:
