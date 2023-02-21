@@ -175,6 +175,7 @@ export function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
+                imagery_source_id: 1,
                 storage: false,
                 osmtag_id: null,
                 classes: [
@@ -227,6 +228,7 @@ export function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
+                imagery_source_id: 1,
                 storage: true,
                 osmtag_id: null,
                 classes: [
