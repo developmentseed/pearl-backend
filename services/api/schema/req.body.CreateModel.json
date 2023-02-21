@@ -6,6 +6,7 @@
         "model_type",
         "model_inputshape",
         "model_zoom",
+        "imagery_source_id",
         "classes",
         "meta"
     ],
@@ -65,6 +66,10 @@
         },
         "tagmap": {
             "$ref": "./util/osm-tagmap.json"
+        },
+        "imagery_source_id": {
+            "type": "integer",
+            "description": "The Imagery Sources that can be used with this model"
         }
     }
 }

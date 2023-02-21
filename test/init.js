@@ -139,6 +139,7 @@ export function connect(test, API) {
                     name: 'NAIP Supervised',
                     active: true,
                     model_type: 'pytorch_example',
+                    imagery_source_id: 1,
                     model_inputshape: [256, 256, 4],
                     model_zoom: 17,
                     classes: [
