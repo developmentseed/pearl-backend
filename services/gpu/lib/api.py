@@ -443,7 +443,7 @@ class API:
 
         _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
-        params = _mosaic.get("default_params", {})
+        params = _mosaic.get("params", {})
         url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/{searchid}/tilejson.json"
 
         LOGGER.info("ok - GET " + url)
@@ -461,7 +461,7 @@ class API:
         _mosaic = AVAILABLE_MOSAICS[mosaic]
 
         searchid = _mosaic["id"]
-        params = _mosaic.get("default_params", {})
+        params = _mosaic.get("params", {})
         params.update(
             {
                 "return_mask": False,
