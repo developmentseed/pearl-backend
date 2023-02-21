@@ -1,29 +1,23 @@
-import json
-import logging
 import os
+import jwt
+import json
 import shutil
+import logging
 import zipfile
+import urllib3
+import requests
+import numpy as np
 from io import BytesIO
 from os import path
-
-
-import jwt
-
-import numpy as np
-
-import requests
-import urllib3
+from .MemRaster import MemRaster
+from tiletanic import tileschemes
+from shapely.geometry import mapping
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
-from shapely.geometry import mapping
-from tiletanic import tileschemes
-
-from .MemRaster import MemRaster
 
 LOGGER = logging.getLogger("server")
 
 tiler = tileschemes.WebMercator()
-
 
 AVAILABLE_MOSAICS = {
     "naip.latest": {
@@ -35,7 +29,6 @@ AVAILABLE_MOSAICS = {
         },
     }
 }
-
 
 class API:
     def __init__(self, url, instance_id):
@@ -431,6 +424,25 @@ class API:
         r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def get_mosaic(mosaic):
+        url = (
+            self.url
+            + "/api/mosaic/"
+            + mosaic
+        )
+
+        LOGGER.info("ok - GET " + url)
+
+        r = self.requests.get(
+            url, headers={"authorization": "Bearer " + self.token}
+        )
+
+        LOGGER.info("ok - Received " + url)
+
+        r.raise_for_status()
+
         return r.json()
 
     def get_tilejson(self, mosaic):

@@ -4,7 +4,9 @@ import Flight from './flight.js';
 const flight = new Flight();
 
 flight.init(test);
-flight.takeoff(test);
+flight.takeoff(test, {
+    PcTileUrl: 'https://planetarycomputer-staging.microsoft.com'
+});
 flight.user(test, 'ingalls', true);
 
 test('GET /api/mosaic', async(t) => {
@@ -52,8 +54,6 @@ test('GET /api/imagery', async(t) => {
             delete s.created;
             delete s.updated;
         }
-
-        console.error(JSON.stringify(res.body));
 
         t.deepEquals(res.body, {
             total: 2,
@@ -156,7 +156,28 @@ test('GET /api/mosaic/naip.latest', async (t) => {
             }
         }, false);
 
-        t.equals(res.statusCode, 404, 'status: 404');
+        t.deepEquals(res.body.tilejson, '2.2.0');
+        t.deepEquals(res.body.name, '87b72c66331e136e088004fba817e3e8');
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/mosaic/87b72c66331e136e088004fba817e3e8', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/mosaic/87b72c66331e136e088004fba817e3e8',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, false);
+
+        t.deepEquals(res.body.tilejson, '2.2.0');
+        t.deepEquals(res.body.name, '87b72c66331e136e088004fba817e3e8');
     } catch (err) {
         t.error(err, 'no errors');
     }
@@ -165,3 +186,5 @@ test('GET /api/mosaic/naip.latest', async (t) => {
 });
 
 flight.landing(test);
+
+delete process.env.PcTileUrl;

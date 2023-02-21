@@ -45,9 +45,17 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        const mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
-            column: 'name'
-        });
+        let mosaic;
+        try {
+            mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                column: 'name'
+            });
+        } catch (err) {
+            mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                column: 'id'
+            });
+        }
+
         req.url = `/api/data/v1/mosaic/${mosaic.id}/tilejson.json`;
         req.query = {
             ...mosaic.params,
