@@ -479,7 +479,7 @@ class API:
             res = False
 
             if not cache or not os.path.isfile(tmpfs):
-                LOGGER.info("ok - GET " + url)
+                LOGGER.info("ok - GET " + url + " " + str(params))
                 r = self.requests.get(url, params=params)
 
                 r.raise_for_status()

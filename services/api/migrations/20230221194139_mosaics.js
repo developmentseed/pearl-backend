@@ -38,6 +38,16 @@ function up(knex) {
                 '2023-02-28'::TIMESTAMP
             );
 
+
+        UPDATE mosaics
+            SET
+                params = '{
+                    "assets": "image",
+                    "asset_bidx": "image|1,2,3,4",
+                    "collection": "naip"
+                }'::JSONB
+            WHERE id = 1;
+
     `);
 }
 
