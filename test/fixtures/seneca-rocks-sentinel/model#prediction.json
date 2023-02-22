@@ -2,6 +2,6 @@
     "action": "model#prediction",
     "data": {
         "aoi_id": 3,
-        "mosaic": "naip.latest"
+        "mosaic": "9406dbfba1d5416dc521857008180079"
     }
 }

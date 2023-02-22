@@ -20,7 +20,7 @@ const state = {
     timeframes: []
 };
 
-export function reconnect(test, API) {
+export function reconnect(test, API, argv) {
     running(test, API);
 
     test('pre-run', async (t) => {
@@ -47,7 +47,7 @@ export function reconnect(test, API) {
             const res = await prequest({
                 method: 'GET',
                 json: true,
-                url: API + '/api/project/1/instance/1',
+                url: API + '/api/project/${argv.project}/instance/1',
                 headers: {
                     Authorization: `Bearer ${state.token}`
                 }
@@ -71,7 +71,7 @@ export function reconnect(test, API) {
 
             t.deepEquals(res.body, {
                 is_batch: false,
-                project_id: 1,
+                project_id: parseInt(argv.project),
                 aoi_id: null,
                 checkpoint_id: null
             }, 'expected body');
@@ -88,7 +88,7 @@ export function reconnect(test, API) {
     return state;
 }
 
-export function connect(test, API) {
+export function connect(test, API, argv) {
     test('pre-run', async (t) => {
         try {
             await drop();
@@ -539,60 +539,6 @@ export function connect(test, API) {
         t.end();
     });
 
-    test('Instance 1', async (t) => {
-        try {
-            const res = await prequest({
-                method: 'POST',
-                json: true,
-                url: API + '/api/project/1/instance',
-                body: {},
-                headers: {
-                    Authorization: `Bearer ${state.token}`
-                }
-            });
-
-            t.equals(res.statusCode, 200, '200 status code');
-
-            t.deepEquals(Object.keys(res.body).sort(), [
-                'active',
-                'timeframe_id',
-                'checkpoint_id',
-                'created',
-                'id',
-                'batch',
-                'last_update',
-                'pod',
-                'project_id',
-                'token',
-                'type'
-            ].sort(), 'expected props');
-
-            t.ok(parseInt(res.body.id), 'id: <integer>');
-
-            state.instance = JSON.parse(JSON.stringify(res.body));
-
-            delete res.body.id;
-            delete res.body.created;
-            delete res.body.last_update;
-            delete res.body.token;
-
-            t.deepEquals(res.body, {
-                project_id: 1,
-                batch: null,
-                timeframe_id: null,
-                checkpoint_id: null,
-                active: false,
-                pod: {},
-                type: 'cpu'
-            }, 'expected body');
-
-        } catch (err) {
-            t.error(err, 'no error');
-        }
-
-        t.end();
-    });
-
     test('Project 2 - Sentinel', async (t) => {
         try {
             const res = await prequest({
@@ -693,6 +639,61 @@ export function connect(test, API) {
 
         t.end();
     });
+
+    test('Instance 1', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + `/api/project/${parseInt(argv.project)}/instance`,
+                body: {},
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'active',
+                'timeframe_id',
+                'checkpoint_id',
+                'created',
+                'id',
+                'batch',
+                'last_update',
+                'pod',
+                'project_id',
+                'token',
+                'type'
+            ].sort(), 'expected props');
+
+            t.ok(parseInt(res.body.id), 'id: <integer>');
+
+            state.instance = JSON.parse(JSON.stringify(res.body));
+
+            delete res.body.id;
+            delete res.body.created;
+            delete res.body.last_update;
+            delete res.body.token;
+
+            t.deepEquals(res.body, {
+                project_id: parseInt(argv.project),
+                batch: null,
+                timeframe_id: null,
+                checkpoint_id: null,
+                active: false,
+                pod: {},
+                type: 'cpu'
+            }, 'expected body');
+
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
 
     populate(test, API, state);
 

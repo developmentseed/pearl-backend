@@ -13,13 +13,14 @@ const SOCKET = process.env.SOCKET || 'ws://localhost:1999';
 import { connect, reconnect } from './init.js';
 
 const argv = minimist(process.argv, {
-    string: ['postgres'],
+    string: ['postgres', 'project'],
     boolean: ['interactive', 'debug', 'reconnect'],
     alias: {
         interactive: 'i'
     },
     default: {
-        postgres: process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis'
+        postgres: process.env.Postgres || 'postgres://docker:docker@localhost:5433/gis',
+        project: 1
     }
 });
 
@@ -27,9 +28,9 @@ process.env.Postgres = argv.postgres;
 
 let state;
 if (argv.reconnect) {
-    state = reconnect(test, API);
+    state = reconnect(test, API, argv);
 } else {
-    state = connect(test, API);
+    state = connect(test, API, argv);
 }
 
 if (argv.interactive) {
@@ -41,6 +42,7 @@ if (argv.interactive) {
 
 async function gpu() {
     state.connected = false;
+    console.error(state.instance);
 
     const ws = new WebSocket(SOCKET + `?token=${state.instance.token}`);
     const term = new Term(argv.debug);
