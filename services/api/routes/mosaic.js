@@ -24,7 +24,7 @@ export default async function router(schema, config) {
         auth: 'public',
         description: 'Return a list of currently supported mosaic layers',
         query: 'req.query.Mosaic.json',
-        res: 'res.Mosaic.json'
+        res: 'res.Mosaics.json'
     }, async (req, res) => {
         try {
             const list = await Mosaic.list(config.pool, req.query);
@@ -41,7 +41,7 @@ export default async function router(schema, config) {
         auth: 'public',
         description: 'Return a single Mosaic Config',
         ':mosaic': 'string',
-        res: 'mosaics.json'
+        res: 'res.Mosaic.json'
     }, async (req, res) => {
         try {
             let mosaic;

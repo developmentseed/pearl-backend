@@ -1262,7 +1262,7 @@ Note: this will not affect currently running instances of the model
 *
 * @apiSchema (Query) {jsonschema=../schema/req.query.Mosaic.json} apiParam
 *
-* @apiSchema {jsonschema=../schema/res.Mosaic.json} apiSuccess
+* @apiSchema {jsonschema=../schema/res.Mosaics.json} apiSuccess
 */
 
 
@@ -1280,7 +1280,7 @@ Note: this will not affect currently running instances of the model
 *
 *
 *
-* @apiSchema {jsonschema=../schema/mosaics.json} apiSuccess
+* @apiSchema {jsonschema=../schema/res.Mosaic.json} apiSuccess
 */
 
 

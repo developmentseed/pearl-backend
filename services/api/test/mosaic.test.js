@@ -145,6 +145,34 @@ test('GET /api/mosaic?sourceid=2', async(t) => {
     t.end();
 });
 
+test('GET /api/mosaic/2849689f57f1b3b9c1f725abb75aa411', async(t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/mosaic/2849689f57f1b3b9c1f725abb75aa411',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        delete res.body.created;
+        delete res.body.updated;
+        t.deepEquals(res.body, {
+            id: '2849689f57f1b3b9c1f725abb75aa411',
+            name: 'Sentinel-2 Dec 2019 - March 2020',
+            params: { assets: ['B03', 'B02'], collection: 'sentinel-2-l2a', color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35' },
+            mosaic_ts_start: 1575158400000,
+            mosaic_ts_end: 1585612800000,
+            imagery_source_id: 2
+        });
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 test('GET /api/mosaic/naip.latest/tiles', async (t) => {
     try {
         const res = await flight.request({
