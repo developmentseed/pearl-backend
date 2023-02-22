@@ -46,8 +46,7 @@ function up(knex) {
                     "asset_bidx": "image|1,2,3,4",
                     "collection": "naip"
                 }'::JSONB
-            WHERE id = 1;
-
+            WHERE id = '87b72c66331e136e088004fba817e3e8';
     `);
 }
 
