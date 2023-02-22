@@ -199,7 +199,7 @@ export function connect(test, API) {
         t.end();
     });
 
-    test('new model - storage: true', async (t) => {
+    test('NAIP Model - storage: true', async (t) => {
         try {
             const res = await prequest({
                 method: 'PATCH',
@@ -275,7 +275,7 @@ export function connect(test, API) {
                         {"name": "Agua", "color":"#FF5733"},
                         {"name": "Suelo desnudo", "color":"#48F374"},
                     ],
-                    meta: {}
+                    meta: {},
                 },
                 headers: {
                     Authorization: `Bearer ${state.token}`
@@ -298,6 +298,7 @@ export function connect(test, API) {
                 imagery_source_id: 2,
                 model_inputshape: [256, 256, 3],
                 model_zoom: 14,
+                storage: false,
                 classes: [
                     {"name": "Bosque", "color": "#6CA966"},
                     {"name": "Selvas", "color": "#D0F3AB"},
@@ -308,7 +309,9 @@ export function connect(test, API) {
                     {"name": "Agua", "color":"#FF5733"},
                     {"name": "Suelo desnudo", "color":"#48F374"},
                 ],
-                meta: {}
+                meta: {},
+                bounds: [ -180, -90, 180, 90 ],
+                osmtag_id: null
             }, 'expected body');
 
         } catch (err) {
@@ -318,12 +321,12 @@ export function connect(test, API) {
         t.end();
     });
 
-    test('new model - storage: true', async (t) => {
+    test('Sentinel Model - storage: true', async (t) => {
         try {
             const res = await prequest({
                 method: 'PATCH',
                 json: true,
-                url: API + '/api/model/1',
+                url: API + '/api/model/2',
                 body: {
                     storage: true
                 },
@@ -342,26 +345,26 @@ export function connect(test, API) {
             t.deepEquals(res.body, {
                 active: true,
                 uid: 1,
-                name: 'NAIP Supervised',
-                bounds: [-180, -90, 180, 90],
-                model_type: 'pytorch_example',
-                model_inputshape: [256, 256, 4],
-                model_zoom: 17,
-                imagery_source_id: 1,
+                name: 'Sentinel',
+                active: true,
+                model_type: 'unet3',
+                imagery_source_id: 2,
+                model_inputshape: [256, 256, 3],
+                model_zoom: 14,
                 storage: true,
-                osmtag_id: null,
                 classes: [
-                    { name: 'Water', color: '#0000FF' },
-                    { name: 'Emergent Wetlands', color: '#008000' },
-                    { name: 'Tree Canopy', color: '#80FF80' },
-                    { name: 'Shrubland', color: '#806060' },
-                    { name: 'Low Vegetation', color: '#07c4c5' },
-                    { name: 'Barren', color: '#027fdc' },
-                    { name: 'Structure', color: '#f76f73' },
-                    { name: 'Impervious Surface', color: '#ffb703' },
-                    { name: 'Impervious Road', color: '#0218a2' }
+                    {"name": "Bosque", "color": "#6CA966"},
+                    {"name": "Selvas", "color": "#D0F3AB"},
+                    {"name": "Pastos", "color": "#D2AD74"},
+                    {"name": "Agricultura", "color": "#486DA2"},
+                    {"name": "Urbano", "color": "#F10100"},
+                    {"name": "Sin vegetación aparente", "color": "#FFC300"},
+                    {"name": "Agua", "color":"#FF5733"},
+                    {"name": "Suelo desnudo", "color":"#48F374"},
                 ],
-                meta: {}
+                meta: {},
+                bounds: [ -180, -90, 180, 90 ],
+                osmtag_id: null
             }, 'expected body');
 
         } catch (err) {
@@ -616,11 +619,11 @@ export function connect(test, API) {
             delete res.body.created;
 
             t.deepEquals(res.body, {
-                id: 1,
+                id: 2,
                 uid: 1,
                 name: 'Sentinel Project',
                 model_id: 2,
-                model_name: 'NAIP Supervised'
+                model_name: 'Sentinel'
             }, 'expected body');
         } catch (err) {
             t.error(err, 'no error');
