@@ -32,6 +32,7 @@
             "type": "string",
             "description": "Underlying model type",
             "enum": [
+                "unet3",
                 "random_forest",
                 "pytorch_example",
                 "pytorch_solar",
