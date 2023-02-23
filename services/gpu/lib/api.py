@@ -462,17 +462,9 @@ class API:
 
         searchid = _mosaic["id"]
         params = _mosaic.get("params", {})
-        params.update(
-            {
-                "return_mask": False,
-                "buffer": buffer,
-            }
-        )
+        params.update({ "return_mask": False, "buffer": buffer })
 
-        url = (
-            os.environ["PcTileUrl"]
-            + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
-        )
+        url = (os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}")
 
         if iformat == "npy":
             tmpfs = "{}/tiles/{}-{}-{}.{}".format(self.tmp_dir, x, y, z, iformat)
@@ -482,14 +474,23 @@ class API:
                 LOGGER.info("ok - GET " + url + " " + str(params))
                 r = self.requests.get(url, params=params)
 
+                print(r.text);
                 r.raise_for_status()
                 LOGGER.info("ok - Received " + url)
 
                 res = np.load(BytesIO(r.content))
 
-                assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
-                res = np.moveaxis(res, 0, -1)
-                assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
+                print(res.shape);
+                channels = self.model.get('model_inputshape', [256, 256, 4])[2]
+
+                if channels == 4:
+                    assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
+                    res = np.moveaxis(res, 0, -1)
+                    assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
+                else:
+                    res = np.moveaxis(res, 0, -1)
+                    res = res[..., :channels]
+                    print('FINAL', res.shape);
 
                 np.save("{}/tiles/{}-{}-{}.npy".format(self.tmp_dir, x, y, z), res)
             else:
