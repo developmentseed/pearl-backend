@@ -338,8 +338,14 @@ export default async function router(schema, config) {
                     column: 'name'
                 });
             } catch (err) {
-                console.error(err);
-                throw new Err(400, null, 'Invalid Mosaic');
+                try {
+                    await Mosaic.from(config.pool, req.body.mosaic, {
+                        column: 'id'
+                    });
+                } catch (err) {
+                    console.error(err);
+                    throw new Err(400, null, 'Invalid Mosaic');
+                }
             }
 
             req.body.aoi_id = req.params.aoiid;
