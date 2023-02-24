@@ -27,8 +27,8 @@ class InferenceDataSet(Dataset):
                 in_memraster = self.api.get_tile(self.mosaic, zxy.z, zxy.x, zxy.y)
             except:
                 print("InferenceDataSet ERROR", sys.exc_info()[0])
-        tile = in_memraster.data
-        tile = tile.transpose(1,2,0)
+        tile = in_memraster.data # tile shape: HxWxC
+        # tile = tile.transpose(1,2,0)
         tile = self.tfm(image=tile)["image"]
         return (
             tile,
