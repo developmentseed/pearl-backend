@@ -486,13 +486,11 @@ class API:
                 paramstp = urllib.parse.urlencode(paramstp, safe=':+')
                 r = self.requests.get(url, params=paramstp)
 
-                print(r.text);
                 r.raise_for_status()
                 LOGGER.info("ok - Received " + url)
 
                 res = np.load(BytesIO(r.content))
 
-                print(res.shape);
                 channels = self.model.get('model_inputshape', [256, 256, 4])[2]
 
                 if channels == 4:
@@ -502,7 +500,6 @@ class API:
                 else:
                     res = np.moveaxis(res, 0, -1)
                     res = res[..., :channels]
-                    print('FINAL', res.shape);
 
                 np.save("{}/tiles/{}-{}-{}.npy".format(self.tmp_dir, x, y, z), res)
             else:
