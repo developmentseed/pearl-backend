@@ -7,6 +7,7 @@ import zipfile
 import urllib3
 import requests
 import numpy as np
+import urllib.parse
 from io import BytesIO
 from os import path
 from .MemRaster import MemRaster
@@ -14,6 +15,7 @@ from tiletanic import tileschemes
 from shapely.geometry import mapping
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+import http.client as http_client
 
 LOGGER = logging.getLogger("server")
 
@@ -472,7 +474,17 @@ class API:
 
             if not cache or not os.path.isfile(tmpfs):
                 LOGGER.info("ok - GET " + url + " " + str(params))
-                r = self.requests.get(url, params=params)
+
+                paramstp = [];
+                for item in params.items():
+                    if isinstance(item[1], list):
+                        for value in item[1]:
+                            paramstp.append((item[0], value))
+                    else:
+                        paramstp.append(item)
+
+                paramstp = urllib.parse.urlencode(paramstp, safe=':+')
+                r = self.requests.get(url, params=paramstp)
 
                 print(r.text);
                 r.raise_for_status()
