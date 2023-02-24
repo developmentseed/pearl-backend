@@ -24,7 +24,7 @@ export default async function router(schema, config) {
         auth: 'public',
         description: 'Return a list of currently supported mosaic layers',
         query: 'req.query.Mosaic.json',
-        res: 'res.Mosaic.json'
+        res: 'res.Mosaics.json'
     }, async (req, res) => {
         try {
             const list = await Mosaic.list(config.pool, req.query);
@@ -36,6 +36,32 @@ export default async function router(schema, config) {
     });
 
     await schema.get('/mosaic/:mosaic', {
+        name: 'Get Mosaic',
+        group: 'Mosaic',
+        auth: 'public',
+        description: 'Return a single Mosaic Config',
+        ':mosaic': 'string',
+        res: 'res.Mosaic.json'
+    }, async (req, res) => {
+        try {
+            let mosaic;
+            try {
+                mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                    column: 'name'
+                });
+            } catch (err) {
+                mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                    column: 'id'
+                });
+            }
+
+            return res.json(mosaic);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    await schema.get('/mosaic/:mosaic/tiles', {
         name: 'Get TileJSON',
         group: 'Mosaic',
         auth: 'public',
@@ -45,9 +71,17 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         if (!config.PcTileUrl) return Err.respond(new Err(404, null, 'Tile Endpoint Not Configured'), res);
 
-        const mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
-            column: 'name'
-        });
+        let mosaic;
+        try {
+            mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                column: 'name'
+            });
+        } catch (err) {
+            mosaic = await Mosaic.from(config.pool, req.params.mosaic, {
+                column: 'id'
+            });
+        }
+
         req.url = `/api/data/v1/mosaic/${mosaic.id}/tilejson.json`;
         req.query = {
             ...mosaic.params,
@@ -60,6 +94,7 @@ export default async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
 
     await schema.get('/mosaic/:layer/tiles/:z/:x/:y.:format', {
         name: 'Get Tile',

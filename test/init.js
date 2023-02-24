@@ -20,7 +20,7 @@ const state = {
     timeframes: []
 };
 
-export function reconnect(test, API) {
+export function reconnect(test, API, argv) {
     running(test, API);
 
     test('pre-run', async (t) => {
@@ -47,7 +47,7 @@ export function reconnect(test, API) {
             const res = await prequest({
                 method: 'GET',
                 json: true,
-                url: API + '/api/project/1/instance/1',
+                url: API + '/api/project/${argv.project}/instance/1',
                 headers: {
                     Authorization: `Bearer ${state.token}`
                 }
@@ -71,7 +71,7 @@ export function reconnect(test, API) {
 
             t.deepEquals(res.body, {
                 is_batch: false,
-                project_id: 1,
+                project_id: parseInt(argv.project),
                 aoi_id: null,
                 checkpoint_id: null
             }, 'expected body');
@@ -88,7 +88,7 @@ export function reconnect(test, API) {
     return state;
 }
 
-export function connect(test, API) {
+export function connect(test, API, argv) {
     test('pre-run', async (t) => {
         try {
             await drop();
@@ -129,7 +129,7 @@ export function connect(test, API) {
 
     running(test, API);
 
-    test('new model', async (t) => {
+    test('NAIP Model', async (t) => {
         try {
             const res = await prequest({
                 method: 'POST',
@@ -139,6 +139,7 @@ export function connect(test, API) {
                     name: 'NAIP Supervised',
                     active: true,
                     model_type: 'pytorch_example',
+                    imagery_source_id: 1,
                     model_inputshape: [256, 256, 4],
                     model_zoom: 17,
                     classes: [
@@ -174,6 +175,7 @@ export function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
+                imagery_source_id: 1,
                 storage: false,
                 osmtag_id: null,
                 classes: [
@@ -197,7 +199,7 @@ export function connect(test, API) {
         t.end();
     });
 
-    test('new model - storage: true', async (t) => {
+    test('NAIP Model - storage: true', async (t) => {
         try {
             const res = await prequest({
                 method: 'PATCH',
@@ -226,6 +228,7 @@ export function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
+                imagery_source_id: 1,
                 storage: true,
                 osmtag_id: null,
                 classes: [
@@ -249,7 +252,129 @@ export function connect(test, API) {
         t.end();
     });
 
-    test('Project 1', async (t) => {
+    test('Sentinel Model', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/model',
+                body: {
+                    name: 'Sentinel',
+                    active: true,
+                    model_type: 'unet3',
+                    imagery_source_id: 2,
+                    model_inputshape: [256, 256, 3],
+                    model_zoom: 14,
+                    classes: [
+                        {"name": "Bosque", "color": "#6CA966"},
+                        {"name": "Selvas", "color": "#D0F3AB"},
+                        {"name": "Pastos", "color": "#D2AD74"},
+                        {"name": "Agricultura", "color": "#486DA2"},
+                        {"name": "Urbano", "color": "#F10100"},
+                        {"name": "Sin vegetación aparente", "color": "#FFC300"},
+                        {"name": "Agua", "color":"#FF5733"},
+                        {"name": "Suelo desnudo", "color":"#48F374"},
+                    ],
+                    meta: {},
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.ok(parseInt(res.body.id), 'id: <integer>');
+
+            delete res.body.created;
+            delete res.body.id;
+
+            t.deepEquals(res.body, {
+                active: true,
+                uid: 1,
+                name: 'Sentinel',
+                active: true,
+                model_type: 'unet3',
+                imagery_source_id: 2,
+                model_inputshape: [256, 256, 3],
+                model_zoom: 14,
+                storage: false,
+                classes: [
+                    {"name": "Bosque", "color": "#6CA966"},
+                    {"name": "Selvas", "color": "#D0F3AB"},
+                    {"name": "Pastos", "color": "#D2AD74"},
+                    {"name": "Agricultura", "color": "#486DA2"},
+                    {"name": "Urbano", "color": "#F10100"},
+                    {"name": "Sin vegetación aparente", "color": "#FFC300"},
+                    {"name": "Agua", "color":"#FF5733"},
+                    {"name": "Suelo desnudo", "color":"#48F374"},
+                ],
+                meta: {},
+                bounds: [ -180, -90, 180, 90 ],
+                osmtag_id: null
+            }, 'expected body');
+
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('Sentinel Model - storage: true', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'PATCH',
+                json: true,
+                url: API + '/api/model/2',
+                body: {
+                    storage: true
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.ok(parseInt(res.body.id), 'id: <integer>');
+
+            delete res.body.created;
+            delete res.body.id;
+
+            t.deepEquals(res.body, {
+                active: true,
+                uid: 1,
+                name: 'Sentinel',
+                active: true,
+                model_type: 'unet3',
+                imagery_source_id: 2,
+                model_inputshape: [256, 256, 3],
+                model_zoom: 14,
+                storage: true,
+                classes: [
+                    {"name": "Bosque", "color": "#6CA966"},
+                    {"name": "Selvas", "color": "#D0F3AB"},
+                    {"name": "Pastos", "color": "#D2AD74"},
+                    {"name": "Agricultura", "color": "#486DA2"},
+                    {"name": "Urbano", "color": "#F10100"},
+                    {"name": "Sin vegetación aparente", "color": "#FFC300"},
+                    {"name": "Agua", "color":"#FF5733"},
+                    {"name": "Suelo desnudo", "color":"#48F374"},
+                ],
+                meta: {},
+                bounds: [ -180, -90, 180, 90 ],
+                osmtag_id: null
+            }, 'expected body');
+
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('Project 1 - NAIP', async (t) => {
         try {
             const res = await prequest({
                 method: 'POST',
@@ -414,12 +539,113 @@ export function connect(test, API) {
         t.end();
     });
 
+    test('Project 2 - Sentinel', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project',
+                body: {
+                    name: 'Sentinel Project',
+                    model_id: 2
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'created', 'id', 'model_id', 'name', 'uid', 'model_name'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+
+            delete res.body.created;
+
+            t.deepEquals(res.body, {
+                id: 2,
+                uid: 1,
+                name: 'Sentinel Project',
+                model_id: 2,
+                model_name: 'Sentinel'
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('AOI 3 - Seneca Rocks (small)', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project/2/aoi',
+                body: {
+                    name: 'Seneca Rocks, WV',
+                    bounds: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [ -79.38355922698973, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.830046580030306 ]
+                        ]]
+                    }
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'area', 'bookmarked', 'bookmarked_at', 'bounds', 'created', 'id', 'name', 'project_id', 'updated'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+            delete res.body.created;
+
+            t.ok(res.body.updated, 'updated: <date>');
+            delete res.body.updated;
+
+            t.deepEquals(res.body, {
+                id: 3,
+                name: 'Seneca Rocks, WV',
+                project_id: 2,
+                bookmarked: false,
+                bookmarked_at: null,
+                area: 722859,
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [ -79.38355922698973, 38.830046580030306, -79.37222957611084, 38.83666569946354 ],
+                    coordinates: [[
+                        [ -79.38355922698973, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.830046580030306 ]
+                    ]]
+                }
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
     test('Instance 1', async (t) => {
         try {
             const res = await prequest({
                 method: 'POST',
                 json: true,
-                url: API + '/api/project/1/instance',
+                url: API + `/api/project/${parseInt(argv.project)}/instance`,
                 body: {},
                 headers: {
                     Authorization: `Bearer ${state.token}`
@@ -452,7 +678,7 @@ export function connect(test, API) {
             delete res.body.token;
 
             t.deepEquals(res.body, {
-                project_id: 1,
+                project_id: parseInt(argv.project),
                 batch: null,
                 timeframe_id: null,
                 checkpoint_id: null,
@@ -467,6 +693,7 @@ export function connect(test, API) {
 
         t.end();
     });
+
 
     populate(test, API, state);
 

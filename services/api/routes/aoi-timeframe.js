@@ -169,7 +169,7 @@ export default async function router(schema, config) {
                 }
             });
 
-            const tf = await TimeFrame.from(config.pool, req.params.aoiid);
+            const tf = await TimeFrame.from(config.pool, req.params.timeframeid);
 
             const files = [];
 
@@ -222,6 +222,7 @@ export default async function router(schema, config) {
 
             return req.pipe(busboy);
         } catch (err) {
+            console.error(err);
             return Err.respond(err, res);
         }
     });
@@ -338,8 +339,14 @@ export default async function router(schema, config) {
                     column: 'name'
                 });
             } catch (err) {
-                console.error(err);
-                throw new Err(400, null, 'Invalid Mosaic');
+                try {
+                    await Mosaic.from(config.pool, req.body.mosaic, {
+                        column: 'id'
+                    });
+                } catch (err) {
+                    console.error(err);
+                    throw new Err(400, null, 'Invalid Mosaic');
+                }
             }
 
             req.body.aoi_id = req.params.aoiid;

@@ -42,6 +42,7 @@
             "type": "string",
             "description": "Underlying model type",
             "enum": [
+                "unet3",
                 "deeplabv3plus",
                 "random_forest",
                 "pytorch_example",

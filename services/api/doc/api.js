@@ -1262,14 +1262,32 @@ Note: this will not affect currently running instances of the model
 *
 * @apiSchema (Query) {jsonschema=../schema/req.query.Mosaic.json} apiParam
 *
+* @apiSchema {jsonschema=../schema/res.Mosaics.json} apiSuccess
+*/
+
+
+/**
+* @api {get} /mosaic/:mosaic Get Mosaic
+* @apiVersion 1.0.0
+* @apiName GET-/mosaic/:mosaic
+* @apiGroup Mosaic
+* @apiPermission public
+*
+* @apidescription
+*   Return a single Mosaic Config
+*
+* @apiParam {string} mosaic param
+*
+*
+*
 * @apiSchema {jsonschema=../schema/res.Mosaic.json} apiSuccess
 */
 
 
 /**
-* @api {get} /mosaic/:mosaic Get TileJSON
+* @api {get} /mosaic/:mosaic/tiles Get TileJSON
 * @apiVersion 1.0.0
-* @apiName GET-/mosaic/:mosaic
+* @apiName GET-/mosaic/:mosaic/tiles
 * @apiGroup Mosaic
 * @apiPermission public
 *

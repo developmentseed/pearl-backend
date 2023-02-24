@@ -319,6 +319,11 @@
         "query": false,
         "res": true
     },
+    "GET /mosaic/:mosaic/tiles": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /mosaic/:layer/tiles/:z/:x/:y.:format": {
         "body": false,
         "query": false,

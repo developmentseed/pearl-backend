@@ -1,41 +1,28 @@
-import json
-import logging
 import os
+import jwt
+import json
 import shutil
+import logging
 import zipfile
+import urllib3
+import requests
+import numpy as np
+import urllib.parse
 from io import BytesIO
 from os import path
-
-
-import jwt
-
-import numpy as np
-
-import requests
-import urllib3
+from .MemRaster import MemRaster
+from tiletanic import tileschemes
+from shapely.geometry import mapping
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
-from shapely.geometry import mapping
-from tiletanic import tileschemes
-
-from .MemRaster import MemRaster
+import http.client as http_client
 
 LOGGER = logging.getLogger("server")
 
 tiler = tileschemes.WebMercator()
 
-
-AVAILABLE_MOSAICS = {
-    "naip.latest": {
-        "id": "87b72c66331e136e088004fba817e3e8",
-        "default_params": {
-            "assets": "image",
-            "asset_bidx": "image|1,2,3,4",
-            "collection": "naip",
-        },
-    }
-}
-
+# Cached Mosaics
+AVAILABLE_MOSAICS = {}
 
 class API:
     def __init__(self, url, instance_id):
@@ -433,10 +420,32 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
+    def get_mosaic(self, mosaic):
+        url = (
+            self.url
+            + "/api/mosaic/"
+            + mosaic
+        )
+
+        LOGGER.info("ok - GET " + url)
+
+        r = self.requests.get(
+            url, headers={"authorization": "Bearer " + self.token}
+        )
+
+        LOGGER.info("ok - Received " + url)
+
+        r.raise_for_status()
+
+        return r.json()
+
     def get_tilejson(self, mosaic):
+        if AVAILABLE_MOSAICS.get(mosaic) is None:
+            AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
+
         _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
-        params = _mosaic.get("default_params", {})
+        params = _mosaic.get("params", {})
         url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/{searchid}/tilejson.json"
 
         LOGGER.info("ok - GET " + url)
@@ -448,37 +457,49 @@ class API:
         return r.json()
 
     def get_tile(self, mosaic, z, x, y, iformat="npy", buffer=32, cache=True):
-        _mosaic = AVAILABLE_MOSAICS[mosaic]
-        searchid = _mosaic["id"]
-        params = _mosaic.get("default_params", {})
-        params.update(
-            {
-                "return_mask": False,
-                "buffer": buffer,
-            }
-        )
+        if AVAILABLE_MOSAICS.get(mosaic) is None:
+            AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
 
-        url = (
-            os.environ["PcTileUrl"]
-            + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
-        )
+        _mosaic = AVAILABLE_MOSAICS[mosaic]
+
+        searchid = _mosaic["id"]
+        params = _mosaic.get("params", {})
+        params.update({ "return_mask": False, "buffer": buffer })
+
+        url = (os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}")
 
         if iformat == "npy":
             tmpfs = "{}/tiles/{}-{}-{}.{}".format(self.tmp_dir, x, y, z, iformat)
             res = False
 
             if not cache or not os.path.isfile(tmpfs):
-                LOGGER.info("ok - GET " + url)
-                r = self.requests.get(url, params=params)
+                LOGGER.info("ok - GET " + url + " " + str(params))
+
+                paramstp = [];
+                for item in params.items():
+                    if isinstance(item[1], list):
+                        for value in item[1]:
+                            paramstp.append((item[0], value))
+                    else:
+                        paramstp.append(item)
+
+                paramstp = urllib.parse.urlencode(paramstp, safe=':+')
+                r = self.requests.get(url, params=paramstp)
 
                 r.raise_for_status()
                 LOGGER.info("ok - Received " + url)
 
                 res = np.load(BytesIO(r.content))
 
-                assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
-                res = np.moveaxis(res, 0, -1)
-                assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
+                channels = self.model.get('model_inputshape', [256, 256, 4])[2]
+
+                if channels == 4:
+                    assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
+                    res = np.moveaxis(res, 0, -1)
+                    assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
+                else:
+                    res = np.moveaxis(res, 0, -1)
+                    res = res[..., :channels]
 
                 np.save("{}/tiles/{}-{}-{}.npy".format(self.tmp_dir, x, y, z), res)
             else:
