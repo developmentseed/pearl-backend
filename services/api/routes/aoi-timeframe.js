@@ -169,7 +169,7 @@ export default async function router(schema, config) {
                 }
             });
 
-            const tf = await TimeFrame.from(config.pool, req.params.aoiid);
+            const tf = await TimeFrame.from(config.pool, req.params.timeframeid);
 
             const files = [];
 
@@ -222,6 +222,7 @@ export default async function router(schema, config) {
 
             return req.pipe(busboy);
         } catch (err) {
+            console.error(err);
             return Err.respond(err, res);
         }
     });
