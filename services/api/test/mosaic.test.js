@@ -26,7 +26,7 @@ test('GET /api/mosaic', async(t) => {
             mosaics: [{
                 id: '2849689f57f1b3b9c1f725abb75aa411',
                 name: 'Sentinel-2 Dec 2019 - March 2020',
-                params: { assets: ['B03', 'B02'], collection: 'sentinel-2-l2a', color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35' },
+                params: { assets: ['B04', 'B03', 'B02'], collection: 'sentinel-2-l2a', color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35' },
                 mosaic_ts_start: 1575158400000,
                 mosaic_ts_end: 1585612800000,
                 imagery_source_id: 2
@@ -161,7 +161,7 @@ test('GET /api/mosaic/2849689f57f1b3b9c1f725abb75aa411', async(t) => {
         t.deepEquals(res.body, {
             id: '2849689f57f1b3b9c1f725abb75aa411',
             name: 'Sentinel-2 Dec 2019 - March 2020',
-            params: { assets: ['B03', 'B02'], collection: 'sentinel-2-l2a', color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35' },
+            params: { assets: ['B03', 'B03', 'B02'], collection: 'sentinel-2-l2a', color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35' },
             mosaic_ts_start: 1575158400000,
             mosaic_ts_end: 1585612800000,
             imagery_source_id: 2
