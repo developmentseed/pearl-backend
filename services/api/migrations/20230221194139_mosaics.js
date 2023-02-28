@@ -1,5 +1,16 @@
 function up(knex) {
     return knex.schema.raw(`
+        DELETE FROM mosaics;
+
+        INSERT INTO mosaics (id, imagery_source_id, name, params) VALUES (
+            '87b72c66331e136e088004fba817e3e8', 1,
+            'naip.latest',
+            params = '{
+                "assets": "image",
+                "asset_bidx": "image|1,2,3,4",
+                "collection": "naip"
+            }'::JSONB
+
         INSERT INTO mosaics (id, imagery_source_id, name, params, mosaic_ts_start, mosaic_ts_end)
             VALUES (
                 '2849689f57f1b3b9c1f725abb75aa411', 2,
@@ -37,16 +48,6 @@ function up(knex) {
                 '2022-12-01'::TIMESTAMP,
                 '2023-02-28'::TIMESTAMP
             );
-
-
-        UPDATE mosaics
-            SET
-                params = '{
-                    "assets": "image",
-                    "asset_bidx": "image|1,2,3,4",
-                    "collection": "naip"
-                }'::JSONB
-            WHERE id = '87b72c66331e136e088004fba817e3e8';
     `);
 }
 
