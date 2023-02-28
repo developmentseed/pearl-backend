@@ -5,11 +5,12 @@ function up(knex) {
         INSERT INTO mosaics (id, imagery_source_id, name, params) VALUES (
             '87b72c66331e136e088004fba817e3e8', 1,
             'naip.latest',
-            params = '{
+            '{
                 "assets": "image",
                 "asset_bidx": "image|1,2,3,4",
                 "collection": "naip"
             }'::JSONB
+        );
 
         INSERT INTO mosaics (id, imagery_source_id, name, params, mosaic_ts_start, mosaic_ts_end)
             VALUES (
