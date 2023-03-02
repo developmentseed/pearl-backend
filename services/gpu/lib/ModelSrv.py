@@ -8,7 +8,6 @@ import torch
 from shapely.geometry import mapping
 
 from .TimeFrame import TimeFrame
-from .InferenceDataSet import InferenceDataSet
 from .MemRaster import MemRaster
 from .osm import OSM
 from .utils import generate_random_points, geom2px, geom2coords, pred2png, pxs2geojson
@@ -195,7 +194,8 @@ class ModelSrv:
 
                 color_list = [item["color"] for item in self.model.classes]
 
-                dataset = InferenceDataSet(self.api, self.timeframe)
+                dataset = self.model.loader(self.api, self.timeframe)
+
                 if torch.cuda.is_available():
                     batch_size = 8
                 else:
@@ -385,7 +385,6 @@ class ModelSrv:
                     websocket,
                 )
 
-            print(body)
             self.timeframe = TimeFrame.create(
                 self.api,
                 aoi,
@@ -411,7 +410,7 @@ class ModelSrv:
 
             color_list = [item["color"] for item in self.model.classes]
 
-            dataset = InferenceDataSet(self.api, self.timeframe)
+            dataset = self.model.loader(self.api, self.timeframe)
             if torch.cuda.is_available():
                 batch_size = 8
             else:
