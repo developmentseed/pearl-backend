@@ -20,6 +20,9 @@
                     "params": {
                         "type": "object"
                     },
+                    "ui_params": {
+                        "type": "object"
+                    },
                     "mosaic_ts_start": {
                         "type": ["integer", "null"]
                     },

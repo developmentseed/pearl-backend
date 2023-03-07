@@ -25,6 +25,9 @@
         },
         "mosaic_ts_end": {
             "$ref": "./mosaics/mosaic_ts_end.json"
+        },
+        "ui_params": {
+            "$ref": "./mosaics/ui_params.json"
         }
     },
     "required": [
@@ -35,6 +38,7 @@
         "created",
         "updated",
         "mosaic_ts_start",
-        "mosaic_ts_end"
+        "mosaic_ts_end",
+        "ui_params"
     ]
 }
