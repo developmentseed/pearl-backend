@@ -12,6 +12,7 @@ from lib.models.ModelSessionUnet import LoadUnet
 from lib.models.ModelSessionDeepLabv3 import LoadDeepLabv3Plus
 from lib.models.ModelSessionUnet2 import LoadUnet2
 from lib.models.ModelSessionUnet3 import LoadUnet3
+from lib.models.ModelSessionS2ADeepLabv3plus import LoadS2ADeepLabv3plus
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
 from lib.utils import setup_logging
@@ -133,6 +134,8 @@ def load(gpu_id, api):
         model = LoadUnet3(gpu_id, api.model_dir, api.model["classes"])
     elif model_type == "deeplabv3plus":
         model = LoadDeepLabv3Plus(gpu_id, api.model_dir, api.model["classes"])
+    elif model_type == "s2adeeplabv3plus":
+        model = LoadS2ADeepLabv3plus(gpu_id, api.model_dir, api.model["classes"])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
