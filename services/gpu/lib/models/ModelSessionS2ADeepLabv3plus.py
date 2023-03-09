@@ -285,21 +285,15 @@ class LoadS2ADeepLabv3plus(ModelSession):
         print("Fine-tuning accuracy: %0.4f" % (score))
 
         new_weights = torch.from_numpy(
-            self.augment_model.coef_.copy().astype(np.float32)[
-                :, :, np.newaxis, np.newaxis
-            ]
-        )
+            self.augment_model.coef_.copy().astype(np.float32)[:, :, None, None])
         new_biases = torch.from_numpy(self.augment_model.intercept_.astype(np.float32))
-        new_weights = new_weights.to(self.device)
-        print("new_weights shape: ")
-        print(new_weights.shape)
-        new_biases = new_biases.to(self.device)
-        print("new_biases shape: ")
-        print(new_biases.shape)
 
-        self.model.segmentation_head[0].weight = nn.Parameter(new_weights)
-        self.model.segmentation_head[0].bias = nn.Parameter(new_biases)
+        with torch.no_grad():
+            self.model.segmentation_head[0].weight = nn.Parameter(new_weights)
+            self.model.segmentation_head[0].bias = nn.Parameter(new_biases)
 
+        self.model.to(self.device)
+        self.model.eval()
         print("last layer of pytorch model updated post retraining")
 
         return {"message": "Accuracy Score on data: %0.2f" % (score), "success": True}
@@ -395,16 +389,17 @@ class LoadS2ADeepLabv3plus(ModelSession):
 
         self.classes = chkpt["classes"]
         self.model = smp.create_model(
-            arch="Unet",
-            encoder_name="efficientnet-b0",
+            arch="DeepLabV3Plus",
+            encoder_name="timm-efficientnet-b5",
             encoder_weights=None,
-            in_channels=3,
-            classes=len(chkpt["classes"]),
+            in_channels=4,
+            classes=len(self.classes),
             activation=None,
         )
         
         checkpoint = torch.load(self.model_fs, map_location=self.device)
         self.model.load_state_dict(checkpoint)
         self.model = self.model.to(self.device)
-
+        self.model.eval()
+        
         return {"message": "Loaded model state", "success": True}
