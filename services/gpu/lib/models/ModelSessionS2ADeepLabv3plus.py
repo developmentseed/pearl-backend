@@ -328,23 +328,30 @@ class LoadS2ADeepLabv3plus(ModelSession):
 
     def run_model_on_tile_embedding(self, tile):
         """
-        TODO: where is this getting called, implementation looks buggy
-        Gets embeddings for retraining
+        Gets embeddings for each tile for retraining.
+
+        Input:
+            tile: numpy array of shape (h, w, c)
         """
-        tile = tile.transpose(1,2,0)
+        tile = tile / 255.0  # Normalize to 0-1
         tile = self.tfm(image=tile)["image"]
-        data = tile.to(self.device)
+        data = tile.to(dtype=torch.float32, device=self.device)
 
         with torch.no_grad():
             features = forward_features(self.model, data[None, ...])
-            # insert singleton "batch" dimension to input data for pytorch to be happy
-        # get embeddings
-        features = np.rollaxis(features.squeeze().cpu().numpy(), 0, 3)
+        features = (features
+                        .detach()
+                        .squeeze() # remove the batch dimension
+                        .cpu().numpy()
+                        .transpose(1, 2, 0)) # move the channel dimension to the end
         return features
 
     def run_model_on_tile(self, tile):
         """
-        Gets model predicted classes per tile
+        Gets model predictions for a batch of tiles.
+
+        Input:
+            tile: torch dataset of shape (bs, c, h, w)
         """
         data = tile.to(dtype=torch.float32, device=self.device) # tile: bs, c, h, w
         with torch.no_grad():
