@@ -333,6 +333,7 @@ class LoadS2ADeepLabv3plus(ModelSession):
         Input:
             tile: numpy array of shape (h, w, c)
         """
+        print(f"Running on a tile to generate embeddings, tile: {tile.shape}")
         tile = tile / 255.0  # Normalize to 0-1
         tile = self.tfm(image=tile)["image"]
         data = tile.to(dtype=torch.float32, device=self.device)
@@ -344,6 +345,7 @@ class LoadS2ADeepLabv3plus(ModelSession):
                         .squeeze() # remove the batch dimension
                         .cpu().numpy()
                         .transpose(1, 2, 0)) # move the channel dimension to the end
+        print(f"Generated embeddings, features: {features.shape}")
         return features
 
     def run_model_on_tile(self, tile):
@@ -353,6 +355,7 @@ class LoadS2ADeepLabv3plus(ModelSession):
         Input:
             tile: torch dataset of shape (bs, c, h, w)
         """
+        print(f"Running on a tile dataset, tile-dataset: {tile.shape}")
         data = tile.to(dtype=torch.float32, device=self.device) # tile: bs, c, h, w
         with torch.no_grad():
             logits = self.model(data)
