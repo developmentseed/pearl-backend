@@ -593,7 +593,7 @@ class ModelSrv:
                         feature["geometry"]["type"] == "Polygon"
                         or feature["geometry"]["type"] == "MultiPolygon"
                     ):
-                        points = generate_random_points(50, feature["geometry"])
+                        points = generate_random_points(200, feature["geometry"])
                         cls["retrain_geometry"] = [
                             *cls["retrain_geometry"],
                             *geom2coords(points),
