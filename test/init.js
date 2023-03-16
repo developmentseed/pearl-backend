@@ -263,7 +263,7 @@ export function connect(test, API, argv) {
                     active: true,
                     model_type: 'unet3',
                     imagery_source_id: 2,
-                    model_inputshape: [1024, 1024, 3],
+                    model_inputshape: [512, 512, 3],
                     model_zoom: 14,
                     classes: [
                         {"name": "Bosque", "color": "#6CA966"},
@@ -296,7 +296,7 @@ export function connect(test, API, argv) {
                 active: true,
                 model_type: 'unet3',
                 imagery_source_id: 2,
-                model_inputshape: [1024, 1024, 3],
+                model_inputshape: [512, 512, 3],
                 model_zoom: 14,
                 storage: false,
                 classes: [
@@ -349,7 +349,7 @@ export function connect(test, API, argv) {
                 active: true,
                 model_type: 'unet3',
                 imagery_source_id: 2,
-                model_inputshape: [256, 256, 3],
+                model_inputshape: [512, 512, 3],
                 model_zoom: 14,
                 storage: true,
                 classes: [
