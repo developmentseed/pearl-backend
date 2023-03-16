@@ -466,6 +466,21 @@ class API:
         params = _mosaic.get("params", {})
         params.update({ "return_mask": False, "buffer": buffer })
 
+        shape = self.model.get('model_inputshape', [256, 256, 4])
+        if shape[0] != shape[1]:
+            LOGGER.warn("not ok - model.inputshape[0] should equal model.inputshape[1] - defaulting to model.inputshape[0]");
+            shape[1] = shape[0]
+        if !(shape[0] / 256).is_integer():
+            LOGGER.warn("not ok - model.inputshape[0] should be a multiple of 256 - defaulting to 256");
+            shape[0] = 256
+            shape[1] = 256
+        if shape[2] < 3
+            LOGGER.warn("not ok - model.inputshape[2] should be at least 3 - defaulting to 3");
+            shape[2] = 3
+
+        scale = shape[0] / 256
+        params.update({ "scale": scale });
+
         url = (os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}")
 
         if iformat == "npy":
@@ -491,15 +506,10 @@ class API:
 
                 res = np.load(BytesIO(r.content))
 
-                channels = self.model.get('model_inputshape', [256, 256, 4])[2]
-
-                if channels == 4:
-                    assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
-                    res = np.moveaxis(res, 0, -1)
-                    assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
-                else:
-                    res = np.moveaxis(res, 0, -1)
-                    res = res[..., :channels]
+                assert res.shape == (shape[2], shape[0] + buffer * 2, shape[1] + buffer * 2), "Unexpeccted Raster Numpy array"
+                res = np.moveaxis(res, 0, -1)
+                assert res.shape == (shape[0] + buffer * 2, shape[1] + buffer * 2, shape[2]), "Failed to reshape numpy array"
+                res = res[..., :shape[2]]
 
                 np.save("{}/tiles/{}-{}-{}.npy".format(self.tmp_dir, x, y, z), res)
             else:
