@@ -508,17 +508,14 @@ class API:
 
                 r = self.requests.get(url, params=paramstp)
 
-                print(r.content)
                 r.raise_for_status()
                 LOGGER.info("ok - Received " + url)
 
                 res = np.load(BytesIO(r.content))
 
-                print('PRE', res.shape);
                 assert res.shape == (shape[2], shape[0] + buffer * 2, shape[1] + buffer * 2), "Unexpeccted Raster Numpy array"
                 res = np.moveaxis(res, 0, -1)
                 res = res[..., :shape[2]]
-                print('POST', res.shape);
                 assert res.shape == (shape[0] + buffer * 2, shape[1] + buffer * 2, shape[2]), "Failed to reshape numpy array"
 
                 np.save("{}/tiles/{}-{}-{}.npy".format(self.tmp_dir, x, y, z), res)
