@@ -39,7 +39,7 @@ class InferenceDataSet(Dataset):
             try:
                 in_memraster = self.api.get_tile(self.mosaic, zxy.z, zxy.x, zxy.y)
             except:
-                print("InferenceDataSet ERROR", sys.exc_info()[0])
+                print("InferenceDataSet (DeepLabv3) ERROR", sys.exc_info()[0])
         tile = in_memraster.data # tile shape: HxWxC as expected by albumentation transforms
         # tile = tile.transpose(1,2,0)
         tile = tile / 255.0  # Normalize to 0-1

@@ -513,7 +513,7 @@ class API:
 
                 res = np.load(BytesIO(r.content))
 
-                assert res.shape == (shape[2], shape[0] + buffer * 2, shape[1] + buffer * 2), "Unexpeccted Raster Numpy array"
+                assert res.shape == (shape[2], shape[0] + buffer * 2, shape[1] + buffer * 2), "Unexpected Raster Numpy array"
                 res = np.moveaxis(res, 0, -1)
                 res = res[..., :shape[2]]
                 assert res.shape == (shape[0] + buffer * 2, shape[1] + buffer * 2, shape[2]), "Failed to reshape numpy array"
