@@ -7,6 +7,7 @@ import rasterio
 from rasterio.io import MemoryFile
 from rasterio.transform import from_bounds
 from rasterio.warp import transform_geom
+from skimage.transform import resize
 
 
 class MemRaster(object):
@@ -49,7 +50,9 @@ class MemRaster(object):
             self.buffered = False
 
         if self.data.shape[0] != 256:
-            self.data = cv2.resize(self.data, dsize=(256, 256), interpolation=cv2.INTER_NEAREST)
+            self.data = resize(
+                image=self.data, output_shape=(256, 256), order=0)
+            ) # order 0 is nearest neighbor
 
         return self
 
