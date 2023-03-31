@@ -5,6 +5,8 @@ EXPOSE 2001
 ENV HOME=/home/lulc
 WORKDIR $HOME
 
+RUN apk add ffmpeg
+
 ADD requirements.txt .
 
 RUN pip install -r requirements.txt
