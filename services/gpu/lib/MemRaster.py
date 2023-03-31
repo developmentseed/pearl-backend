@@ -51,7 +51,7 @@ class MemRaster(object):
 
         if self.data.shape[0] != 256:
             self.data = resize(
-                image=self.data, output_shape=(256, 256), order=0)
+                image=self.data, output_shape=(256, 256), order=0
             ) # order 0 is nearest neighbor
 
         return self
