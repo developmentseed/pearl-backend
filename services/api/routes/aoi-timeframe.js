@@ -15,11 +15,11 @@ export default async function router(schema, config) {
     const getAoiTileJSON = async (timeframe, req) => {
         let tiffurl;
         if (timeframe.uuid) {
-            const a = await TimeFrameShare.from(config.pool, timeframe.uuid);
+            const tf = await TimeFrameShare.from(config.pool, timeframe.uuid);
             tiffurl = await a.url(config);
         } else {
-            const a = await AOI.from(config.pool, timeframe.id);
-            tiffurl = await a.url(config);
+            const tf = await TimeFrame.from(config.pool, timeframe.id);
+            tiffurl = await tf.url(config);
         }
 
         req.url = '/cog/tilejson.json';
