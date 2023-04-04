@@ -16,7 +16,7 @@ export default async function router(schema, config) {
         let tiffurl;
         if (timeframe.uuid) {
             const tf = await TimeFrameShare.from(config.pool, timeframe.uuid);
-            tiffurl = await a.url(config);
+            tiffurl = await tf.url(config);
         } else {
             const tf = await TimeFrame.from(config.pool, timeframe.id);
             tiffurl = await tf.url(config);
