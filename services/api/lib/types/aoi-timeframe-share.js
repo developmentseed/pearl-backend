@@ -77,6 +77,8 @@ export default class AOIShare extends Generic {
 
         return await this.commit({
             storage: true
+        }, {
+            column: 'uuid'
         });
     }
 
