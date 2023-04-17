@@ -55,7 +55,7 @@ export default async function router(schema, config) {
             tj = response.body;
 
             tiles = [
-                `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
+                `/api/project/${req.params.projectid}/aoi/${req.params.aoiid}/timeframe/${req.params.timeframeid}/tiles/{z}/{x}/{y}?colormap=${encodeURIComponent(JSON.stringify(cmap))}`
             ];
         }
 
