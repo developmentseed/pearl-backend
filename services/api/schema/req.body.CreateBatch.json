@@ -1,25 +1,18 @@
 {
     "type": "object",
     "required": [
-        "name",
-        "bounds"
+        "aoi",
+        "mosaic"
     ],
     "additionalProperties": false,
     "properties": {
-        "name": {
-            "type": "string"
-        },
-        "checkpoint_id": {
-            "type": "integer",
-            "description": "The current checkpoint loaded on the instance"
-        },
-        "bounds": {
-            "$ref": "./util/polygon.json"
-        },
-        "type": {
+        "mosaic": {
             "type": "string",
-            "description": "The instance type to be used for this batch job. cpu or gpu. cpu is default",
-            "default": "cpu"
+            "description": "The mosaic name for the TimeFrame"
+        },
+        "aoi": {
+            "type": "integer",
+            "description": "The AOI to load onto the instance"
         }
     }
 }

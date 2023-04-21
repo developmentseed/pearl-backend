@@ -59,15 +59,7 @@ export default class Batch extends Generic {
             pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
-                    id,
-                    abort,
-                    created,
-                    updated,
-                    error,
-                    aoi,
-                    name,
-                    completed,
-                    progress
+                    *
                 FROM
                     batch
                 WHERE
