@@ -35,8 +35,8 @@ class ModelSrv:
         if api.batch is not False:
             self.prediction(
                 {
-                    "name": api.batch.get("name", "Default Batch"),
-                    "polygon": api.batch.get("bounds"),
+                    "aoi_id": api.batch.get("aoi"),
+                    "mosaic": self.batch.get("mosaic")
                 }
             )
 
