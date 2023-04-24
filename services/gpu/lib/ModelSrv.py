@@ -32,11 +32,11 @@ class ModelSrv:
                 self.api, self.api.instance.get("timeframe_id")
             )
 
-        if api.batch is not False:
+        if self.api.batch is not False:
             self.prediction(
                 {
-                    "aoi_id": api.batch.get("aoi"),
-                    "mosaic": self.batch.get("mosaic")
+                    "aoi_id": self.api.batch.get("aoi"),
+                    "mosaic": self.api.batch.get("mosaic")
                 }
             )
 

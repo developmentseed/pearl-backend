@@ -4,6 +4,8 @@ function up(knex) {
 
         ALTER TABLE batch
             DROP COLUMN aoi;
+        ALTER TABLE batch
+            DROP COLUMN name;
 
         ALTER TABLE batch
             ADD COLUMN aoi BIGINT NOT NULL REFERENCES aois(id);
