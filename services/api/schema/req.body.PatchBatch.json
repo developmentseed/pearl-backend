@@ -2,7 +2,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "aoi": {
+        "timeframe": {
             "type": "integer"
         },
         "error": {
