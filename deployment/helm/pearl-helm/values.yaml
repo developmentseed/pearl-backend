@@ -45,6 +45,8 @@ tiles:
   debug: false
   mosaicBackends: sqlite:///
   mosaicHost: /tmp/data/mosaics.db
+  minReplicaCount: 2
+  maxReplicaCount: 5
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
