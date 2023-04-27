@@ -75,9 +75,13 @@ export default class AOIShare extends Generic {
         const storage = new Storage(config, 'aois');
         await storage.upload(file, `share-${this.uuid}.tiff`);
 
-        return await this.commit({
+        await this.commit({
             storage: true
         }, {
+            column: 'uuid'
+        });
+
+        return AOIShare.from(config.pool, this.uuid, {
             column: 'uuid'
         });
     }
@@ -146,13 +150,17 @@ export default class AOIShare extends Generic {
                     s.patches,
                     s.storage,
                     tf.checkpoint_id,
-                    c.classes
+                    c.classes,
+                    Row_To_Json(aois.*) AS aoi,
+                    Row_To_Json(tf.*) AS timeframe
                 FROM
                     aoi_timeframe_share s
                         LEFT JOIN aoi_timeframe tf
                             ON s.timeframe_id = tf.id
                         LEFT JOIN checkpoints c
                             ON tf.checkpoint_id = c.id
+                        LEFT JOIN aois
+                            ON s.aoi_id = aois.id
                 WHERE
                     s.uuid = ${shareuuid}
             `);

@@ -388,13 +388,17 @@ export default async function router(schema, config) {
             }
 
             const a = await AOI.from(config.pool, req.params.aoiid);
-            const share = await TimeFrameShare.generate(config.pool, {
+            let share = await TimeFrameShare.generate(config.pool, {
                 project_id: req.params.projectid,
                 aoi_id: req.params.aoiid,
                 timeframe_id: req.params.timeframeid,
                 bounds: a.bounds,
                 patches: tf.patches
             });
+
+            share = await TimeFrameShare.from(config.pool, share.uuid, {
+                column: 'uuid'
+            })
 
             if (config.TileUrl) {
                 const tiffurl = await tf.url(config);
@@ -409,9 +413,17 @@ export default async function router(schema, config) {
 
                 const pres = await Proxy.request(req, true, config.TileUrl);
                 const up = await share.upload(config, pres);
-                return res.json(up.serialize());
+
+                const json = up.serialize();
+                json.aoi = up.aoi;
+                json.timeframe = up.timeframe;
+
+                return res.json(json);
             } else {
-                return res.json(share.serialize());
+                const json = share.serialize();
+                json.aoi = share.aoi;
+                json.timeframe = share.timeframe;
+                return res.json(json);
             }
         } catch (err) {
             return Err.respond(err, res);
@@ -535,6 +547,8 @@ export default async function router(schema, config) {
             const json = share.serialize();
             json.checkpoint_id = share.checkpoint_id;
             json.classes = share.classes;
+            json.aoi = share.aoi;
+            json.timeframe = share.timeframe;
 
             return res.json(json);
         } catch (err) {

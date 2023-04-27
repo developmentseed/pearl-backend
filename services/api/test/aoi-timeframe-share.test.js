@@ -122,6 +122,11 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
         t.ok(res.body.uuid, '.uuid: <uuid>');
         delete res.body.uuid;
 
+        t.ok(typeof res.body.aoi === 'object');
+        delete res.body.aoi;
+        t.ok(typeof res.body.timeframe === 'object');
+        delete res.body.timeframe;
+
         t.deepEquals(res.body, {
             aoi_id: 1,
             project_id: 1,
@@ -211,6 +216,11 @@ test('GET /api/share/uuid', async (t) => {
         t.ok(res.body.uuid, '.uuid: <uuid>');
         delete res.body.uuid;
 
+        t.ok(typeof res.body.aoi === 'object');
+        delete res.body.aoi;
+        t.ok(typeof res.body.timeframe === 'object');
+        delete res.body.timeframe;
+
         t.deepEqual(res.body, {
             aoi_id: 1,
             project_id: 1,
@@ -262,16 +272,29 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
         t.ok(res.body.shares[0].uuid, '.shares[0].uuid: <date>');
         delete res.body.shares[0].uuid;
 
+        t.ok(res.body.mosaic.created);
+        t.ok(res.body.mosaic.updated);
+        delete res.body.mosaic.created;
+        delete res.body.mosaic.updated;
+
         t.deepEquals(res.body, {
             id: 1,
             storage: true,
             bookmarked: false,
             bookmarked_at: null,
             aoi_id: 1,
-            mosaic: 'naip.latest',
             checkpoint_id: 1,
             patches: [],
             px_stats: {},
+            mosaic: {
+                id: '87b72c66331e136e088004fba817e3e8',
+                name: 'naip.latest',
+                params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' },
+                imagery_source_id: 1,
+                mosaic_ts_start: null,
+                mosaic_ts_end: null,
+                ui_params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' }
+            },
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },

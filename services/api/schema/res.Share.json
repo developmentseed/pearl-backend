@@ -8,7 +8,9 @@
         "bounds",
         "created",
         "storage",
-        "patches"
+        "patches",
+        "aoi",
+        "timeframe"
     ],
     "additionalProperties": false,
     "properties": {
@@ -32,6 +34,12 @@
         },
         "storage": {
             "type": "boolean"
+        },
+        "aoi": {
+            "type": "object"
+        },
+        "timeframe": {
+            "type": "object"
         },
         "patches": {
             "type": "array",
