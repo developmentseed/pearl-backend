@@ -94,6 +94,11 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
+        t.ok(res.body.mosaic.created, 'mosaic.created: <date>');
+        delete res.body.mosaic.created;
+        t.ok(res.body.mosaic.updated, 'mosaic.updated: <date>');
+        delete res.body.mosaic.updated;
+
         t.deepEquals(res.body, {
             id: 1,
             storage: false,
@@ -101,7 +106,15 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
             checkpoint_id: 1,
             bookmarked: false,
             bookmarked_at: null,
-            mosaic: 'naip.latest',
+            mosaic: {
+                id: '87b72c66331e136e088004fba817e3e8',
+                imagery_source_id: 1,
+                name: 'naip.latest',
+                mosaic_ts_end: null,
+                mosaic_ts_start: null,
+                params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' },
+                ui_params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' }
+            },
             patches: [],
             px_stats: {},
             classes: [
@@ -133,12 +146,25 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
+        t.ok(res.body.mosaic.created, 'mosaic.created: <date>');
+        delete res.body.mosaic.created;
+        t.ok(res.body.mosaic.updated, 'mosaic.updated: <date>');
+        delete res.body.mosaic.updated;
+
         t.deepEquals(res.body, {
             id: 1,
             storage: false,
             aoi_id: 1,
             checkpoint_id: 1,
-            mosaic: 'naip.latest',
+            mosaic: {
+                id: '87b72c66331e136e088004fba817e3e8',
+                imagery_source_id: 1,
+                name: 'naip.latest',
+                mosaic_ts_end: null,
+                mosaic_ts_start: null,
+                params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' },
+                ui_params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' }
+            },
             bookmarked: false,
             bookmarked_at: null,
             patches: [],
@@ -294,6 +320,11 @@ test('PATCH /api/project/1/aoi/1/timeframe/1', async (t) => {
         delete res.body.created;
         delete res.body.bookmarked_at;
 
+        t.ok(res.body.mosaic.created, 'mosaic.created: <date>');
+        delete res.body.mosaic.created;
+        t.ok(res.body.mosaic.updated, 'mosaic.updated: <date>');
+        delete res.body.mosaic.updated;
+
         t.deepEquals(res.body, {
             id: 1,
             storage: true,
@@ -303,7 +334,15 @@ test('PATCH /api/project/1/aoi/1/timeframe/1', async (t) => {
                 0: 100,
                 1: 0
             },
-            mosaic: 'naip.latest',
+            mosaic: {
+                id: '87b72c66331e136e088004fba817e3e8',
+                imagery_source_id: 1,
+                name: 'naip.latest',
+                mosaic_ts_end: null,
+                mosaic_ts_start: null,
+                params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' },
+                ui_params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' }
+            },
             checkpoint_id: 1,
             bookmarked: true,
             classes: [
@@ -358,6 +397,11 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
+        t.ok(res.body.mosaic.created, 'mosaic.created: <date>');
+        delete res.body.mosaic.created;
+        t.ok(res.body.mosaic.updated, 'mosaic.updated: <date>');
+        delete res.body.mosaic.updated;
+
         t.deepEquals(res.body, {
             id: 2,
             storage: false,
@@ -365,9 +409,17 @@ test('POST /api/project/1/aoi/1/timeframe', async (t) => {
             checkpoint_id: 1,
             bookmarked: false,
             bookmarked_at: null,
-            mosaic: 'naip.latest',
             patches: [],
             px_stats: {},
+            mosaic: {
+                id: '87b72c66331e136e088004fba817e3e8',
+                imagery_source_id: 1,
+                name: 'naip.latest',
+                mosaic_ts_end: null,
+                mosaic_ts_start: null,
+                params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' },
+                ui_params: { assets: 'image', asset_bidx: 'image|1,2,3,4', collection: 'naip' }
+            },
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },

@@ -49,7 +49,7 @@
             "$ref": "./util/classes.json"
         },
         "mosaic": {
-            "type": "string"
+            "type": "object"
         },
         "shares": {
             "type": "array",

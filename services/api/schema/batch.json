@@ -17,9 +17,6 @@
         "updated": {
             "$ref": "./batch/updated.json"
         },
-        "name": {
-            "$ref": "./batch/name.json"
-        },
         "completed": {
             "$ref": "./batch/completed.json"
         },
@@ -51,7 +48,6 @@
         "project_id",
         "created",
         "updated",
-        "name",
         "completed",
         "progress",
         "abort",

@@ -214,7 +214,7 @@ export default async function router(schema, config) {
 
                     await tf.commit({ px_stats });
 
-                    return res.json(tf);
+                    return res.json(TimeFrame.from(config.pool, tf.id));
                 } catch (err) {
                     Err.respond(err, res);
                 }
@@ -354,7 +354,8 @@ export default async function router(schema, config) {
             const chkpt = await Checkpoint.from(config.pool, req.body.checkpoint_id);
             req.body.classes = chkpt.classes;
 
-            return res.json(await TimeFrame.generate(config.pool, req.body));
+            const tf = await TimeFrame.generate(config.pool, req.body);
+            return res.json(await TimeFrame.from(config.pool, tf.id));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -501,20 +502,20 @@ export default async function router(schema, config) {
         res: 'res.TimeFrame.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const a = await TimeFrame.has_auth(config.pool, req);
+            const tf = await TimeFrame.has_auth(config.pool, req);
 
-            if (req.body.classes && req.body.classes.length !== a.classes.length) {
+            if (req.body.classes && req.body.classes.length !== tf.classes.length) {
                 throw new Err(400, null, 'Cannot change number of classes on an existing AOI');
             }
 
-            if (req.body.bookmarked && !a.bookmarked_at) {
+            if (req.body.bookmarked && !tf.bookmarked_at) {
                 req.body.bookmarked_at = sql`NOW()`;
             } else if (req.body.bookmarked === false) {
                 req.body.bookmarked_at = sql`NULL`;
             }
 
-            await a.commit(req.body);
-            return res.json(a);
+            await tf.commit(req.body);
+            return res.json(await TimeFrame.from(config.pool, tf.id));
         } catch (err) {
             return Err.respond(err, res);
         }

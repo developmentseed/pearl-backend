@@ -151,9 +151,12 @@ export default class AOITimeframe extends Generic {
         try {
             pgres = await pool.query(sql`
                SELECT
-                    a.*
+                    a.*,
+                    Row_To_JSON(mosaics.*) AS mosaic
                 FROM
                     aoi_timeframe a
+                        LEFT JOIN mosaics
+                            ON a.mosaic = mosaics.name
                 WHERE
                     a.id = ${id}
                 AND
