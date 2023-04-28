@@ -22,12 +22,20 @@
                     "aoi_id",
                     "timeframe_id",
                     "created",
-                    "storage"
+                    "storage",
+                    "aoi",
+                    "timeframe"
                 ],
                 "additionalProperties": false,
                 "properties": {
                     "uuid": {
                         "type": "string"
+                    },
+                    "aoi": {
+                        "type": "object"
+                    },
+                    "timeframe": {
+                        "type": "object"
                     },
                     "aoi_id": {
                         "type": "integer"

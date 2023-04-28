@@ -171,6 +171,11 @@ test('GET /api/project/1/share', async (t) => {
         t.ok(res.body.shares[0].uuid, '.uuid: <uuid>');
         delete res.body.shares[0].uuid;
 
+        t.ok(res.body.shares[0].aoi, '.aoi');
+        delete res.body.shares[0].aoi;
+        t.ok(res.body.shares[0].timeframe, '.timeframe');
+        delete res.body.shares[0].timeframe;
+
         t.deepEquals(res.body, {
             total: 1,
             project_id: 1,
@@ -276,6 +281,11 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
         t.ok(res.body.mosaic.updated);
         delete res.body.mosaic.created;
         delete res.body.mosaic.updated;
+
+        t.ok(res.body.shares[0].aoi);
+        t.ok(res.body.shares[0].timeframe);
+        delete res.body.shares[0].aoi;
+        delete res.body.shares[0].timeframe;
 
         t.deepEquals(res.body, {
             id: 1,

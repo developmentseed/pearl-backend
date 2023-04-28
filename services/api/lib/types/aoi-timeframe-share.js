@@ -28,15 +28,21 @@ export default class AOIShare extends Generic {
             pgres = await pool.query(sql`
                SELECT
                     count(*) OVER() AS count,
-                    uuid,
-                    aoi_id,
-                    timeframe_id,
-                    created,
-                    storage
+                    aoi_timeframe_share.uuid,
+                    aoi_timeframe_share.aoi_id,
+                    Row_To_JSON(tf.*) AS timeframe,
+                    Row_To_JSON(aois.*) AS aoi,
+                    aoi_timeframe_share.timeframe_id,
+                    aoi_timeframe_share.created,
+                    aoi_timeframe_share.storage
                 FROM
                     aoi_timeframe_share
+                        LEFT JOIN aoi_timeframe tf
+                            ON aoi_timeframe_share.timeframe_id = tf.id
+                        LEFT JOIN aois
+                            ON aoi_timeframe_share.aoi_id = aois.id
                 WHERE
-                    project_id = ${projectid}
+                    aoi_timeframe_share.project_id = ${projectid}
                 ORDER BY
                     created DESC
                 LIMIT
