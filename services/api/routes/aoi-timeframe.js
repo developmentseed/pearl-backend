@@ -417,11 +417,13 @@ export default async function router(schema, config) {
                 const json = up.serialize();
                 json.aoi = up.aoi;
                 json.timeframe = up.timeframe;
+                json.mosaic = up.mosaic;
 
                 return res.json(json);
             } else {
                 const json = share.serialize();
                 json.aoi = share.aoi;
+                json.mosaic = share.mosaic;
                 json.timeframe = share.timeframe;
                 return res.json(json);
             }
@@ -549,6 +551,7 @@ export default async function router(schema, config) {
             json.classes = share.classes;
             json.aoi = share.aoi;
             json.timeframe = share.timeframe;
+            json.mosaic = share.mosaic;
 
             return res.json(json);
         } catch (err) {

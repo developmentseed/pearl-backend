@@ -9,6 +9,7 @@
         "created",
         "storage",
         "patches",
+        "mosaic",
         "aoi",
         "timeframe"
     ],
@@ -34,6 +35,9 @@
         },
         "storage": {
             "type": "boolean"
+        },
+        "mosaic": {
+            "type": "object"
         },
         "aoi": {
             "type": "object"

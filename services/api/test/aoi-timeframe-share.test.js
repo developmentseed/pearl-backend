@@ -116,6 +116,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
             }
         }, t);
 
+        console.error(res.body);
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -126,6 +127,8 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
         delete res.body.aoi;
         t.ok(typeof res.body.timeframe === 'object');
         delete res.body.timeframe;
+        t.ok(typeof res.body.mosaic === 'object');
+        delete res.body.mosaic;
 
         t.deepEquals(res.body, {
             aoi_id: 1,
@@ -171,6 +174,8 @@ test('GET /api/project/1/share', async (t) => {
         t.ok(res.body.shares[0].uuid, '.uuid: <uuid>');
         delete res.body.shares[0].uuid;
 
+        t.ok(res.body.shares[0].mosaic, '.mosaic');
+        delete res.body.shares[0].mosaic;
         t.ok(res.body.shares[0].aoi, '.aoi');
         delete res.body.shares[0].aoi;
         t.ok(res.body.shares[0].timeframe, '.timeframe');
@@ -225,6 +230,8 @@ test('GET /api/share/uuid', async (t) => {
         delete res.body.aoi;
         t.ok(typeof res.body.timeframe === 'object');
         delete res.body.timeframe;
+        t.ok(typeof res.body.mosaic === 'object');
+        delete res.body.mosaic;
 
         t.deepEqual(res.body, {
             aoi_id: 1,
@@ -284,8 +291,10 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
 
         t.ok(res.body.shares[0].aoi);
         t.ok(res.body.shares[0].timeframe);
+        t.ok(res.body.shares[0].mosaic);
         delete res.body.shares[0].aoi;
         delete res.body.shares[0].timeframe;
+        delete res.body.shares[0].mosaic;
 
         t.deepEquals(res.body, {
             id: 1,

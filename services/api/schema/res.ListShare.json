@@ -24,7 +24,8 @@
                     "created",
                     "storage",
                     "aoi",
-                    "timeframe"
+                    "timeframe",
+                    "mosaic"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -35,6 +36,9 @@
                         "type": "object"
                     },
                     "timeframe": {
+                        "type": "object"
+                    },
+                    "mosaic": {
                         "type": "object"
                     },
                     "aoi_id": {
