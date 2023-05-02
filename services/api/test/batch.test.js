@@ -48,7 +48,7 @@ test('GET /api/project/1/batch/1 (does not exist)', async (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'batch not found',
+            message: 'Batch not found',
             messages: []
         });
     } catch (err) {
@@ -78,14 +78,17 @@ test('POST /api/project/1/batch', async (t) => {
         t.ok(res.body.updated);
         delete res.body.updated;
 
+        t.ok(res.body.mosaic && typeof res.body.mosaic === 'object');
+        delete res.body.mosaic;
+        t.ok(res.body.aoi && typeof res.body.aoi === 'object');
+        delete res.body.aoi;
+
         t.deepEquals(res.body, {
             id: 1,
             uid: 1,
             project_id: 1,
             progress: 0,
-            aoi: 1,
             timeframe: null,
-            mosaic: 'naip.latest',
             abort: false,
             error: null,
             completed: false,
@@ -236,16 +239,19 @@ test('POST /api/project/1/batch', async (t) => {
         t.ok(res.body.updated);
         delete res.body.updated;
 
+        t.ok(res.body.mosaic && typeof res.body.mosaic === 'object');
+        delete res.body.mosaic;
+        t.ok(res.body.aoi && typeof res.body.aoi === 'object');
+        delete res.body.aoi;
+
         t.deepEquals(res.body, {
             id: 2,
             uid: 1,
             project_id: 1,
             progress: 0,
-            aoi: 1,
             timeframe: null,
             abort: false,
             error: null,
-            mosaic: 'naip.latest',
             completed: false,
             instance: 2
         });

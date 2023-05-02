@@ -68,9 +68,8 @@ export default async function router(schema, config) {
             req.body.uid = req.auth.id;
             const inst = await Instance.generate(config, req.body);
 
-            const batch_json = batch.serialize();
+            const batch_json = (await Batch.from(config.pool, batch.id)).serialize();
             batch_json.instance = inst.id;
-
             return res.json(batch_json);
         } catch (err) {
             return Err.respond(err, res);
@@ -112,7 +111,7 @@ export default async function router(schema, config) {
                 updated: sql`Now()`
             });
 
-            return res.json(batch.serialize());
+            return res.json((await Batch.from(config.pool, batch.id)).serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

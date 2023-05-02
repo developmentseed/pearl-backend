@@ -38,16 +38,15 @@
             "$ref": "./util/updated.json"
         },
         "aoi": {
-            "type": "integer",
-            "description": "The initial AOI ID"
+            "type": ["object", "null"]
         },
         "mosaic": {
-            "type": "string",
-            "description": "The mosaic name for the TimeFrame"
+            "type": ["object", "null"],
+            "description": "The mosaic of the batch"
         },
         "timeframe": {
-            "type": ["integer", "null"],
-            "description": "The completed TimeFrame ID"
+            "type": ["object", "null"],
+            "description": "The completed TimeFrame"
         },
         "progress": {
             "type": "integer",
