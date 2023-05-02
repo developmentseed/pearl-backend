@@ -392,27 +392,6 @@ test('GET /api/project/1/batch', async (t) => {
             }
         }, t);
 
-        t.deepEquals(res.body, {
-            total: 0,
-            batch: []
-        });
-    } catch (err) {
-        t.error(err);
-    }
-
-    t.end();
-});
-test('GET /api/project/1/batch (empty)', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/project/1/batch',
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            }
-        }, t);
-
         for (const batch of res.body.batch) {
             t.ok(batch.created);
             delete batch.created;

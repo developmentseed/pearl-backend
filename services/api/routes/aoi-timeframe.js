@@ -398,7 +398,7 @@ export default async function router(schema, config) {
 
             share = await TimeFrameShare.from(config.pool, share.uuid, {
                 column: 'uuid'
-            })
+            });
 
             if (config.TileUrl) {
                 const tiffurl = await tf.url(config);
