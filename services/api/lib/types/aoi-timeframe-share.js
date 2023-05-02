@@ -44,6 +44,7 @@ export default class AOIShare extends Generic {
                             ON aoi_timeframe_share.aoi_id = aois.id
                         LEFT JOIN mosaics
                             ON tf.mosaic = mosaics.name
+                                OR tf.mosaic = mosaics.id
                 WHERE
                     aoi_timeframe_share.project_id = ${projectid}
                 ORDER BY
@@ -173,6 +174,7 @@ export default class AOIShare extends Generic {
                             ON s.aoi_id = aois.id
                         LEFT JOIN mosaics
                             ON tf.mosaic = mosaics.name
+                                OR tf.mosaic = mosaics.id
                 WHERE
                     s.uuid = ${shareuuid}
             `);

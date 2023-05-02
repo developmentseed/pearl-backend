@@ -141,7 +141,7 @@ export default class AOITimeframe extends Generic {
     }
 
     /**
-     * Return a single aoi
+     * Return a single AOI TimeFrame
      *
      * @param {Pool} pool - Instantiated Postgres Pool
      * @param {Number} id - Specific AOI id
@@ -151,16 +151,18 @@ export default class AOITimeframe extends Generic {
         try {
             pgres = await pool.query(sql`
                SELECT
-                    a.*,
+                    tf.*,
                     Row_To_JSON(mosaics.*) AS mosaic
                 FROM
-                    aoi_timeframe a
+                    aoi_timeframe tf
                         LEFT JOIN mosaics
-                            ON a.mosaic = mosaics.name
+                            ON
+                                tf.mosaic = mosaics.id
+                                OR tf.mosaic = mosaics.name
                 WHERE
-                    a.id = ${id}
+                    tf.id = ${id}
                 AND
-                    a.archived = false
+                    tf.archived = false
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to get AOI TimeFrame');

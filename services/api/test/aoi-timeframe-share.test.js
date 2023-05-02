@@ -127,6 +127,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
         delete res.body.aoi;
         t.ok(typeof res.body.timeframe === 'object');
         delete res.body.timeframe;
+
         t.ok(typeof res.body.mosaic === 'object');
         delete res.body.mosaic;
 
