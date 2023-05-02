@@ -18,8 +18,10 @@
                     "id",
                     "created",
                     "updated",
+                    "progress",
                     "aoi",
                     "name",
+                    "abort",
                     "completed",
                     "error"
                 ],
@@ -31,11 +33,20 @@
                     "error": {
                         "type": ["null", "string"]
                     },
+                    "progress": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "description": "The percentage of the job complete"
+                    },
                     "created": {
                         "type": "integer"
                     },
                     "updated": {
                         "type": "integer"
+                    },
+                    "abort": {
+                        "type": "boolean"
                     },
                     "aoi": {
                         "type": "integer"
