@@ -381,4 +381,63 @@ test('GET /api/project/1/instance - batch: 1', async (t) => {
     t.end();
 });
 
+test('GET /api/project/1/batch', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/batch',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 0,
+            batch: []
+        });
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+test('GET /api/project/1/batch (empty)', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/batch',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        for (const batch of res.body.batch) {
+            t.ok(batch.created);
+            delete batch.created;
+            t.ok(batch.updated);
+            delete batch.updated;
+
+            t.ok(batch.mosaic && typeof batch.mosaic === 'object');
+            delete batch.mosaic;
+            t.ok(batch.aoi && typeof batch.aoi === 'object');
+            delete batch.aoi;
+        }
+
+        t.deepEquals(res.body, {
+            total: 2,
+            batch: [{
+                id: 1, completed: false, progress: 0, abort: false, error: null, timeframe: null
+            },{
+                id: 2, completed: false, progress: 0, abort: false, error: null, timeframe: null
+            }]
+        });
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+
 flight.landing(test);

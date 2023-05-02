@@ -20,7 +20,8 @@
                     "updated",
                     "progress",
                     "aoi",
-                    "name",
+                    "timeframe",
+                    "mosaic",
                     "abort",
                     "completed",
                     "error"
@@ -49,7 +50,13 @@
                         "type": "boolean"
                     },
                     "aoi": {
-                        "type": "integer"
+                        "type": "object"
+                    },
+                    "timeframe": {
+                        "type": ["object", "null"]
+                    },
+                    "mosaic": {
+                        "type": ["object", "null"]
                     },
                     "name": {
                         "type": "string"
