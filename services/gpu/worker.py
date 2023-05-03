@@ -148,7 +148,7 @@ def arg(iterable, default=False, pred=None):
     If *pred* is not None, returns the first item
     for which pred(item) is true.
     """
-    return next(filter(pred, iterable), default)
+    return str(next(filter(pred, iterable), default))
 
 
 if __name__ == "__main__":
