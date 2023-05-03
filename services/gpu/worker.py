@@ -67,7 +67,7 @@ def main():
 
     # Fallback to INSTANCE_ID 1 if not set - assume local test env
     os.environ["INSTANCE_ID"] = arg(
-        [os.environ.get("INSTANCE_ID"), str(args.instance_id), "1"]
+        [os.environ.get("INSTANCE_ID"), args.instance_id, "1"]
     )
 
     os.environ["API"] = arg([os.environ.get("API"), args.api], "http://localhost:2000")
