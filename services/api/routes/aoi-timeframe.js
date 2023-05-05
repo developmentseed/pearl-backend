@@ -611,10 +611,9 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         try {
             const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
-            if (!share.storage) throw new Err(404, null, 'AOI has not been uploaded');
+            if (!share.storage) throw new Err(404, null, 'Share has not been uploaded');
 
-            const aoi = await AOI.from(config.pool, share.aoi_id);
-            await aoi.download(config, res);
+            await share.download(config, res);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -631,16 +630,16 @@ export default async function router(schema, config) {
             const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
             if (!share.storage) throw new Err(404, null, 'AOI has not been uploaded');
 
-            const aoi = await AOI.from(config.pool, share.aoi_id);
-            const tiffurl = await aoi.url(config);
+            const tf = await TimeFrame.from(config.pool, share.timeframe_id);
+            const tiffurl = await share.url(config);
 
             const cmap = {};
-            for (let i = 0; i < aoi.classes.length; i++) {
-                cmap[i] = aoi.classes[i].color;
+            for (let i = 0; i < tf.classes.length; i++) {
+                cmap[i] = tf.classes[i].color;
             }
 
             const patchurls = [];
-            for (const patchid of aoi.patches) {
+            for (const patchid of share.patches) {
                 const patch = await TimeFramePatch.from(config.pool, patchid);
                 patchurls.push(await patch.url(config));
             }
