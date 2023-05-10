@@ -70,8 +70,8 @@ export default class Kube {
                     memory: '4Gi'
                 },
                 limits: {
-                    cpu: '1500m',
-                    memory: '6Gi'
+                    cpu: '10',
+                    memory: '15Gi'
                 }
             };
         }
