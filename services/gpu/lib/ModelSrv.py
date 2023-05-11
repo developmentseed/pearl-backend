@@ -198,12 +198,15 @@ class ModelSrv:
 
                 if torch.cuda.is_available():
                     batch_size = 8
+                    num_workers = 2
                 else:
-                    batch_size = 2
+                    batch_size = 1
+                    num_workers = 1
+
                 dataloader = torch.utils.data.DataLoader(
                     dataset,
                     batch_size=batch_size,
-                    num_workers=2,
+                    num_workers=num_workers,
                     pin_memory=True,
                 )
 
