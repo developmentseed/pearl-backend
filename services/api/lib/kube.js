@@ -81,7 +81,7 @@ export default class Kube {
 
         let volumes = [];
         let volumeMounts = [];
-        if (type === 'gpu') {
+        if (type === 'gpu' || type === 'cpu') {
             volumes = [{
                 name: 'dshm',
                 emptyDir: {
