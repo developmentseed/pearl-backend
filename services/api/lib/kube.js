@@ -66,12 +66,12 @@ export default class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    cpu: '1500m',
+                    cpu: '2',
                     memory: '4Gi'
                 },
                 limits: {
-                    cpu: '1500m',
-                    memory: '6Gi'
+                    cpu: '10',
+                    memory: '15Gi'
                 }
             };
         }
@@ -81,7 +81,7 @@ export default class Kube {
 
         let volumes = [];
         let volumeMounts = [];
-        if (type === 'gpu') {
+        if (type === 'gpu' || type === 'cpu') {
             volumes = [{
                 name: 'dshm',
                 emptyDir: {
