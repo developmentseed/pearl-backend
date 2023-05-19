@@ -440,6 +440,9 @@ class API:
         return r.json()
 
     def get_tilejson(self, mosaic):
+        if isinstance(mosaic, dict):
+            mosaic = mosaic["id"]
+
         if AVAILABLE_MOSAICS.get(mosaic) is None:
             AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
 
@@ -457,6 +460,9 @@ class API:
         return r.json()
 
     def get_tile(self, mosaic, z, x, y, iformat="npy", buffer=32, cache=True):
+        if isinstance(mosaic, dict):
+            mosaic = mosaic["id"]
+
         if AVAILABLE_MOSAICS.get(mosaic) is None:
             AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
 
