@@ -146,7 +146,7 @@ export default class Kube {
     async deletePod(name) {
         const res = await this.k8sApi.deleteNamespacedPod(name, this.namespace);
         if (res.statusCode >= 400) {
-            return `REquest failed: ${res.statusMessage}`;
+            return `Request failed: ${res.statusMessage}`;
         }
         return res.body;
     }
