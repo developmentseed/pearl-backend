@@ -111,7 +111,7 @@ export default class Kube {
             },
             spec: {
                 containers: [{
-                    name: `instace-${type}-${name}`,
+                    name: `instance-${type}-${name}`,
                     image: `${gpuImageName}:${gpuImageTag}`,
                     resources: resources,
                     env: env,
