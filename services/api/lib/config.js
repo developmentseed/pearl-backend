@@ -48,8 +48,8 @@ export default class Config {
         config.ApiUrl = process.env.ApiUrl || '';
         config.SocketUrl = process.env.SocketUrl || '';
 
-        config.LiveInferenceSize = process.env.LiveInferenceSize || 100000000;
-        config.MaxInferenceSize = process.env.MaxInferenceSize || 200000000;
+        config.LiveInferenceSize = process.env.LiveInferenceSize ? Number(process.env.LiveInferenceSize) : 100000000;
+        config.MaxInferenceSize = process.env.MaxInferenceSize ? Number(process.env.MaxInferenceSize) : 200000000;
 
         return config;
     }

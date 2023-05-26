@@ -92,7 +92,7 @@ spec:
             - name: AUTH0_ISSUER_BASE_URL
               value: {{ .Values.api.auth0BaseUrl }}
             - name: LiveInferenceSize
-              value: {{ .Values.api.liveInferenceSize }}
+              value: {{ .Values.api.liveInferenceSize | quote }}
             - name: MaxInferenceSize
-              value: {{ .Values.api.maxInferenceSize }}
+              value: {{ .Values.api.maxInferenceSize | quote }}
 {{- end }}
