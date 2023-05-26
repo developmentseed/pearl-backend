@@ -125,8 +125,8 @@ export default async function server(config) {
             version: pkg.version,
             qa_tiles: config.QA_Tiles,
             limits: {
-                live_inference: 100000000,
-                max_inference: 200000000,
+                live_inference: config.LiveInferenceSize,
+                max_inference: config.MaxInferenceSize,
                 instance_window: 600,
                 total_gpus: config.GpuCount,
                 total_cpus: config.CpuCount,

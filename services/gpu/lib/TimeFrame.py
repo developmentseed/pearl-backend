@@ -47,6 +47,10 @@ class TimeFrame:
         )
 
         # TODO Check Max size too
+        LOGGER.info(
+            "ok - timeframe area " + str(TimeFrame.area(tf.bounds))
+        )
+
         tf.live = TimeFrame.area(tf.bounds) < tf.api.server["limits"]["live_inference"]
 
         if tf.is_patch is not False:
