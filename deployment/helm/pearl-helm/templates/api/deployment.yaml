@@ -91,4 +91,8 @@ spec:
               value: ws://{{ template "lulc-helm.fullname" . }}-socket
             - name: AUTH0_ISSUER_BASE_URL
               value: {{ .Values.api.auth0BaseUrl }}
+            - name: LiveInferenceSize
+              value: {{ .Values.api.env.liveInferenceSize }}
+            - name: MaxInferenceSize
+              value: {{ .Values.api.env.maxInferenceSize }}
 {{- end }}

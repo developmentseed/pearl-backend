@@ -11,6 +11,8 @@ api:
   auth0BaseUrl: replace_manually
   signingSecret: replace_manually
   postgresUrl: replace_manually
+  liveInferenceSize: 100000000
+  maxInferenceSize: 200000000
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
