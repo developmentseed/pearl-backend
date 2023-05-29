@@ -48,6 +48,7 @@ export default class Config {
         config.ApiUrl = process.env.ApiUrl || '';
         config.SocketUrl = process.env.SocketUrl || '';
 
+        console.log('LiveInferenceSize', process.env.LiveInferenceSize);
         config.LiveInferenceSize = process.env.LiveInferenceSize ? Number(process.env.LiveInferenceSize) : 100000000;
         config.MaxInferenceSize = process.env.MaxInferenceSize ? Number(process.env.MaxInferenceSize) : 200000000;
 
