@@ -76,9 +76,9 @@ spec:
             - name: GpuImageTag
               value: {{ .Values.gpu.image.tag }}
             - name: GpuCount
-              value: {{ .Values.api.GpuCount | quote }}
+              value: {{ .Values.api.gpuCount | quote }}
             - name: CpuCount
-              value: {{ .Values.api.CpuCount | quote }}
+              value: {{ .Values.api.cpuCount | quote }}
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
