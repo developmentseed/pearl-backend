@@ -230,11 +230,9 @@ class API:
 
         ch_zip_fs = self.tmp_dir + "/checkpoint-{}.zip".format(checkpointid)
         with open(ch_zip_fs, "wb") as f:
-            for chunk in r.iter_content(chunk_size=1024):
+            for chunk in r.iter_content(chunk_size=10240):
                 if chunk:
                     f.write(chunk)
-                    f.flush()
-                    os.fsync(f.fileno())
 
         LOGGER.info("ok - Received " + url)
 
