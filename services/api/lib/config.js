@@ -43,7 +43,7 @@ export default class Config {
         config.GpuImageTag = process.env.GpuImageTag || '';
         config.Deployment = process.env.Deployment || 'lulc-test-lulc-helm';
         config.GpuCount = process.env.GpuCount ? Number(process.env.GpuCount) : 2;
-        config.CpuCount = process.env.CpuCount ? Number(process.env.GpuCount) : 10;
+        config.CpuCount = process.env.CpuCount ? Number(process.env.CpuCount) : 10;
 
         config.ApiUrl = process.env.ApiUrl || '';
         config.SocketUrl = process.env.SocketUrl || '';
