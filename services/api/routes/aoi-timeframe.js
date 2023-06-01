@@ -388,6 +388,14 @@ export default async function router(schema, config) {
             }
 
             const a = await AOI.from(config.pool, req.params.aoiid);
+            console.log('TimeFrameShare Generate', {
+                project_id: req.params.projectid,
+                aoi_id: req.params.aoiid,
+                timeframe_id: req.params.timeframeid,
+                bounds: a.bounds,
+                patches: tf.patches
+            });
+
             let share = await TimeFrameShare.generate(config.pool, {
                 project_id: req.params.projectid,
                 aoi_id: req.params.aoiid,
