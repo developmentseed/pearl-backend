@@ -66,8 +66,8 @@ export default class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    cpu: '2',
-                    memory: '4Gi'
+                    cpu: '1.5',
+                    memory: '3Gi'
                 },
                 limits: {
                     cpu: '10',
