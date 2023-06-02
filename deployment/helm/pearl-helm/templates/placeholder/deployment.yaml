@@ -38,10 +38,10 @@ spec:
             nvidia.com/gpu: {{ .Values.placeholder.numGPUs }}
         {{- else }}
           requests:
-            cpu: {{ .Values.placeholder.resources.requests.cpu }}
-            memory: {{ .Values.placeholder.resources.requests.memory }}
+            cpu: {{ .Values.placeholder.resources.requests.cpu | quote }}
+            memory: {{ .Values.placeholder.resources.requests.memory | quote }}
           limits:
-            cpu: {{ .Values.placeholder.resources.limits.cpu }}
-            memory: {{ .Values.placeholder.resources.limits.memory }}
+            cpu: {{ .Values.placeholder.resources.limits.cpu | quote }}
+            memory: {{ .Values.placeholder.resources.limits.memory | quote }}
         {{- end }}
 {{- end }}
