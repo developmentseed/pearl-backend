@@ -95,4 +95,12 @@ spec:
               value: {{ .Values.api.liveInferenceSize | quote }}
             - name: MaxInferenceSize
               value: {{ .Values.api.maxInferenceSize | quote }}
+            - name: InstanceRequestCPU
+              value: {{ .Values.api.instanceRequestCPU }}
+            - name: InstanceRequestMemory
+              value: {{ .Values.api.instanceRequestMemory }}
+            - name: InstanceLimitCPU
+              value: {{ .Values.api.instanceLimitCPU }}
+            - name: InstanceLimitMemory
+              value: {{ .Values.api.instanceLimitMemory }}
 {{- end }}

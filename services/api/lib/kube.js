@@ -66,12 +66,12 @@ export default class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    cpu: '2',
-                    memory: '4Gi'
+                    cpu: this.config.InstanceRequestCPU,
+                    memory: this.config.InstanceRequestMemory
                 },
                 limits: {
-                    cpu: '10',
-                    memory: '15Gi'
+                    cpu: this.config.InstanceLimitCPU,
+                    memory: this.config.InstanceLimitMemory
                 }
             };
         }
