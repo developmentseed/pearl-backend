@@ -45,6 +45,12 @@ export default class Config {
         config.GpuCount = process.env.GpuCount ? Number(process.env.GpuCount) : 2;
         config.CpuCount = process.env.CpuCount ? Number(process.env.CpuCount) : 10;
 
+        config.InstanceRequestCPU = process.env.InstanceRequestCPU || '1500m';
+        config.InstanceRequestMemory = process.env.InstanceRequestMemory || '4Gi'
+
+        config.InstanceLimitCPU = process.env.InstanceLimitCPU || '1500m';
+        config.InstanceLimitMemory = process.env.InstanceLimitMemory || '6Gi'
+
         config.ApiUrl = process.env.ApiUrl || '';
         config.SocketUrl = process.env.SocketUrl || '';
 
