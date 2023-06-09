@@ -480,6 +480,62 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.post('/project/:projectid/aoi/:aoiid/stac', {
+        name: 'Create STAC',
+        group: 'AOI',
+        auth: 'user',
+        description: 'Post the AOI to the public STAC Catalogue',
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        body: 'req.body.CreateStac.json',
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const a = await AOI.has_auth(config.pool, req.auth, req.params.projectid, req.params.aoiid);
+            if (!a.storage) throw new Err(404, null, 'AOI has not been uploaded');
+
+            await config.pool.query(sql`
+                SELECT pgstac.upsert_collection(${JSON.stringify({
+                    stac_version: "1.0.0",
+                    type: "Catalog",
+                    id: a.project_id,
+                    description: `Project ID: ${a.project_id}`,
+                    links: []
+                })}::JSONB);
+            `)
+
+            await config.pool.query(sql`
+                SELECT pgstac.upsert_item(${JSON.stringify({
+                    stac_version: "1.0.0",
+                    collection: a.project_id,
+                    type: "Feature",
+                    id: a.id,
+                    bbox: a.bounds.bounds,
+                    geometry: a.bounds,
+                    properties: {
+                        datetime: (new Date(a.created)).toISOString(),
+                    },
+                    links: [],
+                    assets: {
+                        visual: {
+                            href: 'URL HERE',
+                            type: 'image/tiff; application=geotiff; profile=cloud-optimized',
+                            title: `Project: ${a.project_id} - AOI: ${a.id}`,
+                            roles: [ 'visual' ]
+                        }
+                    }
+                })}::JSONB);
+            `);
+
+            return res.json({
+                status: 200,
+                message: 'Create STAC Item'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     await schema.get('/share/:shareuuid', {
         name: 'Get Share',
         group: 'Share',

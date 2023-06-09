@@ -19,6 +19,25 @@ services:
             - Postgres=postgres://docker:docker@postgis:5432/gis
             - AZURE_STORAGE_CONNECTION_STRING
 
+    stac:
+        platform: linux/amd64
+        build: ./services/stac/
+        restart: always
+        links:
+            - postgis
+        depends_on:
+            - migration
+        ports:
+            - "2002:2002"
+        environment:
+            - POSTGRES_PASS=docker
+            - POSTGRES_USER=docker
+            - POSTGRES_DBNAME=gis
+            - POSTGRES_HOST=postgis
+            - POSTGRES_PORT=5432
+            - POSTGRES_HOST_READER=postgis
+            - POSTGRES_HOST_WRITER=postgis
+
     postgis:
         platform: linux/amd64
         image: kartoza/postgis:13.0
@@ -63,7 +82,7 @@ services:
     migration:
         platform: linux/amd64
         build: ./services/api
-        command: sh -c "sleep 20; npx knex migrate:latest"
+        command: bash -c "echo $${Postgres} && pypgstac --dsn=$${Postgres} pgready && npx knex migrate:latest && pypgstac --dsn=$${Postgres} migrate"
         links:
             - postgis
         ports:

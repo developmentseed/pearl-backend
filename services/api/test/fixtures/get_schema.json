@@ -109,6 +109,11 @@
         "query": false,
         "res": true
     },
+    "POST /project/:projectid/aoi/:aoiid/stac": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
     "GET /share/:shareuuid": {
         "body": false,
         "query": false,

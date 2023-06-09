@@ -448,6 +448,25 @@ Note: this is an internal API that is called by the websocket GPU
 
 
 /**
+* @api {post} /project/:projectid/aoi/:aoiid/stac Create STAC
+* @apiVersion 1.0.0
+* @apiName POST-/project/:projectid/aoi/:aoiid/stac
+* @apiGroup AOI
+* @apiPermission user
+*
+* @apidescription
+*   Post the AOI to the public STAC Catalogue
+*
+* @apiParam {integer} projectid param
+* @apiParam {integer} aoiid param
+*
+*
+* @apiSchema (Body) {jsonschema=../schema/req.body.CreateStac.json} apiParam
+* @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+*/
+
+
+/**
 * @api {get} /share/:shareuuid Get Share
 * @apiVersion 1.0.0
 * @apiName GET-/share/:shareuuid
