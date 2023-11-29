@@ -59,7 +59,7 @@ jobs:
     #   if: startsWith(github.event.head_commit.message, '[deploy]')
     #   run: ./scripts/cideploy --dev
 
-    Uncomment this section to create a staging stack
+    # Uncomment this section to create a staging stack
     - name: Deploy -- Staging
       env:
         postgresPassword: ${{ secrets.TERRAFORM_STAGING_POSTGRES_PASSWORD }}
