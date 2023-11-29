@@ -6,7 +6,7 @@ resource "azurerm_postgresql_flexible_server" "lulc" {
   administrator_login    = "lulc"
   administrator_password = var.postgres_password
   storage_mb             = 32768
-  sku_name               = "B1ms"
+  sku_name               = "B_Standard_B1ms"
   private_dns_zone_id    = azurerm_private_dns_zone.lulc.id
   delegated_subnet_id    = azurerm_subnet.postgres.id
   depends_on = [azurerm_private_dns_zone_virtual_network_link.lulc]
