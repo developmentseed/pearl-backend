@@ -6,7 +6,7 @@ resource "azurerm_kubernetes_cluster" "lulc" {
   location            = azurerm_resource_group.lulc.location
   resource_group_name = azurerm_resource_group.lulc.name
   dns_prefix          = "${local.prefix}-cluster"
-  kubernetes_version  = "1.20.13"
+  kubernetes_version  = "1.25.11"
 
   default_node_pool {
     name           = "nodepool1"
