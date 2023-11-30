@@ -18,4 +18,8 @@ resource "helm_release" "lulc-ingress-nginx" {
     value = azurerm_public_ip.lulc.ip_address
   }
 
+  set {
+    name = "controller.service.externalTrafficPolicy"
+    value = "Local"
+  }
 }
