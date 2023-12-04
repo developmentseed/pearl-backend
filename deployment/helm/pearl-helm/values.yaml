@@ -12,7 +12,7 @@ api:
   signingSecret: replace_manually
   postgresUrl: replace_manually
   liveInferenceSize: 100000000
-  maxInferenceSize: 200000000
+  maxInferenceSize: 500000000
   instanceRequestCPU: '1500m'
   instanceRequestMemory: '4Gi'
   image:
