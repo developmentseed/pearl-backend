@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "required": [
+        "name",
+        "params",
+        "ui_params",
+        "mosaic_ts_start",
+        "mosaic_ts_end",
+        "imagery_source_id"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "params": {
+            "type": "object"
+        },
+        "ui_params": {
+            "type": "object"
+        },
+        "mosaic_ts_start": {
+            "type": ["integer", "null"]
+        },
+        "mosaic_ts_end": {
+            "type": ["integer", "null"]
+        },
+        "imagery_source_id": {
+            "type": "integer"
+        }
+    }
+}

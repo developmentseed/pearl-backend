@@ -39,19 +39,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
 }
 
-/**
- * @apiDefine admin Admin
- *   The user must be an admin to use this endpoint
- */
-/**
- * @apiDefine user User
- *   A user must be logged in to use this endpoint
- */
-/**
- * @apiDefine public Public
- *   This API endpoint does not require authentication
- */
-
 export default async function server(config) {
     const app = express();
 
@@ -134,23 +121,6 @@ export default async function server(config) {
         });
     });
 
-    /**
-     * @api {get} /health Server Healthcheck
-     * @apiVersion 1.0.0
-     * @apiName Health
-     * @apiGroup Server
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     AWS ELB Healthcheck for the server
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "healthy": true,
-     *       "message": "Good to go"
-     *   }
-     */
     app.get('/health', (req, res) => {
         return res.json({
             healthy: true,
