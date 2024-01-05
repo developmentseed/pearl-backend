@@ -77,8 +77,6 @@ export default async function server(config) {
     }));
     app.use(minify());
 
-    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
-
     /**
      * @api {get} /api Get Metadata
      * @apiVersion 1.0.0
@@ -161,6 +159,8 @@ export default async function server(config) {
     });
 
     app.use('/api', schema.router);
+
+    await schema.api();
 
     /*
      * Validate Auth0 JWT tokens
@@ -270,7 +270,6 @@ export default async function server(config) {
     ];
 
 
-    await schema.api();
     await schema.load(
         new URL('./routes/', import.meta.url),
         config,
@@ -278,6 +277,8 @@ export default async function server(config) {
             silent: !!config.silent
         }
     );
+
+    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
 
     schema.not_found();
     schema.error();
