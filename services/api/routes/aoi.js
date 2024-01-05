@@ -90,28 +90,6 @@ export default async function router(schema, config) {
         }
     });
 
-    await schema.patch('/project/:projectid/aoi/:aoiid', {
-        name: 'Patch AOI',
-        group: 'AOI',
-        auth: 'user',
-        description: 'Update an AOI',
-        ':projectid': 'integer',
-        ':aoiid': 'integer',
-        body: 'req.body.PatchAOI.json',
-        res: 'res.AOI.json'
-    }, config.requiresAuth, async (req, res) => {
-        try {
-            const a = await AOI.has_auth(config.pool, req);
-
-            return res.json(await a.commit({
-                updated: sql`Now()`,
-                ...req.body
-            }));
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
     await schema.delete('/project/:projectid/aoi/:aoiid', {
         name: 'Delete AOI',
         group: 'AOI',

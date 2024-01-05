@@ -12,6 +12,7 @@ import minify from 'express-minify';
 import { ValidationError } from 'express-json-validator-middleware';
 import minimist from 'minimist';
 import { Pool } from '@openaddresses/batch-generic';
+import SwaggerUI from 'swagger-ui-express';
 
 import { fetchJSON } from './lib/util.js';
 import Kube from './lib/kube.js';
@@ -64,10 +65,9 @@ export default async function server(config) {
     });
 
     const schema = new Schema(express.Router(), {
-        schemas: new URL('./schema', import.meta.url)
+        schemas: new URL('./schema', import.meta.url),
+        openapi: true
     });
-
-    await schema.api();
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -77,7 +77,7 @@ export default async function server(config) {
     }));
     app.use(minify());
 
-    app.use('/docs', express.static('./doc'));
+    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
 
     /**
      * @api {get} /api Get Metadata
@@ -281,8 +281,6 @@ export default async function server(config) {
 
     schema.not_found();
     schema.error();
-
-    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(config.Port, (err) => {
