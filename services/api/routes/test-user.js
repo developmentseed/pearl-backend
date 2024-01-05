@@ -26,13 +26,14 @@ export default async function router(schema, config) {
                     email: { type: 'string' },
                     created: { type: 'integer' },
                     updated: { type: 'integer' },
+                    token: { type: 'string' },
                     flats: { type: 'object' }
                 }
             }
         }, async (req, res) => {
             try {
                 req.body.auth0Id = '123' + req.body.username;
-                const usr = await User.generate(config.pool, req.body);
+                const usr = (await User.generate(config.pool, req.body)).serialize();
 
                 const tkn = await Token.generate(config.pool, {
                     uid: usr.id,
