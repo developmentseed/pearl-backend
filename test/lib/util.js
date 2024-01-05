@@ -1,6 +1,7 @@
-import { promisify } from 'util';
+import { promisify } from 'node:util';
 import request from 'request';
-import fs from 'fs';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const prequest = promisify(request);
 
