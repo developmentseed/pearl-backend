@@ -7,10 +7,9 @@
     "repository": "git@github.com:developmentseed/lulc-infra",
     "author": "ingalls <nick@ingalls.ca>",
     "scripts": {
-        "doc": "apidoc -i ./doc ./routes/",
         "lint": "eslint index.js lib/*.js lib/types/*.js routes/**.js test/**.js",
         "prod": "node --trace-warnings ./index.js --prod",
-        "dev": "nodemon -i schema/ -i doc/ ./index.js",
+        "dev": "nodemon -i schema/ ./index.js",
         "test": "./test/runner"
     },
     "dependencies": {
@@ -54,14 +53,5 @@
         "nodemon": "^3.0.0",
         "tap-dot": "^2.0.0",
         "tape": "^5.1.1"
-    },
-    "apidoc": {
-        "name": "Microsoft LULC API",
-        "title": "Microsoft LULC API",
-        "version": "1.0.0",
-        "header": {
-            "title": "Authentication",
-            "filename": "API.md"
-        }
     }
 }
