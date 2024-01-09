@@ -25,7 +25,7 @@ export default async function router(schema, config) {
         description: 'Create a new mosaic',
         body: 'req.body.CreateMosaic.json',
         res: 'res.Mosaics.json'
-    }, async (req, res) => {
+    }, config.requiresAuth, async (req, res) => {
         try {
             const mosaic = await Mosaic.generate(config.pool, req.body);
 
