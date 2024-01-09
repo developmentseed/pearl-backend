@@ -292,6 +292,10 @@ test('PATCH /api/project/1/aoi/1/timeframe/1/', async (t) => {
         t.ok(res.body.bookmarked_at);
         delete res.body.created;
         delete res.body.bookmarked_at;
+        t.ok(res.body.mosaic.created, '.mosaic.created: <date>');
+        t.ok(res.body.mosaic.updated, '.mosaic.updated: <date>');
+        delete res.body.mosaic.created;
+        delete res.body.mosaic.updated;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -301,7 +305,23 @@ test('PATCH /api/project/1/aoi/1/timeframe/1/', async (t) => {
             bookmarked: true,
             px_stats: {},
             patches: [1],
-            mosaic: 'naip.latest',
+            mosaic: {
+                id: "87b72c66331e136e088004fba817e3e8",
+                name: "naip.latest",
+                params: {
+                    assets: "image",
+                    asset_bidx: "image|1,2,3,4",
+                    collection: "naip"
+                },
+                imagery_source_id: 1,
+                mosaic_ts_start: null,
+                mosaic_ts_end: null,
+                ui_params: {
+                    assets: "image",
+                    asset_bidx: "image|1,2,3,4",
+                    collection: "naip"
+                }
+            },
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008000' },
@@ -408,6 +428,10 @@ test('GET /api/project/1/aoi/1/timeframe/1 - should return the classes field upd
 
         delete res.body.created;
         delete res.body.mosaic_ts;
+        t.ok(res.body.mosaic.created, '.mosaic.created: <date>');
+        t.ok(res.body.mosaic.updated, '.mosaic.updated: <date>');
+        delete res.body.mosaic.created;
+        delete res.body.mosaic.updated;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -419,7 +443,23 @@ test('GET /api/project/1/aoi/1/timeframe/1 - should return the classes field upd
             patches: [1],
             shares: [],
             px_stats: {},
-            mosaic: 'naip.latest',
+            mosaic: {
+                id: "87b72c66331e136e088004fba817e3e8",
+                name: "naip.latest",
+                params: {
+                    assets: "image",
+                    asset_bidx: "image|1,2,3,4",
+                    collection: "naip"
+                },
+                imagery_source_id: 1,
+                mosaic_ts_start: null,
+                mosaic_ts_end: null,
+                ui_params: {
+                    assets: "image",
+                    asset_bidx: "image|1,2,3,4",
+                    collection: "naip"
+                }
+            },
             classes: [
                 { name: 'Water', color: '#0000FF' },
                 { name: 'Tree Canopy', color: '#008100' },
