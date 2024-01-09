@@ -306,20 +306,20 @@ test('PATCH /api/project/1/aoi/1/timeframe/1/', async (t) => {
             px_stats: {},
             patches: [1],
             mosaic: {
-                id: "87b72c66331e136e088004fba817e3e8",
-                name: "naip.latest",
+                id: '87b72c66331e136e088004fba817e3e8',
+                name: 'naip.latest',
                 params: {
-                    assets: "image",
-                    asset_bidx: "image|1,2,3,4",
-                    collection: "naip"
+                    assets: 'image',
+                    asset_bidx: 'image|1,2,3,4',
+                    collection: 'naip'
                 },
                 imagery_source_id: 1,
                 mosaic_ts_start: null,
                 mosaic_ts_end: null,
                 ui_params: {
-                    assets: "image",
-                    asset_bidx: "image|1,2,3,4",
-                    collection: "naip"
+                    assets: 'image',
+                    asset_bidx: 'image|1,2,3,4',
+                    collection: 'naip'
                 }
             },
             classes: [
@@ -444,20 +444,20 @@ test('GET /api/project/1/aoi/1/timeframe/1 - should return the classes field upd
             shares: [],
             px_stats: {},
             mosaic: {
-                id: "87b72c66331e136e088004fba817e3e8",
-                name: "naip.latest",
+                id: '87b72c66331e136e088004fba817e3e8',
+                name: 'naip.latest',
                 params: {
-                    assets: "image",
-                    asset_bidx: "image|1,2,3,4",
-                    collection: "naip"
+                    assets: 'image',
+                    asset_bidx: 'image|1,2,3,4',
+                    collection: 'naip'
                 },
                 imagery_source_id: 1,
                 mosaic_ts_start: null,
                 mosaic_ts_end: null,
                 ui_params: {
-                    assets: "image",
-                    asset_bidx: "image|1,2,3,4",
-                    collection: "naip"
+                    assets: 'image',
+                    asset_bidx: 'image|1,2,3,4',
+                    collection: 'naip'
                 }
             },
             classes: [
