@@ -1,4 +1,4 @@
-import { promisify } from 'util';
+import { promisify } from 'node:util';
 import request from 'request';
 import Knex from 'knex';
 import Config from '../services/api/lib/config.js';

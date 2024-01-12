@@ -20,11 +20,11 @@
         "ws": "^8.2.3"
     },
     "dependencies": {
-        "@openaddresses/batch-generic": "^13.1.0",
+        "@openaddresses/batch-generic": "^14.0.0",
         "ajv": "^8.6.2",
         "charm": "^1.0.2",
         "inquirer": "^9.1.0",
-        "knex": "^2.0.0",
+        "knex": "^3.0.0",
         "minimist": "^1.2.5",
         "terminal-kit": "^3.0.0"
     }

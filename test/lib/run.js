@@ -1,4 +1,4 @@
-import { promisify } from 'util';
+import { promisify } from 'node:util';
 import request from 'request';
 const arequest = promisify(request);
 

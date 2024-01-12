@@ -18,6 +18,23 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.post('/mosaic', {
+        name: 'Create Mosaic',
+        group: 'Mosaic',
+        auth: 'admin',
+        description: 'Create a new mosaic',
+        body: 'req.body.CreateMosaic.json',
+        res: 'res.Mosaics.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const mosaic = await Mosaic.generate(config.pool, req.body);
+
+            return res.json(mosaic);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     await schema.get('/mosaic', {
         name: 'List Mosaics',
         group: 'Mosaic',

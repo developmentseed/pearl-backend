@@ -12,6 +12,7 @@ import minify from 'express-minify';
 import { ValidationError } from 'express-json-validator-middleware';
 import minimist from 'minimist';
 import { Pool } from '@openaddresses/batch-generic';
+import SwaggerUI from 'swagger-ui-express';
 
 import { fetchJSON } from './lib/util.js';
 import Kube from './lib/kube.js';
@@ -38,19 +39,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
 }
 
-/**
- * @apiDefine admin Admin
- *   The user must be an admin to use this endpoint
- */
-/**
- * @apiDefine user User
- *   A user must be logged in to use this endpoint
- */
-/**
- * @apiDefine public Public
- *   This API endpoint does not require authentication
- */
-
 export default async function server(config) {
     const app = express();
 
@@ -64,10 +52,9 @@ export default async function server(config) {
     });
 
     const schema = new Schema(express.Router(), {
-        schemas: new URL('./schema', import.meta.url)
+        schemas: new URL('./schema', import.meta.url),
+        openapi: true
     });
-
-    await schema.api();
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -76,8 +63,6 @@ export default async function server(config) {
         credentials: true
     }));
     app.use(minify());
-
-    app.use('/docs', express.static('./doc'));
 
     /**
      * @api {get} /api Get Metadata
@@ -136,23 +121,6 @@ export default async function server(config) {
         });
     });
 
-    /**
-     * @api {get} /health Server Healthcheck
-     * @apiVersion 1.0.0
-     * @apiName Health
-     * @apiGroup Server
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     AWS ELB Healthcheck for the server
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "healthy": true,
-     *       "message": "Good to go"
-     *   }
-     */
     app.get('/health', (req, res) => {
         return res.json({
             healthy: true,
@@ -161,6 +129,8 @@ export default async function server(config) {
     });
 
     app.use('/api', schema.router);
+
+    await schema.api();
 
     /*
      * Validate Auth0 JWT tokens
@@ -270,7 +240,6 @@ export default async function server(config) {
     ];
 
 
-    await schema.api();
     await schema.load(
         new URL('./routes/', import.meta.url),
         config,
@@ -279,10 +248,10 @@ export default async function server(config) {
         }
     );
 
+    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
+
     schema.not_found();
     schema.error();
-
-    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(config.Port, (err) => {
