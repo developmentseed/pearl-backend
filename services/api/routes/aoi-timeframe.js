@@ -369,6 +369,7 @@ export default async function router(schema, config) {
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':timeframeid': 'integer',
+        body: 'req.body.CreateShare.json',
         res: 'res.Share.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -389,6 +390,7 @@ export default async function router(schema, config) {
 
             const a = await AOI.from(config.pool, req.params.aoiid);
             let share = await TimeFrameShare.generate(config.pool, {
+                published: req.body.published || false,
                 project_id: req.params.projectid,
                 aoi_id: req.params.aoiid,
                 timeframe_id: req.params.timeframeid,
