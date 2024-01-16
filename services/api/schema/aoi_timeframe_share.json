@@ -25,6 +25,9 @@
         },
         "timeframe_id": {
             "$ref": "./aoi_timeframe_share/timeframe_id.json"
+        },
+        "published": {
+            "$ref": "./aoi_timeframe_share/published.json"
         }
     },
     "required": [
@@ -35,6 +38,7 @@
         "storage",
         "uuid",
         "patches",
-        "timeframe_id"
+        "timeframe_id",
+        "published"
     ]
 }

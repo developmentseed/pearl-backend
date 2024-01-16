@@ -11,7 +11,8 @@
         "patches",
         "mosaic",
         "aoi",
-        "timeframe"
+        "timeframe",
+        "published"
     ],
     "additionalProperties": false,
     "properties": {
@@ -56,6 +57,9 @@
         },
         "classes": {
             "$ref": "./util/classes.json"
+        },
+        "published": {
+            "type": "boolean"
         }
     }
 }
