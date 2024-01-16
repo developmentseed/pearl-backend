@@ -361,6 +361,29 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.patch('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share/:shareuuid', {
+        name: 'Update Share',
+        group: 'Share',
+        auth: 'user',
+        description: 'Update a Shared AOI',
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':timeframeid': 'integer',
+        ':shareuuid': 'string',
+        body: 'req.body.PatchShare.json',
+        res: 'res.Share.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            await TimeFrame.has_auth(config.pool, req);
+
+            const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
+            await share.commit(req.body);
+            return res.json(share);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
     await schema.post('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share', {
         name: 'Create Share',
         group: 'Share',
