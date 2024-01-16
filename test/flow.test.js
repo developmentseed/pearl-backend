@@ -1,9 +1,9 @@
 import { Term } from './lib/term.js';
 import WebSocket from 'ws';
 import test from 'tape';
-import path from 'path';
-import fs from 'fs';
-import fsp from 'fs/promises';
+import path from 'node:path';
+import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import LULC from './lib.js';
 import minimist from 'minimist';
 

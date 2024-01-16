@@ -2,6 +2,7 @@ import Err from '@openaddresses/batch-error';
 import Mosaic from '../lib/types/mosaic.js';
 import ImagerySource from '../lib/types/imagery-source.js';
 import Proxy from '../lib/proxy.js';
+import { randomUUID } from 'node:crypto';
 
 export default async function router(schema, config) {
     await schema.get('/imagery', {
@@ -13,6 +14,26 @@ export default async function router(schema, config) {
     }, async (req, res) => {
         try {
             res.json(await ImagerySource.list(config.pool));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    await schema.post('/mosaic', {
+        name: 'Create Mosaic',
+        group: 'Mosaic',
+        auth: 'admin',
+        description: 'Create a new mosaic',
+        body: 'req.body.CreateMosaic.json',
+        res: 'res.Mosaic.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const mosaic = await Mosaic.generate(config.pool, {
+                id: randomUUID().replace(/-/g, ''),
+                ...req.body
+            });
+
+            return res.json(mosaic);
         } catch (err) {
             return Err.respond(err, res);
         }

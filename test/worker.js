@@ -1,4 +1,4 @@
-import CP from 'child_process';
+import CP from 'node:child_process';
 
 /**
  * Spin up a CPU based GPU worker for tests
