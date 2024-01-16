@@ -227,17 +227,17 @@ test('POST /api/mosaic', async(t) => {
             },
             body: {
                 params: {
-                    assets: ["B04", "B03", "B02", "B08"],
-                    rescale: "0,10000",
-                    collection: "sentinel-2-l2a"
+                    assets: ['B04', 'B03', 'B02', 'B08'],
+                    rescale: '0,10000',
+                    collection: 'sentinel-2-l2a'
                 },
                 imagery_source_id: 2,
                 ui_params: {
-                    assets: ["B04", "B03", "B02"],
-                    collection: "sentinel-2-l2a",
-                    color_formula: "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35"
+                    assets: ['B04', 'B03', 'B02'],
+                    collection: 'sentinel-2-l2a',
+                    color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35'
                 },
-                name: "Sentinel-2 2023-07-03",
+                name: 'Sentinel-2 2023-07-03',
                 mosaic_ts_start: 1688342400000,
                 mosaic_ts_end: 1696118400000
             }
@@ -251,17 +251,17 @@ test('POST /api/mosaic', async(t) => {
         delete res.body.updated;
 
         t.deepEquals(res.body, {
-            name: "Sentinel-2 2023-07-03",
+            name: 'Sentinel-2 2023-07-03',
             params: {
-                assets: ["B04", "B03", "B02", "B08"],
-                rescale: "0,10000",
-                collection: "sentinel-2-l2a"
+                assets: ['B04', 'B03', 'B02', 'B08'],
+                rescale: '0,10000',
+                collection: 'sentinel-2-l2a'
             },
             imagery_source_id: 2,
             ui_params: {
-                assets: ["B04", "B03", "B02"],
-                collection: "sentinel-2-l2a",
-                color_formula: "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35"
+                assets: ['B04', 'B03', 'B02'],
+                collection: 'sentinel-2-l2a',
+                color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35'
             },
             mosaic_ts_start: 1688320800000,
             mosaic_ts_end: 1696096800000
