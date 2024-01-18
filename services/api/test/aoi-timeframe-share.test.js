@@ -116,7 +116,6 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
             }
         }, t);
 
-        console.error(res.body);
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 

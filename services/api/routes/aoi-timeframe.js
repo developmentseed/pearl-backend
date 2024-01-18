@@ -74,6 +74,21 @@ export default async function router(schema, config) {
         };
     };
 
+    await schema.get('/share', {
+        name: 'List Public Shares',
+        group: 'PublicShare',
+        auth: 'user',
+        description: 'List public shares',
+        res: 'res.ListShare.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const list = await TimeFrameShare.public(config.pool, req.query);
+            return res.json(list);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
 
     await schema.get('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid', {
         name: 'Get Timeframe',

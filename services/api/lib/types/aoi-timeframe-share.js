@@ -10,6 +10,59 @@ export default class AOIShare extends Generic {
     static _table = 'aoi_timeframe_share';
 
     /**
+     * Return a list of Public/Published AOI Shares
+     *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     * @param {Object} query - Query Object
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Page to return
+     */
+    static async public(pool, query) {
+        if (!query) query = {};
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 0;
+
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+               SELECT
+                    count(*) OVER() AS count,
+                    aoi_timeframe_share.uuid,
+                    aoi_timeframe_share.aoi_id,
+                    Row_To_JSON(tf.*) AS timeframe,
+                    Row_To_JSON(aois.*) AS aoi,
+                    Row_To_JSON(mosaics.*) AS mosaic,
+                    aoi_timeframe_share.timeframe_id,
+                    aoi_timeframe_share.created,
+                    aoi_timeframe_share.published,
+                    aoi_timeframe_share.storage
+                FROM
+                    aoi_timeframe_share
+                        LEFT JOIN aoi_timeframe tf
+                            ON aoi_timeframe_share.timeframe_id = tf.id
+                        LEFT JOIN aois
+                            ON aoi_timeframe_share.aoi_id = aois.id
+                        LEFT JOIN mosaics
+                            ON tf.mosaic = mosaics.name
+                                OR tf.mosaic = mosaics.id
+                WHERE
+                    aoi_timeframe_share.published = True
+                ORDER BY
+                    created DESC
+                LIMIT
+                    ${query.limit}
+                OFFSET
+                    ${query.page * query.limit}
+            `);
+        } catch (err) {
+            throw new Err(500, new Error(err), 'Failed to list AOI Shares');
+        }
+
+        return this.deserialize_list(pgres, 'shares');
+    }
+
+
+    /**
      * Return a list of AOI Shares
      *
      * @param {Pool} pool - Instantiated Postgres Pool
