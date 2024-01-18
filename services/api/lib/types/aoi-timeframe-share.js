@@ -35,6 +35,7 @@ export default class AOIShare extends Generic {
                     Row_To_JSON(mosaics.*) AS mosaic,
                     aoi_timeframe_share.timeframe_id,
                     aoi_timeframe_share.created,
+                    aoi_timeframe_share.published,
                     aoi_timeframe_share.storage
                 FROM
                     aoi_timeframe_share
@@ -153,6 +154,7 @@ export default class AOIShare extends Generic {
                SELECT
                     s.uuid,
                     s.aoi_id,
+                    s.published,
                     s.project_id,
                     s.timeframe_id,
                     s.bounds,

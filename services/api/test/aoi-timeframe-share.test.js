@@ -135,6 +135,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
             aoi_id: 1,
             project_id: 1,
             timeframe_id: 1,
+            published: false,
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -238,6 +239,7 @@ test('GET /api/share/uuid', async (t) => {
             aoi_id: 1,
             project_id: 1,
             timeframe_id: 1,
+            published: false,
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -323,6 +325,7 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
             ],
             shares: [{
                 aoi_id: 1,
+                published: false,
                 timeframe_id: 1,
                 storage: false
             }]

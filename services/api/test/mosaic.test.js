@@ -226,6 +226,7 @@ test('POST /api/mosaic', async(t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             },
             body: {
+                id: '123',
                 params: {
                     assets: ['B04', 'B03', 'B02', 'B08'],
                     rescale: '0,10000',
@@ -243,14 +244,13 @@ test('POST /api/mosaic', async(t) => {
             }
         }, t);
 
-        t.ok(typeof res.body.id === 'string' && res.body.id.length > 1);
-        delete res.body.id;
         t.ok(res.body.created);
         delete res.body.created;
         t.ok(res.body.updated);
         delete res.body.updated;
 
         t.deepEquals(res.body, {
+            id: '123',
             name: 'Sentinel-2 2023-07-03',
             params: {
                 assets: ['B04', 'B03', 'B02', 'B08'],
