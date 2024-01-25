@@ -337,11 +337,11 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/timeframe/1/share/<uuid> - doesn\'t exist', async (t) => {
+test('DELETE /api/share/<uuid> - doesn\'t exist', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1/timeframe/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
+            url: '/api/share/9218c385-02a8-4334-b574-2992a2810aeb',
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -363,11 +363,11 @@ test('DELETE /api/project/1/aoi/1/timeframe/1/share/<uuid> - doesn\'t exist', as
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/timeframe/1/<uuid> - exists', async (t) => {
+test('DELETE /api/share/<uuid> - exists', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: `/api/project/1/aoi/1/timeframe/1/share/${uuid}`,
+            url: `/api/share/${uuid}`,
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
