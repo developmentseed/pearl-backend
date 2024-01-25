@@ -390,8 +390,19 @@ export default async function router(schema, config) {
     }, config.requiresAuth, async (req, res) => {
         try {
             const share = await TimeFrameShare.has_auth(config.pool, req);
-            await share.commit(req.body);
-            return res.json(share);
+
+            if (Object.keys(req.body).length) {
+                await share.commit(req.body);
+            }
+
+            const json = share.serialize();
+            json.checkpoint_id = share.checkpoint_id;
+            json.classes = share.classes;
+            json.aoi = share.aoi;
+            json.timeframe = share.timeframe;
+            json.mosaic = share.mosaic;
+
+            return res.json(json);
         } catch (err) {
             return Err.respond(err, res);
         }

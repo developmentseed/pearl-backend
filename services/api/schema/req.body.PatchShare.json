@@ -5,7 +5,6 @@
     "properties": {
         "published": {
             "type": "boolean",
-            "default": false,
             "description": "Should the share be added to the public published maps page. If false only those with the ShareID already can view"
         }
     }

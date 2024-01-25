@@ -158,7 +158,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PRIVATE', async (t) => {
     t.end();
 });
 
-test('GET /api/share', async (t) => {
+test('PATCH /api/share', async (t) => {
     try {
         const res = await flight.request({
             json: true,
@@ -170,6 +170,21 @@ test('GET /api/share', async (t) => {
         }, t);
 
         t.equals(res.body.total, 1);
+
+        const uuid = res.body.shares[0].uuid;
+
+        await flight.request({
+            json: true,
+            url: `/api/share/${uuid}`,
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+
+            }
+        }, t);
+
     } catch (err) {
         t.error(err, 'no errors');
     }
