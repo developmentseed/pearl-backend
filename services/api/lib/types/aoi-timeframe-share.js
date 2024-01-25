@@ -1,6 +1,7 @@
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import Storage from '../storage.js';
+import Project from './project.js';
 import { sql } from 'slonik';
 
 /**
@@ -240,5 +241,21 @@ export default class AOIShare extends Generic {
         if (!pgres.rows.length) throw new Err(404, null, 'AOI Share not found');
 
         return this.deserialize(pool, pgres);
+    }
+
+    /**
+     * Ensure a user can only access their own project assets (or is an admin and can access anything)
+     * AOIs can be archived but Shares are still allowed to be managed
+     *
+     * @param {Pool} pool Instantiated Postgres Pool
+     * @param {Object} req req Express Request object
+     */
+    static async has_auth(pool, req) {
+        const share = await this.from(pool, req.params.shareuuid);
+        req.params.projectid = share.project_id;
+
+        await Project.has_auth(pool, req);
+
+        return share;
     }
 }

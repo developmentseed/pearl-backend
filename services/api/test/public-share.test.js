@@ -105,7 +105,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PUBLIC', async (t) => {
     }
 
     t.end();
-})
+});
 
 test('POST /api/project/1/aoi/1/timeframe/1/share - PRIVATE', async (t) => {
     try {
@@ -115,7 +115,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PRIVATE', async (t) => {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
-            },
+            }
         }, t);
 
         t.ok(res.body.created, '.created: <date>');
@@ -156,7 +156,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PRIVATE', async (t) => {
     }
 
     t.end();
-})
+});
 
 test('GET /api/share', async (t) => {
     try {
