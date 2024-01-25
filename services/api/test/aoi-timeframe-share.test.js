@@ -187,6 +187,7 @@ test('GET /api/project/1/share', async (t) => {
             project_id: 1,
             shares: [{
                 aoi_id: 1,
+                published: false,
                 timeframe_id: 1,
                 storage: false
             }]
