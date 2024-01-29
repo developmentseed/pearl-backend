@@ -14,6 +14,9 @@ flight.fixture(test, 'checkpoint.json', 'ingalls');
 flight.fixture(test, 'aoi.json', 'ingalls');
 flight.fixture(test, 'timeframe.json', 'ingalls');
 
+let publicuuid;
+let privateuuid;
+
 test('GET /api/share', async (t) => {
     try {
         const res = await flight.request({
@@ -67,6 +70,8 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PUBLIC', async (t) => {
             }
         }, t);
 
+        publicuuid = res.body.uuid;
+
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -118,6 +123,8 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PRIVATE', async (t) => {
             }
         }, t);
 
+        privateuuid = res.body.uuid;
+
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -158,30 +165,57 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PRIVATE', async (t) => {
     t.end();
 });
 
-test('PATCH /api/share', async (t) => {
+test('PATCH /api/share - Empty Body', async (t) => {
     try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/share',
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            }
-        }, t);
-
-        t.equals(res.body.total, 1);
-
-        const uuid = res.body.shares[0].uuid;
-
         await flight.request({
             json: true,
-            url: `/api/share/${uuid}`,
+            url: `/api/share/${publicuuid}`,
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {}
+        }, t);
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/share - Make Private', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: `/api/share/${publicuuid}`,
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
             },
             body: {
+                published: false
+            }
+        }, t);
 
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/share - Make Public', async (t) => {
+    try {
+        await flight.request({
+            json: true,
+            url: `/api/share/${privateuuid}`,
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                published: true
             }
         }, t);
 

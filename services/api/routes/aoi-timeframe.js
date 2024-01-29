@@ -392,7 +392,7 @@ export default async function router(schema, config) {
             const share = await TimeFrameShare.has_auth(config.pool, req);
 
             if (Object.keys(req.body).length) {
-                await share.commit(req.body);
+                await share.commit(req.body, { column: 'uuid' });
             }
 
             const json = share.serialize();
