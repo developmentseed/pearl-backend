@@ -33,6 +33,7 @@ export default class AOIShare extends Generic {
                     Row_To_JSON(tf.*) AS timeframe,
                     Row_To_JSON(aois.*) AS aoi,
                     Row_To_JSON(mosaics.*) AS mosaic,
+                    Row_To_JSON(models.*) AS model,
                     aoi_timeframe_share.timeframe_id,
                     aoi_timeframe_share.created,
                     aoi_timeframe_share.published,
@@ -46,6 +47,10 @@ export default class AOIShare extends Generic {
                         LEFT JOIN mosaics
                             ON tf.mosaic = mosaics.name
                                 OR tf.mosaic = mosaics.id
+                        LEFT JOIN projects
+                            ON aoi_timeframe_share.project_id = projects.id
+                        LEFT JOIN models
+                            ON projects.model_id = models.id
                 WHERE
                     aoi_timeframe_share.published = True
                 ORDER BY
@@ -87,6 +92,7 @@ export default class AOIShare extends Generic {
                     Row_To_JSON(tf.*) AS timeframe,
                     Row_To_JSON(aois.*) AS aoi,
                     Row_To_JSON(mosaics.*) AS mosaic,
+                    Row_To_JSON(models.*) AS model,
                     aoi_timeframe_share.timeframe_id,
                     aoi_timeframe_share.created,
                     aoi_timeframe_share.published,
@@ -100,6 +106,10 @@ export default class AOIShare extends Generic {
                         LEFT JOIN mosaics
                             ON tf.mosaic = mosaics.name
                                 OR tf.mosaic = mosaics.id
+                        LEFT JOIN projects
+                            ON aoi_timeframe_share.project_id = projects.id
+                        LEFT JOIN models
+                            ON projects.model_id = models.id
                 WHERE
                     aoi_timeframe_share.project_id = ${projectid}
                 ORDER BY

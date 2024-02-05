@@ -40,6 +40,9 @@
         "mosaic": {
             "type": "object"
         },
+        "model": {
+            "type": "object"
+        },
         "aoi": {
             "type": "object"
         },

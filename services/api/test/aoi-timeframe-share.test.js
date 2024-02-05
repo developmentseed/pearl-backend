@@ -295,9 +295,11 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
         t.ok(res.body.shares[0].aoi);
         t.ok(res.body.shares[0].timeframe);
         t.ok(res.body.shares[0].mosaic);
+        t.ok(res.body.shares[0].model);
         delete res.body.shares[0].aoi;
         delete res.body.shares[0].timeframe;
         delete res.body.shares[0].mosaic;
+        delete res.body.shares[0].model;
 
         t.deepEquals(res.body, {
             id: 1,
