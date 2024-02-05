@@ -86,6 +86,15 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PUBLIC', async (t) => {
         t.ok(typeof res.body.mosaic === 'object');
         delete res.body.mosaic;
 
+        t.ok(typeof res.body.imagery === 'object');
+        delete res.body.imagery;
+
+        t.ok(typeof res.body.checkpoint === 'object');
+        delete res.body.checkpoint;
+
+        t.ok(typeof res.body.model === 'object');
+        delete res.body.model;
+
         t.deepEquals(res.body, {
             aoi_id: 1,
             project_id: 1,
@@ -138,6 +147,15 @@ test('POST /api/project/1/aoi/1/timeframe/1/share - PRIVATE', async (t) => {
 
         t.ok(typeof res.body.mosaic === 'object');
         delete res.body.mosaic;
+
+        t.ok(typeof res.body.model === 'object');
+        delete res.body.model;
+
+        t.ok(typeof res.body.imagery === 'object');
+        delete res.body.imagery;
+
+        t.ok(typeof res.body.checkpoint === 'object');
+        delete res.body.checkpoint;
 
         t.deepEquals(res.body, {
             aoi_id: 1,
@@ -253,6 +271,8 @@ test('GET /api/share', async (t) => {
         delete res.body.shares[0].model;
         t.ok(typeof res.body.shares[0].imagery === 'object');
         delete res.body.shares[0].imagery;
+        t.ok(typeof res.body.shares[0].checkpoint === 'object');
+        delete res.body.shares[0].checkpoint;
 
         t.deepEquals(res.body, {
             total: 1,

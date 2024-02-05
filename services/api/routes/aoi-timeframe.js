@@ -402,6 +402,8 @@ export default async function router(schema, config) {
             json.timeframe = share.timeframe;
             json.mosaic = share.mosaic;
             json.model = share.model;
+            json.imagery = share.imagery;
+            json.checkpoint = share.checkpoint;
 
             return res.json(json);
         } catch (err) {
@@ -497,6 +499,9 @@ export default async function router(schema, config) {
                 json.aoi = share.aoi;
                 json.mosaic = share.mosaic;
                 json.timeframe = share.timeframe;
+                json.imagery = share.imagery;
+                json.checkpoint = share.checkpoint;
+                json.model = share.model;
                 return res.json(json);
             }
         } catch (err) {
@@ -600,6 +605,8 @@ export default async function router(schema, config) {
             json.mosaic = share.mosaic;
             json.model = share.model;
             json.imagery = share.imagery;
+            json.checkpoint = share.checkpoint;
+            console.error(share);
 
             return res.json(json);
         } catch (err) {

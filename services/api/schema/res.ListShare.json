@@ -27,6 +27,7 @@
                     "mosaic",
                     "model",
                     "imagery",
+                    "checkpoint",
                     "published"
                 ],
                 "additionalProperties": false,
@@ -47,6 +48,9 @@
                         "type": "object"
                     },
                     "imagery": {
+                        "type": "object"
+                    },
+                    "checkpoint": {
                         "type": "object"
                     },
                     "aoi_id": {

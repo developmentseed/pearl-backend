@@ -35,6 +35,7 @@ export default class AOIShare extends Generic {
                     Row_To_JSON(mosaics.*) AS mosaic,
                     Row_To_JSON(models.*) AS model,
                     Row_To_JSON(imagery_sources.*) AS imagery,
+                    Row_To_JSON(checkpoints.*) AS checkpoint,
                     aoi_timeframe_share.timeframe_id,
                     aoi_timeframe_share.created,
                     aoi_timeframe_share.published,
@@ -48,6 +49,8 @@ export default class AOIShare extends Generic {
                         LEFT JOIN mosaics
                             ON tf.mosaic = mosaics.name
                                 OR tf.mosaic = mosaics.id
+                        LEFT JOIN checkpoints
+                            ON tf.checkpoint_id = checkpoints.id
                         LEFT JOIN imagery_sources
                             ON mosaics.imagery_source_id = imagery_sources.id
                         LEFT JOIN projects
@@ -97,6 +100,7 @@ export default class AOIShare extends Generic {
                     Row_To_JSON(mosaics.*) AS mosaic,
                     Row_To_JSON(models.*) AS model,
                     Row_To_JSON(imagery_sources.*) AS imagery,
+                    Row_To_JSON(checkpoints.*) AS checkpoint,
                     aoi_timeframe_share.timeframe_id,
                     aoi_timeframe_share.created,
                     aoi_timeframe_share.published,
@@ -110,6 +114,8 @@ export default class AOIShare extends Generic {
                         LEFT JOIN mosaics
                             ON tf.mosaic = mosaics.name
                                 OR tf.mosaic = mosaics.id
+                        LEFT JOIN checkpoints
+                            ON tf.checkpoint_id = checkpoints.id
                         LEFT JOIN imagery_sources
                             ON mosaics.imagery_source_id = imagery_sources.id
                         LEFT JOIN projects
@@ -237,7 +243,8 @@ export default class AOIShare extends Generic {
                     Row_To_Json(tf.*) AS timeframe,
                     Row_To_Json(mosaics.*) AS mosaic,
                     Row_To_Json(models.*) AS model,
-                    Row_To_JSON(imagery_sources.*) AS imagery
+                    Row_To_JSON(imagery_sources.*) AS imagery,
+                    Row_To_JSON(checkpoints.*) AS checkpoint
                 FROM
                     aoi_timeframe_share s
                         LEFT JOIN aoi_timeframe tf
@@ -249,6 +256,8 @@ export default class AOIShare extends Generic {
                         LEFT JOIN mosaics
                             ON tf.mosaic = mosaics.name
                                 OR tf.mosaic = mosaics.id
+                        LEFT JOIN checkpoints
+                            ON tf.checkpoint_id = checkpoints.id
                         LEFT JOIN imagery_sources
                             ON mosaics.imagery_source_id = imagery_sources.id
                         LEFT JOIN projects
