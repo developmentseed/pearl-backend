@@ -43,6 +43,9 @@
         "model": {
             "type": "object"
         },
+        "imagery": {
+            "type": "object"
+        },
         "aoi": {
             "type": "object"
         },

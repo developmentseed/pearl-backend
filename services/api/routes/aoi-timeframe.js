@@ -598,6 +598,8 @@ export default async function router(schema, config) {
             json.aoi = share.aoi;
             json.timeframe = share.timeframe;
             json.mosaic = share.mosaic;
+            json.model = share.model;
+            json.imagery = share.imagery;
 
             return res.json(json);
         } catch (err) {

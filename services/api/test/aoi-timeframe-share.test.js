@@ -181,6 +181,10 @@ test('GET /api/project/1/share', async (t) => {
         delete res.body.shares[0].aoi;
         t.ok(res.body.shares[0].timeframe, '.timeframe');
         delete res.body.shares[0].timeframe;
+        t.ok(typeof res.body.shares[0].model);
+        delete res.body.shares[0].model;
+        t.ok(typeof res.body.shares[0].imagery);
+        delete res.body.shares[0].imagery;
 
         t.deepEquals(res.body, {
             total: 1,
@@ -234,6 +238,10 @@ test('GET /api/share/uuid', async (t) => {
         delete res.body.timeframe;
         t.ok(typeof res.body.mosaic === 'object');
         delete res.body.mosaic;
+        t.ok(typeof res.body.model === 'object');
+        delete res.body.model;
+        t.ok(typeof res.body.imagery === 'object');
+        delete res.body.imagery;
 
         t.deepEqual(res.body, {
             aoi_id: 1,
@@ -296,10 +304,12 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
         t.ok(res.body.shares[0].timeframe);
         t.ok(res.body.shares[0].mosaic);
         t.ok(res.body.shares[0].model);
+        t.ok(res.body.shares[0].imagery);
         delete res.body.shares[0].aoi;
         delete res.body.shares[0].timeframe;
         delete res.body.shares[0].mosaic;
         delete res.body.shares[0].model;
+        delete res.body.shares[0].imagery;
 
         t.deepEquals(res.body, {
             id: 1,

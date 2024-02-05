@@ -226,4 +226,49 @@ test('PATCH /api/share - Make Public', async (t) => {
     t.end();
 });
 
+test('GET /api/share', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/share',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        t.ok(res.body.shares[0].created, '.created: <date>');
+        delete res.body.shares[0].created;
+
+        t.ok(res.body.shares[0].uuid, '.uuid: <uuid>');
+        delete res.body.shares[0].uuid;
+
+        t.ok(typeof res.body.shares[0].aoi === 'object');
+        delete res.body.shares[0].aoi;
+        t.ok(typeof res.body.shares[0].timeframe === 'object');
+        delete res.body.shares[0].timeframe;
+        t.ok(typeof res.body.shares[0].mosaic === 'object');
+        delete res.body.shares[0].mosaic;
+        t.ok(typeof res.body.shares[0].model === 'object');
+        delete res.body.shares[0].model;
+        t.ok(typeof res.body.shares[0].imagery === 'object');
+        delete res.body.shares[0].imagery;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            shares: [{
+                aoi_id: 1,
+                timeframe_id: 1,
+                published: true,
+                storage: false
+            }]
+        });
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
 flight.landing(test);

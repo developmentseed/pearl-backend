@@ -25,6 +25,8 @@
                     "aoi",
                     "timeframe",
                     "mosaic",
+                    "model",
+                    "imagery",
                     "published"
                 ],
                 "additionalProperties": false,
@@ -39,6 +41,12 @@
                         "type": "object"
                     },
                     "mosaic": {
+                        "type": "object"
+                    },
+                    "model": {
+                        "type": "object"
+                    },
+                    "imagery": {
                         "type": "object"
                     },
                     "aoi_id": {
