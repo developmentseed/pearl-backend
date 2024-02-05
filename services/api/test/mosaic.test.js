@@ -61,6 +61,7 @@ test('GET /api/imagery', async(t) => {
             imagery_sources: [{
                 id: 1,
                 name: 'NAIP',
+                collection_id: 'naip',
                 bounds: {
                     type: 'Polygon',
                     bounds: [-180,-85.0511287798066,180,85.0511287798066],
@@ -75,6 +76,7 @@ test('GET /api/imagery', async(t) => {
             },{
                 id: 2,
                 name: 'Sentinel-2',
+                collection_id: 'sentinel-2-l2a',
                 bounds: {
                     type: 'Polygon',
                     bounds: [-180,-85.0511287798066,180,85.0511287798066],
