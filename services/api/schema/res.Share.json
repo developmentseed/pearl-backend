@@ -11,7 +11,8 @@
         "patches",
         "mosaic",
         "aoi",
-        "timeframe"
+        "timeframe",
+        "published"
     ],
     "additionalProperties": false,
     "properties": {
@@ -39,6 +40,15 @@
         "mosaic": {
             "type": "object"
         },
+        "model": {
+            "type": "object"
+        },
+        "checkpoint": {
+            "type": "object"
+        },
+        "imagery": {
+            "type": "object"
+        },
         "aoi": {
             "type": "object"
         },
@@ -56,6 +66,9 @@
         },
         "classes": {
             "$ref": "./util/classes.json"
+        },
+        "published": {
+            "type": "boolean"
         }
     }
 }

@@ -74,6 +74,21 @@ export default async function router(schema, config) {
         };
     };
 
+    await schema.get('/share', {
+        name: 'List Public Shares',
+        group: 'PublicShare',
+        auth: 'user',
+        description: 'List public shares',
+        res: 'res.ListShare.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const list = await TimeFrameShare.public(config.pool, req.query);
+            return res.json(list);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
 
     await schema.get('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid', {
         name: 'Get Timeframe',
@@ -361,6 +376,63 @@ export default async function router(schema, config) {
         }
     });
 
+    await schema.patch('/share/:shareuuid', {
+        name: 'Update Share',
+        group: 'Share',
+        auth: 'user',
+        description: 'Update a Shared AOI',
+        ':projectid': 'integer',
+        ':aoiid': 'integer',
+        ':timeframeid': 'integer',
+        ':shareuuid': 'string',
+        body: 'req.body.PatchShare.json',
+        res: 'res.Share.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const share = await TimeFrameShare.has_auth(config.pool, req);
+
+            if (Object.keys(req.body).length) {
+                await share.commit(req.body, { column: 'uuid' });
+            }
+
+            const json = share.serialize();
+            json.checkpoint_id = share.checkpoint_id;
+            json.classes = share.classes;
+            json.aoi = share.aoi;
+            json.timeframe = share.timeframe;
+            json.mosaic = share.mosaic;
+            json.model = share.model;
+            json.imagery = share.imagery;
+            json.checkpoint = share.checkpoint;
+
+            return res.json(json);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    await schema.delete('/share/:shareuuid', {
+        name: 'Delete Share',
+        group: 'Share',
+        auth: 'user',
+        description: 'Delete a shared AOI',
+        ':shareuuid': 'string',
+        res: 'res.Standard.json'
+    }, config.requiresAuth, async (req, res) => {
+        try {
+            const share = await TimeFrameShare.has_auth(config.pool, req);
+            await share.delete(config);
+
+            return res.json({
+                status: 200,
+                message: 'AOI Share Deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+
     await schema.post('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share', {
         name: 'Create Share',
         group: 'Share',
@@ -369,6 +441,7 @@ export default async function router(schema, config) {
         ':projectid': 'integer',
         ':aoiid': 'integer',
         ':timeframeid': 'integer',
+        body: 'req.body.CreateShare.json',
         res: 'res.Share.json'
     }, config.requiresAuth, async (req, res) => {
         try {
@@ -389,6 +462,7 @@ export default async function router(schema, config) {
 
             const a = await AOI.from(config.pool, req.params.aoiid);
             let share = await TimeFrameShare.generate(config.pool, {
+                published: req.body.published || false,
                 project_id: req.params.projectid,
                 aoi_id: req.params.aoiid,
                 timeframe_id: req.params.timeframeid,
@@ -425,34 +499,11 @@ export default async function router(schema, config) {
                 json.aoi = share.aoi;
                 json.mosaic = share.mosaic;
                 json.timeframe = share.timeframe;
+                json.imagery = share.imagery;
+                json.checkpoint = share.checkpoint;
+                json.model = share.model;
                 return res.json(json);
             }
-        } catch (err) {
-            return Err.respond(err, res);
-        }
-    });
-
-    await schema.delete('/project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share/:shareuuid', {
-        name: 'Delete Share',
-        group: 'Share',
-        auth: 'user',
-        description: 'Delete a shared AOI',
-        ':projectid': 'integer',
-        ':aoiid': 'integer',
-        ':timeframeid': 'integer',
-        ':shareuuid': 'string',
-        res: 'res.Standard.json'
-    }, config.requiresAuth, async (req, res) => {
-        try {
-            await TimeFrame.has_auth(config.pool, req);
-
-            const share = await TimeFrameShare.from(config.pool, req.params.shareuuid);
-            await share.delete(config);
-
-            return res.json({
-                status: 200,
-                message: 'AOI Share Deleted'
-            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -552,6 +603,10 @@ export default async function router(schema, config) {
             json.aoi = share.aoi;
             json.timeframe = share.timeframe;
             json.mosaic = share.mosaic;
+            json.model = share.model;
+            json.imagery = share.imagery;
+            json.checkpoint = share.checkpoint;
+            console.error(share);
 
             return res.json(json);
         } catch (err) {

@@ -16,6 +16,7 @@
                 "type": "object",
                 "required": [
                     "id",
+                    "collection_id",
                     "bounds",
                     "created",
                     "updated",
@@ -26,11 +27,14 @@
                     "id": {
                         "$ref": "./util/id.json"
                     },
+                    "collection_id": {
+                        "$ref": "./imagery_sources/collection_id.json"
+                    },
                     "created": {
-                        "type": "integer"
+                        "$ref": "./imagery_sources/created.json"
                     },
                     "updated": {
-                        "type": "integer"
+                        "$ref": "./imagery_sources/updated.json"
                     },
                     "bounds": {
                         "type": "object",

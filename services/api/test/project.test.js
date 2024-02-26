@@ -498,11 +498,11 @@ test('GET /api/project?name=lulc', async (t) => {
             'total': 1,
             'projects': [
                 {
-                    'id': 2,
-                    'name': 'LULC Test Project',
-                    'aois': [],
-                    'checkpoints': [],
-                    'model': {
+                    id: 2,
+                    name: 'LULC Test Project',
+                    aois: [],
+                    checkpoints: [],
+                    model: {
                         id: 1,
                         active: true,
                         uid: 1,

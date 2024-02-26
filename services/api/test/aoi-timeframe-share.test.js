@@ -116,7 +116,6 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
             }
         }, t);
 
-        console.error(res.body);
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
 
@@ -135,6 +134,7 @@ test('POST /api/project/1/aoi/1/timeframe/1/share', async (t) => {
             aoi_id: 1,
             project_id: 1,
             timeframe_id: 1,
+            published: false,
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -181,12 +181,17 @@ test('GET /api/project/1/share', async (t) => {
         delete res.body.shares[0].aoi;
         t.ok(res.body.shares[0].timeframe, '.timeframe');
         delete res.body.shares[0].timeframe;
+        t.ok(typeof res.body.shares[0].model);
+        delete res.body.shares[0].model;
+        t.ok(typeof res.body.shares[0].imagery);
+        delete res.body.shares[0].imagery;
 
         t.deepEquals(res.body, {
             total: 1,
             project_id: 1,
             shares: [{
                 aoi_id: 1,
+                published: false,
                 timeframe_id: 1,
                 storage: false
             }]
@@ -233,11 +238,16 @@ test('GET /api/share/uuid', async (t) => {
         delete res.body.timeframe;
         t.ok(typeof res.body.mosaic === 'object');
         delete res.body.mosaic;
+        t.ok(typeof res.body.model === 'object');
+        delete res.body.model;
+        t.ok(typeof res.body.imagery === 'object');
+        delete res.body.imagery;
 
         t.deepEqual(res.body, {
             aoi_id: 1,
             project_id: 1,
             timeframe_id: 1,
+            published: false,
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -293,9 +303,13 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
         t.ok(res.body.shares[0].aoi);
         t.ok(res.body.shares[0].timeframe);
         t.ok(res.body.shares[0].mosaic);
+        t.ok(res.body.shares[0].model);
+        t.ok(res.body.shares[0].imagery);
         delete res.body.shares[0].aoi;
         delete res.body.shares[0].timeframe;
         delete res.body.shares[0].mosaic;
+        delete res.body.shares[0].model;
+        delete res.body.shares[0].imagery;
 
         t.deepEquals(res.body, {
             id: 1,
@@ -323,6 +337,7 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
             ],
             shares: [{
                 aoi_id: 1,
+                published: false,
                 timeframe_id: 1,
                 storage: false
             }]
@@ -334,11 +349,11 @@ test('GET /api/project/1/aoi/1/timeframe/1', async (t) => {
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/timeframe/1/share/<uuid> - doesn\'t exist', async (t) => {
+test('DELETE /api/share/<uuid> - doesn\'t exist', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: '/api/project/1/aoi/1/timeframe/1/share/9218c385-02a8-4334-b574-2992a2810aeb',
+            url: '/api/share/9218c385-02a8-4334-b574-2992a2810aeb',
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`
@@ -360,11 +375,11 @@ test('DELETE /api/project/1/aoi/1/timeframe/1/share/<uuid> - doesn\'t exist', as
     t.end();
 });
 
-test('DELETE /api/project/1/aoi/1/timeframe/1/<uuid> - exists', async (t) => {
+test('DELETE /api/share/<uuid> - exists', async (t) => {
     try {
         const res = await flight.request({
             json: true,
-            url: `/api/project/1/aoi/1/timeframe/1/share/${uuid}`,
+            url: `/api/share/${uuid}`,
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${flight.token.ingalls}`

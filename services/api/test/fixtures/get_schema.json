@@ -9,7 +9,7 @@
         "query": false,
         "res": false
     },
-    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
+    "GET /share": {
         "body": false,
         "query": false,
         "res": true
@@ -24,27 +24,17 @@
         "query": false,
         "res": true
     },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles": {
         "body": false,
         "query": false,
         "res": true
     },
     "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles/:z/:x/:y": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/upload": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/raw": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/color": {
         "body": false,
         "query": false,
         "res": false
@@ -74,6 +64,21 @@
         "query": true,
         "res": true
     },
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/upload": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/raw": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/color": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
     "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid": {
         "body": false,
         "query": false,
@@ -82,11 +87,6 @@
     "POST /project/:projectid/instance": {
         "body": true,
         "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/aoi/:aoiid/timeframe": {
-        "body": false,
-        "query": true,
         "res": true
     },
     "GET /project/:projectid/checkpoint/:checkpointid/osmtag": {
@@ -139,6 +139,11 @@
         "query": false,
         "res": true
     },
+    "GET /project/:projectid/aoi/:aoiid/timeframe": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
     "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/upload": {
         "body": false,
         "query": false,
@@ -155,11 +160,6 @@
         "res": true
     },
     "POST /model": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /project/:projectid/aoi/:aoiid/timeframe": {
         "body": true,
         "query": false,
         "res": true
@@ -194,8 +194,8 @@
         "query": true,
         "res": true
     },
-    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share": {
-        "body": false,
+    "POST /project/:projectid/aoi/:aoiid/timeframe": {
+        "body": true,
         "query": false,
         "res": true
     },
@@ -204,18 +204,13 @@
         "query": false,
         "res": true
     },
-    "PATCH /project/:projectid/batch/:batchid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
     "DELETE /project/:projectid/aoi/:aoiid": {
         "body": false,
         "query": false,
         "res": true
     },
-    "DELETE /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share/:shareuuid": {
-        "body": false,
+    "PATCH /project/:projectid/batch/:batchid": {
+        "body": true,
         "query": false,
         "res": true
     },
@@ -254,14 +249,19 @@
         "query": false,
         "res": true
     },
+    "GET /token": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
     "GET /mosaic/:mosaic": {
         "body": false,
         "query": false,
         "res": true
     },
-    "GET /token": {
-        "body": false,
-        "query": true,
+    "PATCH /share/:shareuuid": {
+        "body": true,
+        "query": false,
         "res": true
     },
     "GET /project/:projectid/instance/:instanceid": {
@@ -284,6 +284,11 @@
         "query": false,
         "res": false
     },
+    "DELETE /share/:shareuuid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "POST /model/:modelid/upload": {
         "body": false,
         "query": false,
@@ -292,11 +297,6 @@
     "POST /project": {
         "body": true,
         "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/share": {
-        "body": false,
-        "query": true,
         "res": true
     },
     "GET /instance/:instanceid": {
@@ -308,11 +308,6 @@
         "body": false,
         "query": false,
         "res": false
-    },
-    "DELETE /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
-        "body": false,
-        "query": false,
-        "res": true
     },
     "POST /token": {
         "body": true,
@@ -326,6 +321,11 @@
     },
     "DELETE /token/:tokenid": {
         "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share": {
+        "body": true,
         "query": false,
         "res": true
     },
@@ -364,9 +364,9 @@
         "query": false,
         "res": true
     },
-    "PATCH /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
-        "body": true,
-        "query": false,
+    "GET /project/:projectid/share": {
+        "body": false,
+        "query": true,
         "res": true
     },
     "GET /model/:modelid": {
@@ -379,13 +379,33 @@
         "query": false,
         "res": true
     },
-    "GET /share/:shareuuid": {
+    "PATCH /project/:projectid/checkpoint/:checkpointid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
         "body": false,
         "query": false,
         "res": true
     },
-    "PATCH /project/:projectid/checkpoint/:checkpointid": {
+    "GET /model/:modelid/osmtag": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /model/:modelid/download": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "PATCH /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
         "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /share/:shareuuid": {
+        "body": false,
         "query": false,
         "res": true
     },
@@ -405,16 +425,6 @@
         "res": false
     },
     "GET /share/:shareuuid/download/color": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /model/:modelid/osmtag": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /model/:modelid/download": {
         "body": false,
         "query": false,
         "res": false

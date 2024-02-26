@@ -16,6 +16,9 @@
         },
         "bounds": {
             "$ref": "./imagery_sources/bounds.json"
+        },
+        "collection_id": {
+            "$ref": "./imagery_sources/collection_id.json"
         }
     },
     "required": [
@@ -23,6 +26,7 @@
         "created",
         "updated",
         "name",
-        "bounds"
+        "bounds",
+        "collection_id"
     ]
 }

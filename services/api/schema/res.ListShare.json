@@ -2,7 +2,6 @@
     "type": "object",
     "required": [
         "total",
-        "project_id",
         "shares"
     ],
     "additionalProperties": false,
@@ -25,7 +24,11 @@
                     "storage",
                     "aoi",
                     "timeframe",
-                    "mosaic"
+                    "mosaic",
+                    "model",
+                    "imagery",
+                    "checkpoint",
+                    "published"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -41,6 +44,15 @@
                     "mosaic": {
                         "type": "object"
                     },
+                    "model": {
+                        "type": "object"
+                    },
+                    "imagery": {
+                        "type": "object"
+                    },
+                    "checkpoint": {
+                        "type": "object"
+                    },
                     "aoi_id": {
                         "type": "integer"
                     },
@@ -51,6 +63,9 @@
                         "$ref": "./util/created.json"
                     },
                     "storage": {
+                        "type": "boolean"
+                    },
+                    "published": {
                         "type": "boolean"
                     }
                 }
