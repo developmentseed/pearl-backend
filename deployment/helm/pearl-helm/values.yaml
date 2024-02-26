@@ -7,7 +7,7 @@ api:
   replicaCount: 1
   containerPort: 2000
   gpuCount: 0
-  cpuCount: 2
+  cpuCount: 3
   auth0BaseUrl: replace_manually
   signingSecret: replace_manually
   postgresUrl: replace_manually
