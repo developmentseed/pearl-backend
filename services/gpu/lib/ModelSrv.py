@@ -305,7 +305,7 @@ class ModelSrv:
             )
 
             self.timeframe = TimeFrame.load(self.api, body["id"])
-            self.meta_load_checkpoint(self.timeframe.checkpointid)
+            self.meta_load_checkpoint(self.timeframe.checkpoint_id)
 
             websocket.send(
                 json.dumps(
