@@ -139,13 +139,13 @@ class API:
 
         return body
 
-    def get_checkpoint(self, checkpointid):
+    def get_checkpoint(self, checkpoint_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/checkpoint/"
-            + str(checkpointid)
+            + str(checkpoint_id)
         )
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
@@ -160,21 +160,21 @@ class API:
 
         return body
 
-    def upload_checkpoint(self, checkpointid):
+    def upload_checkpoint(self, checkpoint_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/checkpoint/"
-            + str(checkpointid)
+            + str(checkpoint_id)
             + "/upload"
         )
 
         LOGGER.info("ok - POST " + url)
 
-        ch_dir = self.tmp_checkpoints + "/" + str(checkpointid)
+        ch_dir = self.tmp_checkpoints + "/" + str(checkpoint_id)
 
-        zip_fs = self.tmp_dir + "/checkpoints/checkpoint-{}.zip".format(checkpointid)
+        zip_fs = self.tmp_dir + "/checkpoints/checkpoint-{}.zip".format(checkpoint_id)
 
         zipf = zipfile.ZipFile(zip_fs, "w", zipfile.ZIP_DEFLATED)
         for root, dirs, files in os.walk(ch_dir):
@@ -205,19 +205,19 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def download_checkpoint(self, checkpointid):
+    def download_checkpoint(self, checkpoint_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/checkpoint/"
-            + str(checkpointid)
+            + str(checkpoint_id)
             + "/download"
         )
 
         LOGGER.info("ok - GET " + url)
 
-        ch_dir = self.tmp_checkpoints + "/" + str(checkpointid)
+        ch_dir = self.tmp_checkpoints + "/" + str(checkpoint_id)
 
         r = self.requests.get(
             url,
@@ -228,7 +228,7 @@ class API:
 
         r.raise_for_status()
 
-        ch_zip_fs = self.tmp_dir + "/checkpoint-{}.zip".format(checkpointid)
+        ch_zip_fs = self.tmp_dir + "/checkpoint-{}.zip".format(checkpoint_id)
         with open(ch_zip_fs, "wb") as f:
             for chunk in r.iter_content(chunk_size=10240):
                 if chunk:
@@ -236,7 +236,7 @@ class API:
 
         LOGGER.info("ok - Received " + url)
 
-        ch_dir = self.tmp_checkpoints + "/" + str(checkpointid)
+        ch_dir = self.tmp_checkpoints + "/" + str(checkpoint_id)
         os.makedirs(ch_dir, exist_ok=True)
 
         with zipfile.ZipFile(ch_zip_fs, "r") as zip_ref:
@@ -373,7 +373,7 @@ class API:
                 "content-type": "application/json",
             },
             data=json.dumps(
-                {"checkpoint_id": timeframe.checkpointid, "mosaic": timeframe.mosaic}
+                {"checkpoint_id": timeframe.checkpoint_id, "mosaic": timeframe.mosaic}
             ),
         )
 
