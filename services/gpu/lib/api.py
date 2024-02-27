@@ -129,7 +129,10 @@ class API:
             },
             data=json.dumps(data),
         )
-        r.raise_for_status()
+
+        if not response.ok:
+            print('TimeFrame Error', r.json());
+            r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
 
@@ -365,7 +368,8 @@ class API:
             + "/timeframe"
         )
 
-        LOGGER.info("ok - POST " + url)
+        LOGGER.info("ok - POST " + url + ' ' + json.dumps({"checkpoint_id": timeframe.checkpoint_id, "mosaic": timeframe.mosaic}))
+
         r = self.requests.post(
             url,
             headers={
