@@ -27,7 +27,7 @@ class TimeFrame:
         self.name = aoi.get("name", "Default Name")
 
         # TimeFrame Properties
-        self.checkpointid = tf["checkpoint_id"]
+        self.checkpoint_id = tf["checkpoint_id"]
         self.mosaic = tf["mosaic"]
         self.is_patch = is_patch
         self.tiles = []
