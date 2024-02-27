@@ -137,20 +137,17 @@ export default async function router(schema, config) {
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
             const aois = await AOI.list(config.pool, req.params.projectid);
-            aois.aois.forEach(async (a) => {
+
+            for (const a of aois.aois) {
                 const aoi = await AOI.from(config.pool, a.id);
-                await aoi.commit({
-                    archived: true
-                });
-            });
+                await aoi.commit({ archived: true });
+            }
 
             const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
-            chkpts.checkpoints.forEach(async (c) => {
+            for (const c of chkpts.checkpoints) {
                 const ch = await Checkpoint.from(config.pool, c.id);
-                await ch.commit({
-                    archived: true
-                });
-            });
+                await ch.commit({ archived: true });
+            }
 
             await proj.commit({
                 archived: true
