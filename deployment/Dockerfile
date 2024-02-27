@@ -21,6 +21,6 @@ RUN mv terraform /usr/local/bin
 RUN pip3 install -U pip
 
 # Install azure client
-RUN pip3 install azure-cli
+RUN pip3 install azure-cli==2.51.0
 
 WORKDIR /opt/src
