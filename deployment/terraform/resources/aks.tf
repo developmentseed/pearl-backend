@@ -47,10 +47,10 @@ resource "azurerm_kubernetes_cluster_node_pool" "tiler" {
 resource "azurerm_kubernetes_cluster_node_pool" "cpunodepool" {
   name                  = "cpunodepool"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.lulc.id
-  vm_size               = "Standard_DS2_v2"
+  vm_size               = "Standard_B2ms"
   vnet_subnet_id = azurerm_subnet.aks.id
   enable_auto_scaling   = true
-  min_count             = 0
+  min_count             = 1
   max_count             = 3
   tags = {
     Environment = var.environment
