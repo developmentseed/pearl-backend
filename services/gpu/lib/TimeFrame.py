@@ -67,6 +67,8 @@ class TimeFrame:
         tfjson = api.timeframe_meta(timeframeid)
         aoi = api.aoi_meta(tfjson["aoi_id"])
 
+        tfjson["mosaic"] = tfjson["mosaic"]["id"]
+
         tf = TimeFrame(api, aoi, tfjson)
         tf.id = tfjson.get("id")
 
