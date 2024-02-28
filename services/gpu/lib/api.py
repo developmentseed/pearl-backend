@@ -130,8 +130,8 @@ class API:
             data=json.dumps(data),
         )
 
-        if not response.ok:
-            print('TimeFrame Error', r.json());
+        if not r.ok:
+            print('Checkpoint Error', r.json());
             r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
@@ -381,7 +381,9 @@ class API:
             ),
         )
 
-        r.raise_for_status()
+        if not r.ok:
+            print('Timeframe Error', r.json());
+            r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
         return r.json()
