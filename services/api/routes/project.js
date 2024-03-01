@@ -129,10 +129,7 @@ export default async function router(schema, config) {
             const insts = await Instance.list(config.pool, req.params.projectid);
             for (const inst of insts.instances) {
                 if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
-
-                const instance = new Instance();
-                instance.id = inst.id;
-                await instance.delete();
+                await Instance.delete(config.pool, inst.id);
             }
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
