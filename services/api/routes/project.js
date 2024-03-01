@@ -139,14 +139,12 @@ export default async function router(schema, config) {
             const aois = await AOI.list(config.pool, req.params.projectid);
 
             for (const a of aois.aois) {
-                const aoi = await AOI.from(config.pool, a.id);
-                await aoi.commit({ archived: true });
+                await AOI.commit(config.pool, a.id, { archived: true });
             }
 
             const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
             for (const c of chkpts.checkpoints) {
-                const ch = await Checkpoint.from(config.pool, c.id);
-                await ch.commit({ archived: true });
+                await Checkpoint.commit(config.pool, c.id, { archived: true });
             }
 
             await proj.commit({
