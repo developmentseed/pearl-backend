@@ -128,7 +128,7 @@ export default async function router(schema, config) {
 
             const insts = await Instance.list(config.pool, req.params.projectid);
             for (const inst of insts.instances) {
-                if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
+                if (inst.active) throw new Err(400, null, 'Cannot continue project deletion with active instance');
                 await Instance.delete(config.pool, inst.id);
             }
 
