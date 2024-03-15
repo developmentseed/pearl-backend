@@ -720,8 +720,7 @@ class ModelSrv:
                 )
             )
 
-        self.chk = checkpoint
-        return checkpoint
+        self.chk = self.api.get_checkpoint(checkpoint["id"])
 
 
 def done_processing(modelsrv):
