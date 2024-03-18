@@ -66,6 +66,7 @@ export default async function router(schema, config) {
             req.body.type = req.params.type || type || 'cpu';
 
             req.body.uid = req.auth.id;
+            req.body.checkpoint_id = req.params.checkpointid;
             const inst = await Instance.generate(config, req.body);
 
             const batch_json = (await Batch.from(config.pool, batch.id)).serialize();
