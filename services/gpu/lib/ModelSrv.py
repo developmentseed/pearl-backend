@@ -24,6 +24,7 @@ class ModelSrv:
         self.api = api
         self.model = model
 
+        print('INSTANCE DEBUG', json.dumps(api.instance))
         if api.instance.get("checkpoint_id") is not None:
             self.meta_load_checkpoint(self.api.instance.get("checkpoint_id"))
 
