@@ -7,17 +7,21 @@ api:
   replicaCount: 1
   containerPort: 2000
   gpuCount: 0
-  cpuCount: 2
+  cpuCount: 3
   auth0BaseUrl: replace_manually
   signingSecret: replace_manually
   postgresUrl: replace_manually
+  liveInferenceSize: 100000000
+  maxInferenceSize: 500000000
+  instanceRequestCPU: '1500m'
+  instanceRequestMemory: '4Gi'
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
   resources:
     requests:
-      cpu: "0.5"
-      memory: 1.5Gi
+      cpu: "0.3"
+      memory: 1Gi
     limits:
       cpu: "4"
       memory: 12Gi
@@ -31,8 +35,8 @@ socket:
     tag: 'chartpress_replace'
   resources:
     requests:
-      cpu: "0.5"
-      memory: 1.5Gi
+      cpu: "0.2"
+      memory: 400Mi
     limits:
       cpu: "4"
       memory: 8Gi
@@ -45,6 +49,8 @@ tiles:
   debug: false
   mosaicBackends: sqlite:///
   mosaicHost: /tmp/data/mosaics.db
+  minReplicaCount: 2
+  maxReplicaCount: 5
   image:
     name: 'chartpress_replace'
     tag: 'chartpress_replace'
@@ -64,7 +70,7 @@ redis:
   enabled: true
   resources:
     requests:
-      cpu: "0.3"
+      cpu: "0.2"
       memory: 600Mi
     limits:
       cpu: "0.3"

@@ -50,36 +50,6 @@ test('GET /api/project/1 (empty)', async (t) => {
 
 flight.fixture(test, 'model.json', 'ingalls');
 
-test('POST /api/project (Invalid Mosaic)', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/project',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Test Project',
-                model_id: 1,
-                mosaic: 'naip.fake'
-            }
-        }, false);
-
-        t.equals(res.statusCode, 400, 'status: 400');
-
-        t.deepEquals(res.body, {
-            status: 400,
-            message: 'Invalid Mosaic',
-            messages: []
-        });
-    } catch (err) {
-        t.error(err, 'no errors');
-    }
-
-    t.end();
-});
-
 test('PATCH /api/model/1 - storage: false, active: false', async (t) => {
     try {
         await flight.request({
@@ -112,8 +82,7 @@ test('POST /api/project - Model not uploaded', async (t) => {
             },
             body: {
                 name: 'Test Project',
-                model_id: 1,
-                mosaic: 'naip.latest'
+                model_id: 1
             }
         }, false);
 
@@ -161,8 +130,7 @@ test('POST /api/project - Model not active', async (t) => {
             },
             body: {
                 name: 'Test Project',
-                model_id: 1,
-                mosaic: 'naip.latest'
+                model_id: 1
             }
         }, false);
 
@@ -210,8 +178,7 @@ test('POST /api/project', async (t) => {
             },
             body: {
                 name: 'Test Project',
-                model_id: 1,
-                mosaic: 'naip.latest'
+                model_id: 1
             }
         }, t);
 
@@ -223,7 +190,6 @@ test('POST /api/project', async (t) => {
             uid: 1,
             name: 'Test Project',
             model_id: 1,
-            mosaic: 'naip.latest',
             model_name: 'NAIP Supervised'
         });
 
@@ -247,7 +213,6 @@ test('POST /api/project/1/aoi', async (t) => {
             },
             body: {
                 name: 'Test AOI',
-                checkpoint_id: 1,
                 bounds: {
                     type: 'Polygon',
                     coordinates: [[
@@ -263,24 +228,16 @@ test('POST /api/project/1/aoi', async (t) => {
 
         t.ok(res.body.created, '.created: <date>');
         delete res.body.created;
+        t.ok(res.body.updated, '.updated: <date>');
+        delete res.body.updated;
 
         t.deepEquals(res.body, {
             id: 1,
             area: 1238,
-            storage: false,
             project_id: 1,
-            patches: [],
-            checkpoint_id: 1,
             name: 'Test AOI',
             bookmarked: false,
             bookmarked_at: null,
-            px_stats: {},
-            classes: [
-                { name: 'Water', color: '#0000FF' },
-                { name: 'Tree Canopy', color: '#008000' },
-                { name: 'Field', color: '#80FF80' },
-                { name: 'Built', color: '#806060' }
-            ],
             bounds: {
                 type: 'Polygon',
                 bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
@@ -318,55 +275,151 @@ test('GET /api/project', async (t) => {
         delete res.body.projects[0].model.created;
 
         t.deepEquals(res.body, {
-            'total': 1,
-            'projects': [
-                {
-                    'id': 1,
-                    'name': 'Test Project',
-                    'aois': [],
-                    'checkpoints': [],
-                    'model': {
-                        'id': 1,
-                        'active': true,
-                        'uid': 1,
-                        'name': 'NAIP Supervised',
-                        'model_type': 'pytorch_example',
-                        osmtag_id: null,
-                        'model_inputshape': [
-                            240,
-                            240,
-                            4
-                        ],
-                        'model_zoom': 17,
-                        'storage': true,
-                        'classes': [
-                            {
-                                'name': 'Water',
-                                'color': '#0000FF'
-                            },
-                            {
-                                'name': 'Tree Canopy',
-                                'color': '#008000'
-                            },
-                            {
-                                'name': 'Field',
-                                'color': '#80FF80'
-                            },
-                            {
-                                'name': 'Built',
-                                'color': '#806060'
-                            }
-                        ],
-                        'meta': {},
-                        'bounds': [
-                            -180,
-                            -90,
-                            180,
-                            90
-                        ]
-                    }
+            total: 1,
+            projects: [{
+                id: 1,
+                name: 'Test Project',
+                aois: [],
+                checkpoints: [],
+                model: {
+                    id: 1,
+                    active: true,
+                    uid: 1,
+                    name: 'NAIP Supervised',
+                    model_type: 'pytorch_example',
+                    imagery_source_id: 1,
+                    osmtag_id: null,
+                    model_inputshape: [240, 240, 4],
+                    model_zoom: 17,
+                    storage: true,
+                    classes: [
+                        { 'name': 'Water', 'color': '#0000FF' },
+                        { 'name': 'Tree Canopy', 'color': '#008000' },
+                        { 'name': 'Field', 'color': '#80FF80' },
+                        { 'name': 'Built', 'color': '#806060' }
+                    ],
+                    meta: {},
+                    bounds: [-180, -90, 180, 90]
                 }
-            ]
+            }]
+        });
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('PATCH /api/project/1/aoi/1', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/aoi/1',
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            },
+            body: {
+                bookmarked: true
+            }
+        }, t);
+
+        t.ok(res.body.created, '.created: <date>');
+        delete res.body.created;
+        t.ok(res.body.updated, '.updated: <date>');
+        delete res.body.updated;
+        t.ok(res.body.bookmarked_at, '.bookmarked_at: <date>');
+        delete res.body.bookmarked_at;
+
+        t.deepEquals(res.body, {
+            id: 1,
+            area: 1238,
+            project_id: 1,
+            name: 'Test AOI',
+            bookmarked: true,
+            bounds: {
+                type: 'Polygon',
+                bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
+                coordinates: [[
+                    [-79.37724530696869, 38.83428180092151],
+                    [-79.37677592039108, 38.83428180092151],
+                    [-79.37677592039108, 38.83455550411051],
+                    [-79.37724530696869, 38.83455550411051],
+                    [-79.37724530696869, 38.83428180092151]
+                ]]
+            }
+        });
+
+    } catch (err) {
+        t.error(err, 'no errors');
+    }
+
+    t.end();
+});
+
+test('GET /api/project', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+
+        t.ok(res.body.projects[0].created, '.created: <date>');
+        delete res.body.projects[0].created;
+        delete res.body.projects[0].model.created;
+
+        delete res.body.projects[0].aois[0].created;
+        delete res.body.projects[0].aois[0].updated;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            projects: [{
+                id: 1,
+                name: 'Test Project',
+                aois: [{
+                    id: 1,
+                    area: 1238,
+                    name: 'Test AOI',
+                    bounds: {
+                        type: 'Polygon',
+                        bounds: [-79.37724530696869, 38.83428180092151, -79.37677592039108, 38.83455550411051],
+                        coordinates: [[
+                            [-79.37724530696869, 38.83428180092151],
+                            [-79.37677592039108, 38.83428180092151],
+                            [-79.37677592039108, 38.83455550411051],
+                            [-79.37724530696869, 38.83455550411051],
+                            [-79.37724530696869, 38.83428180092151]
+                        ]]
+                    }
+                }],
+                checkpoints: [],
+                model: {
+                    id: 1,
+                    active: true,
+                    uid: 1,
+                    name: 'NAIP Supervised',
+                    model_type: 'pytorch_example',
+                    osmtag_id: null,
+                    imagery_source_id: 1,
+                    model_inputshape: [240, 240, 4],
+                    model_zoom: 17,
+                    storage: true,
+                    classes: [
+                        { 'name': 'Water', 'color': '#0000FF' },
+                        { 'name': 'Tree Canopy', 'color': '#008000' },
+                        { 'name': 'Field', 'color': '#80FF80' },
+                        { 'name': 'Built', 'color': '#806060' }
+                    ],
+                    meta: {},
+                    bounds: [-180, -90, 180, 90]
+                }
+            }]
         });
 
     } catch (err) {
@@ -387,8 +440,7 @@ test('POST /api/project (sort)', async (t) => {
             },
             body: {
                 name: 'LULC Test Project',
-                model_id: 1,
-                mosaic: 'naip.latest'
+                model_id: 1
             }
         }, t);
 
@@ -400,7 +452,6 @@ test('POST /api/project (sort)', async (t) => {
             uid: 1,
             name: 'LULC Test Project',
             model_id: 1,
-            mosaic: 'naip.latest',
             model_name: 'NAIP Supervised'
         });
     } catch (err) {
@@ -447,49 +498,29 @@ test('GET /api/project?name=lulc', async (t) => {
             'total': 1,
             'projects': [
                 {
-                    'id': 2,
-                    'name': 'LULC Test Project',
-                    'aois': [],
-                    'checkpoints': [],
-                    'model': {
-                        'id': 1,
-                        'active': true,
-                        'uid': 1,
-                        'name': 'NAIP Supervised',
-                        'model_type': 'pytorch_example',
+                    id: 2,
+                    name: 'LULC Test Project',
+                    aois: [],
+                    checkpoints: [],
+                    model: {
+                        id: 1,
+                        active: true,
+                        uid: 1,
+                        name: 'NAIP Supervised',
+                        model_type: 'pytorch_example',
+                        imagery_source_id: 1,
                         osmtag_id: null,
-                        'model_inputshape': [
-                            240,
-                            240,
-                            4
+                        model_inputshape: [240, 240, 4],
+                        model_zoom: 17,
+                        storage: true,
+                        classes: [
+                            { name: 'Water',          color: '#0000FF' },
+                            { name: 'Tree Canopy',    color: '#008000' },
+                            { name: 'Field',          color: '#80FF80' },
+                            { name: 'Built',          color: '#806060' }
                         ],
-                        'model_zoom': 17,
-                        'storage': true,
-                        'classes': [
-                            {
-                                'name': 'Water',
-                                'color': '#0000FF'
-                            },
-                            {
-                                'name': 'Tree Canopy',
-                                'color': '#008000'
-                            },
-                            {
-                                'name': 'Field',
-                                'color': '#80FF80'
-                            },
-                            {
-                                'name': 'Built',
-                                'color': '#806060'
-                            }
-                        ],
-                        'meta': {},
-                        'bounds': [
-                            -180,
-                            -90,
-                            180,
-                            90
-                        ]
+                        meta: {},
+                        bounds: [-180, -90, 180, 90]
                     }
                 }
             ]
@@ -521,7 +552,6 @@ test('GET /api/project/1', async (t) => {
             name: 'Test Project',
             model_id: 1,
             model_name: 'NAIP Supervised',
-            mosaic: 'naip.latest',
             checkpoints: []
         });
     } catch (err) {
@@ -553,7 +583,6 @@ test('PATCH /api/project/1', async (t) => {
             uid: 1,
             name: 'Renamed Test Project',
             model_id: 1,
-            mosaic: 'naip.latest',
             model_name: 'NAIP Supervised'
         });
 
@@ -584,7 +613,6 @@ test('GET /api/project/1', async (t) => {
             name: 'Renamed Test Project',
             model_id: 1,
             model_name: 'NAIP Supervised',
-            mosaic: 'naip.latest',
             checkpoints: []
         });
 

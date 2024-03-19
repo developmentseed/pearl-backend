@@ -43,10 +43,20 @@ export default class Config {
         config.GpuImageTag = process.env.GpuImageTag || '';
         config.Deployment = process.env.Deployment || 'lulc-test-lulc-helm';
         config.GpuCount = process.env.GpuCount ? Number(process.env.GpuCount) : 2;
-        config.CpuCount = process.env.CpuCount ? Number(process.env.GpuCount) : 10;
+        config.CpuCount = process.env.CpuCount ? Number(process.env.CpuCount) : 10;
+
+        config.InstanceRequestCPU = process.env.InstanceRequestCPU || '1500m';
+        config.InstanceRequestMemory = process.env.InstanceRequestMemory || '4Gi';
+
+        config.InstanceLimitCPU = process.env.InstanceLimitCPU || '1500m';
+        config.InstanceLimitMemory = process.env.InstanceLimitMemory || '6Gi';
 
         config.ApiUrl = process.env.ApiUrl || '';
         config.SocketUrl = process.env.SocketUrl || '';
+
+        console.log('LiveInferenceSize', process.env.LiveInferenceSize);
+        config.LiveInferenceSize = process.env.LiveInferenceSize ? Number(process.env.LiveInferenceSize) : 100000000;
+        config.MaxInferenceSize = process.env.MaxInferenceSize ? Number(process.env.MaxInferenceSize) : 200000000;
 
         return config;
     }

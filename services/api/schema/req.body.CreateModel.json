@@ -6,6 +6,7 @@
         "model_type",
         "model_inputshape",
         "model_zoom",
+        "imagery_source_id",
         "classes",
         "meta"
     ],
@@ -24,10 +25,15 @@
             "description": "Has the model been uploaded to azure - this is normally set by the server and not the client",
             "default": false
         },
+        "imagery_source_id": {
+            "type": "integer"
+        },
         "model_type": {
             "type": "string",
             "description": "Underlying model type",
             "enum": [
+                "unet3",
+                "s2adeeplabv3plus",
                 "random_forest",
                 "pytorch_example",
                 "pytorch_solar",
@@ -62,6 +68,10 @@
         },
         "tagmap": {
             "$ref": "./util/osm-tagmap.json"
+        },
+        "imagery_source_id": {
+            "type": "integer",
+            "description": "The Imagery Sources that can be used with this model"
         }
     }
 }

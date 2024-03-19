@@ -1,8 +1,5 @@
 {
-    "type": [
-        "object",
-        "null"
-    ],
+    "type": "object",
     "description": "",
     "$comment": "geometry"
 }

@@ -1,0 +1,6 @@
+{
+    "action": "model#timeframe",
+    "data": {
+        "id": 1
+    }
+}

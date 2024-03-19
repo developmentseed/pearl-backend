@@ -1,7 +1,7 @@
-import EventEmitter from 'events';
+import EventEmitter from 'node:events';
 import Charm from 'charm';
-import readline from 'readline';
-import fs from 'fs';
+import readline from 'node:readline';
+import fs from 'node:fs';
 
 export class Progress {
     constructor(y, term) {
@@ -85,7 +85,7 @@ export class Prompt {
     }
 
     ask(question) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.resolve = resolve;
             this.current.shown = question;
             this.current.inp = '';

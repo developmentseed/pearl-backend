@@ -1,4 +1,4 @@
-import { promisify } from 'util';
+import { promisify } from 'node:util';
 import request from 'request';
 import Knex from 'knex';
 import Config from '../services/api/lib/config.js';
@@ -16,10 +16,11 @@ const state = {
     token: false,
     instance: false,
     checkpoints: [],
-    aois: []
+    aois: [],
+    timeframes: []
 };
 
-export function reconnect(test, API) {
+export function reconnect(test, API, argv) {
     running(test, API);
 
     test('pre-run', async (t) => {
@@ -46,7 +47,7 @@ export function reconnect(test, API) {
             const res = await prequest({
                 method: 'GET',
                 json: true,
-                url: API + '/api/project/1/instance/1',
+                url: API + '/api/project/${argv.project}/instance/1',
                 headers: {
                     Authorization: `Bearer ${state.token}`
                 }
@@ -70,7 +71,7 @@ export function reconnect(test, API) {
 
             t.deepEquals(res.body, {
                 is_batch: false,
-                project_id: 1,
+                project_id: parseInt(argv.project),
                 aoi_id: null,
                 checkpoint_id: null
             }, 'expected body');
@@ -87,7 +88,7 @@ export function reconnect(test, API) {
     return state;
 }
 
-export function connect(test, API) {
+export function connect(test, API, argv) {
     test('pre-run', async (t) => {
         try {
             await drop();
@@ -128,7 +129,7 @@ export function connect(test, API) {
 
     running(test, API);
 
-    test('new model', async (t) => {
+    test('NAIP Model', async (t) => {
         try {
             const res = await prequest({
                 method: 'POST',
@@ -138,6 +139,7 @@ export function connect(test, API) {
                     name: 'NAIP Supervised',
                     active: true,
                     model_type: 'pytorch_example',
+                    imagery_source_id: 1,
                     model_inputshape: [256, 256, 4],
                     model_zoom: 17,
                     classes: [
@@ -173,6 +175,7 @@ export function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
+                imagery_source_id: 1,
                 storage: false,
                 osmtag_id: null,
                 classes: [
@@ -196,7 +199,7 @@ export function connect(test, API) {
         t.end();
     });
 
-    test('new model - storage: true', async (t) => {
+    test('NAIP Model - storage: true', async (t) => {
         try {
             const res = await prequest({
                 method: 'PATCH',
@@ -225,6 +228,7 @@ export function connect(test, API) {
                 model_type: 'pytorch_example',
                 model_inputshape: [256, 256, 4],
                 model_zoom: 17,
+                imagery_source_id: 1,
                 storage: true,
                 osmtag_id: null,
                 classes: [
@@ -248,7 +252,135 @@ export function connect(test, API) {
         t.end();
     });
 
-    test('Project 1', async (t) => {
+    test('Sentinel Model', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/model',
+                body: {
+                    name: 'Sentinel',
+                    active: true,
+                    model_type: 's2adeeplabv3plus',
+                    imagery_source_id: 2,
+                    model_inputshape: [512, 512, 4],
+                    model_zoom: 13,
+                    classes: [
+                        {"name": "forest", "color": "#6CA966"},
+                        {"name": "dry_jungle", "color": "#B5C590"},
+                        {"name": "humid_jungle", "color": "#00A884"},
+                        {"name": "pasture", "color": "#DBD746"},
+                        {"name": "agriculture", "color": "#A96E2C"},
+                        {"name": "urban", "color": "#F10100"},
+                        {"name": "without_apparent_vegetation", "color": "#D0F3AB"},
+                        {"name": "water", "color": "#486DA2"},
+                        {"name": "scrub", "color": "#ABC964"},
+                        {"name": "bare_soil", "color": "#B3AC9F"}
+                    ],
+                    meta: {},
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.ok(parseInt(res.body.id), 'id: <integer>');
+
+            delete res.body.created;
+            delete res.body.id;
+
+            t.deepEquals(res.body, {
+                active: true,
+                uid: 1,
+                name: 'Sentinel',
+                active: true,
+                model_type: 's2adeeplabv3plus',
+                imagery_source_id: 2,
+                model_inputshape: [512, 512, 4],
+                model_zoom: 13,
+                storage: false,
+                classes: [
+                    {"name": "forest", "color": "#6CA966"},
+                    {"name": "dry_jungle", "color": "#B5C590"},
+                    {"name": "humid_jungle", "color": "#00A884"},
+                    {"name": "pasture", "color": "#DBD746"},
+                    {"name": "agriculture", "color": "#A96E2C"},
+                    {"name": "urban", "color": "#F10100"},
+                    {"name": "without_apparent_vegetation", "color": "#D0F3AB"},
+                    {"name": "water", "color": "#486DA2"},
+                    {"name": "scrub", "color": "#ABC964"},
+                    {"name": "bare_soil", "color": "#B3AC9F"}
+                ],
+                meta: {},
+                bounds: [ -180, -90, 180, 90 ],
+                osmtag_id: null
+            }, 'expected body');
+
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('Sentinel Model - storage: true', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'PATCH',
+                json: true,
+                url: API + '/api/model/2',
+                body: {
+                    storage: true
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.ok(parseInt(res.body.id), 'id: <integer>');
+
+            delete res.body.created;
+            delete res.body.id;
+
+            t.deepEquals(res.body, {
+                active: true,
+                uid: 1,
+                name: 'Sentinel',
+                active: true,
+                model_type: 's2adeeplabv3plus',
+                imagery_source_id: 2,
+                model_inputshape: [512, 512, 4],
+                model_zoom: 13,
+                storage: true,
+                classes: [
+                    {"name": "forest", "color": "#6CA966"},
+                    {"name": "dry_jungle", "color": "#B5C590"},
+                    {"name": "humid_jungle", "color": "#00A884"},
+                    {"name": "pasture", "color": "#DBD746"},
+                    {"name": "agriculture", "color": "#A96E2C"},
+                    {"name": "urban", "color": "#F10100"},
+                    {"name": "without_apparent_vegetation", "color": "#D0F3AB"},
+                    {"name": "water", "color": "#486DA2"},
+                    {"name": "scrub", "color": "#ABC964"},
+                    {"name": "bare_soil", "color": "#B3AC9F"}
+                ],
+                meta: {},
+                bounds: [ -180, -90, 180, 90 ],
+                osmtag_id: null
+            }, 'expected body');
+
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('Project 1 - NAIP', async (t) => {
         try {
             const res = await prequest({
                 method: 'POST',
@@ -256,8 +388,7 @@ export function connect(test, API) {
                 url: API + '/api/project',
                 body: {
                     name: 'Test Project',
-                    model_id: 1,
-                    mosaic: 'naip.latest'
+                    model_id: 1
                 },
                 headers: {
                     Authorization: `Bearer ${state.token}`
@@ -267,7 +398,7 @@ export function connect(test, API) {
             t.equals(res.statusCode, 200, '200 status code');
 
             t.deepEquals(Object.keys(res.body).sort(), [
-                'created', 'id', 'model_id', 'mosaic', 'name', 'uid', 'model_name'
+                'created', 'id', 'model_id', 'name', 'uid', 'model_name'
             ].sort(), 'expected props');
 
             t.ok(res.body.created, 'created: <date>');
@@ -279,8 +410,234 @@ export function connect(test, API) {
                 uid: 1,
                 name: 'Test Project',
                 model_id: 1,
-                mosaic: 'naip.latest',
                 model_name: 'NAIP Supervised'
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('AOI 1 - Seneca Rocks (small)', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project/1/aoi',
+                body: {
+                    name: 'Seneca Rocks, WV',
+                    bounds: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [ -79.38355922698973, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.830046580030306 ]
+                        ]]
+                    }
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'area', 'bookmarked', 'bookmarked_at', 'bounds', 'created', 'id', 'name', 'project_id', 'updated'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+            delete res.body.created;
+
+            t.ok(res.body.updated, 'updated: <date>');
+            delete res.body.updated;
+
+            t.deepEquals(res.body, {
+                id: 1,
+                name: 'Seneca Rocks, WV',
+                project_id: 1,
+                bookmarked: false,
+                bookmarked_at: null,
+                area: 722859,
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [ -79.38355922698973, 38.830046580030306, -79.37222957611084, 38.83666569946354 ],
+                    coordinates: [[
+                        [ -79.38355922698973, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.830046580030306 ]
+                    ]]
+                }
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('AOI 2 - Riverton (large)', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project/1/aoi',
+                body: {
+                    name: 'Riverton, WV',
+                    bounds: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [-79.4466018676758,38.72850983470067],
+                            [-79.40935134887695,38.72850983470067],
+                            [-79.40935134887695,38.756225137839074],
+                            [-79.4466018676758,38.756225137839074],
+                            [-79.4466018676758,38.72850983470067]
+                        ]]
+                    }
+
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'area', 'bookmarked', 'bookmarked_at', 'bounds', 'created', 'id', 'name', 'project_id', 'updated'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+            delete res.body.created;
+
+            t.ok(res.body.updated, 'updated: <date>');
+            delete res.body.updated;
+
+            t.deepEquals(res.body, {
+                id: 2,
+                project_id: 1,
+                bookmarked: false,
+                bookmarked_at: null,
+                area: 9964013,
+                name: 'Riverton, WV',
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [ -79.4466018676758, 38.72850983470067, -79.40935134887695, 38.756225137839074 ],
+                    coordinates: [[
+                        [-79.4466018676758,38.72850983470067],
+                        [-79.40935134887695,38.72850983470067],
+                        [-79.40935134887695,38.756225137839074],
+                        [-79.4466018676758,38.756225137839074],
+                        [-79.4466018676758,38.72850983470067]
+                    ]]
+                }
+
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('Project 2 - Sentinel', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project',
+                body: {
+                    name: 'Sentinel Project',
+                    model_id: 2
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'created', 'id', 'model_id', 'name', 'uid', 'model_name'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+
+            delete res.body.created;
+
+            t.deepEquals(res.body, {
+                id: 2,
+                uid: 1,
+                name: 'Sentinel Project',
+                model_id: 2,
+                model_name: 'Sentinel'
+            }, 'expected body');
+        } catch (err) {
+            t.error(err, 'no error');
+        }
+
+        t.end();
+    });
+
+    test('AOI 3 - Seneca Rocks (small)', async (t) => {
+        try {
+            const res = await prequest({
+                method: 'POST',
+                json: true,
+                url: API + '/api/project/2/aoi',
+                body: {
+                    name: 'Seneca Rocks, WV',
+                    bounds: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [ -79.38355922698973, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.830046580030306 ],
+                            [ -79.37222957611084, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.83666569946354 ],
+                            [ -79.38355922698973, 38.830046580030306 ]
+                        ]]
+                    }
+                },
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            });
+
+            t.equals(res.statusCode, 200, '200 status code');
+
+            t.deepEquals(Object.keys(res.body).sort(), [
+                'area', 'bookmarked', 'bookmarked_at', 'bounds', 'created', 'id', 'name', 'project_id', 'updated'
+            ].sort(), 'expected props');
+
+            t.ok(res.body.created, 'created: <date>');
+            delete res.body.created;
+
+            t.ok(res.body.updated, 'updated: <date>');
+            delete res.body.updated;
+
+            t.deepEquals(res.body, {
+                id: 3,
+                name: 'Seneca Rocks, WV',
+                project_id: 2,
+                bookmarked: false,
+                bookmarked_at: null,
+                area: 722859,
+                bounds: {
+                    type: 'Polygon',
+                    bounds: [ -79.38355922698973, 38.830046580030306, -79.37222957611084, 38.83666569946354 ],
+                    coordinates: [[
+                        [ -79.38355922698973, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.830046580030306 ],
+                        [ -79.37222957611084, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.83666569946354 ],
+                        [ -79.38355922698973, 38.830046580030306 ]
+                    ]]
+                }
             }, 'expected body');
         } catch (err) {
             t.error(err, 'no error');
@@ -294,7 +651,7 @@ export function connect(test, API) {
             const res = await prequest({
                 method: 'POST',
                 json: true,
-                url: API + '/api/project/1/instance',
+                url: API + `/api/project/${parseInt(argv.project)}/instance`,
                 body: {},
                 headers: {
                     Authorization: `Bearer ${state.token}`
@@ -305,7 +662,7 @@ export function connect(test, API) {
 
             t.deepEquals(Object.keys(res.body).sort(), [
                 'active',
-                'aoi_id',
+                'timeframe_id',
                 'checkpoint_id',
                 'created',
                 'id',
@@ -327,9 +684,9 @@ export function connect(test, API) {
             delete res.body.token;
 
             t.deepEquals(res.body, {
-                project_id: 1,
+                project_id: parseInt(argv.project),
                 batch: null,
-                aoi_id: null,
+                timeframe_id: null,
                 checkpoint_id: null,
                 active: false,
                 pod: {},
@@ -342,6 +699,7 @@ export function connect(test, API) {
 
         t.end();
     });
+
 
     populate(test, API, state);
 

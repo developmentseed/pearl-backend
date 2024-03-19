@@ -8,12 +8,11 @@
         "created",
         "updated",
         "aoi",
-        "name",
         "abort",
         "completed",
         "progress",
         "instance",
-        "bounds"
+        "mosaic"
     ],
     "additionalProperties": false,
     "properties": {
@@ -39,12 +38,15 @@
             "$ref": "./util/updated.json"
         },
         "aoi": {
-            "type": ["integer", "null"],
-            "description": "The completed AOI ID"
+            "type": ["object", "null"]
         },
-        "name": {
-            "type": "string",
-            "description": "The name of the AOI to be created"
+        "mosaic": {
+            "type": ["object", "null"],
+            "description": "The mosaic of the batch"
+        },
+        "timeframe": {
+            "type": ["object", "null"],
+            "description": "The completed TimeFrame"
         },
         "progress": {
             "type": "integer",
@@ -63,9 +65,6 @@
         "instance": {
             "type": "integer",
             "description": "Instance ID of batch"
-        },
-        "bounds": {
-            "$ref": "./util/polygon.json"
         }
     }
 }

@@ -17,15 +17,6 @@
         "updated": {
             "$ref": "./batch/updated.json"
         },
-        "aoi": {
-            "$ref": "./batch/aoi.json"
-        },
-        "name": {
-            "$ref": "./batch/name.json"
-        },
-        "bounds": {
-            "$ref": "./batch/bounds.json"
-        },
         "completed": {
             "$ref": "./batch/completed.json"
         },
@@ -40,6 +31,15 @@
         },
         "status": {
             "$ref": "./batch/status.json"
+        },
+        "aoi": {
+            "$ref": "./batch/aoi.json"
+        },
+        "timeframe": {
+            "$ref": "./batch/timeframe.json"
+        },
+        "mosaic": {
+            "$ref": "./batch/mosaic.json"
         }
     },
     "required": [
@@ -48,13 +48,13 @@
         "project_id",
         "created",
         "updated",
-        "aoi",
-        "name",
-        "bounds",
         "completed",
         "progress",
         "abort",
         "error",
-        "status"
+        "status",
+        "aoi",
+        "timeframe",
+        "mosaic"
     ]
 }

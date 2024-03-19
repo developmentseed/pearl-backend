@@ -17,9 +17,6 @@
         "last_update": {
             "$ref": "./instances/last_update.json"
         },
-        "aoi_id": {
-            "$ref": "./instances/aoi_id.json"
-        },
         "checkpoint_id": {
             "$ref": "./instances/checkpoint_id.json"
         },
@@ -28,6 +25,9 @@
         },
         "batch": {
             "$ref": "./instances/batch.json"
+        },
+        "timeframe_id": {
+            "$ref": "./instances/timeframe_id.json"
         }
     },
     "required": [
@@ -36,9 +36,9 @@
         "active",
         "created",
         "last_update",
-        "aoi_id",
         "checkpoint_id",
         "type",
-        "batch"
+        "batch",
+        "timeframe_id"
     ]
 }

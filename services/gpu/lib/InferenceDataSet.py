@@ -3,11 +3,15 @@ import sys
 import numpy as np
 from torch.utils.data.dataset import Dataset
 
+# This File servers as a default DataSet generator for models that don't
+# export their own custom InferenceDataSet class. Modifications to this file
+# must be generic to all models and contain no model-specific code
 
 class InferenceDataSet(Dataset):
-    def __init__(self, api, tiles):
+    def __init__(self, api, timeframe):
         self.api = api
-        self.tiles = tiles
+        self.mosaic = timeframe.mosaic
+        self.tiles = timeframe.tiles
 
     def __getitem__(self, idx):
         zxy = self.tiles[idx]
@@ -15,7 +19,7 @@ class InferenceDataSet(Dataset):
         in_memraster = False
         while in_memraster is False:
             try:
-                in_memraster = self.api.get_tile(zxy.z, zxy.x, zxy.y)
+                in_memraster = self.api.get_tile(self.mosaic, zxy.z, zxy.x, zxy.y)
             except:
                 print("InferenceDataSet ERROR", sys.exc_info()[0])
         tile = in_memraster.data
@@ -31,3 +35,4 @@ class InferenceDataSet(Dataset):
 
     def __len__(self):
         return len(self.tiles)
+

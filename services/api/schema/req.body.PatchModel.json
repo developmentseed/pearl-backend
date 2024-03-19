@@ -8,6 +8,9 @@
         "active": {
             "type": "boolean"
         },
+        "imagery_source_id": {
+            "type": "integer"
+        },
         "bounds": {
             "type": ["array", "null"],
             "description": "Recommended geographic area on which this model can be used",

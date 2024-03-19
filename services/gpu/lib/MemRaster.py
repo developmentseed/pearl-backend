@@ -2,10 +2,12 @@
 
 import mercantile
 import numpy as np
+import cv2
 import rasterio
 from rasterio.io import MemoryFile
 from rasterio.transform import from_bounds
 from rasterio.warp import transform_geom
+from skimage.transform import resize
 
 
 class MemRaster(object):
@@ -38,10 +40,19 @@ class MemRaster(object):
     def remove_buffer(self):
         """
         Removes 32 pixel buffer on each side of tile post inferece.
+        and resize images to 256x256
         """
         if self.buffered:
-            self.data = self.data[32:288, 32:288]
+            x = self.data.shape[0] - 32
+            y = self.data.shape[1] - 32
+
+            self.data = self.data[32:x, 32:y]
             self.buffered = False
+
+        if self.data.shape[0] != 256:
+            # order 0 is nearest neighbor
+            self.data = resize(image=self.data, output_shape=(256, 256), order=0)
+
         return self
 
     def clip(self, polygon):

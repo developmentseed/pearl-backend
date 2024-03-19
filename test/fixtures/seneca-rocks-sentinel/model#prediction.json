@@ -1,0 +1,7 @@
+{
+    "action": "model#prediction",
+    "data": {
+        "aoi_id": 3,
+        "mosaic": "2849689f57f1b3b9c1f725abb75aa411"
+    }
+}

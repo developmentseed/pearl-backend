@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "aoi_id": {
+            "$ref": "./aoi_timeframe_share/aoi_id.json"
+        },
+        "project_id": {
+            "$ref": "./aoi_timeframe_share/project_id.json"
+        },
+        "bounds": {
+            "$ref": "./aoi_timeframe_share/bounds.json"
+        },
+        "created": {
+            "$ref": "./aoi_timeframe_share/created.json"
+        },
+        "storage": {
+            "$ref": "./aoi_timeframe_share/storage.json"
+        },
+        "uuid": {
+            "$ref": "./aoi_timeframe_share/uuid.json"
+        },
+        "patches": {
+            "$ref": "./aoi_timeframe_share/patches.json"
+        },
+        "timeframe_id": {
+            "$ref": "./aoi_timeframe_share/timeframe_id.json"
+        },
+        "published": {
+            "$ref": "./aoi_timeframe_share/published.json"
+        }
+    },
+    "required": [
+        "aoi_id",
+        "project_id",
+        "bounds",
+        "created",
+        "storage",
+        "uuid",
+        "patches",
+        "timeframe_id",
+        "published"
+    ]
+}

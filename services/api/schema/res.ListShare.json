@@ -2,7 +2,6 @@
     "type": "object",
     "required": [
         "total",
-        "project_id",
         "shares"
     ],
     "additionalProperties": false,
@@ -20,21 +19,53 @@
                 "required": [
                     "uuid",
                     "aoi_id",
+                    "timeframe_id",
                     "created",
-                    "storage"
+                    "storage",
+                    "aoi",
+                    "timeframe",
+                    "mosaic",
+                    "model",
+                    "imagery",
+                    "checkpoint",
+                    "published"
                 ],
                 "additionalProperties": false,
                 "properties": {
                     "uuid": {
                         "type": "string"
                     },
+                    "aoi": {
+                        "type": "object"
+                    },
+                    "timeframe": {
+                        "type": "object"
+                    },
+                    "mosaic": {
+                        "type": "object"
+                    },
+                    "model": {
+                        "type": "object"
+                    },
+                    "imagery": {
+                        "type": "object"
+                    },
+                    "checkpoint": {
+                        "type": "object"
+                    },
                     "aoi_id": {
+                        "type": "integer"
+                    },
+                    "timeframe_id": {
                         "type": "integer"
                     },
                     "created": {
                         "$ref": "./util/created.json"
                     },
                     "storage": {
+                        "type": "boolean"
+                    },
+                    "published": {
                         "type": "boolean"
                     }
                 }

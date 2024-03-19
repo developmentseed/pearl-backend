@@ -1,0 +1,61 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "aoi_id",
+        "bookmarked",
+        "bookmarked_at",
+        "checkpoint_id",
+        "created",
+        "storage",
+        "patches",
+        "px_stats",
+        "classes",
+        "mosaic"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./util/id.json"
+        },
+        "aoi_id": {
+            "type": "integer"
+        },
+        "bookmarked": {
+            "type": ["boolean", "null"]
+        },
+        "bookmarked_at": {
+            "type": ["integer", "null"]
+        },
+        "checkpoint_id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "storage": {
+            "type": "boolean"
+        },
+        "patches": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        },
+        "px_stats": {
+            "type": "object"
+        },
+        "classes": {
+            "$ref": "./util/classes.json"
+        },
+        "mosaic": {
+            "type": "object"
+        },
+        "shares": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        }
+    }
+}

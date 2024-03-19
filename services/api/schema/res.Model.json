@@ -6,6 +6,7 @@
         "active",
         "uid",
         "name",
+        "imagery_source_id",
         "model_type",
         "model_inputshape",
         "model_zoom",
@@ -34,10 +35,15 @@
             "type": "boolean",
             "description": "Can the model be used for gpu instances"
         },
+        "imagery_source_id": {
+            "type": "integer"
+        },
         "model_type": {
             "type": "string",
             "description": "Underlying model type",
             "enum": [
+                "unet3",
+                "s2adeeplabv3plus",
                 "deeplabv3plus",
                 "random_forest",
                 "pytorch_example",

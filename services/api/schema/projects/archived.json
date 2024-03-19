@@ -1,8 +1,5 @@
 {
-    "type": [
-        "boolean",
-        "null"
-    ],
+    "type": "boolean",
     "description": "",
     "$comment": "bool"
 }

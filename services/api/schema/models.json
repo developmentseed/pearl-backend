@@ -40,6 +40,9 @@
         },
         "osmtag_id": {
             "$ref": "./models/osmtag_id.json"
+        },
+        "imagery_source_id": {
+            "$ref": "./models/imagery_source_id.json"
         }
     },
     "required": [
@@ -55,6 +58,7 @@
         "classes",
         "meta",
         "bounds",
-        "osmtag_id"
+        "osmtag_id",
+        "imagery_source_id"
     ]
 }

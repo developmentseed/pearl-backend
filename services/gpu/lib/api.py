@@ -1,41 +1,28 @@
-import json
-import logging
 import os
+import jwt
+import json
 import shutil
+import logging
 import zipfile
+import urllib3
+import requests
+import numpy as np
+import urllib.parse
 from io import BytesIO
 from os import path
-
-
-import jwt
-
-import numpy as np
-
-import requests
-import urllib3
+from .MemRaster import MemRaster
+from tiletanic import tileschemes
+from shapely.geometry import mapping
 from requests.adapters import HTTPAdapter
 from requests_toolbelt.multipart.encoder import MultipartEncoder
-from shapely.geometry import mapping
-from tiletanic import tileschemes
-
-from .MemRaster import MemRaster
+import http.client as http_client
 
 LOGGER = logging.getLogger("server")
 
 tiler = tileschemes.WebMercator()
 
-
-AVAILABLE_MOSAICS = {
-    'naip.latest': {
-        'id': '87b72c66331e136e088004fba817e3e8',
-        'default_params': {
-            'assets': 'image',
-            'asset_bidx': 'image|1,2,3,4',
-            'collection': 'naip',
-        }
-    }
-}
-
+# Cached Mosaics
+AVAILABLE_MOSAICS = {}
 
 class API:
     def __init__(self, url, instance_id):
@@ -96,11 +83,9 @@ class API:
         self.project = self.project_meta()
 
         self.model_id = self.project["model_id"]
-        self.mosaic_id = self.project["mosaic"]
 
         self.model = self.model_meta()
         self.model_dir = self.model_download()
-        self.mosaic = self.get_tilejson()
 
     def server_meta(self):
         url = self.url + "/api"
@@ -144,7 +129,10 @@ class API:
             },
             data=json.dumps(data),
         )
-        r.raise_for_status()
+
+        if not r.ok:
+            print('Checkpoint Error', r.json());
+            r.raise_for_status()
 
         LOGGER.info("ok - Received " + url)
 
@@ -154,13 +142,13 @@ class API:
 
         return body
 
-    def get_checkpoint(self, checkpointid):
+    def get_checkpoint(self, checkpoint_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/checkpoint/"
-            + str(checkpointid)
+            + str(checkpoint_id)
         )
         LOGGER.info("ok - GET " + url)
         r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
@@ -175,21 +163,21 @@ class API:
 
         return body
 
-    def upload_checkpoint(self, checkpointid):
+    def upload_checkpoint(self, checkpoint_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/checkpoint/"
-            + str(checkpointid)
+            + str(checkpoint_id)
             + "/upload"
         )
 
         LOGGER.info("ok - POST " + url)
 
-        ch_dir = self.tmp_checkpoints + "/" + str(checkpointid)
+        ch_dir = self.tmp_checkpoints + "/" + str(checkpoint_id)
 
-        zip_fs = self.tmp_dir + "/checkpoints/checkpoint-{}.zip".format(checkpointid)
+        zip_fs = self.tmp_dir + "/checkpoints/checkpoint-{}.zip".format(checkpoint_id)
 
         zipf = zipfile.ZipFile(zip_fs, "w", zipfile.ZIP_DEFLATED)
         for root, dirs, files in os.walk(ch_dir):
@@ -220,19 +208,19 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def download_checkpoint(self, checkpointid):
+    def download_checkpoint(self, checkpoint_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/checkpoint/"
-            + str(checkpointid)
+            + str(checkpoint_id)
             + "/download"
         )
 
         LOGGER.info("ok - GET " + url)
 
-        ch_dir = self.tmp_checkpoints + "/" + str(checkpointid)
+        ch_dir = self.tmp_checkpoints + "/" + str(checkpoint_id)
 
         r = self.requests.get(
             url,
@@ -243,17 +231,15 @@ class API:
 
         r.raise_for_status()
 
-        ch_zip_fs = self.tmp_dir + "/checkpoint-{}.zip".format(checkpointid)
+        ch_zip_fs = self.tmp_dir + "/checkpoint-{}.zip".format(checkpoint_id)
         with open(ch_zip_fs, "wb") as f:
-            for chunk in r.iter_content(chunk_size=1024):
+            for chunk in r.iter_content(chunk_size=10240):
                 if chunk:
                     f.write(chunk)
-                    f.flush()
-                    os.fsync(f.fileno())
 
         LOGGER.info("ok - Received " + url)
 
-        ch_dir = self.tmp_checkpoints + "/" + str(checkpointid)
+        ch_dir = self.tmp_checkpoints + "/" + str(checkpoint_id)
         os.makedirs(ch_dir, exist_ok=True)
 
         with zipfile.ZipFile(ch_zip_fs, "r") as zip_ref:
@@ -261,13 +247,15 @@ class API:
 
         return ch_dir
 
-    def create_patch(self, aoi_id):
+    def create_patch(self, aoi_id, timeframe_id):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoi_id)
+            + "/timeframe/"
+            + str(timeframe_id)
             + "/patch"
         )
 
@@ -285,13 +273,15 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_patch(self, aoiid, patchid, geotiff):
+    def upload_patch(self, aoiid, timeframeid, patchid, geotiff):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoiid)
+            + "/timeframe/"
+            + str(timeframeid)
             + "/patch/"
             + str(patchid)
             + "/upload"
@@ -299,7 +289,7 @@ class API:
 
         LOGGER.info("ok - POST " + url)
 
-        geo_path = self.tmp_dir + "/aoi-{}-patch-{}.tiff".format(aoiid, patchid)
+        geo_path = self.tmp_dir + "/aoi-{}-patch-{}.tiff".format(timeframeid, patchid)
         with open(geo_path, "wb") as filehandle:
             filehandle.write(geotiff.read())
 
@@ -332,8 +322,24 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
+    def timeframe_meta(self, timeframeid):
+        url = self.url + "/api/timeframe/" + str(timeframeid)
+
+        LOGGER.info("ok - GET " + url)
+        r = self.requests.get(url, headers={"authorization": "Bearer " + self.token})
+
+        r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
     def create_aoi(self, aoi):
-        url = self.url + "/api/project/" + str(self.project_id) + "/aoi"
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/aoi"
+        )
 
         LOGGER.info("ok - POST " + url)
         r = self.requests.post(
@@ -343,11 +349,7 @@ class API:
                 "content-type": "application/json",
             },
             data=json.dumps(
-                {
-                    "name": aoi.name,
-                    "checkpoint_id": aoi.checkpointid,
-                    "bounds": mapping(aoi.poly),
-                }
+                {"name": aoi["name"], "bounds": aoi["bounds"]}
             ),
         )
 
@@ -356,13 +358,45 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def upload_aoi(self, aoiid, geotiff):
+    def create_timeframe(self, timeframe):
+        url = (
+            self.url
+            + "/api/project/"
+            + str(self.project_id)
+            + "/aoi/"
+            + str(timeframe.aoi_id)
+            + "/timeframe"
+        )
+
+        LOGGER.info("ok - POST " + url + ' ' + json.dumps({"checkpoint_id": timeframe.checkpoint_id, "mosaic": timeframe.mosaic}))
+
+        r = self.requests.post(
+            url,
+            headers={
+                "authorization": "Bearer " + self.token,
+                "content-type": "application/json",
+            },
+            data=json.dumps(
+                {"checkpoint_id": timeframe.checkpoint_id, "mosaic": timeframe.mosaic}
+            ),
+        )
+
+        if not r.ok:
+            print('Timeframe Error', r.json());
+            r.raise_for_status()
+
+        LOGGER.info("ok - Received " + url)
+        return r.json()
+
+    def upload_timeframe(self, aoiid, timeframeid, geotiff):
         url = (
             self.url
             + "/api/project/"
             + str(self.project_id)
             + "/aoi/"
             + str(aoiid)
+            + "/timeframe/"
+            + str(timeframeid)
             + "/upload"
         )
 
@@ -390,10 +424,35 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tilejson(self):
-        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
+    def get_mosaic(self, mosaic):
+        url = (
+            self.url
+            + "/api/mosaic/"
+            + mosaic
+        )
+
+        LOGGER.info("ok - GET " + url)
+
+        r = self.requests.get(
+            url, headers={"authorization": "Bearer " + self.token}
+        )
+
+        LOGGER.info("ok - Received " + url)
+
+        r.raise_for_status()
+
+        return r.json()
+
+    def get_tilejson(self, mosaic):
+        if isinstance(mosaic, dict):
+            mosaic = mosaic["id"]
+
+        if AVAILABLE_MOSAICS.get(mosaic) is None:
+            AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
+
+        _mosaic = AVAILABLE_MOSAICS[mosaic]
         searchid = _mosaic["id"]
-        params = _mosaic.get("default_params", {})
+        params = _mosaic.get("params", {})
         url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/{searchid}/tilejson.json"
 
         LOGGER.info("ok - GET " + url)
@@ -404,35 +463,70 @@ class API:
         LOGGER.info("ok - Received " + url)
         return r.json()
 
-    def get_tile(self, z, x, y, iformat="npy", buffer=32, cache=True):
-        _mosaic = AVAILABLE_MOSAICS[self.mosaic_id]
-        searchid = _mosaic["id"]
-        params = _mosaic.get("default_params", {})
-        params.update(
-            {
-                'return_mask': False,
-                'buffer': buffer,
-            }
-        )
+    def get_tile(self, mosaic, z, x, y, iformat="npy", buffer=32, cache=True):
+        if isinstance(mosaic, dict):
+            mosaic = mosaic["id"]
 
-        url = os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}"
+        if AVAILABLE_MOSAICS.get(mosaic) is None:
+            AVAILABLE_MOSAICS[mosaic] = self.get_mosaic(mosaic)
+
+        _mosaic = AVAILABLE_MOSAICS[mosaic]
+
+        searchid = _mosaic["id"]
+        params = _mosaic.get("params", {})
+        params.update({ "return_mask": False, "buffer": buffer })
+
+        shape = self.model.get('model_inputshape', [256, 256, 4])
+        if shape[0] != shape[1]:
+            LOGGER.warn("not ok - model.inputshape[0] should equal model.inputshape[1] - defaulting to model.inputshape[0]");
+            shape[1] = shape[0]
+        if (shape[0] / 256).is_integer() is False:
+            LOGGER.warn("not ok - model.inputshape[0] should be a multiple of 256 - defaulting to 256");
+            shape[0] = 256
+            shape[1] = 256
+        if shape[2] < 3:
+            LOGGER.warn("not ok - model.inputshape[2] should be at least 3 - defaulting to 3");
+            shape[2] = 3
+
+
+        scale = shape[0] / 256;
+
+        if scale >= 4:
+            LOGGER.warn("not ok - scale cannot be greater than 3 - setting to 2 (512x512px)");
+            scale = 2; # 512px
+
+        params.update({ "scale": int(scale) });
+
+        url = (os.environ["PcTileUrl"] + f"/api/data/v1/mosaic/tiles/{searchid}/{z}/{x}/{y}.{iformat}")
 
         if iformat == "npy":
             tmpfs = "{}/tiles/{}-{}-{}.{}".format(self.tmp_dir, x, y, z, iformat)
             res = False
 
             if not cache or not os.path.isfile(tmpfs):
-                LOGGER.info("ok - GET " + url)
-                r = self.requests.get(url, params=params)
+                paramstp = [];
+                for item in params.items():
+                    if isinstance(item[1], list):
+                        for value in item[1]:
+                            paramstp.append((item[0], value))
+                    else:
+                        paramstp.append(item)
+
+                paramstp = urllib.parse.urlencode(paramstp, safe=':+')
+
+                LOGGER.info("ok - GET " + url + " " + str(paramstp))
+
+                r = self.requests.get(url, params=paramstp)
 
                 r.raise_for_status()
                 LOGGER.info("ok - Received " + url)
 
                 res = np.load(BytesIO(r.content))
 
-                assert res.shape == (4, 320, 320), "Unexpeccted Raster Numpy array"
+                assert res.shape == (shape[2], shape[0] + buffer * 2, shape[1] + buffer * 2), "Unexpected Raster Numpy array"
                 res = np.moveaxis(res, 0, -1)
-                assert res.shape == (320, 320, 4), "Failed to reshape numpy array"
+                res = res[..., :shape[2]]
+                assert res.shape == (shape[0] + buffer * 2, shape[1] + buffer * 2, shape[2]), "Failed to reshape numpy array"
 
                 np.save("{}/tiles/{}-{}-{}.npy".format(self.tmp_dir, x, y, z), res)
             else:
@@ -455,7 +549,7 @@ class API:
 
             return r.content
 
-    def instance_patch(self, aoi_id=None, checkpoint_id=None):
+    def instance_patch(self, timeframe_id=None, checkpoint_id=None):
         url = (
             self.url
             + "/api/project/"
@@ -465,8 +559,8 @@ class API:
         )
 
         data = {}
-        if aoi_id is not None:
-            data["aoi_id"] = aoi_id
+        if timeframe_id is not None:
+            data["timeframe_id"] = timeframe_id
         if checkpoint_id is not None:
             data["checkpoint_id"] = checkpoint_id
 

@@ -3,7 +3,7 @@
     "required": [
         "id",
         "project_id",
-        "aoi_id",
+        "timeframe_id",
         "created",
         "storage"
     ],
@@ -15,7 +15,7 @@
         "project_id": {
             "type": "integer"
         },
-        "aoi_id": {
+        "timeframe_id": {
             "type": "integer"
         },
         "created": {

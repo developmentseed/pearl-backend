@@ -14,6 +14,7 @@ from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 
 from .ModelSessionAbstract import ModelSession
+from ..InferenceDataSet import InferenceDataSet
 
 sys.path.append("..")
 LOGGER = logging.getLogger("server")
@@ -183,6 +184,9 @@ class LoadUnet(ModelSession):
         self.class_names_mapping = {
             k: v for v, k in enumerate(x["name"] for x in self.classes)
         }  # map class name to integer value
+
+    def loader(self, api, timeframe):
+         return InferenceDataSet(api, timeframe);
 
     @property
     def last_tile(self):
