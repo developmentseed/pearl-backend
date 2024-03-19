@@ -10,6 +10,10 @@
             "type": "string",
             "description": "The mosaic name for the TimeFrame"
         },
+        "checkpoint_id": {
+            "type": "integer",
+            "description": "The Checkpoint to load onto the instance"
+        },
         "aoi": {
             "type": "integer",
             "description": "The AOI to load onto the instance"
