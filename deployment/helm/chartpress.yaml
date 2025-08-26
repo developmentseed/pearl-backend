@@ -1,6 +1,6 @@
 charts:
   - name: pearl-helm
-    imagePrefix: ghcr.io.pearl-backend/lulc-
+    imagePrefix: ghcr.io/pearl-backend/lulc-
     repo:
        git: developmentseed/pearl-helm-chart
        published: https://devseed.com/pearl-helm-chart
