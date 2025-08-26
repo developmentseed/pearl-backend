@@ -32,6 +32,14 @@ jobs:
         login-server: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
         username: ${{ secrets.TERRAFORM_REGISTRY_USERNAME }}
         password: ${{ secrets.TERRAFORM_REGISTRY_PASSWORD }}
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Setup python
       uses: actions/setup-python@v2
       with:
