@@ -79,7 +79,12 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1, bounds=None):
 
     for i, coord in enumerate(coords):
         inside = True
-        if bounds is not None and (bounds[0] > coord[0] or bounds[1] > coord[1] or bounds[2] < coord[0] or bounds[3] < coord[1]):
+        if bounds is not None and (
+            bounds[0] > coord[0]
+            or bounds[1] > coord[1]
+            or bounds[2] < coord[0]
+            or bounds[3] < coord[1]
+        ):
             inside = False
 
         if inside:
@@ -90,7 +95,9 @@ def geom2px(coords, modelsrv, websocket=False, total=0, curr=1, bounds=None):
 
             pixels = rowcol(transform, *xy)
 
-            in_memraster = modelsrv.api.get_tile(xyz.z, xyz.x, xyz.y, iformat="npy")
+            in_memraster = modelsrv.api.get_tile(
+                modelsrv.timeframe.mosaic, xyz.z, xyz.x, xyz.y, iformat="npy"
+            )
 
             retrain = modelsrv.model.run(in_memraster.data)
             retrain = retrain[32:288, 32:288, :]
@@ -207,7 +214,7 @@ def rowcol(transform, xs, ys, op=math.floor, precision=None):
     if precision is None:
         eps = sys.float_info.epsilon
     elif isinstance(precision, int):
-        eps = 10.0 ** -precision
+        eps = 10.0**-precision
     else:
         eps = precision
 

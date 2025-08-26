@@ -76,9 +76,9 @@ spec:
             - name: GpuImageTag
               value: {{ .Values.gpu.image.tag }}
             - name: GpuCount
-              value: {{ .Values.api.GpuCount | quote }}
+              value: {{ .Values.api.gpuCount | quote }}
             - name: CpuCount
-              value: {{ .Values.api.CpuCount | quote }}
+              value: {{ .Values.api.cpuCount | quote }}
             - name: Deployment
               value: {{ template "lulc-helm.fullname" . }}
             - name: TileUrl
@@ -91,4 +91,16 @@ spec:
               value: ws://{{ template "lulc-helm.fullname" . }}-socket
             - name: AUTH0_ISSUER_BASE_URL
               value: {{ .Values.api.auth0BaseUrl }}
+            - name: LiveInferenceSize
+              value: {{ .Values.api.liveInferenceSize | quote }}
+            - name: MaxInferenceSize
+              value: {{ .Values.api.maxInferenceSize | quote }}
+            - name: InstanceRequestCPU
+              value: {{ .Values.api.instanceRequestCPU | quote }}
+            - name: InstanceRequestMemory
+              value: {{ .Values.api.instanceRequestMemory | quote }}
+            - name: InstanceLimitCPU
+              value: {{ .Values.api.instanceLimitCPU | quote }}
+            - name: InstanceLimitMemory
+              value: {{ .Values.api.instanceLimitMemory | quote }}
 {{- end }}

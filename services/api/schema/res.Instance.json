@@ -6,7 +6,7 @@
         "type",
         "active",
         "last_update",
-        "aoi_id",
+        "timeframe_id",
         "checkpoint_id",
         "created",
         "project_id"
@@ -32,7 +32,7 @@
         "active": {
             "type": "boolean"
         },
-        "aoi_id": {
+        "timeframe_id": {
             "type": ["integer", "null"]
         },
         "checkpoint_id": {

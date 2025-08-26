@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
 import Ajv from 'ajv';
 
 const ajv = new Ajv({ allErrors: true });

@@ -5,15 +5,11 @@
         "name",
         "bounds",
         "project_id",
-        "bookmarked",
-        "bookmarked_at",
-        "checkpoint_id",
         "created",
-        "storage",
-        "patches",
-        "px_stats",
+        "updated",
         "area",
-        "classes"
+        "bookmarked",
+        "bookmarked_at"
     ],
     "additionalProperties": false,
     "properties": {
@@ -32,38 +28,17 @@
         "project_id": {
             "type": "integer"
         },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
         "bookmarked": {
             "type": ["boolean", "null"]
         },
         "bookmarked_at": {
             "type": ["integer", "null"]
-        },
-        "checkpoint_id": {
-            "type": "integer"
-        },
-        "created": {
-            "type": "integer"
-        },
-        "storage": {
-            "type": "boolean"
-        },
-        "patches": {
-            "type": "array",
-            "items": {
-                "type": "integer"
-            }
-        },
-        "px_stats": {
-            "type": "object"
-        },
-        "classes": {
-            "$ref": "./util/classes.json"
-        },
-        "shares": {
-            "type": "array",
-            "items": {
-                "type": "object"
-            }
         }
     }
 }

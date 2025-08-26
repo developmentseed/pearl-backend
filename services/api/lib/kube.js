@@ -66,12 +66,12 @@ export default class Kube {
         if (type === 'cpu') {
             resources = {
                 requests: {
-                    cpu: '1500m',
-                    memory: '4Gi'
+                    cpu: this.config.InstanceRequestCPU,
+                    memory: this.config.InstanceRequestMemory
                 },
                 limits: {
-                    cpu: '1500m',
-                    memory: '6Gi'
+                    cpu: this.config.InstanceLimitCPU,
+                    memory: this.config.InstanceLimitMemory
                 }
             };
         }
@@ -81,7 +81,7 @@ export default class Kube {
 
         let volumes = [];
         let volumeMounts = [];
-        if (type === 'gpu') {
+        if (type === 'gpu' || type === 'cpu') {
             volumes = [{
                 name: 'dshm',
                 emptyDir: {
@@ -111,7 +111,7 @@ export default class Kube {
             },
             spec: {
                 containers: [{
-                    name: `instace-${type}-${name}`,
+                    name: `instance-${type}-${name}`,
                     image: `${gpuImageName}:${gpuImageTag}`,
                     resources: resources,
                     env: env,
@@ -146,7 +146,7 @@ export default class Kube {
     async deletePod(name) {
         const res = await this.k8sApi.deleteNamespacedPod(name, this.namespace);
         if (res.statusCode >= 400) {
-            return `REquest failed: ${res.statusMessage}`;
+            return `Request failed: ${res.statusMessage}`;
         }
         return res.body;
     }

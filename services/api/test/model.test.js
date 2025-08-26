@@ -94,6 +94,7 @@ test('POST /api/model', async (t) => {
             body: {
                 name: 'NAIP Supervised',
                 active: true,
+                imagery_source_id: 1,
                 model_type: 'pytorch_example',
                 model_inputshape: [240,240,4],
                 model_zoom: 17,
@@ -107,7 +108,7 @@ test('POST /api/model', async (t) => {
             }
         }, t);
 
-        t.deepEquals(Object.keys(res.body).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'model_zoom', 'name', 'storage', 'uid', 'osmtag_id'].sort(), 'body');
+        t.deepEquals(Object.keys(res.body).sort(), ['active', 'imagery_source_id', 'bounds', 'classes', 'created', 'id', 'meta', 'model_inputshape', 'model_type', 'model_zoom', 'name', 'storage', 'uid', 'osmtag_id'].sort(), 'body');
         t.ok(res.body.id, 1, '.id: 1');
     } catch (err) {
         t.error(err, 'no errors');
@@ -232,7 +233,7 @@ test('GET /api/model (storage: true)', async (t) => {
         t.equals(res.body.models.length, 1, '1 model');
 
         for (const model of res.body.models) {
-            t.deepEquals(Object.keys(model).sort(), ['active', 'bounds', 'classes', 'created', 'id', 'meta', 'name', 'storage', 'uid']);
+            t.deepEquals(Object.keys(model).sort(), ['active', 'imagery_source_id', 'bounds', 'classes', 'created', 'id', 'meta', 'name', 'storage', 'uid'].sort());
 
             t.ok(parseInt(model.id), 'id is int');
             t.ok(parseInt(model.uid), 'uid is int');
@@ -267,6 +268,7 @@ test('GET /api/model/1', async (t) => {
             osmtag_id: null,
             uid: 1,
             bounds: [-180, -90, 180, 90],
+            imagery_source_id: 1,
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',
             model_inputshape: [240, 240, 4],
@@ -309,6 +311,7 @@ test('PATCH /api/model/1', async (t) => {
             active: true,
             uid: 1,
             osmtag_id: null,
+            imagery_source_id: 1,
             bounds: [-1, -1, 1, 1],
             name: 'NAIP Supervised',
             model_type: 'pytorch_example',

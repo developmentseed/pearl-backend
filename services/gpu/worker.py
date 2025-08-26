@@ -11,6 +11,8 @@ from lib.models.ModelSessionPyTorchExample import TorchFineTuning
 from lib.models.ModelSessionUnet import LoadUnet
 from lib.models.ModelSessionDeepLabv3 import LoadDeepLabv3Plus
 from lib.models.ModelSessionUnet2 import LoadUnet2
+from lib.models.ModelSessionUnet3 import LoadUnet3
+from lib.models.ModelSessionS2ADeepLabv3plus import LoadS2ADeepLabv3plus
 from lib.ModelSrv import ModelSrv
 from lib.Router import Router
 from lib.utils import setup_logging
@@ -75,7 +77,9 @@ def main():
     )
     os.environ["SigningSecret"] = arg([os.environ.get("SigningSecret")], "dev-secret")
     os.environ["TileUrl"] = arg([os.environ.get("TileUrl")], "http://localhost:8000")
-    os.environ["PcTileUrl"] = arg([os.environ.get("PcTileUrl")], "https://planetarycomputer-staging.microsoft.com")
+    os.environ["PcTileUrl"] = arg(
+        [os.environ.get("PcTileUrl")], "https://planetarycomputer-staging.microsoft.com"
+    )
 
     api = API(os.environ["API"], os.environ["INSTANCE_ID"])
 
@@ -105,7 +109,7 @@ def connection(uri, model, api):
         router.on_act("model#osm", model.osm)
         router.on_act("model#retrain", model.retrain)
         router.on_act("model#checkpoint", model.load_checkpoint)
-        router.on_act("model#aoi", model.load_aoi)
+        router.on_act("model#timeframe", model.load_timeframe)
 
     router.on_act("model#status", model.status)
 
@@ -126,8 +130,12 @@ def load(gpu_id, api):
         model = LoadUnet(gpu_id, api.model_dir, api.model["classes"])
     elif model_type == "unet2":
         model = LoadUnet2(gpu_id, api.model_dir, api.model["classes"])
+    elif model_type == "unet3":
+        model = LoadUnet3(gpu_id, api.model_dir, api.model["classes"])
     elif model_type == "deeplabv3plus":
         model = LoadDeepLabv3Plus(gpu_id, api.model_dir, api.model["classes"])
+    elif model_type == "s2adeeplabv3plus":
+        model = LoadS2ADeepLabv3plus(gpu_id, api.model_dir, api.model["classes"])
     else:
         raise NotImplementedError("The given model type is not implemented yet.")
 
@@ -140,7 +148,7 @@ def arg(iterable, default=False, pred=None):
     If *pred* is not None, returns the first item
     for which pred(item) is true.
     """
-    return next(filter(pred, iterable), default)
+    return str(next(filter(pred, iterable), default))
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@
         "total",
         "project_id",
         "aoi_id",
+        "timeframe_id",
         "patches"
     ],
     "additionalProperties": false,
@@ -16,6 +17,9 @@
             "type": "integer"
         },
         "aoi_id": {
+            "type": "integer"
+        },
+        "timeframe_id": {
             "type": "integer"
         },
         "patches": {

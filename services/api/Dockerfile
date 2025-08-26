@@ -1,4 +1,4 @@
-FROM alpine:3.17
+FROM alpine:3.19
 
 RUN apk add --no-cache bash nodejs npm
 
@@ -9,7 +9,6 @@ WORKDIR $HOME
 COPY ./ $HOME/api
 WORKDIR $HOME/api
 
-RUN npm install \
-    && npm run doc
+RUN npm install
 
 CMD npm run dev

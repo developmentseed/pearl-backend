@@ -11,7 +11,7 @@
     },{
         "type": "static",
         "data": {
-            "message": "model#aoi",
+            "message": "model#timeframe",
             "data": {
                 "id": 1,
                 "live": true,
@@ -58,7 +58,7 @@
     },{
         "type": "static",
         "data": {
-            "message": "model#aoi",
+            "message": "model#timeframe",
             "data": {
                 "id": 2,
                 "live": true,

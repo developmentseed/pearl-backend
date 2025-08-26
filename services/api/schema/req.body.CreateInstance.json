@@ -3,9 +3,9 @@
     "required": [ ],
     "additionalProperties": false,
     "properties": {
-        "aoi_id": {
+        "timeframe_id": {
             "type": "integer",
-            "description": "The current AOI loaded on the instance"
+            "description": "The current TimeFrame loaded on the instance"
         },
         "checkpoint_id": {
             "type": "integer",

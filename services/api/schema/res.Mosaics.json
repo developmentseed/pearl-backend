@@ -1,0 +1,45 @@
+{
+    "type": "object",
+    "required": [
+        "mosaics"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "mosaics": {
+            "type": "array",
+            "description": "List of supported mosaics",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "params": {
+                        "type": "object"
+                    },
+                    "ui_params": {
+                        "type": "object"
+                    },
+                    "mosaic_ts_start": {
+                        "type": ["integer", "null"]
+                    },
+                    "mosaic_ts_end": {
+                        "type": ["integer", "null"]
+                    },
+                    "imagery_source_id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "updated": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

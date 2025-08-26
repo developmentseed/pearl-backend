@@ -13,17 +13,15 @@ export default class Batch extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} batchid Checkpoint the user is attemping to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(pool, auth, projectid, batchid) {
+    static async has_auth(pool, req) {
 
-        const proj = await Project.has_auth(pool, auth, projectid);
-        const batch = await this.from(pool, batchid);
+        const proj = await Project.has_auth(pool, req);
+        const batch = await this.from(pool, req.params.batchid);
 
         if (batch.project_id !== proj.id) {
-            throw new Err(400, null, `Batch #${batchid} is not associated with project #${projectid}`);
+            throw new Err(400, null, `Batch #${req.params.batchid} is not associated with project #${req.params.projectid}`);
         }
 
         return batch;
@@ -61,21 +59,23 @@ export default class Batch extends Generic {
             pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
-                    id,
-                    abort,
-                    created,
-                    updated,
-                    error,
-                    aoi,
-                    name,
-                    completed,
-                    progress
+                    batch.*,
+                    Row_To_JSON(mosaics.*) AS mosaic,
+                    Row_To_JSON(aois.*) AS aoi,
+                    Row_To_JSON(tf.*) AS timeframe
                 FROM
                     batch
+                        LEFT JOIN aoi_timeframe tf
+                            ON batch.timeframe = tf.id
+                        LEFT JOIN aois
+                            ON batch.aoi = aois.id
+                        LEFT JOIN mosaics
+                            ON batch.mosaic = mosaics.name
+                                OR batch.mosaic = mosaics.id
                 WHERE
                     uid = ${query.uid}
-                    AND project_id = ${query.projectid}
-                    AND (${query.completed}::BOOLEAN IS NULL OR ${query.completed} = completed)
+                    AND batch.project_id = ${query.projectid}
+                    AND (${query.completed}::BOOLEAN IS NULL OR ${query.completed} = batch.completed)
                 ORDER BY
                     ${sql.identifier(['batch', query.sort])} ${query.order}
                 LIMIT
@@ -88,5 +88,41 @@ export default class Batch extends Generic {
         }
 
         return this.deserialize_list(pgres);
+    }
+
+    /**
+     * Return a single Batch
+     *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     * @param {Number} id - Specific Batch id
+     */
+    static async from(pool, id) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+               SELECT
+                    batch.*,
+                    Row_To_JSON(mosaics.*) AS mosaic,
+                    Row_To_JSON(aois.*) AS aoi,
+                    Row_To_JSON(tf.*) AS timeframe
+                FROM
+                    batch
+                        LEFT JOIN aoi_timeframe tf
+                            ON batch.timeframe = tf.id
+                        LEFT JOIN aois
+                            ON batch.aoi = aois.id
+                        LEFT JOIN mosaics
+                            ON batch.mosaic = mosaics.name
+                                OR batch.mosaic = mosaics.id
+                WHERE
+                    batch.id = ${id}
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to get Batch');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Batch not found');
+
+        return this.deserialize(pool, pgres);
     }
 }

@@ -1,6 +1,6 @@
 {
     "type": [
-        "string",
+        "integer",
         "null"
     ],
     "format": "date-time",

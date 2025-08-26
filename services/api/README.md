@@ -117,12 +117,10 @@ variable will be used to connect.
 In development mode it is easier to add a `.env` to this folder to set environment variables, as the server loads them using [dotenv](https://www.npmjs.com/package/dotenv) module.
 
 #### Authentication with Auth0
+* Create a new Application in the Tenant and provide callback URLs to the frontend and localhost for testing. Copy the same values to Logout URLs and Allowed Web Origins.
+* Create an API in Auth0 and set the following environment variables:
 
-Create an API in Auth0 and set the following environment variables:
-
-- AUTH0_ISSUER_BASE_URL
-- AUTH0_CLIENT_ID
-- AUTH0_AUDIENCE
+- AUTH0_ISSUER_BASE_URL (make sure the URL has https://)
 
 #### `AZURE_STORAGE_CONNECTION_STRING` [optionalish]
 

@@ -1,0 +1,8 @@
+{
+    "type": "array",
+    "items": {
+        "type": "number",
+        "description": ""
+    },
+    "$comment": "int8[]"
+}

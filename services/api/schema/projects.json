@@ -17,9 +17,6 @@
         "model_id": {
             "$ref": "./projects/model_id.json"
         },
-        "mosaic": {
-            "$ref": "./projects/mosaic.json"
-        },
         "archived": {
             "$ref": "./projects/archived.json"
         }
@@ -30,7 +27,6 @@
         "name",
         "created",
         "model_id",
-        "mosaic",
         "archived"
     ]
 }

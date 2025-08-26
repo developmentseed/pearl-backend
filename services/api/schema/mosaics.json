@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./mosaics/id.json"
+        },
+        "name": {
+            "$ref": "./mosaics/name.json"
+        },
+        "params": {
+            "$ref": "./mosaics/params.json"
+        },
+        "imagery_source_id": {
+            "$ref": "./mosaics/imagery_source_id.json"
+        },
+        "created": {
+            "$ref": "./mosaics/created.json"
+        },
+        "updated": {
+            "$ref": "./mosaics/updated.json"
+        },
+        "mosaic_ts_start": {
+            "$ref": "./mosaics/mosaic_ts_start.json"
+        },
+        "mosaic_ts_end": {
+            "$ref": "./mosaics/mosaic_ts_end.json"
+        },
+        "ui_params": {
+            "$ref": "./mosaics/ui_params.json"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "params",
+        "imagery_source_id",
+        "created",
+        "updated",
+        "mosaic_ts_start",
+        "mosaic_ts_end",
+        "ui_params"
+    ]
+}

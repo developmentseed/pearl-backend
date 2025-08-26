@@ -1,0 +1,32 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./imagery_sources/id.json"
+        },
+        "created": {
+            "$ref": "./imagery_sources/created.json"
+        },
+        "updated": {
+            "$ref": "./imagery_sources/updated.json"
+        },
+        "name": {
+            "$ref": "./imagery_sources/name.json"
+        },
+        "bounds": {
+            "$ref": "./imagery_sources/bounds.json"
+        },
+        "collection_id": {
+            "$ref": "./imagery_sources/collection_id.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "name",
+        "bounds",
+        "collection_id"
+    ]
+}

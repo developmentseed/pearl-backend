@@ -5,13 +5,14 @@ dotenv.config();
 
 import fs from 'fs';
 import express from 'express';
-import jwt from 'express-jwt';
+import { expressjwt as jwt } from 'express-jwt';
 import jwks from 'jwks-rsa';
 import cors from 'cors';
 import minify from 'express-minify';
 import { ValidationError } from 'express-json-validator-middleware';
 import minimist from 'minimist';
 import { Pool } from '@openaddresses/batch-generic';
+import SwaggerUI from 'swagger-ui-express';
 
 import { fetchJSON } from './lib/util.js';
 import Kube from './lib/kube.js';
@@ -38,19 +39,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
 }
 
-/**
- * @apiDefine admin Admin
- *   The user must be an admin to use this endpoint
- */
-/**
- * @apiDefine user User
- *   A user must be logged in to use this endpoint
- */
-/**
- * @apiDefine public Public
- *   This API endpoint does not require authentication
- */
-
 export default async function server(config) {
     const app = express();
 
@@ -64,10 +52,9 @@ export default async function server(config) {
     });
 
     const schema = new Schema(express.Router(), {
-        schemas: new URL('./schema', import.meta.url)
+        schemas: new URL('./schema', import.meta.url),
+        openapi: true
     });
-
-    await schema.api();
 
     app.disable('x-powered-by');
     app.use(cors({
@@ -76,8 +63,6 @@ export default async function server(config) {
         credentials: true
     }));
     app.use(minify());
-
-    app.use('/docs', express.static('./doc'));
 
     /**
      * @api {get} /api Get Metadata
@@ -125,8 +110,8 @@ export default async function server(config) {
             version: pkg.version,
             qa_tiles: config.QA_Tiles,
             limits: {
-                live_inference: 100000000,
-                max_inference: 200000000,
+                live_inference: config.LiveInferenceSize,
+                max_inference: config.MaxInferenceSize,
                 instance_window: 600,
                 total_gpus: config.GpuCount,
                 total_cpus: config.CpuCount,
@@ -136,23 +121,6 @@ export default async function server(config) {
         });
     });
 
-    /**
-     * @api {get} /health Server Healthcheck
-     * @apiVersion 1.0.0
-     * @apiName Health
-     * @apiGroup Server
-     * @apiPermission public
-     *
-     * @apiDescription
-     *     AWS ELB Healthcheck for the server
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   {
-     *       "healthy": true,
-     *       "message": "Good to go"
-     *   }
-     */
     app.get('/health', (req, res) => {
         return res.json({
             healthy: true,
@@ -161,6 +129,8 @@ export default async function server(config) {
     });
 
     app.use('/api', schema.router);
+
+    await schema.api();
 
     /*
      * Validate Auth0 JWT tokens
@@ -224,6 +194,7 @@ export default async function server(config) {
             } else if (err instanceof ValidationError) {
                 return Err.respond(new Err(400, null, 'validation error'), res, err.validationErrors.body);
             } else if (err) {
+                console.log('error', err);
                 return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
             } else {
                 next();
@@ -233,28 +204,35 @@ export default async function server(config) {
             if (req.jwt.type === 'auth0') {
                 try {
                     // Load user from database, if exists
-                    const user = await User.from(config.pool, req.user.sub, 'auth0_id');
+                    const user = await User.from(config.pool, req.auth.sub, 'auth0_id');
                     req.auth = user;
                 } catch (err) {
                     // Fetch user metadata from Auth0
-                    const { body: auth0User } = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${req.jwt.token}`
-                        }
-                    });
+                    console.log('Failed to fetch user from DB', err);
+                    try {
+                        const auth0Data = await fetchJSON(`${config.Auth0IssuerBaseUrl}/userinfo`,{
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${req.jwt.token}`
+                            }
+                        });
+                        const auth0User = auth0Data.body;
 
-                    // Create user, add to request
-                    req.auth = await User.generate(config.pool, {
-                        access: 'user',
-                        auth0Id: auth0User.sub,
-                        username: auth0User.name,
-                        email: auth0User.email
-                    });
+                        // Create user, add to request
+                        req.auth = await User.generate(config.pool, {
+                            access: 'user',
+                            auth0Id: auth0User.sub,
+                            username: auth0User.name,
+                            email: auth0User.email
+                        });
 
-                    // Set auth type
-                    req.auth.type = 'auth0';
+                        // Set auth type
+                        req.auth.type = 'auth0';
+                    } catch (error) {
+                        console.log('Failed to create user', error);
+                        return Err.respond(new Err(500, null, 'Generic Internal Error'), res);
+                    }
                 }
             }
             next();
@@ -262,7 +240,6 @@ export default async function server(config) {
     ];
 
 
-    await schema.api();
     await schema.load(
         new URL('./routes/', import.meta.url),
         config,
@@ -271,10 +248,10 @@ export default async function server(config) {
         }
     );
 
+    app.use('/docs', SwaggerUI.serve, SwaggerUI.setup(schema.docs.base));
+
     schema.not_found();
     schema.error();
-
-    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
 
     return new Promise((resolve, reject) => {
         const srv = app.listen(config.Port, (err) => {

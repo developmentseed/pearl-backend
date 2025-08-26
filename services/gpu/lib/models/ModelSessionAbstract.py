@@ -27,6 +27,20 @@ class ModelSession(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def loader(self, api, timeframe):
+        """Responsible for returning a DatSet loader. Models can either implement their own or return an
+            instantiated version of the provided default InferenceDataSet
+
+        Args:
+            api: API Object for fetching Tiles
+            timeframe: The timeframe that is currently loaded
+
+        Returns:
+            InerenceDataSet
+        """
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def run(self, tile, inference_mode=False):
         """Responsible for running the model on arbitrarily sized inputs.
 

@@ -1,5 +1,4 @@
 import Err from '@openaddresses/batch-error';
-import Mosaic from '../lib/mosaic.js';
 import Project from '../lib/types/project.js';
 import AOI from '../lib/types/aoi.js';
 import Model from '../lib/types/model.js';
@@ -35,7 +34,7 @@ export default async function router(schema, config) {
                 }
             }
 
-            res.json(results);
+            return res.json(results);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -50,7 +49,7 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            const proj = await Project.has_auth(config.pool, req);
 
             const json = proj.serialize();
 
@@ -76,8 +75,6 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            if (!req.body.mosaic || !Mosaic.list().mosaics.includes(req.body.mosaic)) throw new Err(400, null, 'Invalid Mosaic');
-
             const model = await Model.from(config.pool, req.body.model_id);
 
             if (!model.storage) throw new Err(400, null, 'Model has not been uploaded');
@@ -106,7 +103,7 @@ export default async function router(schema, config) {
         res: 'res.Project.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            const proj = await Project.has_auth(config.pool, req);
             await proj.commit(req.body);
 
             const json = proj.serialize();
@@ -127,33 +124,25 @@ export default async function router(schema, config) {
         res: 'res.Standard.json'
     }, config.requiresAuth, async (req, res) => {
         try {
-            const proj = await Project.has_auth(config.pool, req.auth, req.params.projectid);
+            const proj = await Project.has_auth(config.pool, req);
 
             const insts = await Instance.list(config.pool, req.params.projectid);
             for (const inst of insts.instances) {
-                if (inst.active) throw new Error(400, null, 'Cannot continue project deletion with active instance');
-
-                const instance = new Instance();
-                instance.id = inst.id;
-                await instance.delete();
+                if (inst.active) throw new Err(400, null, 'Cannot continue project deletion with active instance');
+                await Instance.delete(config.pool, inst.id);
             }
 
             // TODO - Add support for paging aois/checkpoints/instances for projects with > 100 features
             const aois = await AOI.list(config.pool, req.params.projectid);
-            aois.aois.forEach(async (a) => {
-                const aoi = await AOI.from(config.pool, a.id);
-                await aoi.commit({
-                    archived: true
-                });
-            });
+
+            for (const a of aois.aois) {
+                await AOI.commit(config.pool, a.id, { archived: true });
+            }
 
             const chkpts = await Checkpoint.list(config.pool, req.params.projectid);
-            chkpts.checkpoints.forEach(async (c) => {
-                const ch = await Checkpoint.from(config.pool, c.id);
-                await ch.commit({
-                    archived: true
-                });
-            });
+            for (const c of chkpts.checkpoints) {
+                await Checkpoint.commit(config.pool, c.id, { archived: true });
+            }
 
             await proj.commit({
                 archived: true

@@ -12,13 +12,12 @@ export default class Project extends Generic {
      * Ensure a user can only access their own projects (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(pool, auth, projectid) {
-        const proj = await Project.from(pool, projectid);
+    static async has_auth(pool, req) {
+        const proj = await Project.from(pool, req.params.projectid);
 
-        if (auth.access !== 'admin' && auth.id !== proj.uid) {
+        if (req.auth.access !== 'admin' && req.auth.id !== proj.uid) {
             throw new Err(403, null, 'Cannot access a project you are not the owner of');
         }
 

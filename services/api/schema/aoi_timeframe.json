@@ -1,0 +1,60 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./aoi_timeframe/id.json"
+        },
+        "checkpoint_id": {
+            "$ref": "./aoi_timeframe/checkpoint_id.json"
+        },
+        "created": {
+            "$ref": "./aoi_timeframe/created.json"
+        },
+        "storage": {
+            "$ref": "./aoi_timeframe/storage.json"
+        },
+        "bookmarked": {
+            "$ref": "./aoi_timeframe/bookmarked.json"
+        },
+        "patches": {
+            "$ref": "./aoi_timeframe/patches.json"
+        },
+        "px_stats": {
+            "$ref": "./aoi_timeframe/px_stats.json"
+        },
+        "archived": {
+            "$ref": "./aoi_timeframe/archived.json"
+        },
+        "bookmarked_at": {
+            "$ref": "./aoi_timeframe/bookmarked_at.json"
+        },
+        "classes": {
+            "$ref": "./aoi_timeframe/classes.json"
+        },
+        "aoi_id": {
+            "$ref": "./aoi_timeframe/aoi_id.json"
+        },
+        "mosaic": {
+            "$ref": "./aoi_timeframe/mosaic.json"
+        },
+        "mosaic_ts": {
+            "$ref": "./aoi_timeframe/mosaic_ts.json"
+        }
+    },
+    "required": [
+        "id",
+        "checkpoint_id",
+        "created",
+        "storage",
+        "bookmarked",
+        "patches",
+        "px_stats",
+        "archived",
+        "bookmarked_at",
+        "classes",
+        "aoi_id",
+        "mosaic",
+        "mosaic_ts"
+    ]
+}

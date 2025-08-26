@@ -10,6 +10,8 @@ flight.user(test, 'ingalls', true);
 
 flight.fixture(test, 'model.json', 'ingalls');
 flight.fixture(test, 'project.json', 'ingalls');
+flight.fixture(test, 'checkpoint.json', 'ingalls');
+flight.fixture(test, 'aoi.json', 'ingalls');
 
 test('GET /api/project/1/batch (empty)', async (t) => {
     try {
@@ -46,7 +48,7 @@ test('GET /api/project/1/batch/1 (does not exist)', async (t) => {
 
         t.deepEquals(res.body, {
             status: 404,
-            message: 'batch not found',
+            message: 'Batch not found',
             messages: []
         });
     } catch (err) {
@@ -66,17 +68,8 @@ test('POST /api/project/1/batch', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             },
             body: {
-                name: 'Area',
-                bounds: {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [-79.37724530696869, 38.83428180092151],
-                        [-79.37677592039108, 38.83428180092151],
-                        [-79.37677592039108, 38.83455550411051],
-                        [-79.37724530696869, 38.83455550411051],
-                        [-79.37724530696869, 38.83428180092151]
-                    ]]
-                }
+                aoi: 1,
+                mosaic: 'naip.latest'
             }
         }, t);
 
@@ -85,19 +78,19 @@ test('POST /api/project/1/batch', async (t) => {
         t.ok(res.body.updated);
         delete res.body.updated;
 
+        t.ok(res.body.mosaic && typeof res.body.mosaic === 'object');
+        delete res.body.mosaic;
+        t.ok(res.body.aoi && typeof res.body.aoi === 'object');
+        delete res.body.aoi;
+
         t.deepEquals(res.body, {
             id: 1,
             uid: 1,
             project_id: 1,
             progress: 0,
-            aoi: null,
-            name: 'Area',
+            timeframe: null,
             abort: false,
             error: null,
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]]
-            },
             completed: false,
             instance: 1
         });
@@ -131,7 +124,7 @@ test('GET /api/project/1/instance/1', async (t) => {
             id: 1,
             batch: 1,
             project_id: 1,
-            aoi_id: null,
+            timeframe_id: null,
             checkpoint_id: null,
             active: false,
             type: 'cpu',
@@ -169,17 +162,8 @@ test('POST /api/project/1/batch', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             },
             body: {
-                name: 'Area',
-                bounds: {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [-79.37724530696869, 38.83428180092151],
-                        [-79.37677592039108, 38.83428180092151],
-                        [-79.37677592039108, 38.83455550411051],
-                        [-79.37724530696869, 38.83455550411051],
-                        [-79.37724530696869, 38.83428180092151]
-                    ]]
-                }
+                aoi: 1,
+                mosaic: 'naip.latest'
             }
         }, false);
 
@@ -245,18 +229,8 @@ test('POST /api/project/1/batch', async (t) => {
                 Authorization: `Bearer ${flight.token.ingalls}`
             },
             body: {
-                name: 'Area',
-                checkpoint_id: 1,
-                bounds: {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [-79.37724530696869, 38.83428180092151],
-                        [-79.37677592039108, 38.83428180092151],
-                        [-79.37677592039108, 38.83455550411051],
-                        [-79.37724530696869, 38.83455550411051],
-                        [-79.37724530696869, 38.83428180092151]
-                    ]]
-                }
+                aoi: 1,
+                mosaic: 'naip.latest'
             }
         }, t);
 
@@ -265,59 +239,21 @@ test('POST /api/project/1/batch', async (t) => {
         t.ok(res.body.updated);
         delete res.body.updated;
 
+        t.ok(res.body.mosaic && typeof res.body.mosaic === 'object');
+        delete res.body.mosaic;
+        t.ok(res.body.aoi && typeof res.body.aoi === 'object');
+        delete res.body.aoi;
+
         t.deepEquals(res.body, {
             id: 2,
             uid: 1,
             project_id: 1,
             progress: 0,
-            aoi: null,
-            name: 'Area',
+            timeframe: null,
             abort: false,
             error: null,
-            bounds: {
-                type: 'Polygon',
-                coordinates: [[[-79.37724530696869, 38.83428180092151], [-79.37677592039108, 38.83428180092151], [-79.37677592039108, 38.83455550411051], [-79.37724530696869, 38.83455550411051], [-79.37724530696869, 38.83428180092151]]]
-            },
             completed: false,
             instance: 2
-        });
-
-    } catch (err) {
-        t.error(err);
-    }
-
-    t.end();
-});
-
-test('POST /api/project/1/batch - invalid checkpoint', async (t) => {
-    try {
-        const res = await flight.request({
-            json: true,
-            url: '/api/project/1/batch',
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${flight.token.ingalls}`
-            },
-            body: {
-                name: 'Area',
-                checkpoint_id: 2,
-                bounds: {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [-79.37724530696869, 38.83428180092151],
-                        [-79.37677592039108, 38.83428180092151],
-                        [-79.37677592039108, 38.83455550411051],
-                        [-79.37724530696869, 38.83455550411051],
-                        [-79.37724530696869, 38.83428180092151]
-                    ]]
-                }
-            }
-        }, false);
-
-        t.deepEquals(res.body, {
-            status: 404,
-            message: 'Checkpoint not found',
-            messages: []
         });
 
     } catch (err) {
@@ -438,6 +374,44 @@ test('GET /api/project/1/instance - batch: 1', async (t) => {
             }]
         });
 
+    } catch (err) {
+        t.error(err);
+    }
+
+    t.end();
+});
+
+test('GET /api/project/1/batch', async (t) => {
+    try {
+        const res = await flight.request({
+            json: true,
+            url: '/api/project/1/batch',
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${flight.token.ingalls}`
+            }
+        }, t);
+
+        for (const batch of res.body.batch) {
+            t.ok(batch.created);
+            delete batch.created;
+            t.ok(batch.updated);
+            delete batch.updated;
+
+            t.ok(batch.mosaic && typeof batch.mosaic === 'object');
+            delete batch.mosaic;
+            t.ok(batch.aoi && typeof batch.aoi === 'object');
+            delete batch.aoi;
+        }
+
+        t.deepEquals(res.body, {
+            total: 2,
+            batch: [{
+                id: 1, completed: false, progress: 0, abort: false, error: null, timeframe: null
+            },{
+                id: 2, completed: false, progress: 0, abort: false, error: null, timeframe: null
+            }]
+        });
     } catch (err) {
         t.error(err);
     }

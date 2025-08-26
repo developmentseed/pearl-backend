@@ -31,6 +31,7 @@ spec:
                   values:
                     - "gpunodepool"
                     - "tiler"
+                    - "cpunodepool"
       containers:
         - name: {{ .Chart.Name }}-socket
           image: "{{ .Values.socket.image.name }}:{{ .Values.socket.image.tag }}"

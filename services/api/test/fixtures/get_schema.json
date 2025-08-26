@@ -4,44 +4,19 @@
         "query": true,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/patch": {
+    "GET /openapi": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /share": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch": {
         "body": false,
         "query": true,
-        "res": true
-    },
-    "POST /project/:projectid/aoi/:aoiid/patch": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /project/:projectid/aoi/:aoiid/patch/:patchid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/tiles/:z/:x/:y": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /project/:projectid/aoi/:aoiid/patch/:patchid/download": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "POST /project/:projectid/aoi/:aoiid/patch/:patchid/upload": {
-        "body": false,
-        "query": false,
         "res": true
     },
     "GET /project/:projectid/aoi/:aoiid": {
@@ -49,34 +24,109 @@
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/tiles": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
         "body": false,
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/tiles/:z/:x/:y": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "POST /project/:projectid/aoi/:aoiid/upload": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles": {
         "body": false,
         "query": false,
         "res": true
     },
-    "GET /project/:projectid/aoi/:aoiid/download/raw": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/tiles/:z/:x/:y": {
         "body": false,
         "query": false,
         "res": false
     },
-    "GET /project/:projectid/aoi/:aoiid/download/color": {
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid": {
         "body": false,
         "query": false,
-        "res": false
+        "res": true
+    },
+    "GET /project/:projectid/checkpoint/:checkpointid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/batch": {
+        "body": false,
+        "query": true,
+        "res": true
     },
     "GET /project/:projectid/aoi": {
         "body": false,
         "query": true,
+        "res": true
+    },
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/upload": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/raw": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/download/color": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /project/:projectid/instance": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/checkpoint/:checkpointid/osmtag": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/tiles/:z/:x/:y": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/download": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /project/:projectid/batch": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/checkpoint/:checkpointid/tiles": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /user": {
+        "body": true,
+        "query": false,
         "res": true
     },
     "POST /project/:projectid/aoi": {
@@ -84,12 +134,232 @@
         "query": false,
         "res": true
     },
-    "POST /project/:projectid/aoi/:aoiid/share": {
+    "GET /imagery": {
         "body": false,
         "query": false,
         "res": true
     },
-    "DELETE /project/:projectid/aoi/:aoiid/share/:shareuuid": {
+    "GET /project/:projectid/aoi/:aoiid/timeframe": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/patch/:patchid/upload": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PATCH /project/:projectid/instance/:instanceid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/batch/:batchid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /model": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /project/:projectid/checkpoint/:checkpointid/upload": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/checkpoint/:checkpointid/download": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /mosaic": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /tiles": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PATCH /project/:projectid/aoi/:aoiid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /project": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /project/:projectid/aoi/:aoiid/timeframe": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /tiles/:layer": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "DELETE /project/:projectid/aoi/:aoiid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PATCH /project/:projectid/batch/:batchid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/instance": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /tiles/:layer/:z/:x/:y.mvt": {
+        "body": false,
+        "query": true,
+        "res": false
+    },
+    "GET /project/:projectid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /mosaic": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /project/:projectid/checkpoint": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "PATCH /model/:modelid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /websocket": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /token": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /mosaic/:mosaic": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PATCH /share/:shareuuid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /project/:projectid/instance/:instanceid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /user": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "GET /mosaic/:mosaic/tiles": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /mosaic/:layer/tiles/:z/:x/:y.:format": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "DELETE /share/:shareuuid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /model/:modelid/upload": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /project": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /instance/:instanceid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "DELETE /instance": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "POST /token": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /project/:projectid/checkpoint": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /token/:tokenid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /project/:projectid/aoi/:aoiid/timeframe/:timeframeid/share": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "PATCH /project/:projectid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "PATCH /user/:userid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /project/:projectid/checkpoint/:checkpointid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /model": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "DELETE /project/:projectid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "DELETE /model/:modelid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /user/me": {
         "body": false,
         "query": false,
         "res": true
@@ -99,12 +369,37 @@
         "query": true,
         "res": true
     },
-    "DELETE /project/:projectid/aoi/:aoiid": {
+    "GET /model/:modelid": {
         "body": false,
         "query": false,
         "res": true
     },
-    "PATCH /project/:projectid/aoi/:aoiid": {
+    "GET /user/:userid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "PATCH /project/:projectid/checkpoint/:checkpointid": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "DELETE /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /model/:modelid/osmtag": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "GET /model/:modelid/download": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "PATCH /project/:projectid/aoi/:aoiid/timeframe/:timeframeid": {
         "body": true,
         "query": false,
         "res": true
@@ -134,242 +429,7 @@
         "query": false,
         "res": false
     },
-    "GET /project/:projectid/batch": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /project/:projectid/batch": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/batch/:batchid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "PATCH /project/:projectid/batch/:batchid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/checkpoint/:checkpointid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/checkpoint/:checkpointid/osmtag": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/checkpoint/:checkpointid/tiles": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/checkpoint/:checkpointid/tiles/:z/:x/:y.mvt": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "POST /project/:projectid/checkpoint/:checkpointid/upload": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/checkpoint/:checkpointid/download": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /project/:projectid/checkpoint": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /project/:projectid/checkpoint": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /project/:projectid/checkpoint/:checkpointid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "PATCH /project/:projectid/checkpoint/:checkpointid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /project/:projectid/instance": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "PATCH /project/:projectid/instance/:instanceid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /project/:projectid/instance": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "GET /project/:projectid/instance/:instanceid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /instance/:instanceid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "DELETE /instance": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "POST /model": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "PATCH /model/:modelid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /model/:modelid/upload": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /model": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "DELETE /model/:modelid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /model/:modelid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /model/:modelid/osmtag": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /model/:modelid/download": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /mosaic": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /mosaic/:layer": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /mosaic/:layer/tiles/:z/:x/:y.:format": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /project": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "GET /project/:projectid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /project": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "PATCH /project/:projectid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /project/:projectid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /user": {
-        "body": false,
-        "query": false,
-        "res": false
-    },
-    "GET /tiles": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /tiles/:layer": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /tiles/:layer/:z/:x/:y.mvt": {
-        "body": false,
-        "query": true,
-        "res": false
-    },
-    "GET /token": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /token": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "DELETE /token/:tokenid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /user": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "PATCH /user/:userid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /user/me": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /user/:userid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /websocket": {
+    "GET /timeframe/:timeframeid": {
         "body": false,
         "query": false,
         "res": true

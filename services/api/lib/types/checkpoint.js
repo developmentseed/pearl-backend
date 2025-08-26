@@ -14,16 +14,14 @@ export default class CheckPoint extends Generic {
      * Ensure a user can only access their own project assets (or is an admin and can access anything)
      *
      * @param {Pool} pool Instantiated Postgres Pool
-     * @param {Object} auth req.auth object
-     * @param {Number} projectid Project the user is attempting to access
-     * @param {Number} checkpointid Checkpoint the user is attemping to access
+     * @param {Object} req Express Req Object
      */
-    static async has_auth(pool, auth, projectid, checkpointid) {
-        const proj = await Project.has_auth(pool, auth, projectid);
-        const checkpoint = await CheckPoint.from(pool, checkpointid);
+    static async has_auth(pool, req) {
+        const proj = await Project.has_auth(pool, req);
+        const checkpoint = await CheckPoint.from(pool, req.params.checkpointid);
 
         if (checkpoint.project_id !== proj.id) {
-            throw new Err(400, null, `Checkpoint #${checkpointid} is not associated with project #${projectid}`);
+            throw new Err(400, null, `Checkpoint #${req.params.checkpointid} is not associated with project #${req.params.projectid}`);
         }
 
         return checkpoint;

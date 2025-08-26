@@ -1,0 +1,51 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "imagery_sources"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "imagery_sources": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "collection_id",
+                    "bounds",
+                    "created",
+                    "updated",
+                    "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "$ref": "./util/id.json"
+                    },
+                    "collection_id": {
+                        "$ref": "./imagery_sources/collection_id.json"
+                    },
+                    "created": {
+                        "$ref": "./imagery_sources/created.json"
+                    },
+                    "updated": {
+                        "$ref": "./imagery_sources/updated.json"
+                    },
+                    "bounds": {
+                        "type": "object",
+                        "description": "GeoJSON Bounds of the Imagery Sources"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Human-readable name of the Group"
+                    }
+                }
+            }
+        }
+    }
+}

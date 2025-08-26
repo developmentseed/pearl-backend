@@ -74,14 +74,17 @@ class OSM:
 
         tags = []
         for ele in cls.get("tagmap", []):
-            tags.append({
-                "key": ele.get("key", ""),
-                "value": re.compile(ele.get("value", ""))
-            })
+            tags.append(
+                {"key": ele.get("key", ""), "value": re.compile(ele.get("value", ""))}
+            )
 
         with open(self.cache) as f:
             if len(tags) == 0:
-                LOGGER.info("ok - Empty Layer (no tags): {}: {}".format(cls.get("name"), extract.name))
+                LOGGER.info(
+                    "ok - Empty Layer (no tags): {}: {}".format(
+                        cls.get("name"), extract.name
+                    )
+                )
             else:
                 for feat in f.readlines():
                     feat = json.loads(feat)
