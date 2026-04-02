@@ -25,15 +25,15 @@ jobs:
       servicePrincipalKey: ${{ secrets.TERRAFORM_SERVICE_PRINCIPAL_KEY }}
       storageAccessKey: ${{ secrets.TERRAFORM_STORAGE_KEY }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
     - name: Login to Azure Container Registry
-      uses: azure/docker-login@v1
+      uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1
       with:
         login-server: ${{ env.STAGING_REGISTRY_NAME }}.azurecr.io
         username: ${{ secrets.TERRAFORM_REGISTRY_USERNAME }}
         password: ${{ secrets.TERRAFORM_REGISTRY_PASSWORD }}
     - name: Setup python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@e9aba2c848f5ebd159c070c61ea2c4e2b122355e # v2
       with:
         python-version: '3.11'
     - name: Setup git
