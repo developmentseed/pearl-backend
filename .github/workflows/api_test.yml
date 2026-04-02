@@ -16,13 +16,13 @@ jobs:
     env:
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.LULCCI_ASCS }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
 
       - name: Docker Pull
         run: docker-compose pull
 
       - name: Docker Layer Caching
-        uses: satackey/action-docker-layer-caching@v0.0.11
+        uses: satackey/action-docker-layer-caching@46d2c640b1d8ef50d185452ad6fb324e6bd1d052 # v0.0.11
         continue-on-error: true
 
       - name: Docker Build
